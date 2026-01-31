@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router.dart';
-import 'package:monikid/core/theme/app_theme.dart';
+import 'package:monikid/core/theme/theme.dart';
 
 /// Main App Widget
 class MoniKidApp extends ConsumerWidget {

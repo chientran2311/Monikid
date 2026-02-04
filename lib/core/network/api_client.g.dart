@@ -20,12 +20,12 @@ class _ApiClient implements ApiClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<PostResponse> getPosts(int userId, int id) async {
+  Future<List<PostResponseItem>> getPosts() async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'userId': userId, r'id': id};
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<PostResponse>(
+    final _options = _setStreamType<List<PostResponseItem>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -35,10 +35,14 @@ class _ApiClient implements ApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late PostResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<PostResponseItem> _value;
     try {
-      _value = PostResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map(
+            (dynamic i) => PostResponseItem.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

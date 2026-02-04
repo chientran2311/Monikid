@@ -4,9 +4,9 @@ import 'package:monikid/core/network/api_client.dart';
 import 'package:monikid/models/response/post_response.dart';
 
 abstract class PostRepository {
-  Future<PostResponse> getPosts({
-    required int userId,
-    required int id,
+  Future<PostDataWrapper> getPosts({
+    int? userId,
+    int? id,
     String? title,
     String? body,
   });
@@ -18,15 +18,16 @@ class PostRepositoryImpl implements PostRepository {
 
   PostRepositoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
   @override
-  Future<PostResponse> getPosts({
-    required int userId,
-    required int id,
+  Future<PostDataWrapper> getPosts({
+    int? userId,
+    int? id,
     String? title,
     String? body,
   }) async {
     try {
-      final response = await _apiClient.getPosts(userId, id);
-      return response;
+      final response = await _apiClient.getPosts();
+      // API trả về List<PostResponseItem>, wrap vào PostDataWrapper
+      return PostDataWrapper(items: response);
     } catch (e) {
       rethrow;
     }

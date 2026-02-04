@@ -9,8 +9,5 @@ abstract class ApiClient {
   factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
 
   @GET("/posts")
-  Future<PostResponse> getPosts(
-    @Query('userId') int userId,
-    @Query('id') int id,
-  );
+  Future<List<PostResponseItem>> getPosts();
 }

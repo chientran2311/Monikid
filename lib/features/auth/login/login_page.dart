@@ -123,7 +123,7 @@ class LoginPage extends HookConsumerWidget {
               Expanded(
                 child: SocialButton(
                   text: "Google",
-                  // Dùng icon tạm vì không có assets, thực tế dùng SVG
+
                   icon: Icons.g_mobiledata,
                   isGoogle: true,
                   onPressed: () {},

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:monikid/core/router/router_config.dart';
 import 'package:monikid/core/theme/theme.dart';
 
 class DashboardHeader extends StatelessWidget {
@@ -19,17 +21,37 @@ class DashboardHeader extends StatelessWidget {
               child: Icon(Icons.person, color: AppColors.textGrey),
             ),
             // Notification Icon
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.cardFill,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.notifications,
-                color: AppColors.textWhite,
-                size: 20,
-              ),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.cardFill,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      context.go(AppRoutes.home);
+                    },
+                    icon: Icon(Icons.notifications),
+                    color: AppColors.textWhite,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: AppColors.cardFill,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      context.go(AppRoutes.settings);
+                    },
+                    icon: Icon(Icons.settings),
+                    color: AppColors.textWhite,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

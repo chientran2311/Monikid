@@ -2,46 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Import screens from feature folders
-import '../features/auth/presentation/screens/splash_screen.dart';
-import '../features/auth/presentation/screens/welcome_screen.dart';
-import '../features/auth/presentation/screens/login_screen.dart';
-import '../features/auth/presentation/screens/register_screen.dart';
-import '../features/auth/presentation/screens/forgot_password_screen.dart';
-import '../features/parent/presentation/screens/parent_home_screen.dart';
-import '../features/child/presentation/screens/child_home_screen.dart';
-import '../features/wallet/presentation/screens/wallet_detail_screen.dart';
+// Auth provider
+import 'package:monikid/features/auth/providers/auth_provider.dart';
 
-/// MoniKid App Router Configuration
-///
-/// Route structure:
-/// - /                    → Splash
-/// - /welcome             → Welcome screen
-/// - /login               → Login
-/// - /register            → Register
-/// - /create-family       → Create family (parent)
-/// - /join-family         → Join family with code
-///
-/// Parent routes:
-/// - /parent              → Parent shell (with bottom nav)
-/// - /parent/home         → Dashboard
-/// - /parent/bank         → Mock bank
-/// - /parent/children     → Children list
-/// - /parent/children/:id → Child detail
-/// - /parent/chat         → Family chat
-/// - /parent/settings     → Settings
-///
-/// Child routes:
-/// - /child               → Child shell (with bottom nav)
-/// - /child/home          → Dashboard
-/// - /child/pay           → QR Payment
-/// - /child/receipts      → Receipts
-/// - /child/request       → Request money
-/// - /child/chat          → Family chat
-/// - /child/settings      → Settings
+// Import screens
+// (Đảm bảo các đường dẫn import này đúng với cấu trúc thư mục thực tế của bạn)
+import 'package:monikid/features/auth/splash/splash_screen.dart';
+import 'package:monikid/features/auth/login/login_screen.dart';
+import 'package:monikid/features/auth/register/register.dart';
+import 'package:monikid/features/auth/onboard/onboard_1.dart';
+import 'package:monikid/features/auth/onboard/onboard_2.dart';
+import 'package:monikid/features/auth/onboard/onboard_3.dart';
 
-// Route names for type-safe navigation
-abstract class AppRoutes {
+import 'package:monikid/features/home/home_screen.dart'; 
+import 'package:monikid/features/wallet/wallet_screen.dart';
+import 'package:monikid/features/wallet/transfer_money_screen.dart';
+import 'package:monikid/features/wallet/withdraw_deposit.dart';
+
+class AppRoutes {
   AppRoutes._();
 
   // Auth routes
@@ -49,368 +27,188 @@ abstract class AppRoutes {
   static const String welcome = '/welcome';
   static const String login = '/login';
   static const String register = '/register';
+  static const String onboard1 = '/onboard-1';
+  static const String onboard2 = '/onboard-2';
+  static const String onboard3 = '/onboard-3';
   static const String createFamily = '/create-family';
   static const String joinFamily = '/join-family';
   static const String forgotPassword = '/forgot-password';
 
   // Parent routes
   static const String parent = '/parent';
-  static const String parentHome = '/parent/home';
-  static const String parentBank = '/parent/bank';
-  static const String parentChildren = '/parent/children';
-  static const String parentChildDetail = '/parent/children/:id';
-  static const String parentChat = '/parent/chat';
-  static const String parentSettings = '/parent/settings';
-  static const String parentAllowance = '/parent/allowance';
-  static const String parentReports = '/parent/reports';
+  // Note: Các route con thường dùng trong ShellRoute (BottomNav), 
+  // tạm thời định nghĩa dạng flat URL để chạy được ngay.
+  static const String parentHome = '/home';
+  static const String parentWallet = '/wallet';
+  static const String parentTransfer = '/transfer';
+  static const String parentWithdrawDeposit = '/withdraw-deposit';
+  static const String parentChildren = '/children';
+  static const String parentChildDetail = '/children/:id'; // Dynamic param
 
   // Child routes
   static const String child = '/child';
   static const String childHome = '/child/home';
-  static const String childPay = '/child/pay';
-  static const String childReceipts = '/child/receipts';
-  static const String childRequest = '/child/request';
-  static const String childChat = '/child/chat';
-  static const String childSettings = '/child/settings';
-  static const String childSpending = '/child/spending';
 }
 
-/// Router provider using Riverpod
+/// Global Key để quản lý Navigator (hữu ích khi cần show dialog/snackbar từ logic)
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Danh sách các route công khai (không cần đăng nhập)
+const publicRoutes = [
+  AppRoutes.splash,
+  AppRoutes.login,
+  AppRoutes.register,
+  AppRoutes.onboard1,
+  AppRoutes.onboard2,
+  AppRoutes.onboard3,
+  AppRoutes.forgotPassword,
+];
+
+/// 🟢 ROUTER PROVIDER
+/// Đây là biến mà MoniKidApp đang thiếu
 final routerProvider = Provider<GoRouter>((ref) {
+  // Lắng nghe auth state changes để refresh router
+  final authState = ref.watch(authProvider);
+  
   return GoRouter(
-    initialLocation: AppRoutes.splash,
-    debugLogDiagnostics: true,
+    navigatorKey: rootNavigatorKey,
+    initialLocation: AppRoutes.onboard1, // Màn hình đầu tiên khi mở app
+    debugLogDiagnostics: true, // In log chuyển trang để dễ debug
+    
+    // Refresh router khi auth state thay đổi
+    refreshListenable: GoRouterRefreshStream(ref),
+
+    // Định nghĩa danh sách các màn hình
     routes: [
-      // ======================================================================
-      // AUTH ROUTES
-      // ======================================================================
+      // --- AUTH GROUP ---
       GoRoute(
         path: AppRoutes.splash,
-        name: 'splash',
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
-        path: AppRoutes.welcome,
-        name: 'welcome',
-        builder: (context, state) => const WelcomeScreen(),
+        path: AppRoutes.onboard1,
+        builder: (context, state) => const Onboard1Screen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboard2,
+        builder: (context, state) => const Onboard2Screen(),
+      ),
+      GoRoute(
+        path: AppRoutes.onboard3,
+        builder: (context, state) => const Onboard3Screen(),
       ),
       GoRoute(
         path: AppRoutes.login,
-        name: 'login',
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         path: AppRoutes.register,
-        name: 'register',
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
+        path: AppRoutes.parentHome,
+        builder: (context, state) => const ParentHomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentWallet,
+        builder: (context, state) => const WalletScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentTransfer,
+        builder: (context, state) => const TransferMoneyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentWithdrawDeposit,
+        builder: (context, state) => const WithdrawDepositScreen(),
+      ),  
+      // GoRoute(
+      //   path: AppRoutes.forgotPassword,
+      //   builder: (context, state) => const ForgotPasswordScreen(),
+      // ),
+      
+      // Placeholder cho các màn hình chưa import (Bỏ comment khi bạn đã tạo file)
+      /*
+      GoRoute(
         path: AppRoutes.createFamily,
-        name: 'createFamily',
-        builder: (context, state) =>
-            const _PlaceholderScreen(title: 'Tạo gia đình'),
+        builder: (context, state) => const CreateFamilyScreen(),
       ),
       GoRoute(
         path: AppRoutes.joinFamily,
-        name: 'joinFamily',
-        builder: (context, state) =>
-            const _PlaceholderScreen(title: 'Tham gia gia đình'),
+        builder: (context, state) => const JoinFamilyScreen(),
       ),
+      */
+
+      // --- PARENT GROUP ---
+      // Nếu sau này bạn làm BottomNavigationBar, bạn sẽ cần đổi thành ShellRoute
       GoRoute(
-        path: AppRoutes.forgotPassword,
-        name: 'forgotPassword',
-        builder: (context, state) => const ForgotPasswordScreen(),
-      ),
-
-      // ======================================================================
-      // PARENT ROUTES (with shell for bottom navigation)
-      // ======================================================================
-      ShellRoute(
-        builder: (context, state, child) {
-          return _ParentShell(child: child);
-        },
+        path: AppRoutes.parent,
+        builder: (context, state) => const ParentHomeScreen(),
         routes: [
+          // Định nghĩa các sub-routes: /parent/children/:id
           GoRoute(
-            path: AppRoutes.parentHome,
-            name: 'parentHome',
-            builder: (context, state) => const ParentHomeScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.parentBank,
-            name: 'parentBank',
-            builder: (context, state) => const WalletDetailScreen(isParent: true),
-          ),
-          GoRoute(
-            path: AppRoutes.parentChildren,
-            name: 'parentChildren',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Con cái'),
-            routes: [
-              GoRoute(
-                path: ':id',
-                name: 'parentChildDetail',
-                builder: (context, state) {
-                  final childId = state.pathParameters['id']!;
-                  return _PlaceholderScreen(title: 'Chi tiết: $childId');
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            path: AppRoutes.parentChat,
-            name: 'parentChat',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Chat gia đình'),
-          ),
-          GoRoute(
-            path: AppRoutes.parentSettings,
-            name: 'parentSettings',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Cài đặt'),
-          ),
-          GoRoute(
-            path: AppRoutes.parentAllowance,
-            name: 'parentAllowance',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Tiền tiêu vặt'),
-          ),
-          GoRoute(
-            path: AppRoutes.parentReports,
-            name: 'parentReports',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Báo cáo'),
+            path: AppRoutes.parentChildDetail,
+            builder: (context, state) {
+              // Lấy ID từ URL
+              final childId = state.pathParameters['id'];
+              // Trả về màn hình chi tiết (Ví dụ)
+              // return ChildDetailScreen(id: childId);
+              return Scaffold(body: Center(child: Text("Detail for $childId"))); 
+            },
           ),
         ],
       ),
 
-      // ======================================================================
-      // CHILD ROUTES (with shell for bottom navigation)
-      // ======================================================================
-      ShellRoute(
-        builder: (context, state, child) {
-          return _ChildShell(child: child);
-        },
-        routes: [
-          GoRoute(
-            path: AppRoutes.childHome,
-            name: 'childHome',
-            builder: (context, state) => const ChildHomeScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.childPay,
-            name: 'childPay',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Thanh toán QR'),
-          ),
-          GoRoute(
-            path: AppRoutes.childReceipts,
-            name: 'childReceipts',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Hóa đơn'),
-          ),
-          GoRoute(
-            path: AppRoutes.childRequest,
-            name: 'childRequest',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Xin tiền'),
-          ),
-          GoRoute(
-            path: AppRoutes.childChat,
-            name: 'childChat',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Chat gia đình'),
-          ),
-          GoRoute(
-            path: AppRoutes.childSettings,
-            name: 'childSettings',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Cài đặt'),
-          ),
-          GoRoute(
-            path: AppRoutes.childSpending,
-            name: 'childSpending',
-            builder: (context, state) =>
-                const _PlaceholderScreen(title: 'Chi tiêu của tôi'),
-          ),
-        ],
-      ),
+      // --- CHILD GROUP ---
+      // GoRoute(
+      //   path: AppRoutes.child,
+      //   builder: (context, state) => const ChildHomeScreen(),
+      // ),
     ],
-    errorBuilder: (context, state) => _PlaceholderScreen(
-      title: 'Lỗi: ${state.error?.message ?? 'Không tìm thấy trang'}',
-    ),
+
+    // Xử lý chuyển hướng (Redirect)
+    // Kiểm tra auth state và redirect phù hợp
+    redirect: (context, state) {
+      final currentPath = state.uri.path;
+      final isPublicRoute = publicRoutes.contains(currentPath);
+      final isAuthenticated = authState.isAuthenticated;
+      final isInitial = authState.isInitial;
+      
+      // Đang ở onboarding hoặc splash -> cho phép access
+      if (currentPath == AppRoutes.splash || 
+          currentPath == AppRoutes.onboard1 ||
+          currentPath == AppRoutes.onboard2 ||
+          currentPath == AppRoutes.onboard3) {
+        return null;
+      }
+      
+      // Auth chưa khởi tạo xong -> đợi
+      if (isInitial) {
+        return null;
+      }
+      
+      // Đã đăng nhập nhưng đang ở trang auth -> redirect về home
+      if (isAuthenticated && isPublicRoute) {
+        return AppRoutes.parentHome;
+      }
+      
+      // Chưa đăng nhập và đang ở trang private -> redirect về login
+      if (!isAuthenticated && !isPublicRoute) {
+        return AppRoutes.login;
+      }
+      
+      // Các trường hợp khác -> cho phép truy cập
+      return null;
+    },
   );
 });
 
-// =============================================================================
-// PLACEHOLDER WIDGETS (to be replaced with actual screens)
-// =============================================================================
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-
-  const _PlaceholderScreen({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.construction, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Màn hình đang phát triển',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
+/// Helper class để refresh GoRouter khi Riverpod state thay đổi
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(this._ref) {
+    _ref.listen(authProvider, (previous, next) {
+      notifyListeners();
+    });
   }
-}
-
-class _ParentShell extends StatelessWidget {
-  final Widget child;
-
-  const _ParentShell({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _getSelectedIndex(context),
-        onDestinationSelected: (index) => _onDestinationSelected(context, index),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.account_balance_outlined),
-            selectedIcon: Icon(Icons.account_balance),
-            label: 'Ngân hàng',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.child_care_outlined),
-            selectedIcon: Icon(Icons.child_care),
-            label: 'Con cái',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.chat_outlined),
-            selectedIcon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Cài đặt',
-          ),
-        ],
-      ),
-    );
-  }
-
-  int _getSelectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith(AppRoutes.parentBank)) return 1;
-    if (location.startsWith(AppRoutes.parentChildren)) return 2;
-    if (location.startsWith(AppRoutes.parentChat)) return 3;
-    if (location.startsWith(AppRoutes.parentSettings)) return 4;
-    return 0;
-  }
-
-  void _onDestinationSelected(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.parentHome);
-        break;
-      case 1:
-        context.go(AppRoutes.parentBank);
-        break;
-      case 2:
-        context.go(AppRoutes.parentChildren);
-        break;
-      case 3:
-        context.go(AppRoutes.parentChat);
-        break;
-      case 4:
-        context.go(AppRoutes.parentSettings);
-        break;
-    }
-  }
-}
-
-class _ChildShell extends StatelessWidget {
-  final Widget child;
-
-  const _ChildShell({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _getSelectedIndex(context),
-        onDestinationSelected: (index) => _onDestinationSelected(context, index),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.qr_code_scanner_outlined),
-            selectedIcon: Icon(Icons.qr_code_scanner),
-            label: 'Thanh toán',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Hóa đơn',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.chat_outlined),
-            selectedIcon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-        ],
-      ),
-    );
-  }
-
-  int _getSelectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith(AppRoutes.childPay)) return 1;
-    if (location.startsWith(AppRoutes.childReceipts)) return 2;
-    if (location.startsWith(AppRoutes.childChat)) return 3;
-    return 0;
-  }
-
-  void _onDestinationSelected(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.childHome);
-        break;
-      case 1:
-        context.go(AppRoutes.childPay);
-        break;
-      case 2:
-        context.go(AppRoutes.childReceipts);
-        break;
-      case 3:
-        context.go(AppRoutes.childChat);
-        break;
-    }
-  }
+  
+  final Ref _ref;
 }

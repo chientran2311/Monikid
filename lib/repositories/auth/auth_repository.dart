@@ -1,11 +1,11 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthRepository {
   User? get currentUser;
   
-  Stream<AuthState> get authStateChanges;
+  Stream<User?> get authStateChanges;
 
-  Future<AuthResponse> signUp({
+  Future<UserCredential> signUp({
     required String email,
     required String password,
     required String fullName,
@@ -13,7 +13,7 @@ abstract class AuthRepository {
     required String role,
   });
 
-  Future<AuthResponse> signIn({
+  Future<UserCredential> signIn({
     required String email,
     required String password,
   });

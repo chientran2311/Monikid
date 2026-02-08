@@ -1,13 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Add this
-
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:monikid/firebase_options.dart';
 
 import 'app/app.dart';
-import 'core/network/supabase_client.dart';
-import 'core/injection.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -26,16 +24,16 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarColor: Color(0xFF0E1F18), // AppTheme.background
+      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
 
-
-  // Initialize Supabase
-  await SupabaseConfig.initialize();
-  configureDependencies();
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Run the app
   runApp(

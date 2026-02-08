@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "628886293390",
+    "project_id": "monikid-bb66b",
+    "storage_bucket": "monikid-bb66b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628886293390:android:f419265d592a926125f2df",
+        "android_client_info": {
+          "package_name": "com.example.monikid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeYec3Te0KnhhWsmLhZDjFRgauoTbeXvU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

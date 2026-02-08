@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:intl/intl.dart';
-import '../config/app_constants.dart';
+import '../constants/app_constants.dart';
 
 /// Utility functions for MoniKid app.
 

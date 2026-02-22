@@ -5,10 +5,10 @@ part 'auth_state.freezed.dart';
 
 /// Auth status enum để quản lý trạng thái xác thực
 enum AuthStatus {
-  initial,       // Chưa kiểm tra
+  initial, // Chưa kiểm tra
   authenticated, // Đã đăng nhập
   unauthenticated, // Chưa đăng nhập
-  loading,       // Đang xử lý (login/register/logout)
+  loading, // Đang xử lý (login/register/logout)
 }
 
 @freezed
@@ -19,6 +19,7 @@ abstract class AppAuthState with _$AppAuthState {
     String? errorMessage,
     @Default(false) bool isLoading,
     @Default(false) bool isFirstTime, // Để check show onboarding
+    String? userRole, // Role của user (parent/child)
   }) = _AppAuthState;
 
   const AppAuthState._();

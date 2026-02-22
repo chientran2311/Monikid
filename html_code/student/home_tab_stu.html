@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trang chủ Sinh viên - SmartSpending</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2f7f34",
+                        "primary-dark": "#1b4d1e",
+                        "primary-light": "#eaf5ea",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#141e15",
+                        "income": "#3b82f6",
+                        "expense": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "sans": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 4px rgba(0,0,0,0.05)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden">
+<!-- Mobile Container -->
+<div class="relative w-full max-w-md mx-auto h-screen flex flex-col bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden">
+<!-- Header Section -->
+<header class="pt-12 pb-4 px-6 flex justify-between items-center bg-white dark:bg-[#1c2a1e] sticky top-0 z-10 border-b border-gray-100 dark:border-gray-800">
+<div class="flex flex-col">
+<span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Chào buổi sáng,</span>
+<h1 class="text-xl font-bold text-slate-900 dark:text-white mt-0.5">Đạt Chiến</h1>
+</div>
+<div class="relative">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/20 p-0.5">
+<img alt="Avatar of Dat Chien" class="w-full h-full object-cover rounded-full" data-alt="User profile photo showing a smiling young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8i2nO1sdgMgKpryBtLIehCSzgrBNubs2XQtPQQk-5Dn1amotsHY1sLW9YWJerlk4YomNQelTgWuQsAkMJo43zbN1MI-RmE9_bcb0kFhDUfaXe1rwxAWiM6lbZDOHoc_4-_226qRV6w8aQK5nCuquBPQhR09YFgfgEZi591BAdehHtekwXPZoB8A563_Z3OxXuNRvoAj28pmleeNjZtar9eo77zbCOP8wlc7QZx1okz9K9n7OJfeGb3F__V0pjZWspN48L7ts5ZBQ"/>
+</div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#1c2a1e] rounded-full"></div>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-24 space-y-6">
+<!-- Summary Card -->
+<section class="px-6 pt-6">
+<div class="bg-gradient-to-br from-[#2f7f34] to-[#246228] rounded-2xl p-6 text-white shadow-soft relative overflow-hidden">
+<!-- Decorative patterns -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-8 -mb-8 blur-xl"></div>
+<div class="relative z-10">
+<p class="text-green-100 text-sm font-medium mb-1 opacity-90">Số dư hiện tại</p>
+<h2 class="text-3xl font-bold tracking-tight mb-6">5.000.000 ₫</h2>
+<div class="flex gap-4">
+<!-- Income -->
+<div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-200">
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+</div>
+<span class="text-xs text-green-100 font-medium opacity-90">Tổng Thu</span>
+</div>
+<p class="text-base font-semibold text-white ml-0.5">2.000.000 ₫</p>
+</div>
+<!-- Expense -->
+<div class="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/10">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-red-200">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+</div>
+<span class="text-xs text-green-100 font-medium opacity-90">Tổng Chi</span>
+</div>
+<p class="text-base font-semibold text-white ml-0.5">1.500.000 ₫</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions (Optional but useful for students) -->
+<section class="px-6">
+<div class="grid grid-cols-4 gap-4">
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center transition-transform group-active:scale-95">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Quét QR</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center transition-transform group-active:scale-95">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Nạp tiền</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center transition-transform group-active:scale-95">
+<span class="material-symbols-outlined">savings</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Tiết kiệm</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-12 h-12 rounded-2xl bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center transition-transform group-active:scale-95">
+<span class="material-symbols-outlined">more_horiz</span>
+</div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Xem thêm</span>
+</button>
+</div>
+</section>
+<!-- Recent Transactions -->
+<section class="px-6 pb-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Giao dịch gần đây</h3>
+<a class="text-sm font-medium text-primary hover:text-primary-dark transition-colors" href="#">Xem tất cả</a>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Item 1: Food -->
+<div class="bg-white dark:bg-[#1c2a1e] p-4 rounded-xl shadow-card border border-slate-100 dark:border-slate-800 flex items-center justify-between active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-xl shrink-0">
+                                🍜
+                            </div>
+<div>
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 text-sm">Ăn uống</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sáng nay • 08:30</p>
+</div>
+</div>
+<span class="font-semibold text-expense">-35.000 ₫</span>
+</div>
+<!-- Item 2: Education -->
+<div class="bg-white dark:bg-[#1c2a1e] p-4 rounded-xl shadow-card border border-slate-100 dark:border-slate-800 flex items-center justify-between active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xl shrink-0">
+                                📚
+                            </div>
+<div>
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 text-sm">Học tập</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Hôm qua • 14:20</p>
+</div>
+</div>
+<span class="font-semibold text-expense">-120.000 ₫</span>
+</div>
+<!-- Item 3: Entertainment -->
+<div class="bg-white dark:bg-[#1c2a1e] p-4 rounded-xl shadow-card border border-slate-100 dark:border-slate-800 flex items-center justify-between active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-xl shrink-0">
+                                🎮
+                            </div>
+<div>
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 text-sm">Giải trí</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">20/10 • 19:45</p>
+</div>
+</div>
+<span class="font-semibold text-expense">-50.000 ₫</span>
+</div>
+<!-- Item 4: Freelance Income -->
+<div class="bg-white dark:bg-[#1c2a1e] p-4 rounded-xl shadow-card border border-slate-100 dark:border-slate-800 flex items-center justify-between active:bg-slate-50 dark:active:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-xl shrink-0">
+                                💻
+                            </div>
+<div>
+<h4 class="font-semibold text-slate-900 dark:text-slate-100 text-sm">Lương làm thêm</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">15/10 • 10:00</p>
+</div>
+</div>
+<span class="font-semibold text-income">+500.000 ₫</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="bg-white dark:bg-[#1c2a1e] border-t border-slate-100 dark:border-slate-800 px-6 pb-8 pt-3 absolute bottom-0 w-full z-20">
+<div class="flex items-end justify-between relative">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center gap-1 min-w-[3.5rem] group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform filled">home</span>
+<span class="text-[10px] font-semibold text-primary">Trang chủ</span>
+</a>
+<!-- Transactions -->
+<a class="flex flex-col items-center gap-1 min-w-[3.5rem] group" href="#">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">receipt_long</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">Giao dịch</span>
+</a>
+<!-- FAB (Floating Action Button) -->
+<div class="relative -top-8">
+<button class="w-14 h-14 bg-primary text-white rounded-full shadow-[0_4px_10px_rgba(47,127,52,0.4)] flex items-center justify-center transform active:scale-95 transition-transform hover:shadow-[0_6px_14px_rgba(47,127,52,0.5)]">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Statistics -->
+<a class="flex flex-col items-center gap-1 min-w-[3.5rem] group" href="#">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">bar_chart</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">Thống kê</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-col items-center gap-1 min-w-[3.5rem] group" href="#">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">settings</span>
+<span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 group-hover:text-primary dark:group-hover:text-primary transition-colors">Cài đặt</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

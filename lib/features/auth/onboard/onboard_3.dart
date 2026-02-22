@@ -4,6 +4,9 @@ import 'package:monikid/App/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/auth/onboard/widget/onboarding_indicator.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
+import 'package:monikid/core/di/locator.dart';
+import 'package:monikid/core/storage/local_storage.dart';
+import 'package:monikid/core/config/storage_keys.dart';
 
 class Onboard3Screen extends StatelessWidget {
   const Onboard3Screen({Key? key}) : super(key: key);
@@ -35,14 +38,18 @@ class Onboard3Screen extends StatelessWidget {
                           color: AppTheme.inputBackground,
                           borderRadius: BorderRadius.circular(32),
                         ),
-                        child: Icon(Icons.emoji_events_rounded, size: 100, color: Colors.orangeAccent),
+                        child: Icon(
+                          Icons.emoji_events_rounded,
+                          size: 100,
+                          color: Colors.orangeAccent,
+                        ),
                         // Thay bằng Image.asset('assets/img3.png')
                       ),
                     ),
                   ),
 
                   const SizedBox(height: 30),
-                  
+
                   // INDICATOR
                   const OnboardingIndicator(activeIndex: 2), // Index 2
 
@@ -56,10 +63,18 @@ class Onboard3Screen extends StatelessWidget {
                         RichText(
                           textAlign: TextAlign.center,
                           text: const TextSpan(
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, height: 1.3, color: AppTheme.textWhite),
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              height: 1.3,
+                              color: AppTheme.textWhite,
+                            ),
                             children: [
                               TextSpan(text: "Learning Through "),
-                              TextSpan(text: "Fun", style: TextStyle(color: AppTheme.primaryGreen)),
+                              TextSpan(
+                                text: "Fun",
+                                style: TextStyle(color: AppTheme.primaryGreen),
+                              ),
                             ],
                           ),
                         ),
@@ -67,7 +82,11 @@ class Onboard3Screen extends StatelessWidget {
                         const Text(
                           "Turn daily chores into exciting missions. Kids earn rewards for completing tasks.",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: AppTheme.textGrey, fontSize: 15, height: 1.5),
+                          style: TextStyle(
+                            color: AppTheme.textGrey,
+                            fontSize: 15,
+                            height: 1.5,
+                          ),
                         ),
                       ],
                     ),
@@ -80,20 +99,33 @@ class Onboard3Screen extends StatelessWidget {
                       children: [
                         PrimaryButton(
                           text: "Get Started",
-                          onPressed: () {
-                            context.go(AppRoutes.register);
+                          onPressed: () async {
+                            final storage = getIt<AppLocalStorage>();
+                            await storage.write(
+                              key: StorageKeys.onboardCompleteKey,
+                              value: 'true',
+                            );
+                            if (context.mounted) context.go(AppRoutes.register);
                           },
                         ),
                         const SizedBox(height: 16),
                         GestureDetector(
-                          onTap: () {
-                            context.go(AppRoutes.login);
+                          onTap: () async {
+                            final storage = getIt<AppLocalStorage>();
+                            await storage.write(
+                              key: StorageKeys.onboardCompleteKey,
+                              value: 'true',
+                            );
+                            if (context.mounted) context.go(AppRoutes.login);
                           },
                           child: const Text(
                             "Already have an account? Login",
-                            style: TextStyle(color: AppTheme.textGrey, fontSize: 13),
+                            style: TextStyle(
+                              color: AppTheme.textGrey,
+                              fontSize: 13,
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

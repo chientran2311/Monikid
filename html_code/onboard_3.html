@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartSpending - Tiết kiệm thông minh</title>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#2f7f33", "background-light": "#f6f8f6", "background-dark": "#141e15"}, fontFamily: {display: "Spline Sans"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased h-screen overflow-hidden flex justify-center items-center">
+<!-- Mobile Container -->
+<div class="relative flex h-full w-full max-w-md flex-col bg-background-light dark:bg-background-dark shadow-xl overflow-hidden">
+<!-- Header / Top Nav -->
+<div class="flex w-full items-center justify-between px-6 py-4 z-10">
+<button aria-label="Go back" class="flex items-center justify-center p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<button class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
+                Bỏ qua
+            </button>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col items-center justify-center px-6 pb-8">
+<!-- Illustration Area -->
+<div class="w-full flex-1 flex items-center justify-center relative min-h-[300px]">
+<!-- Abstract decorative blobs behind -->
+<div class="absolute w-64 h-64 bg-primary/10 rounded-full blur-3xl -top-4 -left-4 animate-pulse"></div>
+<div class="absolute w-64 h-64 bg-yellow-200/20 dark:bg-yellow-900/20 rounded-full blur-3xl bottom-10 right-4"></div>
+<!-- Main Image -->
+<div class="relative w-full aspect-square max-w-[320px] bg-contain bg-center bg-no-repeat z-10" data-alt="Golden piggy bank with coins and small green plant growing nearby" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCLw4QBVrUfT5f2fbbczaMeXeKeiv3Dt6v6Wq3oFEZ5fMRw1F90jfAEUdywWNx7SRfnl2wg2nFrikUlB5LBk8dxV4UGfk178DoCYq7ZI6zQqUMuj2jqR3AKVt5xkxhHAsRr1XA76DhLiaxvfldesBqNaU3s3tsh7aW1Nf9wfkI7APauqXjkeEZWNXBIaLZFy2lQ2P8kV4QgvBCXhUaygtKUrN4nJPQ6JKEODZ4X55pdHR8uet1QmfMXAN07tgEoD4-j52kttCzFT98");'>
+</div>
+</div>
+<!-- Text Content -->
+<div class="w-full flex flex-col items-center text-center space-y-4 pt-4 z-10">
+<!-- Pagination Dots -->
+<div class="flex flex-row items-center justify-center gap-2 mb-2">
+<div class="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+<div class="h-2 w-2 rounded-full bg-slate-300 dark:bg-slate-700"></div>
+<div class="h-2 w-8 rounded-full bg-primary transition-all duration-300"></div>
+</div>
+<h1 class="text-slate-900 dark:text-slate-50 text-3xl font-extrabold tracking-tight leading-tight">
+                    Tiết kiệm thông minh
+                </h1>
+<p class="text-slate-600 dark:text-slate-400 text-base font-medium leading-relaxed max-w-[320px]">
+                    Thiết lập hạn mức chi tiêu và đạt được mục tiêu tài chính của bạn một cách dễ dàng nhất.
+                </p>
+</div>
+</div>
+<!-- Bottom Action Area -->
+<div class="w-full px-6 pb-10 pt-2 flex flex-col gap-4 z-10 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-6 bg-primary hover:bg-yellow-500 active:scale-[0.98] transition-all text-[#1b170d] text-lg font-bold shadow-lg shadow-primary/20">
+<span class="truncate">Bắt đầu ngay</span>
+<span class="material-symbols-outlined ml-2 text-[20px]">arrow_forward</span>
+</button>
+<div class="text-center">
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                    Đã có tài khoản? 
+                    <a class="font-bold text-primary hover:underline ml-1" href="#">Đăng nhập</a>
+</p>
+</div>
+</div>
+</div>
+</body></html>

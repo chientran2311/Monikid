@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thêm Giao dịch mới - SmartSpending</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2f7f34",
+                        "primary-content": "#ffffff",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#141e15",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1f2b21",
+                        "input-bg": "#eaf0ea",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<!-- Mobile Container -->
+<div class="w-full max-w-md bg-background-light dark:bg-background-dark min-h-screen flex flex-col relative shadow-xl overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-4 py-2 pt-12 pb-4 bg-background-light dark:bg-background-dark sticky top-0 z-10">
+<button class="w-16 flex justify-start text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+<span class="text-base font-medium">Hủy</span>
+</button>
+<h1 class="text-lg font-bold text-slate-900 dark:text-white flex-1 text-center">Thêm Giao dịch</h1>
+<div class="w-16"></div> <!-- Spacer for alignment -->
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col px-6 overflow-y-auto pb-24">
+<!-- Segmented Control -->
+<div class="flex p-1 bg-input-bg dark:bg-surface-dark rounded-lg mt-2 mb-8">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="peer sr-only" name="transaction_type" type="radio" value="expense"/>
+<div class="py-2 px-4 text-center text-sm font-medium rounded-md text-slate-500 transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-primary peer-checked:shadow-sm">
+                        Tiền Chi
+                    </div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="peer sr-only" name="transaction_type" type="radio" value="income"/>
+<div class="py-2 px-4 text-center text-sm font-medium rounded-md text-slate-500 transition-all peer-checked:bg-white dark:peer-checked:bg-slate-700 peer-checked:text-primary peer-checked:shadow-sm">
+                        Tiền Thu
+                    </div>
+</label>
+</div>
+<!-- Amount Input -->
+<div class="flex flex-col items-center justify-center mb-8 relative group">
+<span class="text-sm font-medium text-slate-400 mb-1">Số tiền</span>
+<div class="flex items-baseline justify-center w-full">
+<input class="bg-transparent border-none text-center text-5xl font-bold text-slate-900 dark:text-white p-0 focus:ring-0 w-full placeholder-slate-300 caret-primary" inputmode="numeric" placeholder="0" type="text" value="50.000"/>
+<span class="text-2xl font-semibold text-slate-500 ml-2 absolute right-0 top-1/2 -translate-y-1/2 hidden md:block">đ</span>
+</div>
+<div class="h-1 w-24 bg-primary/20 mt-2 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full animate-pulse"></div>
+</div>
+</div>
+<!-- Form Fields Container -->
+<div class="space-y-6">
+<!-- Category -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Danh mục</label>
+<button class="w-full flex items-center justify-between bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm active:scale-[0.99] transition-transform">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xl">
+                                🚌
+                            </div>
+<span class="text-base font-medium text-slate-900 dark:text-white">Di chuyển</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</button>
+</div>
+<!-- Date Picker -->
+<div class="space-y-2">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ngày</label>
+<div class="relative w-full">
+<input class="w-full bg-white dark:bg-surface-dark p-4 pl-12 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none appearance-none" type="date" value="2023-10-25"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">calendar_today</span>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Note with AI Hint -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Ghi chú</label>
+<div class="flex items-center gap-1 text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                            AI Tự động
+                        </div>
+</div>
+<div class="relative">
+<textarea class="w-full bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none placeholder:text-slate-400" placeholder="Nhập ghi chú, AI sẽ tự động phân loại..." rows="3"></textarea>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Action -->
+<div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark pt-12">
+<button class="w-full bg-primary hover:bg-[#256629] text-white font-semibold py-4 rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg">
+<span class="material-symbols-outlined">check</span>
+                Lưu giao dịch
+            </button>
+</div>
+</div>
+</body></html>

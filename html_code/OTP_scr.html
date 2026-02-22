@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Xác thực mã OTP - SmartSpending</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#2f7f33", "background-light": "#f6f8f6", "background-dark": "#141e15"}, fontFamily: {display: "Spline Sans"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        body {
+            font-family: "Spline Sans", sans-serif;
+        }
+        /* Hide arrows in number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col items-center">
+<!-- Main Container (Phone Form Factor) -->
+<div class="relative flex h-full min-h-screen w-full max-w-[430px] flex-col bg-white dark:bg-slate-900 shadow-2xl overflow-x-hidden">
+<!-- Top App Bar / Navigation -->
+<div class="flex items-center px-4 py-6 justify-between">
+<button class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="w-10"></div> <!-- Spacer for centering title if needed -->
+</div>
+<!-- Content Header -->
+<div class="px-6 pt-4 pb-2">
+<h1 class="text-slate-900 dark:text-slate-100 tracking-tight text-[32px] font-bold leading-tight">
+                Xác thực mã OTP
+            </h1>
+<p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-relaxed mt-3">
+                Chúng tôi đã gửi mã 6 chữ số đến email của bạn. <br/>Vui lòng nhập mã để tiếp tục.
+            </p>
+</div>
+<!-- OTP Input Section -->
+<div class="flex flex-col items-center justify-center px-6 py-10">
+<div class="flex gap-2 sm:gap-3 w-full justify-between">
+<!-- 6 Separate Input Boxes -->
+<!-- First box with focus state representation -->
+<input autofocus="" class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-primary bg-primary/5 focus:ring-2 focus:ring-primary focus:border-primary dark:bg-slate-800 dark:text-white" maxlength="1" placeholder="—" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary dark:text-white" maxlength="1" placeholder="—" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary dark:text-white" maxlength="1" placeholder="—" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary dark:text-white" maxlength="1" placeholder="—" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary dark:text-white" maxlength="1" placeholder="—" type="number"/>
+<input class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary focus:ring-2 focus:ring-primary dark:text-white" maxlength="1" placeholder="—" type="number"/>
+</div>
+<!-- Countdown Timer -->
+<div class="mt-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">schedule</span>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                    Gửi lại mã sau <span class="text-primary font-bold">59s</span>
+</p>
+</div>
+</div>
+<!-- Spacer -->
+<div class="flex-grow"></div>
+<!-- Action Section -->
+<div class="px-6 pb-12 w-full">
+<button class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-[0.98]">
+                Xác nhận
+            </button>
+<p class="text-center mt-6 text-slate-400 text-xs">
+                Bạn không nhận được mã? <a class="text-primary font-semibold hover:underline" href="#">Gửi lại ngay</a>
+</p>
+</div>
+<!-- iOS Home Indicator Sim -->
+<div class="flex justify-center pb-2">
+<div class="h-1.5 w-32 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+</div>
+</div>
+</body></html>

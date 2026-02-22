@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartSpending - Kết nối gia đình</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2f7f33",
+                        "primary-dark": "#1e5e22",
+                        "primary-light": "#e8f5e9",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#141e15",
+                        "text-main": "#111811",
+                        "text-muted": "#4a554a",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased h-screen flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
+<!-- Top Bar -->
+<div class="flex items-center justify-end p-6 pt-12 pb-2 z-10">
+<button class="text-primary hover:text-primary-dark dark:text-green-400 dark:hover:text-green-300 text-base font-bold leading-normal tracking-wide transition-colors">
+            Bỏ qua
+        </button>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col justify-center px-6 pb-8">
+<!-- Illustration Area -->
+<div class="relative w-full aspect-[4/3] mb-8 flex items-center justify-center">
+<!-- Decorative background blob -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-primary/5 rounded-full blur-3xl scale-90"></div>
+<!-- Illustration Composition -->
+<div class="relative w-full h-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col items-center justify-center p-6" data-alt="Illustration showing a smartphone connecting a parent and student with a heart link symbol" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCDrMo751e-QtXBTvfTYHd5TS4D0l4dg912UemqtKk1pF-hZMJ4M5JL3cVyATsot728wnrBhuC9ItZJcM9oAcE5Jo1KAM91ternpuIRIng9VM9kl84gv4IqQAR9ePLtQ9EsohXuFniUZ4F_UHb-kL9KdeK8q3LuSawlEAUFSzI5g_9MUy9UDtt37ztX1WHLUClGyE4xN44KmkXfKPrCxtOcF5vUjeh5gUpZau_xfl1tclJND2tUqjUdkc-6EQh0SmjGtjn0lVpxPLY'); background-size: cover; background-position: center;">
+<!-- Overlay for text readability over image -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 text-white text-center drop-shadow-md">
+<span class="material-symbols-outlined text-4xl mb-2 text-primary-light">favorite</span>
+</div>
+</div>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col items-center text-center space-y-4 max-w-xs mx-auto">
+<h1 class="text-slate-900 dark:text-white text-[32px] font-bold leading-tight tracking-tight">
+                Kết nối gia đình
+            </h1>
+<p class="text-slate-600 dark:text-slate-300 text-base font-normal leading-relaxed">
+                Phụ huynh và sinh viên dễ dàng liên kết tài khoản để cùng nhau xây dựng kế hoạch tài chính vững chắc.
+            </p>
+</div>
+</div>
+<!-- Bottom Action Area -->
+<div class="px-6 pb-12 pt-4 flex flex-col items-center gap-8 w-full">
+<!-- Pagination Indicators -->
+<div class="flex flex-row items-center justify-center gap-3">
+<div class="h-2.5 w-2.5 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors"></div>
+<div class="h-2.5 w-8 rounded-full bg-primary transition-all shadow-sm shadow-primary/30"></div>
+<div class="h-2.5 w-2.5 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors"></div>
+</div>
+<!-- Primary Button -->
+<button class="w-full bg-primary hover:bg-primary-dark active:scale-[0.98] text-white text-lg font-semibold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all duration-200 ease-in-out flex items-center justify-center gap-2 group">
+<span>Tiếp tục</span>
+<span class="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<!-- Safe Area Spacer -->
+<div class="h-2"></div>
+</div>
+</body></html>

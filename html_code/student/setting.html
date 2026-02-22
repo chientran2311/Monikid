@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cài đặt tài khoản - SmartSpending</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2f7f34",
+                        "primary-light": "#eaf5ea",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#141e15",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center">
+<!-- Mobile Container -->
+<div class="relative w-full max-w-md h-full min-h-screen flex flex-col bg-background-light dark:bg-background-dark overflow-hidden shadow-2xl mx-auto">
+<!-- Header -->
+<header class="flex items-center justify-between px-4 py-3 bg-white dark:bg-[#1a261b] sticky top-0 z-10 border-b border-gray-100 dark:border-gray-800">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold text-slate-900 dark:text-white flex-1 text-center">Cài đặt tài khoản</h1>
+<div class="w-10"></div> <!-- Spacer for alignment -->
+</header>
+<!-- Main Content (Scrollable) -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Profile Section -->
+<div class="flex flex-col items-center pt-8 pb-6 px-4 bg-white dark:bg-[#1a261b] mb-4 shadow-sm">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary-light dark:border-primary/20 shadow-sm" data-alt="Portrait of a young student smiling warmly in a park setting">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXHCDW0QHDubQQ0VcZjlTp1V65N4kf1UOLIqr_MWQHGl_IYnZE6RYFHRdgG1p8E8AdDH_rXXpNmOHw6jbskPkk-NdPBwkjigWRUPF-dMzpfLRdmE-gFAAvTlHm8oaq_kK63JkYh-WL0ZUnSWDh9Rgnu9-r8d78_xe25pgkHOcyFKvxJ4WJlma7BUQe4u20A8oidn030jIXQz6Ls82JPIuBwlU_B0uEoEJdawQSi09DKtgbX5xwivdJyVxZKD9Mqg_o9Lp63ndkrrc"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full shadow-md border-2 border-white dark:border-[#1a261b] flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Nguyễn Văn A</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">nguyen.van.a@example.com</p>
+</div>
+<!-- Settings List -->
+<div class="px-4 space-y-4">
+<!-- Group 1: Features -->
+<div class="bg-white dark:bg-[#1a261b] rounded-2xl shadow-sm overflow-hidden">
+<!-- Item: Thiết lập ngân sách -->
+<a class="flex items-center justify-between p-4 active:bg-gray-50 dark:active:bg-white/5 transition-colors border-b border-gray-50 dark:border-gray-800/50 last:border-0" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-light dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<span class="font-medium text-slate-800 dark:text-slate-200">Thiết lập ngân sách</span>
+</div>
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-600">chevron_right</span>
+</a>
+<!-- Item: Mã liên kết -->
+<a class="flex items-center justify-between p-4 active:bg-gray-50 dark:active:bg-white/5 transition-colors border-b border-gray-50 dark:border-gray-800/50 last:border-0" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-light dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">family_restroom</span>
+</div>
+<span class="font-medium text-slate-800 dark:text-slate-200">Mã liên kết gia đình</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 dark:text-slate-500" style="font-size: 20px;">qr_code_2</span>
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-600">chevron_right</span>
+</div>
+</a>
+</div>
+<!-- Group 2: Security -->
+<div class="bg-white dark:bg-[#1a261b] rounded-2xl shadow-sm overflow-hidden">
+<a class="flex items-center justify-between p-4 active:bg-gray-50 dark:active:bg-white/5 transition-colors" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-light dark:bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">lock_reset</span>
+</div>
+<span class="font-medium text-slate-800 dark:text-slate-200">Đổi mật khẩu</span>
+</div>
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-600">chevron_right</span>
+</a>
+</div>
+<!-- Group 3: Logout -->
+<button class="w-full bg-white dark:bg-[#1a261b] rounded-2xl shadow-sm p-4 flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-semibold">Đăng xuất</span>
+</button>
+<p class="text-center text-xs text-gray-400 dark:text-gray-600 mt-6 pb-4">Phiên bản 2.4.0</p>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 w-full bg-white dark:bg-[#1a261b] border-t border-gray-100 dark:border-gray-800 px-6 py-3 flex justify-between items-center z-20">
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">home</span>
+<span class="text-[10px] font-medium">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">account_balance_wallet</span>
+<span class="text-[10px] font-medium">Ngân sách</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[26px]">pie_chart</span>
+<span class="text-[10px] font-medium">Thống kê</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-primary dark:text-primary-400" href="#">
+<span class="material-symbols-outlined text-[26px] fill-current variation-filled">settings</span>
+<span class="text-[10px] font-medium">Cài đặt</span>
+</a>
+</nav>
+</div>
+</body></html>

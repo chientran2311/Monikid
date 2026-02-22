@@ -6,13 +6,18 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:monikid/firebase_options.dart';
 
 import 'app/app.dart';
+import 'package:monikid/core/di/locator.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Load environment variables
-  await dotenv.load(fileName: '.env');
+
+  // Load environment variables (non-fatal if .env is empty/missing)
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('⚠️ Could not load .env file: $e');
+  }
 
   // Set preferred orientations (portrait only for mobile)
   await SystemChrome.setPreferredOrientations([
@@ -31,14 +36,11 @@ void main() async {
   );
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize dependency injection
+  await setupLocator();
 
   // Run the app
-  runApp(
-    const ProviderScope(
-      child: MoniKidApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MoniKidApp()));
 }

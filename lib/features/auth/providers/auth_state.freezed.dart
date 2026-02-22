@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppAuthState {
 
- AuthStatus get status; User? get user; String? get errorMessage; bool get isLoading; bool get isFirstTime;
+ AuthStatus get status; User? get user; String? get errorMessage; bool get isLoading; bool get isFirstTime;// Để check show onboarding
+ String? get userRole;
 /// Create a copy of AppAuthState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +27,16 @@ $AppAuthStateCopyWith<AppAuthState> get copyWith => _$AppAuthStateCopyWithImpl<A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppAuthState&&(identical(other.status, status) || other.status == status)&&(identical(other.user, user) || other.user == user)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppAuthState&&(identical(other.status, status) || other.status == status)&&(identical(other.user, user) || other.user == user)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime)&&(identical(other.userRole, userRole) || other.userRole == userRole));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,user,errorMessage,isLoading,isFirstTime);
+int get hashCode => Object.hash(runtimeType,status,user,errorMessage,isLoading,isFirstTime,userRole);
 
 @override
 String toString() {
-  return 'AppAuthState(status: $status, user: $user, errorMessage: $errorMessage, isLoading: $isLoading, isFirstTime: $isFirstTime)';
+  return 'AppAuthState(status: $status, user: $user, errorMessage: $errorMessage, isLoading: $isLoading, isFirstTime: $isFirstTime, userRole: $userRole)';
 }
 
 
@@ -46,7 +47,7 @@ abstract mixin class $AppAuthStateCopyWith<$Res>  {
   factory $AppAuthStateCopyWith(AppAuthState value, $Res Function(AppAuthState) _then) = _$AppAuthStateCopyWithImpl;
 @useResult
 $Res call({
- AuthStatus status, User? user, String? errorMessage, bool isLoading, bool isFirstTime
+ AuthStatus status, User? user, String? errorMessage, bool isLoading, bool isFirstTime, String? userRole
 });
 
 
@@ -63,14 +64,15 @@ class _$AppAuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AppAuthState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? user = freezed,Object? errorMessage = freezed,Object? isLoading = null,Object? isFirstTime = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? user = freezed,Object? errorMessage = freezed,Object? isLoading = null,Object? isFirstTime = null,Object? userRole = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
 as User?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isFirstTime: null == isFirstTime ? _self.isFirstTime : isFirstTime // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,userRole: freezed == userRole ? _self.userRole : userRole // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -81,7 +83,7 @@ as bool,
 
 
 class _AppAuthState extends AppAuthState {
-  const _AppAuthState({this.status = AuthStatus.initial, this.user, this.errorMessage, this.isLoading = false, this.isFirstTime = false}): super._();
+  const _AppAuthState({this.status = AuthStatus.initial, this.user, this.errorMessage, this.isLoading = false, this.isFirstTime = false, this.userRole}): super._();
   
 
 @override@JsonKey() final  AuthStatus status;
@@ -89,6 +91,8 @@ class _AppAuthState extends AppAuthState {
 @override final  String? errorMessage;
 @override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  bool isFirstTime;
+// Để check show onboarding
+@override final  String? userRole;
 
 /// Create a copy of AppAuthState
 /// with the given fields replaced by the non-null parameter values.
@@ -100,16 +104,16 @@ _$AppAuthStateCopyWith<_AppAuthState> get copyWith => __$AppAuthStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppAuthState&&(identical(other.status, status) || other.status == status)&&(identical(other.user, user) || other.user == user)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppAuthState&&(identical(other.status, status) || other.status == status)&&(identical(other.user, user) || other.user == user)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime)&&(identical(other.userRole, userRole) || other.userRole == userRole));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,user,errorMessage,isLoading,isFirstTime);
+int get hashCode => Object.hash(runtimeType,status,user,errorMessage,isLoading,isFirstTime,userRole);
 
 @override
 String toString() {
-  return 'AppAuthState(status: $status, user: $user, errorMessage: $errorMessage, isLoading: $isLoading, isFirstTime: $isFirstTime)';
+  return 'AppAuthState(status: $status, user: $user, errorMessage: $errorMessage, isLoading: $isLoading, isFirstTime: $isFirstTime, userRole: $userRole)';
 }
 
 
@@ -120,7 +124,7 @@ abstract mixin class _$AppAuthStateCopyWith<$Res> implements $AppAuthStateCopyWi
   factory _$AppAuthStateCopyWith(_AppAuthState value, $Res Function(_AppAuthState) _then) = __$AppAuthStateCopyWithImpl;
 @override @useResult
 $Res call({
- AuthStatus status, User? user, String? errorMessage, bool isLoading, bool isFirstTime
+ AuthStatus status, User? user, String? errorMessage, bool isLoading, bool isFirstTime, String? userRole
 });
 
 
@@ -137,14 +141,15 @@ class __$AppAuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AppAuthState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? user = freezed,Object? errorMessage = freezed,Object? isLoading = null,Object? isFirstTime = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? user = freezed,Object? errorMessage = freezed,Object? isLoading = null,Object? isFirstTime = null,Object? userRole = freezed,}) {
   return _then(_AppAuthState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,user: freezed == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
 as User?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isFirstTime: null == isFirstTime ? _self.isFirstTime : isFirstTime // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,userRole: freezed == userRole ? _self.userRole : userRole // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

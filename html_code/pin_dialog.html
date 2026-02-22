@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartSpending - Xác nhận mã PIN</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2f7f33",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#141e15",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .pin-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid #2f7f33;
+            transition: all 0.2s ease;
+        }
+        .pin-dot.filled {
+            background-color: #2f7f33;
+        }
+        .keypad-button:active {
+            background-color: rgba(47, 127, 51, 0.1);
+            transform: scale(0.95);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
+<!-- Backdrop (Simulating a modal overlay over an app screen) -->
+<div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-0"></div>
+<!-- Main Dialog Container -->
+<div class="relative z-10 w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Header Section -->
+<div class="pt-8 pb-6 px-6 text-center">
+<div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-4">
+<span class="material-symbols-outlined text-3xl">lock</span>
+</div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">Xác nhận mã PIN</h2>
+<p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Vui lòng nhập mã PIN 6 chữ số để tiếp tục giao dịch.
+            </p>
+</div>
+<!-- PIN Display Section -->
+<div class="flex justify-center gap-4 py-4">
+<!-- 2 Filled, 4 Empty simulation -->
+<div class="pin-dot filled"></div>
+<div class="pin-dot filled"></div>
+<div class="pin-dot bg-slate-200 dark:bg-slate-700 border-slate-200 dark:border-slate-700"></div>
+<div class="pin-dot bg-slate-200 dark:bg-slate-700 border-slate-200 dark:border-slate-700"></div>
+<div class="pin-dot bg-slate-200 dark:bg-slate-700 border-slate-200 dark:border-slate-700"></div>
+<div class="pin-dot bg-slate-200 dark:bg-slate-700 border-slate-200 dark:border-slate-700"></div>
+</div>
+<!-- Custom Numeric Keypad -->
+<div class="px-6 py-6 grid grid-cols-3 gap-3">
+<!-- Row 1 -->
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">1</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">2</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">3</button>
+<!-- Row 2 -->
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">4</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">5</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">6</button>
+<!-- Row 3 -->
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">7</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">8</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">9</button>
+<!-- Row 4 -->
+<div class="h-16"></div> <!-- Empty spacer -->
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-2xl font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">0</button>
+<button class="keypad-button h-16 flex items-center justify-center rounded-lg text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-800/50 transition-all">
+<span class="material-symbols-outlined text-2xl">backspace</span>
+</button>
+</div>
+<!-- Action Links Footer -->
+<div class="px-6 pb-8 pt-2 flex flex-col gap-4 items-center">
+<button class="text-slate-500 dark:text-slate-400 font-medium text-sm hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+                Hủy
+            </button>
+</div>
+<!-- Visual indicator for secure context -->
+<div class="bg-primary/5 dark:bg-primary/10 py-3 px-6 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-primary text-xs">verified_user</span>
+<span class="text-[10px] uppercase tracking-widest font-bold text-primary/70">Kết nối bảo mật bởi SmartSpending</span>
+</div>
+</div>
+<!-- Decorative background elements (representing the underlying app screen) -->
+<div class="fixed top-10 left-10 -z-10 opacity-20 hidden md:block">
+<div class="w-64 h-32 bg-primary rounded-xl"></div>
+<div class="mt-4 w-48 h-8 bg-slate-300 rounded-full"></div>
+<div class="mt-4 w-32 h-8 bg-slate-300 rounded-full"></div>
+</div>
+<div class="fixed bottom-10 right-10 -z-10 opacity-20 hidden md:block text-right">
+<div class="w-20 h-20 bg-primary/40 rounded-full ml-auto"></div>
+<div class="mt-4 w-48 h-12 bg-slate-300 rounded-lg"></div>
+</div>
+</body></html>

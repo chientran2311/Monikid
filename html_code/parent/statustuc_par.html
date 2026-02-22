@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Thống kê Chi tiêu của Con</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec22",
+                        "primary-dark": "#0eb51a",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102212",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2e1d",
+                        "text-main-light": "#0d1b0e",
+                        "text-main-dark": "#e0ece0",
+                        "text-sub-light": "#5f7161",
+                        "text-sub-dark": "#8a9e8c",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hide for horizontal scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- Header & Month Selector -->
+<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md pt-12 pb-2 px-4 shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
+<div class="flex items-center justify-between mb-4">
+<button class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-surface-dark transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold">Thống kê Chi tiêu</h1>
+<button class="p-2 -mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-surface-dark transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined">calendar_month</span>
+</button>
+</div>
+<!-- Month Tabs -->
+<div class="flex items-center justify-between px-2">
+<button class="flex flex-col items-center gap-1 group">
+<span class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary transition-colors">Tháng 9</span>
+<div class="h-1 w-8 rounded-full bg-transparent group-hover:bg-primary/20 transition-colors"></div>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<span class="text-base font-bold text-primary dark:text-primary">Tháng 10</span>
+<div class="h-1 w-8 rounded-full bg-primary transition-colors"></div>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<span class="text-sm font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary transition-colors">Tháng 11</span>
+<div class="h-1 w-8 rounded-full bg-transparent group-hover:bg-primary/20 transition-colors"></div>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-4 py-6 flex flex-col gap-6 pb-24">
+<!-- Pie Chart Card -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+<h2 class="text-lg font-bold mb-6 text-center">Tổng chi tiêu tháng này</h2>
+<div class="relative flex items-center justify-center mb-6">
+<!-- Donut Chart SVG -->
+<svg class="w-64 h-64 transform -rotate-90" viewbox="0 0 100 100">
+<!-- Background Circle -->
+<circle class="dark:stroke-gray-700" cx="50" cy="50" fill="transparent" r="40" stroke="#e5e7eb" stroke-width="12"></circle>
+<!-- Segment 1: Food (Green) - 48% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#13ec22" stroke-dasharray="120.6 251.2" stroke-dashoffset="0" stroke-linecap="round" stroke-width="12"></circle>
+<!-- Segment 2: Transport (Teal) - 20% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#2dd4bf" stroke-dasharray="50.2 251.2" stroke-dashoffset="-125" stroke-linecap="round" stroke-width="12"></circle>
+<!-- Segment 3: Education (Emerald) - 12% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#10b981" stroke-dasharray="30.1 251.2" stroke-dashoffset="-180" stroke-linecap="round" stroke-width="12"></circle>
+<!-- Segment 4: Others (Gray/Dark Green) - 20% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#065f46" stroke-dasharray="50.2 251.2" stroke-dashoffset="-215" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<!-- Center Text -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+<span class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Tổng cộng</span>
+<span class="text-2xl font-bold text-text-main-light dark:text-text-main-dark">2.500k</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex flex-wrap justify-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#13ec22]"></div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Ăn uống</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#2dd4bf]"></div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Di chuyển</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#10b981]"></div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Học tập</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-[#065f46]"></div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark">Khác</span>
+</div>
+</div>
+</div>
+<!-- Analysis Section -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined text-xl">analytics</span>
+</div>
+<h3 class="font-bold text-base">Phân tích ngân sách</h3>
+</div>
+<span class="bg-primary/10 text-primary-dark dark:text-primary text-xs font-bold px-2 py-1 rounded-full">Trong hạn mức</span>
+</div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm text-text-sub-light dark:text-text-sub-dark">Đã dùng</span>
+<span class="text-sm font-bold text-text-main-light dark:text-text-main-dark">2.500.000đ <span class="text-text-sub-light dark:text-text-sub-dark font-normal">/ 3.000.000đ</span></span>
+</div>
+<!-- Progress Bar -->
+<div class="h-3 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 83%"></div>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-2 text-right">Còn lại 500.000đ cho tháng này</p>
+</div>
+<!-- Top Categories List -->
+<div>
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-bold text-lg">Danh mục chi tiêu</h3>
+<button class="text-primary text-sm font-medium hover:underline">Xem tất cả</button>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Item 1 -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="w-10 h-10 rounded-full bg-[#e7f8e8] dark:bg-[#1a3820] flex items-center justify-center text-[#13ec22]">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-semibold text-sm">Ăn uống</span>
+<span class="font-bold text-sm">1.200.000đ</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-1.5 flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-[#13ec22] rounded-full" style="width: 48%"></div>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark w-8 text-right">48%</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-500">
+<span class="material-symbols-outlined">directions_bus</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-semibold text-sm">Di chuyển</span>
+<span class="font-bold text-sm">500.000đ</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-1.5 flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-teal-500 rounded-full" style="width: 20%"></div>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark w-8 text-right">20%</span>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-500">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-semibold text-sm">Học tập</span>
+<span class="font-bold text-sm">300.000đ</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-1.5 flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 rounded-full" style="width: 12%"></div>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark w-8 text-right">12%</span>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-4 flex items-center gap-4 shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">more_horiz</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<span class="font-semibold text-sm">Khác</span>
+<span class="font-bold text-sm">500.000đ</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-1.5 flex-1 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+<div class="h-full bg-slate-500 rounded-full" style="width: 20%"></div>
+</div>
+<span class="text-xs font-medium text-text-sub-light dark:text-text-sub-dark w-8 text-right">20%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 px-6 py-2 pb-6 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
+<div class="flex justify-between items-end">
+<!-- Home -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">home</span>
+<span class="text-[10px] font-medium tracking-wide">Trang chủ</span>
+</a>
+<!-- Statistic (Active) -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary relative -top-5" href="#">
+<div class="bg-primary text-white dark:text-background-dark h-14 w-14 rounded-full flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-background-light dark:border-background-dark transform transition-transform hover:scale-105">
+<span class="material-symbols-outlined text-[28px] fill-current">pie_chart</span>
+</div>
+<span class="text-[10px] font-bold tracking-wide relative top-3">Thống kê</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-[28px] group-hover:scale-110 transition-transform">settings</span>
+<span class="text-[10px] font-medium tracking-wide">Cài đặt</span>
+</a>
+</div>
+</nav>
+</body></html>

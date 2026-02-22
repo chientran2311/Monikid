@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartSpending - Ghi chép thông minh</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#2f7f33", "primary-dark": "#25cc25", "background-light": "#f6f8f6", "background-dark": "#141e15", "neutral-surface": "#eef5ee"}, fontFamily: {display: "Spline Sans"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased h-screen w-full overflow-hidden flex flex-col selection:bg-primary selection:text-black">
+<!-- Top Bar / Skip Button -->
+<div class="flex-none pt-12 px-6 pb-2 flex justify-end items-center z-10">
+<button class="group flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors duration-200">
+<span class="text-sm font-semibold tracking-wide">Bỏ qua</span>
+</button>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col items-center justify-center relative w-full max-w-md mx-auto px-6">
+<!-- Decorative Background Blob -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[60%] bg-primary/10 blur-[80px] rounded-full pointer-events-none"></div>
+<!-- Hero Illustration -->
+<div class="relative w-full aspect-square max-w-[320px] mb-8 flex items-center justify-center">
+<div class="w-full h-full bg-center bg-contain bg-no-repeat drop-shadow-xl" data-alt="Illustration of a green sprout growing from coins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBAQrbuKYk0cHdioGk0bgSvAKS33kU3wHmj_OqJodXcQqKgMtJo5wqB4v6WXkA9SRxLvrjOrv2-mB7eoTqVWB1FUmSVKoLBFF2n-sEQwOJl-9ESzIzPMZIngvyk5TVSYSqn-rC3FELh_x3oUTbYYVaGFY1d-y4SM2MGBvdJg50WEadtOD0tIWP5Za_ssfmJ2PARZ0PXKPdguykeRJRmr2bpwLxMFux6rg8FKzCJ0n7pnyK4LRtIhQEyq2unTncwaFCwMUJCQ5WpijA");'></div>
+<!-- Floating Elements for depth -->
+<div class="absolute -top-4 -right-4 bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-lg animate-bounce duration-[3000ms]">
+<span class="material-symbols-outlined text-primary text-3xl">receipt_long</span>
+</div>
+<div class="absolute -bottom-4 -left-4 bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-lg animate-bounce duration-[4000ms]">
+<span class="material-symbols-outlined text-primary text-3xl">savings</span>
+</div>
+</div>
+<!-- Typography -->
+<div class="text-center space-y-4 relative z-10 max-w-xs">
+<h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white leading-tight">
+                Ghi chép <br/> <span class="text-primary">thông minh</span>
+</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base leading-relaxed">
+                Tự động phân loại chi tiêu với sự hỗ trợ của AI, giúp bạn quản lý tiền bạc không còn là gánh nặng.
+            </p>
+</div>
+</div>
+<!-- Bottom Action Area -->
+<div class="flex-none pb-10 px-6 pt-4 w-full max-w-md mx-auto">
+<!-- Pagination Indicators -->
+<div class="flex justify-center gap-2 mb-8">
+<div class="h-2 w-8 rounded-full bg-primary shadow-[0_0_10px_rgba(43,238,43,0.5)]"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+<div class="h-2 w-2 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+</div>
+<!-- Primary Button -->
+<button class="w-full bg-primary hover:bg-primary-dark active:scale-[0.98] transition-all duration-200 text-slate-900 font-bold py-4 rounded-xl shadow-[0_4px_20px_rgba(43,238,43,0.25)] flex items-center justify-center gap-2 group">
+<span>Tiếp tục</span>
+<span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</body></html>

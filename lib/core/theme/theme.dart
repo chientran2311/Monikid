@@ -1,192 +1,194 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-/// MoniKid App Theme - Warm, Kid-Friendly, Modern Fintech Design
-/// 
-/// Design Philosophy:
-/// - Purple/Violet for trust and modernity (Fintech)
-/// - Coral/Orange for warmth and playfulness (Kid-friendly)
-/// - Soft mint/teal for success and money (Finance)
-/// - Clean, rounded shapes for friendly feel
-/// 
-/// References: Modern kids banking apps like Greenlight, GoHenry, Famzo
+
+/// MoniKid App Theme - Updated to exactly match HTML reference
 class AppTheme {
   AppTheme._();
 
   // ==========================================================================
-  // REFINED COLOR PALETTE FOR MONIKID
-  // Based on: Fintech + Kids + Family + Warmth
+  // COLOR PALETTE FROM HTML REFERENCE
   // ==========================================================================
-  static const Color background = Color(0xFF0E1F18); // Màu nền tối
-  static const Color primaryGreen = Color(0xFF00E676); // Màu nút xanh
-  static const Color inputBackground = Color(0xFF1C2E26); // Màu nền ô nhập
+
+  // Primary colors
+  static const Color primary = Color(0xFF2F7F33);
+  static const Color primaryDark = Color(0xFF1B4D1F);
+  static const Color primaryLight = Color(0xFFE8F5E9);
+
+  // Background and Surface (Dark Mode)
+  static const Color backgroundDark = Color(0xFF141E15);
+  static const Color surfaceDark = Color(0xFF1C2B1E);
+
+  // Background and Surface (Light Mode)
+  static const Color backgroundLight = Color(0xFFF6F8F6);
+  static const Color surfaceLight = Colors.white;
+
+  // Semantic & Text colors
   static const Color textWhite = Colors.white;
-  static const Color textGrey = Colors.grey;
- 
-  static const Color surface = Color(0xFF1C2E26);
-  
+  static const Color textBlack = Color(0xFF111811);
+  static const Color textGrey = Color(0xFF64748B); // neutral-gray
   static const Color redAlert = Color(0xFFFF5252);
-  static const Color _darkBackground = Color(0xFF0E1F18);
-  static const Color _darkSurface = Color(0xFF1C2E26);
-  
-  // Light Mode Colors (Mới bổ sung)
-  static const Color _lightBackground = Color(0xFFF4F6F5); // Màu trắng ám xanh cực nhẹ
-  static const Color _lightSurface = Colors.white;
-  
-  // Brand Colors (Dùng chung)
-
-  static const Color primaryDark = Color(0xFF00B359); // Green đậm hơn (cho text trên nền sáng)
-  
   static const Color orangeWarning = Color(0xFFFFAB40);
-  
-  // Text Colors
-  static const Color _textWhite = Colors.white;
-  static const Color _textBlack = Color(0xFF0E1F18); // Đen xanh (cho Light mode)
-  static const Color _textGrey = Colors.grey;
 
+  // Aliases for legacy compatibility
+  static const Color background = backgroundDark;
+  static const Color surface = surfaceDark;
+  static const Color inputBackground = surfaceDark;
+  static const Color primaryGreen = primary;
+
+  // ==========================================================================
+  // DARK THEME
+  // ==========================================================================
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: _darkBackground,
-      primaryColor: primaryGreen,
-      
+      scaffoldBackgroundColor: backgroundDark,
+      primaryColor: primary,
+
       // Cấu hình màu sắc cốt lõi
       colorScheme: const ColorScheme.dark(
-        primary: primaryGreen,
-        secondary: primaryGreen,
-        surface: _darkSurface,
-        background: _darkBackground,
+        primary: primary,
+        secondary: primaryLight,
+        surface: surfaceDark,
         error: redAlert,
-        onPrimary: _darkBackground, // Chữ trên nền nút xanh -> Màu tối
-        onSurface: _textWhite,
+        onPrimary: Colors.white,
+        onSurface: textWhite,
       ),
 
-      // Font chữ mặc định (Dùng Google Fonts hoặc font hệ thống)
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).apply(
-        bodyColor: _textWhite,
-        displayColor: _textWhite,
-      ),
+      // Font chữ mặc định
+      textTheme: GoogleFonts.interTextTheme(
+        ThemeData.dark().textTheme,
+      ).apply(bodyColor: textWhite, displayColor: textWhite),
 
       // Style cho AppBar
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: _textWhite),
+        iconTheme: IconThemeData(color: textWhite),
         titleTextStyle: TextStyle(
-          color: _textWhite, 
-          fontSize: 20, 
-          fontWeight: FontWeight.bold
+          color: textWhite,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
       ),
 
       // Style cho các ô nhập liệu (Input)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _darkSurface,
-        hintStyle: const TextStyle(color: _textGrey, fontSize: 14),
-        prefixIconColor: _textGrey,
-        suffixIconColor: _textGrey,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        fillColor: surfaceDark,
+        hintStyle: const TextStyle(color: textGrey, fontSize: 14),
+        prefixIconColor: textGrey,
+        suffixIconColor: textGrey,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white10),
+          borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
+          borderSide: const BorderSide(color: Color(0xFF334155)), // slate-700
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white10),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF334155)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: primaryGreen),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primary),
         ),
       ),
 
       // Style cho nút bấm chính (ElevatedButton)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryGreen,
-          foregroundColor: _darkBackground, // Màu chữ trên nút
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
+          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 
   // ==========================================================================
-  // 3. LIGHT THEME (Giao diện sáng - Bổ sung mới)
+  // LIGHT THEME
   // ==========================================================================
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: _lightBackground,
-      primaryColor: primaryGreen,
+      scaffoldBackgroundColor: backgroundLight,
+      primaryColor: primary,
 
       // Cấu hình màu sắc cốt lõi
       colorScheme: const ColorScheme.light(
-        primary: primaryGreen,
+        primary: primary,
         secondary: primaryDark,
-        surface: _lightSurface,
-        background: _lightBackground,
+        surface: surfaceLight,
         error: redAlert,
-        onPrimary: _darkBackground, // Chữ trên nền nút xanh vẫn là màu tối
-        onSurface: _textBlack,
+        onPrimary: Colors.white,
+        onSurface: textBlack,
       ),
 
       // Font chữ
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme).apply(
-        bodyColor: _textBlack,
-        displayColor: _textBlack,
-      ),
+      textTheme: GoogleFonts.interTextTheme(
+        ThemeData.light().textTheme,
+      ).apply(bodyColor: textBlack, displayColor: textBlack),
 
       // AppBar Light Mode
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: _textBlack),
+        iconTheme: IconThemeData(color: textBlack),
         titleTextStyle: TextStyle(
-          color: _textBlack, 
-          fontSize: 20, 
-          fontWeight: FontWeight.bold
+          color: textBlack,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
       ),
 
       // Input Light Mode
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        hintStyle: TextStyle(color: _textGrey.withOpacity(0.8), fontSize: 14),
-        prefixIconColor: _textGrey,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        fillColor: surfaceLight,
+        hintStyle: TextStyle(color: textGrey.withOpacity(0.8), fontSize: 14),
+        prefixIconColor: textGrey,
+        suffixIconColor: textGrey,
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 16,
+        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)), // slate-200
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: primaryGreen),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primary),
         ),
       ),
 
-      // Button Light Mode (Giữ nguyên style nút xanh để nhận diện thương hiệu)
+      // Button Light Mode
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryGreen,
-          foregroundColor: _darkBackground,
-          elevation: 2, // Thêm chút bóng đổ cho nổi trên nền sáng
-          shadowColor: primaryGreen.withOpacity(0.4),
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          elevation: 2,
+          shadowColor: primary.withOpacity(0.4),
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
+          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),
     );

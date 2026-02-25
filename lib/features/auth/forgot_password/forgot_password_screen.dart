@@ -5,6 +5,7 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/validators.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
@@ -42,7 +43,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(authProvider.notifier).resetPassword(email: email);
+      await ref
+          .read(authProvider.notifier)
+          .resetUserPassword(ResetPasswordParam(email: email));
       if (mounted) {
         setState(() => _isLoading = false);
         SuccessDialog.show(

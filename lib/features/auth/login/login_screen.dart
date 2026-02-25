@@ -4,10 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
 import 'package:monikid/shared/widgets/social_button.dart';
 import 'package:monikid/shared/widgets/auth_card.dart';
+import 'package:monikid/features/auth/login/widgets/login_header.dart';
+import 'package:monikid/features/auth/login/widgets/role_selector.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -45,7 +48,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       await ref
           .read(authProvider.notifier)
-          .signIn(email: email, password: password);
+          .validateUser(
+            SignInParam(
+              email: email,
+              password: password,
+              selectedRole: _selectedRole,
+            ),
+          );
       // Let the router handle redirection based on auth state & role
     } catch (e) {
       if (mounted) {
@@ -83,261 +92,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // --- SECTION 1: HEADER & ILLUSTRATION ---
-                    // Abstract Illustration
-                    Container(
-                      width: 128, // w-32
-                      height: 128, // h-32
-                      margin: const EdgeInsets.only(bottom: 32), // mb-8
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        borderRadius: BorderRadius.circular(
-                          40,
-                        ), // rounded-[40px]
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 4,
-                        ), // border-white border-4
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05), // shadow-md
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 64, // w-16
-                            height: 64, // h-16
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFF97316), // bg-orange-500
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const Positioned(
-                            bottom: -16, // -bottom-4
-                            child: Icon(
-                              Icons.yard_rounded, // potted_plant equivalent
-                              size: 80, // text-[80px]
-                              color: AppTheme.primary,
-                            ),
-                          ),
-                          // Sparkles
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: Icon(
-                              Icons.star_rounded,
-                              color: const Color(0xFFFDE047),
-                              size: 16,
-                            ), // text-yellow-300 text-sm
-                          ),
-                          Positioned(
-                            top: 32,
-                            left: 16,
-                            child: Icon(
-                              Icons.star_rounded,
-                              color: const Color(0xFF93C5FD),
-                              size: 24,
-                            ), // text-blue-300 text-xl
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Title & Tagline
-                    Text(
-                      "MoniKid",
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 36, // text-4xl
-                        fontWeight: FontWeight.w800, // font-extrabold
-                        letterSpacing: -0.5,
-                        color: isDark
-                            ? AppTheme.primaryLight
-                            : AppTheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8), // mt-2
-                    Text(
-                      "Quản lý tài chính an toàn cho gia đình bạn.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 14,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(
-                                0xFF64748B,
-                              ), // text-slate-500 / slate-400
-                      ),
-                    ),
-                    const SizedBox(height: 32),
+                    const LoginHeader(),
 
                     // --- SECTION 2: AUTH FORM ---
                     AuthCard(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Role Selector Toggle
-                          Container(
-                            padding: const EdgeInsets.all(4), // p-1
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppTheme.backgroundDark
-                                  : AppTheme.backgroundLight,
-                              borderRadius: BorderRadius.circular(
-                                12,
-                              ), // rounded-lg
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => setState(
-                                      () => _selectedRole = 'parent',
-                                    ),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                      ), // py-2
-                                      decoration: BoxDecoration(
-                                        color: _selectedRole == 'parent'
-                                            ? (isDark
-                                                  ? const Color(0xFF334155)
-                                                  : Colors.white)
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          8,
-                                        ), // rounded-md
-                                        boxShadow: _selectedRole == 'parent'
-                                            ? [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.05),
-                                                  blurRadius: 4,
-                                                ),
-                                              ]
-                                            : [],
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.family_restroom,
-                                            size: 16,
-                                            color: _selectedRole == 'parent'
-                                                ? AppTheme.primary
-                                                : (isDark
-                                                      ? const Color(0xFF94A3B8)
-                                                      : const Color(
-                                                          0xFF64748B,
-                                                        )),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            "Phụ huynh",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight
-                                                  .w600, // font-semibold
-                                              color: _selectedRole == 'parent'
-                                                  ? (isDark
-                                                        ? Colors.white
-                                                        : const Color(
-                                                            0xFF0F172A,
-                                                          ))
-                                                  : (isDark
-                                                        ? const Color(
-                                                            0xFF94A3B8,
-                                                          )
-                                                        : const Color(
-                                                            0xFF64748B,
-                                                          )),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => setState(
-                                      () => _selectedRole = 'student',
-                                    ),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                      ), // py-2
-                                      decoration: BoxDecoration(
-                                        color: _selectedRole == 'student'
-                                            ? (isDark
-                                                  ? const Color(0xFF334155)
-                                                  : Colors.white)
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(
-                                          8,
-                                        ), // rounded-md
-                                        boxShadow: _selectedRole == 'student'
-                                            ? [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.05),
-                                                  blurRadius: 4,
-                                                ),
-                                              ]
-                                            : [],
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.school,
-                                            size: 16,
-                                            color: _selectedRole == 'student'
-                                                ? AppTheme.primary
-                                                : (isDark
-                                                      ? const Color(0xFF94A3B8)
-                                                      : const Color(
-                                                          0xFF64748B,
-                                                        )),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            "Học sinh",
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight
-                                                  .w600, // font-semibold
-                                              color: _selectedRole == 'student'
-                                                  ? (isDark
-                                                        ? Colors.white
-                                                        : const Color(
-                                                            0xFF0F172A,
-                                                          ))
-                                                  : (isDark
-                                                        ? const Color(
-                                                            0xFF94A3B8,
-                                                          )
-                                                        : const Color(
-                                                            0xFF64748B,
-                                                          )),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          RoleSelector(
+                            selectedRole: _selectedRole,
+                            onRoleChanged: (role) {
+                              setState(() => _selectedRole = role);
+                            },
                           ),
                           const SizedBox(height: 24), // space-y-6 equivalent
                           // Form Inputs

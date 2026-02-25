@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 
 // Import screens
-import 'package:monikid/features/auth/splash/splash_screen.dart';
+import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/auth/login/login_screen.dart';
 import 'package:monikid/features/auth/register/register.dart';
 import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
@@ -147,20 +147,27 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isAuthRoute = authRoutes.contains(currentPath);
 
-      // Nếu đã đăng nhập mà đang ở trang auth (Login/Register...) -> redirect về splash,
-      // Splash sẽ quyết định vào Home nào dựa trên Role
+      // Nếu đã đăng nhập mà đang ở trang auth (Login/Register...) -> redirect thẳng vào màn hình tương ứng
       if (isAuthenticated && isAuthRoute) {
-        return AppRoutes.splash;
+        final role = authState.userRole;
+        if (role == 'parent') {
+          return AppRoutes.parent;
+        } else if (role == 'student') {
+          return AppRoutes.studentMain;
+        } else {
+          return AppRoutes.parent; // Tạm thời fallback nếu role chưa set
+        }
       }
 
       // Đang ở onboarding hoặc splash -> cho phép access để xử lý logic bên trong SplashScreen hoặc Onboarding
       if (currentPath == AppRoutes.splash ||
           currentPath == AppRoutes.onboard1) {
-        // Tuy nhiên nếu người dùng đã đăng nhập mà vào Onboard thì cũng đá về Splash
         if (isAuthenticated && currentPath == AppRoutes.onboard1) {
-          return AppRoutes.splash;
+          // Ngăn Onboarding nếu đã login
+          final role = authState.userRole;
+          return role == 'parent' ? AppRoutes.parent : AppRoutes.studentMain;
         }
-        return null; // Trả về null để vào Splash
+        return null;
       }
 
       // Chưa đăng nhập và đang ở trang private -> redirect về login

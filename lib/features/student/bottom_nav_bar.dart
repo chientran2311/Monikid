@@ -5,7 +5,7 @@ import 'package:monikid/app/router.dart';
 
 // Import Tabs
 import 'package:monikid/features/student/home/home_tab_stu.dart';
-import 'package:monikid/features/student/transaction/transaction_history_screen.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_screen.dart';
 import 'package:monikid/features/student/statistic/statistic_screen.dart';
 import 'package:monikid/features/student/setting/setting_tab_stu.dart';
 

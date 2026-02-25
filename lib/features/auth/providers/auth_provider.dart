@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
 import 'auth_state.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
-import 'package:monikid/repositories/auth/auth_repository_impl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'auth_provider.g.dart';
 
@@ -27,53 +27,62 @@ class Auth extends _$Auth {
 
   @override
   AppAuthState build() {
-    // Initialize repository
-    _authRepository = AuthRepositoryImpl(_firebaseAuth, FirebaseFirestore.instance);
-    
+    // Initialize repository via GetIt
+    _authRepository = getIt<AuthRepository>();
+
     // Cleanup khi provider bị dispose
     ref.onDispose(() {
       _authSubscription?.cancel();
     });
-    
+
     // Khởi tạo và lắng nghe auth changes
     _initAuthListener();
-    
-    // Check session hiện tại
-    return _checkCurrentSession();
+
+    // Check session hiện tại (async)
+    _checkCurrentSession();
+
+    return const AppAuthState(status: AuthStatus.initial);
   }
 
-  /// Kiểm tra session hiện tại khi khởi động
-  AppAuthState _checkCurrentSession() {
+  /// Kiểm tra session hiện tại khi khởi động (Async)
+  Future<void> _checkCurrentSession() async {
     try {
       final currentUser = _firebaseAuth.currentUser;
       if (currentUser != null) {
-        return AppAuthState(
+        // Fetch role
+        final role = await _authRepository.getUserRole(currentUser.uid);
+        state = AppAuthState(
           status: AuthStatus.authenticated,
           user: currentUser,
+          userRole: role,
         );
+      } else {
+        state = const AppAuthState(status: AuthStatus.unauthenticated);
       }
-      return const AppAuthState(status: AuthStatus.unauthenticated);
     } catch (e) {
-      // Firebase chưa khởi tạo
-      return const AppAuthState(status: AuthStatus.initial);
+      // Firebase chưa khởi tạo hoặc lỗi mạng
+      state = const AppAuthState(status: AuthStatus.initial);
     }
   }
 
   /// Lắng nghe thay đổi auth state từ Firebase
   void _initAuthListener() {
     try {
-      _authSubscription = _firebaseAuth.authStateChanges().listen(
-        (User? user) {
-          if (user != null) {
-            state = AppAuthState(
-              status: AuthStatus.authenticated,
-              user: user,
-            );
-          } else {
-            state = const AppAuthState(status: AuthStatus.unauthenticated);
-          }
-        },
-      );
+      _authSubscription = _firebaseAuth.authStateChanges().listen((
+        User? user,
+      ) async {
+        if (user != null) {
+          // Fetch the role when session restores via stream
+          final role = await _authRepository.getUserRole(user.uid);
+          state = AppAuthState(
+            status: AuthStatus.authenticated,
+            user: user,
+            userRole: role,
+          );
+        } else {
+          state = const AppAuthState(status: AuthStatus.unauthenticated);
+        }
+      });
     } catch (e) {
       // Firebase chưa khởi tạo - bỏ qua
     }
@@ -83,160 +92,92 @@ class Auth extends _$Auth {
   // PUBLIC METHODS
   // ============================================================================
 
-  /// Đăng nhập với email và password
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  /// Đăng nhập với email và password thông qua Param
+  Future<void> validateUser(SignInParam param) async {
     // Set loading state
-    state = state.copyWith(
-      isLoading: true,
-      errorMessage: null,
-    );
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      _logger.i('🔐 Auth Provider: Starting sign in for $email');
-      
-      final userCredential = await _authRepository.signIn(
-        email: email,
-        password: password,
-      );
+      _logger.i('🔐 Auth Provider: Validating user ${param.email}');
 
-      if (userCredential.user != null) {
-        _logger.i('✅ Auth Provider: Sign in successful');
-        state = AppAuthState(
-          status: AuthStatus.authenticated,
-          user: userCredential.user,
-          isLoading: false,
-        );
-      } else {
-        _logger.w('⚠️ Auth Provider: Sign in returned null user');
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Sign in failed. Please try again.',
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      _logger.e('❌ Auth Provider: Firebase Auth error - ${e.code}: ${e.message}');
-      String errorMessage;
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No user found with this email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Incorrect password.';
-          break;
-        case 'invalid-email':
-          errorMessage = 'Invalid email address.';
-          break;
-        case 'user-disabled':
-          errorMessage = 'This account has been disabled.';
-          break;
-        default:
-          errorMessage = e.message ?? 'An error occurred during sign in.';
-      }
+      final response = await _authRepository.signIn(param);
+
+      _logger.i('✅ Auth Provider: Validation successful');
+
+      state = AppAuthState(
+        status: AuthStatus.authenticated,
+        user: response.user,
+        userRole: response.role,
+        isLoading: false,
+      );
+    } catch (e, stackTrace) {
+      _logger.e(
+        '❌ Auth Provider: Validation error',
+        error: e,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
         isLoading: false,
-        errorMessage: errorMessage,
-      );
-      rethrow;
-    } catch (e, stackTrace) {
-      _logger.e('❌ Auth Provider: Unexpected error', error: e, stackTrace: stackTrace);
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'An unexpected error occurred: ${e.toString()}',
+        errorMessage: e is FirebaseAuthException
+            ? _getFriendlyErrorMessage(e)
+            : e.toString().replaceAll('Exception: ', ''),
       );
       rethrow;
     }
   }
 
-  /// Đăng ký với email và password
-  Future<void> signUp({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-  }) async {
-    state = state.copyWith(
-      isLoading: true,
-      errorMessage: null,
-    );
+  /// Đăng ký người dùng mới với Param
+  Future<void> registerUser(SignUpParam param) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      _logger.i('📝 Auth Provider: Starting sign up for $email');
-      _logger.d('📝 Details - Name: $fullName, Phone: $phone, Role: $role');
-      
+      _logger.i('📝 Auth Provider: Registering user ${param.email}');
+
       // Gọi repository để tạo auth account VÀ sync Firestore
-      final userCredential = await _authRepository.signUp(
-        email: email,
-        password: password,
-        fullName: fullName,
-        phone: phone,
-        role: role,
-      );
+      final response = await _authRepository.signUp(param);
 
-      if (userCredential.user != null) {
-        _logger.i('✅ Auth Provider: Sign up successful');
-        _logger.i('💾 Firestore sync completed by repository');
-        
-        // Update display name
-        await userCredential.user!.updateDisplayName(fullName);
-        
-        // Reload user to get updated info
-        await userCredential.user!.reload();
-        final updatedUser = _firebaseAuth.currentUser;
+      _logger.i('✅ Auth Provider: Registration successful');
 
-        state = AppAuthState(
-          status: AuthStatus.authenticated,
-          user: updatedUser,
-          isLoading: false,
-        );
-      } else {
-        _logger.w('⚠️ Auth Provider: Sign up returned null user');
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Sign up failed. Please try again.',
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      _logger.e('❌ Auth Provider: Firebase Auth error - ${e.code}: ${e.message}');
-      String errorMessage;
-      switch (e.code) {
-        case 'email-already-in-use':
-          errorMessage = 'This email is already registered.';
-          break;
-        case 'invalid-email':
-          errorMessage = 'Invalid email address.';
-          break;
-        case 'weak-password':
-          errorMessage = 'Password is too weak. Use at least 6 characters.';
-          break;
-        default:
-          errorMessage = e.message ?? 'An error occurred during sign up.';
-      }
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
+      state = AppAuthState(
+        status: AuthStatus.authenticated,
+        user: response.user,
+        userRole: response.role,
         isLoading: false,
-        errorMessage: errorMessage,
       );
-      rethrow;
-    } on FirebaseException catch (e) {
-      _logger.e('❌ Auth Provider: Firestore error - ${e.code}: ${e.message}');
-      state = state.copyWith(
-        status: AuthStatus.unauthenticated,
-        isLoading: false,
-        errorMessage: 'Failed to sync user data: ${e.message}',
-      );
-      rethrow;
     } catch (e, stackTrace) {
-      _logger.e('❌ Auth Provider: Unexpected error', error: e, stackTrace: stackTrace);
+      _logger.e(
+        '❌ Auth Provider: Registration error',
+        error: e,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
+        status: AuthStatus.unauthenticated,
         isLoading: false,
-        errorMessage: 'An unexpected error occurred: ${e.toString()}',
+        errorMessage: e is FirebaseAuthException
+            ? _getFriendlyErrorMessage(e)
+            : e.toString().replaceAll('Exception: ', ''),
       );
       rethrow;
+    }
+  }
+
+  String _getFriendlyErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'Không tìm thấy người dùng với email này.';
+      case 'wrong-password':
+        return 'Mật khẩu không chính xác.';
+      case 'invalid-email':
+        return 'Địa chỉ email không hợp lệ.';
+      case 'user-disabled':
+        return 'Tài khoản này đã bị vô hiệu hóa.';
+      case 'email-already-in-use':
+        return 'Email này đã được đăng ký.';
+      case 'weak-password':
+        return 'Mật khẩu quá yếu. Vui lòng sử dụng ít nhất 6 ký tự.';
+      default:
+        return e.message ?? 'Đã xảy ra lỗi hệ thống.';
     }
   }
 
@@ -250,10 +191,14 @@ class Auth extends _$Auth {
       state = const AppAuthState(status: AuthStatus.unauthenticated);
       _logger.i('✅ Auth Provider: Sign out successful');
     } catch (e, stackTrace) {
-      _logger.e('❌ Auth Provider: Sign out failed', error: e, stackTrace: stackTrace);
+      _logger.e(
+        '❌ Auth Provider: Sign out failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Sign out failed: ${e.toString()}',
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
       rethrow;
     }
@@ -266,6 +211,30 @@ class Auth extends _$Auth {
 
   /// Reset state về initial (dùng khi cần re-check auth)
   void reset() {
-    state = _checkCurrentSession();
+    state = const AppAuthState(status: AuthStatus.initial);
+    _checkCurrentSession();
+  }
+
+  /// Gửi email đặt lại mật khẩu bằng Param
+  Future<void> resetUserPassword(ResetPasswordParam param) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      _logger.i('📧 Auth Provider: Sending password reset for ${param.email}');
+      await _authRepository.resetPassword(param);
+      _logger.i('✅ Auth Provider: Password reset email sent');
+      state = state.copyWith(isLoading: false);
+    } catch (e, stackTrace) {
+      _logger.e(
+        '❌ Auth Provider: Reset password error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll('Exception: ', ''),
+      );
+      rethrow;
+    }
   }
 }

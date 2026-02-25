@@ -20,7 +20,9 @@ mixin _$PinDialogState {
  String get currentPin;// Mã PIN đang nhập
  bool get isConfirming;// Đang ở bước xác nhận lại (setup)
  bool get hasError;// Đang ở trạng thái lỗi (rung)
- bool get isSuccess;
+ bool get isSuccess;// Xử lý thành công
+ bool get isLoading;// Đang xử lý
+ bool get isPinCreated;
 /// Create a copy of PinDialogState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,16 +33,16 @@ $PinDialogStateCopyWith<PinDialogState> get copyWith => _$PinDialogStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PinDialogState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.expectedPin, expectedPin) || other.expectedPin == expectedPin)&&(identical(other.firstPin, firstPin) || other.firstPin == firstPin)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.isConfirming, isConfirming) || other.isConfirming == isConfirming)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PinDialogState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.expectedPin, expectedPin) || other.expectedPin == expectedPin)&&(identical(other.firstPin, firstPin) || other.firstPin == firstPin)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.isConfirming, isConfirming) || other.isConfirming == isConfirming)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isPinCreated, isPinCreated) || other.isPinCreated == isPinCreated));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,mode,expectedPin,firstPin,currentPin,isConfirming,hasError,isSuccess);
+int get hashCode => Object.hash(runtimeType,mode,expectedPin,firstPin,currentPin,isConfirming,hasError,isSuccess,isLoading,isPinCreated);
 
 @override
 String toString() {
-  return 'PinDialogState(mode: $mode, expectedPin: $expectedPin, firstPin: $firstPin, currentPin: $currentPin, isConfirming: $isConfirming, hasError: $hasError, isSuccess: $isSuccess)';
+  return 'PinDialogState(mode: $mode, expectedPin: $expectedPin, firstPin: $firstPin, currentPin: $currentPin, isConfirming: $isConfirming, hasError: $hasError, isSuccess: $isSuccess, isLoading: $isLoading, isPinCreated: $isPinCreated)';
 }
 
 
@@ -51,7 +53,7 @@ abstract mixin class $PinDialogStateCopyWith<$Res>  {
   factory $PinDialogStateCopyWith(PinDialogState value, $Res Function(PinDialogState) _then) = _$PinDialogStateCopyWithImpl;
 @useResult
 $Res call({
- PinDialogMode mode, String expectedPin, String firstPin, String currentPin, bool isConfirming, bool hasError, bool isSuccess
+ PinDialogMode mode, String expectedPin, String firstPin, String currentPin, bool isConfirming, bool hasError, bool isSuccess, bool isLoading, bool isPinCreated
 });
 
 
@@ -68,7 +70,7 @@ class _$PinDialogStateCopyWithImpl<$Res>
 
 /// Create a copy of PinDialogState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? expectedPin = null,Object? firstPin = null,Object? currentPin = null,Object? isConfirming = null,Object? hasError = null,Object? isSuccess = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? expectedPin = null,Object? firstPin = null,Object? currentPin = null,Object? isConfirming = null,Object? hasError = null,Object? isSuccess = null,Object? isLoading = null,Object? isPinCreated = null,}) {
   return _then(_self.copyWith(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as PinDialogMode,expectedPin: null == expectedPin ? _self.expectedPin : expectedPin // ignore: cast_nullable_to_non_nullable
@@ -77,6 +79,8 @@ as String,currentPin: null == currentPin ? _self.currentPin : currentPin // igno
 as String,isConfirming: null == isConfirming ? _self.isConfirming : isConfirming // ignore: cast_nullable_to_non_nullable
 as bool,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
+as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,isPinCreated: null == isPinCreated ? _self.isPinCreated : isPinCreated // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -88,7 +92,7 @@ as bool,
 
 
 class _PinDialogState implements PinDialogState {
-  const _PinDialogState({required this.mode, this.expectedPin = '', this.firstPin = '', this.currentPin = '', this.isConfirming = false, this.hasError = false, this.isSuccess = false});
+  const _PinDialogState({required this.mode, this.expectedPin = '', this.firstPin = '', this.currentPin = '', this.isConfirming = false, this.hasError = false, this.isSuccess = false, this.isLoading = false, this.isPinCreated = false});
   
 
 @override final  PinDialogMode mode;
@@ -103,6 +107,10 @@ class _PinDialogState implements PinDialogState {
 @override@JsonKey() final  bool hasError;
 // Đang ở trạng thái lỗi (rung)
 @override@JsonKey() final  bool isSuccess;
+// Xử lý thành công
+@override@JsonKey() final  bool isLoading;
+// Đang xử lý
+@override@JsonKey() final  bool isPinCreated;
 
 /// Create a copy of PinDialogState
 /// with the given fields replaced by the non-null parameter values.
@@ -114,16 +122,16 @@ _$PinDialogStateCopyWith<_PinDialogState> get copyWith => __$PinDialogStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PinDialogState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.expectedPin, expectedPin) || other.expectedPin == expectedPin)&&(identical(other.firstPin, firstPin) || other.firstPin == firstPin)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.isConfirming, isConfirming) || other.isConfirming == isConfirming)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PinDialogState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.expectedPin, expectedPin) || other.expectedPin == expectedPin)&&(identical(other.firstPin, firstPin) || other.firstPin == firstPin)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.isConfirming, isConfirming) || other.isConfirming == isConfirming)&&(identical(other.hasError, hasError) || other.hasError == hasError)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isPinCreated, isPinCreated) || other.isPinCreated == isPinCreated));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,mode,expectedPin,firstPin,currentPin,isConfirming,hasError,isSuccess);
+int get hashCode => Object.hash(runtimeType,mode,expectedPin,firstPin,currentPin,isConfirming,hasError,isSuccess,isLoading,isPinCreated);
 
 @override
 String toString() {
-  return 'PinDialogState(mode: $mode, expectedPin: $expectedPin, firstPin: $firstPin, currentPin: $currentPin, isConfirming: $isConfirming, hasError: $hasError, isSuccess: $isSuccess)';
+  return 'PinDialogState(mode: $mode, expectedPin: $expectedPin, firstPin: $firstPin, currentPin: $currentPin, isConfirming: $isConfirming, hasError: $hasError, isSuccess: $isSuccess, isLoading: $isLoading, isPinCreated: $isPinCreated)';
 }
 
 
@@ -134,7 +142,7 @@ abstract mixin class _$PinDialogStateCopyWith<$Res> implements $PinDialogStateCo
   factory _$PinDialogStateCopyWith(_PinDialogState value, $Res Function(_PinDialogState) _then) = __$PinDialogStateCopyWithImpl;
 @override @useResult
 $Res call({
- PinDialogMode mode, String expectedPin, String firstPin, String currentPin, bool isConfirming, bool hasError, bool isSuccess
+ PinDialogMode mode, String expectedPin, String firstPin, String currentPin, bool isConfirming, bool hasError, bool isSuccess, bool isLoading, bool isPinCreated
 });
 
 
@@ -151,7 +159,7 @@ class __$PinDialogStateCopyWithImpl<$Res>
 
 /// Create a copy of PinDialogState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? expectedPin = null,Object? firstPin = null,Object? currentPin = null,Object? isConfirming = null,Object? hasError = null,Object? isSuccess = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? expectedPin = null,Object? firstPin = null,Object? currentPin = null,Object? isConfirming = null,Object? hasError = null,Object? isSuccess = null,Object? isLoading = null,Object? isPinCreated = null,}) {
   return _then(_PinDialogState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as PinDialogMode,expectedPin: null == expectedPin ? _self.expectedPin : expectedPin // ignore: cast_nullable_to_non_nullable
@@ -160,6 +168,8 @@ as String,currentPin: null == currentPin ? _self.currentPin : currentPin // igno
 as String,isConfirming: null == isConfirming ? _self.isConfirming : isConfirming // ignore: cast_nullable_to_non_nullable
 as bool,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
+as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,isPinCreated: null == isPinCreated ? _self.isPinCreated : isPinCreated // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

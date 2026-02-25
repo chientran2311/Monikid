@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'widgets/month_tab.dart';
+import 'widgets/legend_item.dart';
+import 'widgets/category_item.dart';
 
 class StatisticTabParent extends StatefulWidget {
   const StatisticTabParent({Key? key}) : super(key: key);
@@ -60,9 +63,24 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildMonthTab("Tháng 9", false, primary, textSubColor),
-                _buildMonthTab("Tháng 10", true, primary, textSubColor),
-                _buildMonthTab("Tháng 11", false, primary, textSubColor),
+                MonthTab(
+                  title: "Tháng 9",
+                  isActive: false,
+                  primaryColor: primary,
+                  unselectedColor: textSubColor,
+                ),
+                MonthTab(
+                  title: "Tháng 10",
+                  isActive: true,
+                  primaryColor: primary,
+                  unselectedColor: textSubColor,
+                ),
+                MonthTab(
+                  title: "Tháng 11",
+                  isActive: false,
+                  primaryColor: primary,
+                  unselectedColor: textSubColor,
+                ),
               ],
             ),
           ),
@@ -209,25 +227,25 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
                     runSpacing: 8,
                     alignment: WrapAlignment.center,
                     children: [
-                      _buildLegendItem(
-                        "Ăn uống",
-                        const Color(0xFF13EC22),
-                        textSubColor,
+                      LegendItem(
+                        label: "Ăn uống",
+                        color: const Color(0xFF13EC22),
+                        textSubColor: textSubColor,
                       ),
-                      _buildLegendItem(
-                        "Di chuyển",
-                        const Color(0xFF2DD4BF),
-                        textSubColor,
+                      LegendItem(
+                        label: "Di chuyển",
+                        color: const Color(0xFF2DD4BF),
+                        textSubColor: textSubColor,
                       ),
-                      _buildLegendItem(
-                        "Học tập",
-                        const Color(0xFF10B981),
-                        textSubColor,
+                      LegendItem(
+                        label: "Học tập",
+                        color: const Color(0xFF10B981),
+                        textSubColor: textSubColor,
                       ),
-                      _buildLegendItem(
-                        "Khác",
-                        const Color(0xFF065F46),
-                        textSubColor,
+                      LegendItem(
+                        label: "Khác",
+                        color: const Color(0xFF065F46),
+                        textSubColor: textSubColor,
                       ),
                     ],
                   ),
@@ -378,7 +396,7 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
             ),
             const SizedBox(height: 12),
 
-            _buildCategoryItem(
+            CategoryItem(
               icon: Icons.restaurant,
               title: "Ăn uống",
               amount: "1.200.000đ",
@@ -395,7 +413,7 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
               isDark: isDark,
             ),
             const SizedBox(height: 12),
-            _buildCategoryItem(
+            CategoryItem(
               icon: Icons.directions_bus,
               title: "Di chuyển",
               amount: "500.000đ",
@@ -412,7 +430,7 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
               isDark: isDark,
             ),
             const SizedBox(height: 12),
-            _buildCategoryItem(
+            CategoryItem(
               icon: Icons.school,
               title: "Học tập",
               amount: "300.000đ",
@@ -429,7 +447,7 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
               isDark: isDark,
             ),
             const SizedBox(height: 12),
-            _buildCategoryItem(
+            CategoryItem(
               icon: Icons.more_horiz,
               title: "Khác",
               amount: "500.000đ",
@@ -447,151 +465,6 @@ class _StatisticTabParentState extends State<StatisticTabParent> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildMonthTab(
-    String title,
-    bool isActive,
-    Color primaryColor,
-    Color unselectedColor,
-  ) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: isActive ? 16 : 14,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            color: isActive ? primaryColor : unselectedColor,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          width: 32,
-          height: 4,
-          decoration: BoxDecoration(
-            color: isActive ? primaryColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color, Color textSubColor) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: textSubColor,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCategoryItem({
-    required IconData icon,
-    required String title,
-    required String amount,
-    required String percentage,
-    required double value,
-    required Color color,
-    required Color bgColor,
-    required Color surfaceColor,
-    required Color borderColor,
-    required Color textColor,
-    required Color textSubColor,
-    required bool isDark,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                      ),
-                    ),
-                    Text(
-                      amount,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: value,
-                          backgroundColor: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFF3F4F6),
-                          valueColor: AlwaysStoppedAnimation<Color>(color),
-                          minHeight: 6,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    SizedBox(
-                      width: 32,
-                      child: Text(
-                        percentage,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: textSubColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

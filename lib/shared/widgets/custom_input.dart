@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:monikid/core/theme/theme.dart';
 
 class CustomInputWidget extends StatefulWidget {
   final String label;
@@ -30,51 +29,60 @@ class _CustomInputWidgetState extends State<CustomInputWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Label
         Text(
           widget.label,
-          style: const TextStyle(
-            color: AppTheme.textWhite,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+          style: TextStyle(
+            color: isDark
+                ? const Color(0xFFCBD5E1)
+                : const Color(0xFF334155), // slate-300 : slate-700
+            fontWeight: FontWeight.w500, // font-medium
+            fontSize: 14, // text-sm
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6), // space-y-1.5
         // Input Field
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.inputBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white10),
+        TextFormField(
+          controller: widget.controller,
+          obscureText: widget.isPassword ? _obscureText : false,
+          keyboardType: widget.keyboardType,
+          style: TextStyle(
+            color: isDark
+                ? Colors.white
+                : const Color(0xFF0F172A), // white : slate-900
+            fontSize: 14,
           ),
-          child: TextField(
-            controller: widget.controller,
-            obscureText: widget.isPassword ? _obscureText : false,
-            keyboardType: widget.keyboardType,
-            style: const TextStyle(color: Colors.black87, fontSize: 16),
-            decoration: InputDecoration(
-              hintText: widget.placeholder,
-              hintStyle: const TextStyle(color: AppTheme.textGrey, fontSize: 14),
-              prefixIcon: Icon(widget.prefixIcon, color: AppTheme.textGrey, size: 20),
-              suffixIcon: widget.isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: AppTheme.textGrey,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+          validator: widget.validator,
+          decoration: InputDecoration(
+            hintText: widget.placeholder,
+            hintStyle: const TextStyle(
+              color: Color(0xFF94A3B8), // slate-400
+              fontSize: 14,
             ),
+            prefixIcon: Icon(
+              widget.prefixIcon,
+              color: const Color(0xFF94A3B8), // slate-400
+              size: 20,
+            ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: const Color(0xFF94A3B8), // slate-400
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  )
+                : null,
           ),
         ),
       ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'widgets/month_tab.dart';
+import 'widgets/legend_item.dart';
+import 'widgets/category_progress_item.dart';
 
 class StatisticScreen extends StatefulWidget {
   const StatisticScreen({Key? key}) : super(key: key);
@@ -55,8 +58,22 @@ class _StatisticScreenState extends State<StatisticScreen> {
                     ),
                     child: Row(
                       children: [
-                        _buildMonthTab("Tháng trước", 0, isDark),
-                        _buildMonthTab("Tháng này", 1, isDark),
+                        MonthTab(
+                          title: "Tháng trước",
+                          index: 0,
+                          isDark: isDark,
+                          selectedMonthIndex: _selectedMonthIndex,
+                          onMonthSelected: (idx) =>
+                              setState(() => _selectedMonthIndex = idx),
+                        ),
+                        MonthTab(
+                          title: "Tháng này",
+                          index: 1,
+                          isDark: isDark,
+                          selectedMonthIndex: _selectedMonthIndex,
+                          onMonthSelected: (idx) =>
+                              setState(() => _selectedMonthIndex = idx),
+                        ),
                       ],
                     ),
                   ),
@@ -233,25 +250,25 @@ class _StatisticScreenState extends State<StatisticScreen> {
                           runSpacing: 12,
                           alignment: WrapAlignment.center,
                           children: [
-                            _buildLegendItem(
-                              "Ăn uống",
-                              AppTheme.primary,
-                              isDark,
+                            LegendItem(
+                              label: "Ăn uống",
+                              color: AppTheme.primary,
+                              isDark: isDark,
                             ),
-                            _buildLegendItem(
-                              "Học tập",
-                              const Color(0xFFE89F29),
-                              isDark,
+                            LegendItem(
+                              label: "Học tập",
+                              color: const Color(0xFFE89F29),
+                              isDark: isDark,
                             ),
-                            _buildLegendItem(
-                              "Di chuyển",
-                              const Color(0xFF5e8761),
-                              isDark,
+                            LegendItem(
+                              label: "Di chuyển",
+                              color: const Color(0xFF5e8761),
+                              isDark: isDark,
                             ),
-                            _buildLegendItem(
-                              "Khác",
-                              const Color(0xFFa3c4a6),
-                              isDark,
+                            LegendItem(
+                              label: "Khác",
+                              color: const Color(0xFFa3c4a6),
+                              isDark: isDark,
                             ),
                           ],
                         ),
@@ -284,7 +301,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  _buildCategoryProgressItem(
+                  CategoryProgressItem(
                     icon: Icons.restaurant,
                     name: "Ăn uống",
                     amount: "1.500.000đ",
@@ -293,7 +310,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                     isDark: isDark,
                   ),
                   const SizedBox(height: 12),
-                  _buildCategoryProgressItem(
+                  CategoryProgressItem(
                     icon: Icons.school,
                     name: "Học tập",
                     amount: "500.000đ",
@@ -302,7 +319,7 @@ class _StatisticScreenState extends State<StatisticScreen> {
                     isDark: isDark,
                   ),
                   const SizedBox(height: 12),
-                  _buildCategoryProgressItem(
+                  CategoryProgressItem(
                     icon: Icons.directions_bus,
                     name: "Di chuyển",
                     amount: "300.000đ",
@@ -314,185 +331,6 @@ class _StatisticScreenState extends State<StatisticScreen> {
                   const SizedBox(height: 100), // Bottom nav padding
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthTab(String title, int index, bool isDark) {
-    final isSelected = _selectedMonthIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedMonthIndex = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark ? AppTheme.surfaceDark : Colors.white)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
-                : null,
-            border: isSelected
-                ? Border.all(
-                    color: isDark
-                        ? const Color(0xFF334155)
-                        : const Color(0xFFE2E8F0),
-                  )
-                : null,
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isSelected
-                  ? AppTheme.primary
-                  : (isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B)),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF1E293B).withOpacity(0.5)
-            : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryProgressItem({
-    required IconData icon,
-    required String name,
-    required String amount,
-    required double percent,
-    required Color color,
-    required bool isDark,
-  }) {
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    Text(
-                      amount,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Custom Progress Bar
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Container(
-                      width: constraints.maxWidth,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          width: constraints.maxWidth * percent,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
             ),
           ),
         ],

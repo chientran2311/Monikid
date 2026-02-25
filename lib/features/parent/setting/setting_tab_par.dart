@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'widgets/setting_group.dart';
+import 'widgets/setting_item.dart';
+import 'widgets/switch_item.dart';
 
 class SettingTabParent extends StatefulWidget {
   const SettingTabParent({Key? key}) : super(key: key);
@@ -147,11 +150,11 @@ class _SettingTabParentState extends State<SettingTabParent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildSettingGroup(
+                        SettingGroup(
                           title: "Quản lý gia đình",
                           titleColor: textSubColor,
                           children: [
-                            _buildSettingItem(
+                            SettingItem(
                               icon: Icons.supervisor_account,
                               iconColor: parentPrimary,
                               iconBgColor: parentPrimary.withOpacity(0.1),
@@ -161,7 +164,7 @@ class _SettingTabParentState extends State<SettingTabParent> {
                               borderColor: borderColor,
                               showBorder: true,
                             ),
-                            _buildSettingItem(
+                            SettingItem(
                               icon: Icons.account_balance_wallet,
                               iconColor: Colors.blue.shade600,
                               iconBgColor: Colors.blue.shade100,
@@ -179,11 +182,11 @@ class _SettingTabParentState extends State<SettingTabParent> {
 
                         const SizedBox(height: 24),
 
-                        _buildSettingGroup(
+                        SettingGroup(
                           title: "Thông báo",
                           titleColor: textSubColor,
                           children: [
-                            _buildSwitchItem(
+                            SwitchItem(
                               icon: Icons.notifications_active,
                               iconColor: Colors.orange.shade600,
                               iconBgColor: Colors.orange.shade100,
@@ -197,7 +200,7 @@ class _SettingTabParentState extends State<SettingTabParent> {
                               parentPrimary: parentPrimary,
                               showBorder: true,
                             ),
-                            _buildSwitchItem(
+                            SwitchItem(
                               icon: Icons.mail,
                               iconColor: Colors.purple.shade600,
                               iconBgColor: Colors.purple.shade100,
@@ -219,11 +222,11 @@ class _SettingTabParentState extends State<SettingTabParent> {
 
                         const SizedBox(height: 24),
 
-                        _buildSettingGroup(
+                        SettingGroup(
                           title: "Tài khoản",
                           titleColor: textSubColor,
                           children: [
-                            _buildSettingItem(
+                            SettingItem(
                               icon: Icons.lock_reset,
                               iconColor: isDark
                                   ? const Color(0xFF94A3B8)
@@ -237,7 +240,7 @@ class _SettingTabParentState extends State<SettingTabParent> {
                               borderColor: borderColor,
                               showBorder: true,
                             ),
-                            _buildSettingItem(
+                            SettingItem(
                               icon: Icons.help_outline,
                               iconColor: isDark
                                   ? const Color(0xFF94A3B8)
@@ -295,182 +298,6 @@ class _SettingTabParentState extends State<SettingTabParent> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSettingGroup({
-    required String title,
-    required Color titleColor,
-    required List<Widget> children,
-    required Color surfaceColor,
-    required Color borderColor,
-    required bool isDark,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-          child: Text(
-            title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: surfaceColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              if (!isDark)
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.01),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-            ],
-          ),
-          child: Column(children: children),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSettingItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    required String? subtitle,
-    required Color textColor,
-    required Color borderColor,
-    required bool showBorder,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border(bottom: BorderSide(color: borderColor))
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: iconColor, size: 20),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
-                        ),
-                      ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: Colors.grey),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSwitchItem({
-    required IconData icon,
-    required Color iconColor,
-    required Color iconBgColor,
-    required String title,
-    required String? subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-    required Color textColor,
-    required Color borderColor,
-    required Color parentPrimary,
-    required bool showBorder,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border(bottom: BorderSide(color: borderColor))
-            : null,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: iconBgColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: Colors.white,
-            activeTrackColor: parentPrimary,
           ),
         ],
       ),

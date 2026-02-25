@@ -1,12 +1,14 @@
-import 'package:flutter/gestures.dart'; // Dùng cho TapGestureRecognizer ở phần Terms
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/App/router.dart';
+import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
-import 'package:monikid/shared/widgets/primary_button.dart';
+import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
+import 'package:monikid/shared/widgets/social_button.dart';
+import 'package:monikid/shared/widgets/auth_card.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -16,14 +18,11 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  // Controllers
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  
-  // Biến trạng thái để ẩn/hiện password
-  bool _isPasswordVisible = false;
+  String _selectedRole = 'parent';
 
   @override
   void dispose() {
@@ -43,7 +42,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill in all required fields'),
+          content: Text('Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)'),
           backgroundColor: AppTheme.redAlert,
         ),
       );
@@ -51,19 +50,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
 
     try {
-      await ref.read(authProvider.notifier).signUp(
-        email: email,
-        password: password,
-        fullName: fullName,
-        phone: phone,
-        role: 'parent', // Default role
-      );
-      // Router sẽ tự redirect về home khi auth state thay đổi
+      await ref
+          .read(authProvider.notifier)
+          .registerUser(
+            SignUpParam(
+              email: email,
+              password: password,
+              fullName: fullName,
+              phone: phone,
+              role: _selectedRole,
+            ),
+          );
+      // Router handles redirection natively
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Registration failed: ${e.toString()}'),
+            content: Text('Đăng ký thất bại: ${e.toString()}'),
             backgroundColor: AppTheme.redAlert,
           ),
         );
@@ -74,263 +77,369 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            context.pop(); // Quay lại màn hình trước
-          },
-        ),
-      ),
-      // Sử dụng SingleChildScrollView để cuộn được khi bàn phím hiện lên
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundLight,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- SECTION 1: HEADER ---
-              Center(
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: AppTheme.inputBackground,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.white10),
-                  ),
-                  child: const Icon(Icons.verified_user_outlined, color: AppTheme.primaryGreen, size: 32),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 32.0,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 64, // Subtract padding
                 ),
-              ),
-              const SizedBox(height: 24),
-              
-              const Text(
-                "Create Account",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textWhite,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Join MoniKid to manage your family's finances safely and securely.",
-                style: TextStyle(color: AppTheme.textGrey, fontSize: 14, height: 1.5),
-              ),
-              const SizedBox(height: 32),
-
-              // --- SECTION 2: FORM ---
-              
-              // 1. Full Name
-              CustomInputWidget(
-                label: "FULL NAME",
-                placeholder: "e.g. Sarah Smith",
-                prefixIcon: Icons.person_outline,
-                controller: _fullNameController,
-              ),
-              const SizedBox(height: 20),
-
-              // 2. Email
-              CustomInputWidget(
-                label: "EMAIL ADDRESS",
-                placeholder: "sarah@example.com",
-                prefixIcon: Icons.email_outlined,
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 20),
-
-              // 3. Phone Number (Cấu trúc đặc biệt: Row)
-              const Text(
-                "PHONE NUMBER",
-                style: TextStyle(
-                  color: AppTheme.textWhite,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12, // Label nhỏ in hoa
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // Căn trên để khớp height
-                children: [
-                  // Input Phone (Chiếm phần lớn)
-                  Expanded(
-                    child: Container(
-                      height: 55, // Set chiều cao cố định để khớp nút Verify
-                      decoration: BoxDecoration(
-                        color: AppTheme.inputBackground,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white10),
-                      ),
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        style: const TextStyle(color: Colors.black87),
-                        decoration: const InputDecoration(
-                          hintText: "(555) 000-0000",
-                          hintStyle: TextStyle(color: AppTheme.textGrey, fontSize: 14),
-                          prefixIcon: Icon(Icons.phone_android, color: AppTheme.textGrey, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  
-                  // Verify Button
-                  Container(
-                    height: 55,
-                    width: 90,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppTheme.primaryGreen),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: TextButton(
-                      onPressed: () { print("Verify SMS"); },
-                      child: const Text(
-                        "Verify",
-                        style: TextStyle(
-                          color: AppTheme.primaryGreen,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Helper Text
-             const Padding(
-                padding: EdgeInsets.only(top: 8.0, left: 4.0),
-                child: Row(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.info_outline, size: 12, color: AppTheme.textGrey),
-                    SizedBox(width: 4),
+                    // --- SECTION 1: HEADER & TITLE ---
+                    // Heading instead of large illustration for Register
+                    const SizedBox(height: 16),
                     Text(
-                      "Verification code will be sent via SMS",
-                      style: TextStyle(color: AppTheme.textGrey, fontSize: 11),
+                      "Tạo tài khoản",
+                      style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: 32, // text-3xl
+                        fontWeight: FontWeight.w800, // font-extrabold
+                        letterSpacing: -0.5,
+                        color: isDark
+                            ? AppTheme.primaryLight
+                            : AppTheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 8), // mt-2
+                    Text(
+                      "Tham gia MoniKid để quản lý tài chính gia đình.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Manrope',
+                        fontSize: 14,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B), // text-slate-500
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // --- SECTION 2: AUTH FORM ---
+                    AuthCard(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Role Selector Toggle
+                          Container(
+                            padding: const EdgeInsets.all(4), // p-1
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppTheme.backgroundDark
+                                  : AppTheme.backgroundLight,
+                              borderRadius: BorderRadius.circular(
+                                12,
+                              ), // rounded-lg
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(
+                                      () => _selectedRole = 'parent',
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ), // py-2
+                                      decoration: BoxDecoration(
+                                        color: _selectedRole == 'parent'
+                                            ? (isDark
+                                                  ? const Color(0xFF334155)
+                                                  : Colors.white)
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(
+                                          8,
+                                        ), // rounded-md
+                                        boxShadow: _selectedRole == 'parent'
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.05),
+                                                  blurRadius: 4,
+                                                ),
+                                              ]
+                                            : [],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.family_restroom,
+                                            size: 16,
+                                            color: _selectedRole == 'parent'
+                                                ? AppTheme.primary
+                                                : (isDark
+                                                      ? const Color(0xFF94A3B8)
+                                                      : const Color(
+                                                          0xFF64748B,
+                                                        )),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            "Phụ huynh",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight
+                                                  .w600, // font-semibold
+                                              color: _selectedRole == 'parent'
+                                                  ? (isDark
+                                                        ? Colors.white
+                                                        : const Color(
+                                                            0xFF0F172A,
+                                                          ))
+                                                  : (isDark
+                                                        ? const Color(
+                                                            0xFF94A3B8,
+                                                          )
+                                                        : const Color(
+                                                            0xFF64748B,
+                                                          )),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(
+                                      () => _selectedRole = 'student',
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                      ), // py-2
+                                      decoration: BoxDecoration(
+                                        color: _selectedRole == 'student'
+                                            ? (isDark
+                                                  ? const Color(0xFF334155)
+                                                  : Colors.white)
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(
+                                          8,
+                                        ), // rounded-md
+                                        boxShadow: _selectedRole == 'student'
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.05),
+                                                  blurRadius: 4,
+                                                ),
+                                              ]
+                                            : [],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.school,
+                                            size: 16,
+                                            color: _selectedRole == 'student'
+                                                ? AppTheme.primary
+                                                : (isDark
+                                                      ? const Color(0xFF94A3B8)
+                                                      : const Color(
+                                                          0xFF64748B,
+                                                        )),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            "Học sinh",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight
+                                                  .w600, // font-semibold
+                                              color: _selectedRole == 'student'
+                                                  ? (isDark
+                                                        ? Colors.white
+                                                        : const Color(
+                                                            0xFF0F172A,
+                                                          ))
+                                                  : (isDark
+                                                        ? const Color(
+                                                            0xFF94A3B8,
+                                                          )
+                                                        : const Color(
+                                                            0xFF64748B,
+                                                          )),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24), // space-y-6 equivalent
+                          // Form Inputs
+                          CustomInputWidget(
+                            label: "Họ và tên",
+                            placeholder: "Nguyễn Văn A",
+                            prefixIcon: Icons.person_outline,
+                            controller: _fullNameController,
+                          ),
+                          const SizedBox(height: 20),
+                          CustomInputWidget(
+                            label: "Email",
+                            placeholder: "nguyenvana@example.com",
+                            prefixIcon: Icons.mail_outline,
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          const SizedBox(height: 20),
+                          CustomInputWidget(
+                            label: "Số điện thoại (Tùy chọn)",
+                            placeholder: "090xxxxxxx",
+                            prefixIcon: Icons.phone_android,
+                            controller: _phoneController,
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 20),
+                          CustomInputWidget(
+                            label: "Mật khẩu",
+                            placeholder: "••••••••",
+                            prefixIcon: Icons.lock_outline,
+                            isPassword: true,
+                            controller: _passwordController,
+                          ),
+                          const SizedBox(height: 32),
+
+                          // Error Message Display
+                          if (authState.errorMessage != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Text(
+                                authState.errorMessage!,
+                                style: const TextStyle(
+                                  color: AppTheme.redAlert,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+
+                          // Register Button
+                          PrimaryButton(
+                            text: "Đăng ký",
+                            isLoading: authState.isLoading,
+                            onPressed: _handleSignUp,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32), // mt-8
+                    // --- SECTION 3: SOCIAL LOGIN & FOOTER ---
+                    // Divider
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            "Hoặc tiếp tục với",
+                            style: TextStyle(
+                              color: isDark
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF64748B),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Social Buttons Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SocialButton(
+                            text: "Google",
+                            icon: const Icon(
+                              Icons.g_mobiledata,
+                              size: 24,
+                              color: Color(0xFFDB4437),
+                            ),
+                            onPressed: () {},
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: SocialButton(
+                            text: "Apple",
+                            icon: Icon(
+                              Icons.apple,
+                              size: 24,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Log In Link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Đã có tài khoản? ",
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
+                            fontSize: 14,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go(AppRoutes.login),
+                          child: Text(
+                            "Đăng nhập",
+                            style: TextStyle(
+                              color: AppTheme.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-
-              // 4. Password
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "PASSWORD",
-                    style: TextStyle(
-                      color: AppTheme.textWhite,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.inputBackground,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white10),
-                    ),
-                    child: TextField(
-                      controller: _passwordController,
-                      obscureText: !_isPasswordVisible,
-                      style: const TextStyle(color: Colors.black87),
-                      decoration: InputDecoration(
-                        hintText: "Create a strong password",
-                        hintStyle: const TextStyle(color: AppTheme.textGrey, fontSize: 14),
-                        prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.textGrey, size: 20),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                            color: AppTheme.textGrey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // --- SECTION 3: FOOTER ACTION ---
-              // Error message
-              if (authState.errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    authState.errorMessage!,
-                    style: const TextStyle(
-                      color: AppTheme.redAlert,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              authState.isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: AppTheme.primaryGreen,
-                      ),
-                    )
-                  : PrimaryButton(
-                      text: "Sign Up",
-                      onPressed: _handleSignUp,
-                    ),
-              
-              const SizedBox(height: 20),
-
-              // Already have account
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    style: const TextStyle(color: AppTheme.textGrey, fontSize: 14),
-                    children: [
-                      const TextSpan(text: "Already have an account? "),
-                      TextSpan(
-                        text: "Log In",
-                        style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold),
-                        recognizer: TapGestureRecognizer()..onTap = () {
-                           context.pop();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // Terms and Privacy (Small text at bottom)
-              Center(
-                child: Text(
-                  "By tapping Sign Up, you agree to our Terms and Privacy",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppTheme.textGrey.withOpacity(0.5),
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30), // Padding đáy an toàn
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

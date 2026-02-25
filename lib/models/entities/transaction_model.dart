@@ -1,68 +1,53 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum TransactionType { income, expense }
+part 'transaction_model.freezed.dart';
+part 'transaction_model.g.dart';
 
-enum TransactionSource { manual, ocr }
+/// Chuyển đổi Timestamp của Firestore sang DateTime của Dart
+class TimestampConverter implements JsonConverter<DateTime?, Timestamp?> {
+  const TimestampConverter();
 
-class TransactionModel {
-  final String transactionId;
-  final String userId;
-  final double amount;
-  final TransactionType type;
-  final String category; // food | transport | study | ...
-  final String note;
-  final TransactionSource source;
-  final String? receiptImageUrl;
-  final DateTime date;
-  final DateTime createdAt;
-
-  const TransactionModel({
-    required this.transactionId,
-    required this.userId,
-    required this.amount,
-    required this.type,
-    required this.category,
-    required this.note,
-    required this.source,
-    this.receiptImageUrl,
-    required this.date,
-    required this.createdAt,
-  });
-
-  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
-    final d = doc.data() as Map<String, dynamic>;
-    return TransactionModel(
-      transactionId: doc.id,
-      userId: d['userId'] ?? '',
-      amount: (d['amount'] as num).toDouble(),
-      type: d['type'] == 'income'
-          ? TransactionType.income
-          : TransactionType.expense,
-      category: d['category'] ?? 'other',
-      note: d['note'] ?? '',
-      source: d['source'] == 'ocr'
-          ? TransactionSource.ocr
-          : TransactionSource.manual,
-      receiptImageUrl: d['receiptImageUrl'],
-      date: (d['date'] as Timestamp).toDate(),
-      createdAt: (d['createdAt'] as Timestamp).toDate(),
-    );
+  @override
+  DateTime? fromJson(Timestamp? timestamp) {
+    if (timestamp == null) return null;
+    return timestamp.toDate();
   }
 
-  Map<String, dynamic> toFirestore() => {
-    'userId': userId,
-    'amount': amount,
-    'type': type.name,
-    'category': category,
-    'note': note,
-    'source': source.name,
-    'receiptImageUrl': receiptImageUrl,
-    'date': Timestamp.fromDate(date),
-    'createdAt': Timestamp.fromDate(createdAt),
-  };
+  @override
+  Timestamp? toJson(DateTime? date) {
+    if (date == null) return null;
+    return Timestamp.fromDate(date);
+  }
+}
 
-  bool get isExpense => type == TransactionType.expense;
-  bool get isIncome => type == TransactionType.income;
-  bool get hasReceipt => receiptImageUrl != null;
-  bool get isOcr => source == TransactionSource.ocr;
+@freezed
+abstract class TransactionModel with _$TransactionModel {
+  const factory TransactionModel({
+    required String transactionId,
+    required String userId,
+    required double amount,
+
+    /// 'expense' or 'income'
+    required String type,
+
+    required String category,
+    String? categoryEmoji,
+
+    String? note,
+    String? source,
+    String? paymentMethod,
+    String? receiptImageUrl,
+
+    @TimestampConverter() required DateTime date,
+
+    @TimestampConverter() DateTime? createdAt,
+
+    @TimestampConverter() DateTime? updatedAt,
+
+    String? location,
+  }) = _TransactionModel;
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) =>
+      _$TransactionModelFromJson(json);
 }

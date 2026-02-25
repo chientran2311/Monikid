@@ -18,24 +18,25 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity, // Chiếm hết chiều ngang
-      height: 55,
+      width: double.infinity,
+      height: 56, // py-4 / py-3.5 average tap target size
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryGreen,
+          backgroundColor: AppTheme.primary,
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(12), // rounded-xl
           ),
-          elevation: 5,
-          shadowColor: AppTheme.primaryGreen.withOpacity(0.4),
+          elevation: 4, // shadow-md effectively
+          shadowColor: AppTheme.primary.withOpacity(0.25),
         ),
         child: isLoading
             ? const SizedBox(
                 height: 24,
                 width: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.black,
+                  color: Colors.white,
                   strokeWidth: 2,
                 ),
               )
@@ -43,13 +44,13 @@ class PrimaryButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, color: Colors.black, size: 20),
+                    Icon(icon, color: Colors.white, size: 20),
                     const SizedBox(width: 8),
                   ],
                   Text(
                     text,
                     style: const TextStyle(
-                      color: Colors.black, // Chữ đen trên nền xanh neon
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),

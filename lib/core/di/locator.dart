@@ -1,7 +1,10 @@
 import 'package:get_it/get_it.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:monikid/repositories/auth/auth_repository.dart';
+import 'package:monikid/repositories/auth/auth_repository_impl.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_repository_impl.dart';
 
@@ -15,12 +18,19 @@ Future<void> setupLocator() async {
   // Register secure storage as lazy singleton
   getIt.registerLazySingleton<AppSecureStorage>(() => AppSecureStorage());
 
+  // Firebase Auth
+  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+
   // Firestore
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
 
   // Repositories
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(getIt<FirebaseAuth>(), getIt<FirebaseFirestore>()),
+  );
+
   getIt.registerLazySingleton<TransactionRepository>(
     () => TransactionRepositoryImpl(getIt<FirebaseFirestore>()),
   );

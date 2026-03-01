@@ -11,7 +11,11 @@ import 'package:monikid/features/auth/login/login_screen.dart';
 import 'package:monikid/features/auth/register/register.dart';
 import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_screen.dart';
-import 'package:monikid/features/auth/update_password/update_password_screen.dart';
+
+import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_screen.dart';
+import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_screen.dart';
+import 'package:monikid/features/auth/pin/enter_pin_code/enter_pin_code_screen.dart';
+import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
 
 // Main screens (Bottom Nav)
 import 'package:monikid/features/parent/bottom_nav_bar_par.dart';
@@ -36,6 +40,11 @@ class AppRoutes {
   static const String joinFamily = '/join-family';
   static const String forgotPassword = '/forgot-password';
   static const String updatePassword = '/update-password';
+
+  // PIN routes
+  static const String createNewPin = '/create-new-pin';
+  static const String reEnterPin = '/re-enter-pin';
+  static const String enterPinCode = '/enter-pin-code';
 
   // Parent routes
   static const String parent = '/parent';
@@ -92,9 +101,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
+
+      // --- PIN GROUP ---
       GoRoute(
-        path: AppRoutes.updatePassword,
-        builder: (context, state) => const UpdatePasswordScreen(),
+        path: AppRoutes.createNewPin,
+        builder: (context, state) {
+          return const CreateNewPinScreen(type: EnterPINCodeEnum.createdNew);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.reEnterPin,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final pinCodeHash = extra['pinCodeHash'] as String;
+          return ReEnterPinScreen(pinCodeHash: pinCodeHash);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.enterPinCode,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          final expectedPinHash = extra['expectedPinHash'] as String;
+          return EnterPinCodeScreen(expectedPinHash: expectedPinHash);
+        },
       ),
 
       // --- PARENT GROUP ---

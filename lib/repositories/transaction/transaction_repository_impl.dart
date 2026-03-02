@@ -142,4 +142,106 @@ class TransactionRepositoryImpl implements TransactionRepository {
         .map((doc) => TransactionModel.fromJson(doc.data()))
         .toList();
   }
+
+  @override
+  Future<List<TransactionModel>> getTransactionsByDateAndCategory(
+    String userId, {
+    DateTime? date,
+    String? category,
+    TransactionModel? lastTransaction,
+    int limit = 8,
+  }) async {
+    try {
+      _logger.i(
+        '📊 Fetching transactions for $userId | date: ${date?.day}/${date?.month}/${date?.year} | category: $category',
+      );
+
+      var query = _transactions
+          .where('userId', isEqualTo: userId)
+          .orderBy('date', descending: true)
+          .limit(limit);
+
+      if (date != null) {
+        final startOfDay = DateTime(
+          date.year,
+          date.month,
+          date.day,
+        ).toIso8601String();
+        final endOfDay = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          23,
+          59,
+          59,
+          999,
+        ).toIso8601String();
+
+        query = _transactions
+            .where('userId', isEqualTo: userId)
+            .where('date', isGreaterThanOrEqualTo: startOfDay)
+            .where('date', isLessThanOrEqualTo: endOfDay)
+            .orderBy('date', descending: true)
+            .limit(limit);
+      }
+
+      // Optional category filter
+      if (category != null && category.isNotEmpty) {
+        if (date != null) {
+          final startOfDay = DateTime(
+            date.year,
+            date.month,
+            date.day,
+          ).toIso8601String();
+          final endOfDay = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            23,
+            59,
+            59,
+            999,
+          ).toIso8601String();
+
+          query = _transactions
+              .where('userId', isEqualTo: userId)
+              .where('category', isEqualTo: category)
+              .where('date', isGreaterThanOrEqualTo: startOfDay)
+              .where('date', isLessThanOrEqualTo: endOfDay)
+              .orderBy('date', descending: true)
+              .limit(limit);
+        } else {
+          query = _transactions
+              .where('userId', isEqualTo: userId)
+              .where('category', isEqualTo: category)
+              .orderBy('date', descending: true)
+              .limit(limit);
+        }
+      }
+
+      // Cursor-based pagination
+      if (lastTransaction != null) {
+        try {
+          final lastDoc = await _transactions
+              .doc(lastTransaction.transactionId)
+              .get();
+          if (lastDoc.exists) {
+            query = query.startAfterDocument(lastDoc);
+          }
+        } catch (e) {
+          _logger.e('Failed to fetch cursor document: $e');
+        }
+      }
+
+      final snapshot = await query.get();
+      final results = snapshot.docs
+          .map((doc) => TransactionModel.fromJson(doc.data()))
+          .toList();
+      _logger.i('✅ Fetched ${results.length} transactions');
+      return results;
+    } catch (e) {
+      _logger.e('❌ getTransactionsByDateAndCategory failed: $e');
+      rethrow;
+    }
+  }
 }

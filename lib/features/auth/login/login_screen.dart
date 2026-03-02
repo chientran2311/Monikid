@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
-import 'package:monikid/features/auth/domain/params/auth_param.dart';
+import 'package:monikid/features/auth/login/login_provider.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
 import 'package:monikid/shared/widgets/social_button.dart';
@@ -22,7 +21,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'parent'; // Default role based on HTML
 
   @override
   void dispose() {
@@ -32,45 +30,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng nhập email và mật khẩu'),
-          backgroundColor: AppTheme.redAlert,
-        ),
-      );
-      return;
-    }
-
-    try {
-      await ref
-          .read(authProvider.notifier)
-          .validateUser(
-            SignInParam(
-              email: email,
-              password: password,
-              selectedRole: _selectedRole,
-            ),
-          );
-      // Let the router handle redirection based on auth state & role
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đăng nhập thất bại: ${e.toString()}'),
-            backgroundColor: AppTheme.redAlert,
-          ),
+    // Clear any old error and delegate to loginProvider
+    ref.read(loginProvider.notifier).clearError();
+    await ref
+        .read(loginProvider.notifier)
+        .signIn(
+          email: _emailController.text,
+          password: _passwordController.text,
         );
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final loginState = ref.watch(loginProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -87,7 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 64, // Subtract padding
+                  minHeight: constraints.maxHeight - 64,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -100,12 +72,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           RoleSelector(
-                            selectedRole: _selectedRole,
+                            selectedRole: loginState.selectedRole,
                             onRoleChanged: (role) {
-                              setState(() => _selectedRole = role);
+                              ref.read(loginProvider.notifier).setRole(role);
                             },
                           ),
-                          const SizedBox(height: 24), // space-y-6 equivalent
+                          const SizedBox(height: 24),
                           // Form Inputs
                           CustomInputWidget(
                             label: "Email",
@@ -122,7 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             isPassword: true,
                             controller: _passwordController,
                           ),
-                          const SizedBox(height: 8), // mt-2
+                          const SizedBox(height: 8),
                           // Forgot Password
                           Align(
                             alignment: Alignment.centerRight,
@@ -138,19 +110,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 "Quên mật khẩu?",
                                 style: TextStyle(
                                   color: AppTheme.primary,
-                                  fontWeight: FontWeight.w600, // font-semibold
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 24), // mt-6
+                          const SizedBox(height: 24),
                           // Error Message Display
-                          if (authState.errorMessage != null)
+                          if (loginState.errorMessage != null)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 16),
                               child: Text(
-                                authState.errorMessage!,
+                                loginState.errorMessage!,
+                                textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   color: AppTheme.redAlert,
                                   fontSize: 14,
@@ -161,15 +134,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           // Login Button
                           PrimaryButton(
                             text: "Đăng nhập",
-                            isLoading: authState.isLoading,
+                            isLoading: loginState.isLoading,
                             onPressed: _handleLogin,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32), // mt-8
+                    const SizedBox(height: 32),
                     // --- SECTION 3: SOCIAL LOGIN & FOOTER ---
-                    // Divider
                     Row(
                       children: [
                         Expanded(
@@ -178,18 +150,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? const Color(0xFF334155)
                                 : const Color(0xFFE2E8F0),
                           ),
-                        ), // border-slate-200
+                        ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                          ), // px-4
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             "Hoặc tiếp tục với",
                             style: TextStyle(
                               color: isDark
                                   ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B), // text-slate-500
-                              fontSize: 14, // text-sm
+                                  : const Color(0xFF64748B),
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -202,8 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24), // mt-6
-                    // Social Buttons Row
+                    const SizedBox(height: 24),
                     Row(
                       children: [
                         Expanded(
@@ -213,11 +182,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Icons.g_mobiledata,
                               size: 24,
                               color: Color(0xFFDB4437),
-                            ), // Fake Google icon
+                            ),
                             onPressed: () {},
                           ),
                         ),
-                        const SizedBox(width: 16), // gap-4
+                        const SizedBox(width: 16),
                         Expanded(
                           child: SocialButton(
                             text: "Apple",
@@ -231,8 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32), // mt-8
-                    // Sign Up Link
+                    const SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -251,7 +219,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             "Đăng ký",
                             style: TextStyle(
                               color: AppTheme.primary,
-                              fontWeight: FontWeight.w600, // font-semibold
+                              fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),

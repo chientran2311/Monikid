@@ -51,12 +51,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final role = await getUserRole(credential.user!.uid);
       _logger.i('✅ Fetched role: $role');
 
-      if (role != null && role != param.selectedRole) {
-        // Role mismatch - sign out and throw error
-        await _firebaseAuth.signOut();
-        throw Exception('Tài khoản này không đăng ký với vai trò đã chọn.');
-      }
-
       return AuthResponse(user: credential.user!, role: role);
     } catch (e) {
       _logger.e('❌ Sign in failed: $e');
@@ -189,7 +183,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // 7. Lấy role của user từ Firestore
+  // 7. Lấy role của user từ Firestore theo UID
   @override
   Future<String?> getUserRole(String uid) async {
     try {
@@ -204,6 +198,29 @@ class AuthRepositoryImpl implements AuthRepository {
       return null;
     } catch (e) {
       _logger.e('❌ getUserRole failed: $e');
+      rethrow;
+    }
+  }
+
+  // 8. Lấy role của user từ Firestore theo email (dùng trước khi đăng nhập)
+  @override
+  Future<String?> getRoleByEmail(String email) async {
+    try {
+      _logger.i('📬 Fetching user role for email: $email');
+      final query = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email.trim().toLowerCase())
+          .limit(1)
+          .get();
+      if (query.docs.isNotEmpty) {
+        final role = query.docs.first.data()['role'] as String?;
+        _logger.i('✅ Role found for email: $role');
+        return role;
+      }
+      _logger.w('⚠️ No user found for email: $email');
+      return null;
+    } catch (e) {
+      _logger.e('❌ getRoleByEmail failed: $e');
       rethrow;
     }
   }

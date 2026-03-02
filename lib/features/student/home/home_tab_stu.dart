@@ -5,12 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_item.dart';
-import 'package:monikid/features/student/transaction/transaction_history/transaction_provider.dart';
 import 'package:monikid/features/student/home/home_tab_provider.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
-import 'package:monikid/features/auth/pin/pin_dialog.dart';
+import 'package:monikid/features/auth/pin/pin_checker.dart';
 import 'widgets/summary_mini_card.dart';
 import 'widgets/quick_action.dart';
 
@@ -23,7 +22,7 @@ class HomeTabStudent extends HookConsumerWidget {
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        showPinDialogIfNeeded(context, ref);
+        checkAndShowPinScreens(context);
       });
       return null;
     }, const []);
@@ -36,7 +35,7 @@ class HomeTabStudent extends HookConsumerWidget {
     final user = authState.user;
     final userName = user?.displayName ?? "Học sinh";
 
-    final transactionAsync = ref.watch(transactionNotifierProvider);
+    final transactionAsync = ref.watch(transactionStreamProvider);
 
     final recentTxsAsync = ref.watch(homeTabNotifierProvider);
 

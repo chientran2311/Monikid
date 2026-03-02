@@ -6,7 +6,7 @@ part of 'create_new_pin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$createNewPINHash() => r'fdb92927a6fd5337f3d4f907364ee768b134e765';
+String _$createNewPINHash() => r'70d521d7bb2e7d5f3a829c70708676964b46c1a0';
 
 /// Copied from Dart SDK
 class _SystemHash {

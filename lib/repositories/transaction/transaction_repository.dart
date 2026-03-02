@@ -25,4 +25,14 @@ abstract class TransactionRepository {
     TransactionModel? lastTransaction,
     int limit = 4,
   });
+
+  /// Retrieves a paginated list of transactions filtered by exact date and optional category
+  /// Page size is 8 items.
+  Future<List<TransactionModel>> getTransactionsByDateAndCategory(
+    String userId, {
+    DateTime? date,
+    String? category,
+    TransactionModel? lastTransaction,
+    int limit = 8,
+  });
 }

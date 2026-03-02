@@ -16,6 +16,9 @@ abstract class AuthRepository {
   /// Gửi email đặt lại mật khẩu qua Firebase
   Future<void> resetPassword(ResetPasswordParam param);
 
-  /// Lấy role của user từ Firestore
+  /// Lấy role của user từ Firestore theo UID
   Future<String?> getUserRole(String uid);
+
+  /// Lấy role của user từ Firestore theo email (dùng trước khi đăng nhập)
+  Future<String?> getRoleByEmail(String email);
 }

@@ -1,0 +1,18 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:monikid/models/entities/transaction_model.dart';
+
+part 'transaction_history_state.freezed.dart';
+
+@freezed
+abstract class TransactionHistoryState with _$TransactionHistoryState {
+  const factory TransactionHistoryState({
+    @Default([]) List<TransactionModel> transactions,
+    @Default(true) bool isLoading,
+    @Default(false) bool isLoadingMore,
+    @Default(false) bool isRefreshing,
+    @Default(true) bool hasMore,
+    DateTime? selectedDate,
+    String? selectedCategory,
+    String? errorMessage,
+  }) = _TransactionHistoryState;
+}

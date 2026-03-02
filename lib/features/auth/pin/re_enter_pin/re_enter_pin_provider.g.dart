@@ -6,7 +6,7 @@ part of 're_enter_pin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reEnterPINHash() => r'6982bf3edc67360ec1ce1b83e04c9d4409dd543c';
+String _$reEnterPINHash() => r'980b01ef42707f921a753ab9ddb4e62d491ed611';
 
 /// Copied from Dart SDK
 class _SystemHash {

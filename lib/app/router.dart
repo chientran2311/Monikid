@@ -71,8 +71,6 @@ const authRoutes = [
 
 /// 🟢 ROUTER PROVIDER
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
-
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
@@ -165,14 +163,17 @@ final routerProvider = Provider<GoRouter>((ref) {
 
     // Xử lý chuyển hướng (Redirect)
     redirect: (context, state) {
+      // Đọc auth state hiện tại mà không subscribe vào
+      final authState = ref.read(authProvider);
       final currentPath = state.uri.path;
       final isAuthenticated = authState.isAuthenticated;
       final isInitial = authState.isInitial;
 
       // Auth chưa khởi tạo xong -> đợi
-      if (isInitial) {
-        return null;
-      }
+      if (isInitial) return null;
+
+      // Đang trong quá trình xử lý auth (isLoading) -> chặn redirect tạm thời
+      if (authState.isLoading) return null;
 
       final isAuthRoute = authRoutes.contains(currentPath);
 
@@ -184,15 +185,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         } else if (role == 'student') {
           return AppRoutes.studentMain;
         } else {
-          return AppRoutes.parent; // Tạm thời fallback nếu role chưa set
+          return AppRoutes.parent;
         }
       }
 
-      // Đang ở onboarding hoặc splash -> cho phép access để xử lý logic bên trong SplashScreen hoặc Onboarding
+      // Đang ở onboarding hoặc splash -> cho phép access
       if (currentPath == AppRoutes.splash ||
           currentPath == AppRoutes.onboard1) {
         if (isAuthenticated && currentPath == AppRoutes.onboard1) {
-          // Ngăn Onboarding nếu đã login
           final role = authState.userRole;
           return role == 'parent' ? AppRoutes.parent : AppRoutes.studentMain;
         }

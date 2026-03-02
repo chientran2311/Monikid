@@ -56,3 +56,12 @@ class HomeTabNotifier extends _$HomeTabNotifier {
     }
   }
 }
+
+@riverpod
+Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
+  final authState = ref.watch(authProvider);
+  if (authState.isAuthenticated && authState.user != null) {
+    return getIt<TransactionRepository>().getTransactions(authState.user!.uid);
+  }
+  return const Stream.empty();
+}

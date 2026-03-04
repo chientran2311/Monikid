@@ -3,17 +3,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:logger/logger.dart';
 
 import 'login_state.dart';
-import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/utils/validators.dart';
 import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
-import 'package:monikid/repositories/auth/auth_repository.dart';
 
 part 'login_provider.g.dart';
 
 @riverpod
 class Login extends _$Login {
-  late final AuthRepository _authRepository;
   final Logger _logger = Logger(
     printer: PrettyPrinter(
       methodCount: 0,
@@ -26,13 +23,7 @@ class Login extends _$Login {
 
   @override
   LoginState build() {
-    _authRepository = getIt<AuthRepository>();
     return const LoginState();
-  }
-
-  /// Thay đổi role được chọn trên UI (parent / student)
-  void setRole(String role) {
-    state = state.copyWith(selectedRole: role, errorMessage: null);
   }
 
   /// Xóa thông báo lỗi
@@ -57,43 +48,10 @@ class Login extends _$Login {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      // --- 2. Fetch role từ Firestore theo email TRƯỚC khi login ---
-      _logger.i('🔍 Login Provider: Fetching role for email: $email');
-      final existingRole = await _authRepository.getRoleByEmail(email.trim());
-
-      // --- 3. Validate role mismatch ---
-      final mismatchError = Validators.roleEmailMismatch(
-        existingRole: existingRole,
-        selectedRole: state.selectedRole,
-      );
-      if (mismatchError != null) {
-        _logger.w('⚠️ Login Provider: Role mismatch — $mismatchError');
-        state = state.copyWith(isLoading: false, errorMessage: mismatchError);
-        return;
-      }
-
-      // --- 4. Tài khoản chưa tồn tại hoặc role khớp → tiến hành đăng nhập ---
-      if (existingRole == null) {
-        // Email không tồn tại trong Firestore
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: 'Không tìm thấy người dùng với email này.',
-        );
-        return;
-      }
-
-      _logger.i(
-        '✅ Login Provider: Role verified ($existingRole). Signing in...',
-      );
+      _logger.i('✅ Login Provider: Signing in...');
       await ref
           .read(authProvider.notifier)
-          .validateUser(
-            SignInParam(
-              email: email.trim(),
-              password: password,
-              selectedRole: state.selectedRole,
-            ),
-          );
+          .validateUser(SignInParam(email: email.trim(), password: password));
 
       _logger.i('✅ Login Provider: Sign in successful');
       state = state.copyWith(isLoading: false);

@@ -7,6 +7,7 @@ import 'package:monikid/features/student/transaction/add_transaction/add_transac
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:uuid/uuid.dart';
+import '../transaction_history/widgets/category_dialog.dart';
 import 'widgets/transaction_type_tab.dart';
 import 'widgets/transaction_form_field.dart';
 
@@ -257,12 +258,33 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                TransactionFormField(
-                  label: "Danh mục",
-                  value: _selectedCategory,
-                  iconOrEmoji: _selectedEmoji,
-                  iconColor: Colors.orange, // fake color match tailwind
-                  showChevron: true,
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (ctx) => CategoryDialog(
+                        selectedCategory: _selectedCategory,
+                        showAllOption: false,
+                        onCategorySelected: (category) {
+                          if (category != null) {
+                            setState(() {
+                              _selectedCategory = category.label;
+                              _selectedEmoji = category.icon;
+                            });
+                          }
+                        },
+                      ),
+                    );
+                  },
+                  child: TransactionFormField(
+                    label: "Danh mục",
+                    value: _selectedCategory,
+                    iconOrEmoji: _selectedEmoji,
+                    iconColor: Colors.orange, // fake color match tailwind
+                    showChevron: true,
+                  ),
                 ),
                 const SizedBox(height: 16),
 

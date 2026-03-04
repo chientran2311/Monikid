@@ -9,15 +9,10 @@ part of 'auth_param.dart';
 _SignInParam _$SignInParamFromJson(Map<String, dynamic> json) => _SignInParam(
   email: json['email'] as String,
   password: json['password'] as String,
-  selectedRole: json['selectedRole'] as String,
 );
 
 Map<String, dynamic> _$SignInParamToJson(_SignInParam instance) =>
-    <String, dynamic>{
-      'email': instance.email,
-      'password': instance.password,
-      'selectedRole': instance.selectedRole,
-    };
+    <String, dynamic>{'email': instance.email, 'password': instance.password};
 
 _SignUpParam _$SignUpParamFromJson(Map<String, dynamic> json) => _SignUpParam(
   email: json['email'] as String,

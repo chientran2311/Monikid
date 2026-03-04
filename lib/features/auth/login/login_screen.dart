@@ -9,7 +9,6 @@ import 'package:monikid/shared/widgets/primary_button.dart';
 import 'package:monikid/shared/widgets/social_button.dart';
 import 'package:monikid/shared/widgets/auth_card.dart';
 import 'package:monikid/features/auth/login/widgets/login_header.dart';
-import 'package:monikid/features/auth/login/widgets/role_selector.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -71,13 +70,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          RoleSelector(
-                            selectedRole: loginState.selectedRole,
-                            onRoleChanged: (role) {
-                              ref.read(loginProvider.notifier).setRole(role);
-                            },
-                          ),
-                          const SizedBox(height: 24),
                           // Form Inputs
                           CustomInputWidget(
                             label: "Email",

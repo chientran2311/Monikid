@@ -112,7 +112,7 @@ class TransactionHistory extends _$TransactionHistory {
         state.selectedDate?.day == date?.day) {
       return;
     }
-    state = state.copyWith(selectedDate: date, selectedCategory: null);
+    state = state.copyWith(selectedDate: date);
     await loadFirstPage();
   }
 

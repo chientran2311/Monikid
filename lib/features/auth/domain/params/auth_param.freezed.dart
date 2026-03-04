@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SignInParam {
 
- String get email; String get password; String get selectedRole;
+ String get email; String get password;
 /// Create a copy of SignInParam
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $SignInParamCopyWith<SignInParam> get copyWith => _$SignInParamCopyWithImpl<Sign
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.selectedRole, selectedRole) || other.selectedRole == selectedRole));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,email,password,selectedRole);
+int get hashCode => Object.hash(runtimeType,email,password);
 
 @override
 String toString() {
-  return 'SignInParam(email: $email, password: $password, selectedRole: $selectedRole)';
+  return 'SignInParam(email: $email, password: $password)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $SignInParamCopyWith<$Res>  {
   factory $SignInParamCopyWith(SignInParam value, $Res Function(SignInParam) _then) = _$SignInParamCopyWithImpl;
 @useResult
 $Res call({
- String email, String password, String selectedRole
+ String email, String password
 });
 
 
@@ -66,11 +66,10 @@ class _$SignInParamCopyWithImpl<$Res>
 
 /// Create a copy of SignInParam
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,Object? selectedRole = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,}) {
   return _then(_self.copyWith(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
-as String,selectedRole: null == selectedRole ? _self.selectedRole : selectedRole // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -82,12 +81,11 @@ as String,
 @JsonSerializable()
 
 class _SignInParam implements SignInParam {
-  const _SignInParam({required this.email, required this.password, required this.selectedRole});
+  const _SignInParam({required this.email, required this.password});
   factory _SignInParam.fromJson(Map<String, dynamic> json) => _$SignInParamFromJson(json);
 
 @override final  String email;
 @override final  String password;
-@override final  String selectedRole;
 
 /// Create a copy of SignInParam
 /// with the given fields replaced by the non-null parameter values.
@@ -102,16 +100,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignInParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.selectedRole, selectedRole) || other.selectedRole == selectedRole));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignInParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,email,password,selectedRole);
+int get hashCode => Object.hash(runtimeType,email,password);
 
 @override
 String toString() {
-  return 'SignInParam(email: $email, password: $password, selectedRole: $selectedRole)';
+  return 'SignInParam(email: $email, password: $password)';
 }
 
 
@@ -122,7 +120,7 @@ abstract mixin class _$SignInParamCopyWith<$Res> implements $SignInParamCopyWith
   factory _$SignInParamCopyWith(_SignInParam value, $Res Function(_SignInParam) _then) = __$SignInParamCopyWithImpl;
 @override @useResult
 $Res call({
- String email, String password, String selectedRole
+ String email, String password
 });
 
 
@@ -139,11 +137,10 @@ class __$SignInParamCopyWithImpl<$Res>
 
 /// Create a copy of SignInParam
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,Object? selectedRole = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,}) {
   return _then(_SignInParam(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
-as String,selectedRole: null == selectedRole ? _self.selectedRole : selectedRole // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

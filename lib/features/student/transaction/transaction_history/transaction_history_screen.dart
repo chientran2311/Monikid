@@ -10,28 +10,13 @@ import 'package:monikid/features/student/transaction/transaction_history/transac
 import 'package:monikid/features/student/transaction/transaction_history/transaction_history_skeleton.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_item.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/models/entities/category_model.dart';
 import 'widgets/calendar_dialog.dart';
-import 'widgets/category_dialog.dart'; // =============================================================================
+import 'widgets/category_dialog.dart';
+import 'package:monikid/features/student/transaction/providers/category_provider.dart';
+// =============================================================================
 // CATEGORY MODEL
 // =============================================================================
-
-class _Category {
-  final String emoji;
-  final String label;
-  final String value;
-  const _Category(this.emoji, this.label, this.value);
-}
-
-const _categories = [
-  _Category('🍜', 'Ăn uống', 'food'),
-  _Category('🚌', 'Di chuyển', 'transport'),
-  _Category('📚', 'Học tập', 'education'),
-  _Category('🎬', 'Giải trí', 'entertainment'),
-  _Category('🛍️', 'Mua sắm', 'shopping'),
-  _Category('💊', 'Sức khỏe', 'health'),
-  _Category('🏠', 'Sinh hoạt', 'living'),
-  _Category('📦', 'Khác', 'other'),
-];
 
 // =============================================================================
 // SCREEN
@@ -48,6 +33,9 @@ class TransactionHistoryScreen extends HookConsumerWidget {
 
     final txState = ref.watch(transactionHistoryProvider);
     final notifier = ref.read(transactionHistoryProvider.notifier);
+
+    final categories =
+        ref.watch(categoryStreamProvider).value ?? defaultCategories;
 
     // Scroll controller for pagination
     final scrollCtrl = useScrollController();
@@ -250,34 +238,23 @@ class TransactionHistoryScreen extends HookConsumerWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      _categories
+                                      categories
                                           .firstWhere(
                                             (c) =>
-                                                c.value ==
+                                                c.label ==
                                                 txState.selectedCategory,
-                                            orElse: () => _Category(
-                                              '📦',
-                                              txState.selectedCategory!,
-                                              txState.selectedCategory!,
+                                            orElse: () => const CategoryModel(
+                                              id: '',
+                                              label: '',
+                                              icon: '📦',
                                             ),
                                           )
-                                          .emoji,
+                                          .icon,
                                       style: const TextStyle(fontSize: 13),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      _categories
-                                          .firstWhere(
-                                            (c) =>
-                                                c.value ==
-                                                txState.selectedCategory,
-                                            orElse: () => _Category(
-                                              '',
-                                              txState.selectedCategory!,
-                                              txState.selectedCategory!,
-                                            ),
-                                          )
-                                          .label,
+                                      txState.selectedCategory!,
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.white,
@@ -450,7 +427,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => CategoryDialog(
         selectedCategory: currentCategory,
-        onCategorySelected: (category) => notifier.setCategory(category),
+        onCategorySelected: (category) => notifier.setCategory(category?.label),
       ),
     );
   }

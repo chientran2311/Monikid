@@ -5,11 +5,8 @@ part 'auth_param.g.dart';
 
 @freezed
 abstract class SignInParam with _$SignInParam {
-  const factory SignInParam({
-    required String email,
-    required String password,
-    required String selectedRole,
-  }) = _SignInParam;
+  const factory SignInParam({required String email, required String password}) =
+      _SignInParam;
 
   factory SignInParam.fromJson(Map<String, dynamic> json) =>
       _$SignInParamFromJson(json);

@@ -1,72 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/features/student/transaction/providers/category_provider.dart';
+import 'package:monikid/models/entities/category_model.dart';
 
-class CategoryDialog extends StatelessWidget {
-  final String? selectedCategory;
-  final Function(String?) onCategorySelected;
+class CategoryDialog extends HookConsumerWidget {
+  final String? selectedCategory; // This is the label
+  final Function(CategoryModel?) onCategorySelected;
+  final bool showAllOption;
 
   const CategoryDialog({
     Key? key,
     this.selectedCategory,
     required this.onCategorySelected,
+    this.showAllOption = true,
   }) : super(key: key);
 
-  static const List<Map<String, dynamic>> _categories = [
-    {'id': null, 'label': 'Tất cả', 'icon': '📝', 'color': Colors.grey},
-    {
-      'id': 'food',
-      'label': 'Ăn uống',
-      'icon': '🍜',
-      'color': Color(0xFF4ADE80),
-    }, // Green
-    {
-      'id': 'transport',
-      'label': 'Di chuyển',
-      'icon': '🚌',
-      'color': Color(0xFF60A5FA),
-    }, // Blue
-    {
-      'id': 'education',
-      'label': 'Học tập',
-      'icon': '📚',
-      'color': Color(0xFFA78BFA),
-    }, // Purple
-    {
-      'id': 'entertainment',
-      'label': 'Giải trí',
-      'icon': '🎬',
-      'color': Color(0xFFF472B6),
-    }, // Pink
-    {
-      'id': 'shopping',
-      'label': 'Mua sắm',
-      'icon': '🛍️',
-      'color': Color(0xFFFBBF24),
-    }, // Yellow
-    {
-      'id': 'health',
-      'label': 'Sức khỏe',
-      'icon': '💊',
-      'color': Color(0xFFF87171),
-    }, // Red
-    {
-      'id': 'living',
-      'label': 'Sinh hoạt',
-      'icon': '🏠',
-      'color': Color(0xFFFB923C),
-    }, // Orange
-    {
-      'id': 'other',
-      'label': 'Khác',
-      'icon': '📦',
-      'color': Color(0xFF94A3B8),
-    }, // Slate
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
+    final categoriesAsync = ref.watch(categoryStreamProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -129,109 +84,150 @@ class CategoryDialog extends StatelessWidget {
 
             // Category Grid
             Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.85,
-                  ),
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    final isSelected = selectedCategory == category['id'];
-                    final Color baseColor = category['color'];
+              child: categoriesAsync.when(
+                data: (categories) {
+                  // Prepend "Tất cả" option if requested
+                  final allCategories = [
+                    if (showAllOption)
+                      const CategoryModel(
+                        id: 'all',
+                        label: 'Tất cả',
+                        icon: '📝',
+                        colorHex: '0xFF9E9E9E',
+                        isDefault: true,
+                      ),
+                    ...categories,
+                  ];
 
-                    return GestureDetector(
-                      onTap: () {
-                        onCategorySelected(category['id']);
-                        Navigator.pop(context);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? baseColor.withOpacity(0.1)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isSelected
-                                ? baseColor
-                                : isDark
-                                ? Colors.transparent
-                                : Colors.transparent,
-                            width: 2,
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 0.85,
                           ),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
+                      itemCount: allCategories.length,
+                      itemBuilder: (context, index) {
+                        final category = allCategories[index];
+                        // If "Tất cả" is selected, selectedCategory is null
+                        final isSelected = category.id == 'all'
+                            ? selectedCategory == null
+                            : selectedCategory == category.label;
+
+                        // Parse color from hex
+                        Color baseColor = Colors.grey;
+                        if (category.colorHex != null) {
+                          try {
+                            baseColor = Color(int.parse(category.colorHex!));
+                          } catch (_) {}
+                        }
+
+                        return GestureDetector(
+                          onTap: () {
+                            onCategorySelected(
+                              category.id == 'all' ? null : category,
+                            );
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? baseColor.withOpacity(0.1)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
                                 color: isSelected
-                                    ? baseColor.withOpacity(0.2)
-                                    : isDark
-                                    ? const Color(0xFF334155)
-                                    : baseColor.withOpacity(0.15),
-                                shape: BoxShape.circle,
+                                    ? baseColor
+                                    : Colors.transparent,
+                                width: 2,
                               ),
-                              alignment: Alignment.center,
-                              child: Stack(
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      category['icon'],
-                                      style: const TextStyle(fontSize: 24),
-                                    ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? baseColor.withOpacity(0.2)
+                                        : isDark
+                                        ? const Color(0xFF334155)
+                                        : baseColor.withOpacity(0.15),
+                                    shape: BoxShape.circle,
                                   ),
-                                  if (isSelected)
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          color: baseColor,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 12,
+                                  alignment: Alignment.center,
+                                  child: Stack(
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          category.icon,
+                                          style: const TextStyle(fontSize: 24),
                                         ),
                                       ),
-                                    ),
-                                ],
-                              ),
+                                      if (isSelected)
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: baseColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.check,
+                                              color: Colors.white,
+                                              size: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  category.label,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? textColor
+                                        : isDark
+                                        ? const Color(0xFFCBD5E1)
+                                        : const Color(0xFF475569),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              category['label'],
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? textColor
-                                    : isDark
-                                    ? const Color(0xFFCBD5E1)
-                                    : const Color(0xFF475569),
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+                loading: () => const SizedBox(
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (error, _) => SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: Text(
+                      'Lỗi: $error',
+                      style: TextStyle(color: textColor),
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -9,6 +9,8 @@ import 'package:monikid/repositories/transaction/transaction_repository_impl.dar
     as monikid_tx_impl;
 import 'package:monikid/repositories/auth/auth_repository.dart';
 import 'package:monikid/repositories/auth/auth_repository_impl.dart';
+import 'package:monikid/repositories/category/category_repository.dart';
+import 'package:monikid/repositories/category/category_repository_impl.dart';
 
 final getIt = GetIt.instance;
 
@@ -33,5 +35,9 @@ Future<void> configureDependencies() async {
 
   getIt.registerLazySingleton<monikid_tx_repo.TransactionRepository>(
     () => monikid_tx_impl.TransactionRepositoryImpl(getIt<FirebaseFirestore>()),
+  );
+
+  getIt.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(getIt<FirebaseFirestore>()),
   );
 }

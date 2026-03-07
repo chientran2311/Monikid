@@ -13,10 +13,8 @@ import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'widgets/calendar_dialog.dart';
 import 'widgets/category_dialog.dart';
+import 'widgets/summary_card.dart';
 import 'package:monikid/features/student/transaction/providers/category_provider.dart';
-// =============================================================================
-// CATEGORY MODEL
-// =============================================================================
 
 // =============================================================================
 // SCREEN
@@ -58,6 +56,8 @@ class TransactionHistoryScreen extends HookConsumerWidget {
       scrollCtrl.addListener(onScroll);
       return () => scrollCtrl.removeListener(onScroll);
     }, [scrollCtrl]);
+
+    // Server already filters by type
 
     // Group transactions by date
     Map<String, List<TransactionModel>> grouped(
@@ -329,18 +329,47 @@ class TransactionHistoryScreen extends HookConsumerWidget {
                       ),
                     )
                   else ...[
-                    // Summary card
+                    // ── Summary card ─────────────────────────────────────────
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        child: _SummaryCard(
-                          transactions: txState.transactions,
-                          selectedDate: txState.selectedDate,
+                        child: Builder(
+                          builder: (context) {
+                            final double totalIncome = txState.totalIncome ?? 0;
+                            final double totalExpense = txState.totalExpense ?? 0;
+                            
+                            final effectiveMonth =
+                                txState.selectedDate ?? DateTime.now();
+                            return SummaryCard(
+                              totalIncome: totalIncome,
+                              totalExpense: totalExpense,
+                              selectedDate: txState.selectedDate,
+                              displayMonth: effectiveMonth,
+                            );
+                          },
                         ),
                       ),
                     ),
 
-                    // Grouped transaction list
+                    // ── Transaction type switch tab ───────────────────────────
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: _TypeFilterTab(
+                          selected: txState.transactionTypeFilter,
+                          isDark: isDark,
+                          onChanged: (type) {
+                            if (type == 'income') {
+                              notifier.loadIncome();
+                            } else {
+                              notifier.loadExpense();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Grouped transaction list (already filtered by backend)
                     _GroupedTransactionList(
                       grouped: grouped(txState.transactions),
                       isDark: isDark,
@@ -433,110 +462,66 @@ class TransactionHistoryScreen extends HookConsumerWidget {
   }
 }
 
-// =============================================================================
-// PRIVATE WIDGETS
-// =============================================================================
+class _TypeFilterTab extends StatelessWidget {
+  final String selected; // 'income' | 'expense'
+  final bool isDark;
+  final void Function(String) onChanged;
 
-class _SummaryCard extends StatelessWidget {
-  final List<TransactionModel> transactions;
-  final DateTime? selectedDate;
-  const _SummaryCard({required this.transactions, this.selectedDate});
+  const _TypeFilterTab({
+    required this.selected,
+    required this.isDark,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    double totalExpense = 0;
-    double totalIncome = 0;
-    for (final t in transactions) {
-      if (t.type == 'expense') {
-        totalExpense += t.amount;
-      } else {
-        totalIncome += t.amount;
-      }
-    }
-
     return Container(
+      height: 38,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, Color(0xFF1e5222)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(10),
       ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                selectedDate == null
-                    ? 'TỔNG CHI TIÊU'
-                    : 'TỔNG CHI TIÊU NGÀY ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
-                style: const TextStyle(
-                  color: Color(0xFFeaf2eb),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Icon(
-                Icons.pie_chart,
-                color: Colors.white.withOpacity(0.6),
-                size: 20,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            CurrencyFormatter.format(totalExpense),
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              _badge(
-                Icons.arrow_downward,
-                'Chi: ${CurrencyFormatter.formatCompact(totalExpense)}',
-              ),
-              const SizedBox(width: 16),
-              _badge(
-                Icons.arrow_upward,
-                'Thu: ${CurrencyFormatter.formatCompact(totalIncome)}',
-              ),
-            ],
-          ),
+          _tab(context, 'income', 'Thu tiền'),
+          _tab(context, 'expense', 'Chi tiền'),
         ],
       ),
     );
   }
 
-  Widget _badge(IconData icon, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: Colors.white),
-          const SizedBox(width: 4),
-          Text(text, style: const TextStyle(fontSize: 12, color: Colors.white)),
-        ],
+  Widget _tab(BuildContext context, String value, String label) {
+    final isActive = selected == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onChanged(value),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            color: isActive
+                ? (value == 'income'
+                      ? const Color(0xFF2563EB)
+                      : value == 'expense'
+                      ? AppTheme.redAlert
+                      : AppTheme.primary)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              color: isActive
+                  ? Colors.white
+                  : isDark
+                  ? const Color(0xFF94A3B8)
+                  : const Color(0xFF64748B),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -556,6 +541,24 @@ class _GroupedTransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateKeys = grouped.keys.toList();
+
+    if (dateKeys.isEmpty) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 32),
+            child: Text(
+              'Không có giao dịch nào.',
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.white54 : const Color(0xFF94A3B8),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
@@ -610,3 +613,5 @@ class _GroupedTransactionList extends StatelessWidget {
     );
   }
 }
+
+

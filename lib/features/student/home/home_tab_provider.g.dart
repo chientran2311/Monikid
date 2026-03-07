@@ -6,7 +6,7 @@ part of 'home_tab_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$transactionStreamHash() => r'8e1098529909b0e775648d554f8ceb43137a9e3f';
+String _$transactionStreamHash() => r'cfab4287fc99d583b86495afedf3be2e1c34a2c0';
 
 /// See also [transactionStream].
 @ProviderFor(transactionStream)

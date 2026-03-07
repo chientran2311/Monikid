@@ -3,6 +3,7 @@ import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:logger/logger.dart';
 
 import 'home_tab_state.dart';
 
@@ -61,7 +62,13 @@ class HomeTabNotifier extends _$HomeTabNotifier {
 Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
   final authState = ref.watch(authProvider);
   if (authState.isAuthenticated && authState.user != null) {
-    return getIt<TransactionRepository>().getTransactions(authState.user!.uid);
+    return getIt<TransactionRepository>()
+        .getTransactionsByMonth(authState.user!.uid, DateTime.now(), limit: 4)
+        .map((record) => record.transactions)
+        .handleError((error) {
+          final logger = getIt<Logger>();
+          logger.e('❌ Firebase Index Error (Click link below to create):\n$error');
+        });
   }
   return const Stream.empty();
 }

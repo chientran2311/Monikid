@@ -411,7 +411,47 @@ class HomeTabStudent extends HookConsumerWidget {
             );
           },
           loading: () => const HomeTabSkeleton(),
-          error: (err, stack) => Center(child: Text("Lỗi: $err")),
+          error: (err, stack) => RefreshIndicator(
+            onRefresh: () async {
+               // Trigger a rebuild of the stream provider by calling refresh on homeTabNotifierProvider 
+               // (or invalidating the stream provider directly)
+               ref.invalidate(transactionStreamProvider);
+               await ref.read(homeTabNotifierProvider.notifier).refresh();
+            },
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Có lỗi xảy ra khi tải dữ liệu.\nVui lòng kiểm tra console/log (nếu là lỗi Index).",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: textColor),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              ref.invalidate(transactionStreamProvider);
+                              ref.read(homeTabNotifierProvider.notifier).refresh();
+                            },
+                            child: const Text("Thử lại"),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

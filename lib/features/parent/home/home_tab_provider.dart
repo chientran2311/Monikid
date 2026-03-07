@@ -61,7 +61,13 @@ class HomeTabNotifier extends _$HomeTabNotifier {
 Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
   final authState = ref.watch(authProvider);
   if (authState.isAuthenticated && authState.user != null) {
-    return getIt<TransactionRepository>().getTransactions(authState.user!.uid);
+    return getIt<TransactionRepository>()
+        .getTransactionsByMonth(authState.user!.uid, DateTime.now(), limit: 4)
+        .map((record) => record.transactions)
+        .handleError((error) {
+          print('❌ Firebase Index Error (Click link below to create):');
+          print(error.toString());
+        });
   }
   return const Stream.empty();
 }

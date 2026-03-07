@@ -10,14 +10,13 @@ abstract class TransactionRepository {
   /// Deletes a transaction by its ID
   Future<void> deleteTransaction(String transactionId);
 
-  /// Retrieves a stream of all transactions for a specific user
-  Stream<List<TransactionModel>> getTransactions(String userId);
-
   /// Retrieves a stream of transactions for a specific user within a given month
-  Stream<List<TransactionModel>> getTransactionsByMonth(
+  Stream<({List<TransactionModel> transactions, DateTime month})> getTransactionsByMonth(
     String userId,
-    DateTime month,
-  );
+    DateTime month, {
+    int? limit,
+    String? type,
+  });
 
   /// Retrieves a paginated list of recent transactions
   Future<List<TransactionModel>> getRecentTransactionsPaginated(
@@ -26,13 +25,21 @@ abstract class TransactionRepository {
     int limit = 4,
   });
 
-  /// Retrieves a paginated list of transactions filtered by exact date and optional category
+  /// Retrieves a paginated list of transactions filtered by exact date and optional category/type
   /// Page size is 8 items.
-  Future<List<TransactionModel>> getTransactionsByDateAndCategory(
+  Future<List<TransactionModel>> getTransactionsByFilter(
     String userId, {
     DateTime? date,
     String? category,
+    String? type,
     TransactionModel? lastTransaction,
     int limit = 8,
+  });
+
+  /// Tính tổng thu và chi theo tháng (nếu month != null) hoặc theo ngày (nếu date != null).
+  Future<({double totalIncome, double totalExpense})> getSummary(
+    String userId, {
+    DateTime? month,
+    DateTime? date,
   });
 }

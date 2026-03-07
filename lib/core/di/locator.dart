@@ -9,6 +9,8 @@ import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_repository_impl.dart';
 import 'package:monikid/repositories/category/category_repository.dart';
 import 'package:monikid/repositories/category/category_repository_impl.dart';
+import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/statistic/statistic_repository_impl.dart';
 
 final getIt = GetIt.instance;
 
@@ -39,5 +41,9 @@ Future<void> setupLocator() async {
 
   getIt.registerLazySingleton<CategoryRepository>(
     () => CategoryRepositoryImpl(getIt<FirebaseFirestore>()),
+  );
+
+  getIt.registerLazySingleton<StatisticRepository>(
+    () => StatisticRepositoryImpl(getIt<FirebaseFirestore>()),
   );
 }

@@ -11,8 +11,13 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
     @Default(false) bool isLoadingMore,
     @Default(false) bool isRefreshing,
     @Default(true) bool hasMore,
+    double? totalIncome,
+    double? totalExpense,
     DateTime? selectedDate,
     String? selectedCategory,
+    // Mặc định là 'expense' hoặc 'income', không còn null
+    @Default('expense') String transactionTypeFilter,
+    @Default(8) int monthLimit,
     String? errorMessage,
   }) = _TransactionHistoryState;
 }

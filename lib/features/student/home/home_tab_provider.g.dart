@@ -25,6 +25,28 @@ final transactionStreamProvider =
 // ignore: unused_element
 typedef TransactionStreamRef =
     AutoDisposeStreamProviderRef<List<TransactionModel>>;
+String _$homeMonthlySummaryHash() =>
+    r'856588f166a78a75210c0757a546b29cb1e4cf7d';
+
+/// See also [homeMonthlySummary].
+@ProviderFor(homeMonthlySummary)
+final homeMonthlySummaryProvider =
+    AutoDisposeStreamProvider<
+      ({double totalIncome, double totalExpense})
+    >.internal(
+      homeMonthlySummary,
+      name: r'homeMonthlySummaryProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$homeMonthlySummaryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HomeMonthlySummaryRef =
+    AutoDisposeStreamProviderRef<({double totalIncome, double totalExpense})>;
 String _$homeTabNotifierHash() => r'e0762d03b12fbf98ccec2ba23166a2cc6a0609f4';
 
 /// See also [HomeTabNotifier].

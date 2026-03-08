@@ -72,3 +72,20 @@ Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
   }
   return const Stream.empty();
 }
+
+@riverpod
+Stream<({double totalIncome, double totalExpense})> homeMonthlySummary(
+  HomeMonthlySummaryRef ref,
+) {
+  final uid = ref.watch(authProvider.select((a) => a.user?.uid));
+  if (uid == null) {
+    return Stream.value((totalIncome: 0.0, totalExpense: 0.0));
+  }
+
+  // Luôn lấy summary của tháng hiện tại
+  final repository = getIt<TransactionRepository>();
+  return repository.watchSummary(
+    uid,
+    month: DateTime.now(),
+  );
+}

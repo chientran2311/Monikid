@@ -42,4 +42,11 @@ abstract class TransactionRepository {
     DateTime? month,
     DateTime? date,
   });
+
+  /// Theo dõi realtime tổng thu chi
+  Stream<({double totalIncome, double totalExpense})> watchSummary(
+    String userId, {
+    DateTime? month,
+    DateTime? date,
+  });
 }

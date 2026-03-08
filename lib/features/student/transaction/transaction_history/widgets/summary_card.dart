@@ -95,14 +95,18 @@ class SummaryCard extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              _badge(
-                Icons.arrow_downward,
-                'Chi: ${CurrencyFormatter.formatCompact(totalExpense)}',
+              Expanded(
+                child: _badge(
+                  Icons.arrow_downward,
+                  'Chi: ${CurrencyFormatter.formatCompact(totalExpense)}',
+                ),
               ),
               const SizedBox(width: 16),
-              _badge(
-                Icons.arrow_upward,
-                'Thu: ${CurrencyFormatter.formatCompact(totalIncome)}',
+              Expanded(
+                child: _badge(
+                  Icons.arrow_upward,
+                  'Thu: ${CurrencyFormatter.formatCompact(totalIncome)}',
+                ),
               ),
             ],
           ),
@@ -119,10 +123,17 @@ class SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: Colors.white),
           const SizedBox(width: 4),
-          Text(text, style: const TextStyle(fontSize: 12, color: Colors.white)),
+          Flexible(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 12, color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );

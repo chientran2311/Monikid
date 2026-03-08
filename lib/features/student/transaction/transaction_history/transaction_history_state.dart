@@ -10,9 +10,8 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
     @Default(true) bool isLoading,
     @Default(false) bool isLoadingMore,
     @Default(false) bool isRefreshing,
+    @Default(false) bool isListLoading,
     @Default(true) bool hasMore,
-    double? totalIncome,
-    double? totalExpense,
     DateTime? selectedDate,
     String? selectedCategory,
     // Mặc định là 'expense' hoặc 'income', không còn null

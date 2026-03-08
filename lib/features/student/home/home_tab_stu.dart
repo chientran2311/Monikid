@@ -38,23 +38,16 @@ class HomeTabStudent extends HookConsumerWidget {
     final transactionAsync = ref.watch(transactionStreamProvider);
 
     final recentTxsAsync = ref.watch(homeTabNotifierProvider);
+    final summaryAsync = ref.watch(homeMonthlySummaryProvider);
 
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
         child: transactionAsync.when(
           data: (transactions) {
-            double totalIncome = 0;
-            double totalExpense = 0;
-
-            for (var tx in transactions) {
-              if (tx.type == 'income') {
-                totalIncome += tx.amount;
-              } else {
-                totalExpense += tx.amount;
-              }
-            }
-
+            final summary = summaryAsync.valueOrNull ?? (totalIncome: 0.0, totalExpense: 0.0);
+            final totalIncome = summary.totalIncome;
+            final totalExpense = summary.totalExpense;
             final balance = totalIncome - totalExpense;
 
             return RefreshIndicator(

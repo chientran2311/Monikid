@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/app/router.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
 // Import Tabs
 import 'package:monikid/features/student/home/home_tab_stu.dart';
@@ -40,8 +41,8 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
         : const Color(0xFF94A3B8);
 
     return Scaffold(
-      // IndexedStack dùng để giữ state của các tab không bị reload khi chuyển qua lại
-      body: IndexedStack(index: _currentIndex, children: _tabs),
+      // LazyLoadIndexedStack dùng để giữ state của các tab không bị reload khi chuyển qua lại, đồng thời ko render tất cả ngay từ đầu
+      body: LazyLoadIndexedStack(index: _currentIndex, children: _tabs),
 
       // Nút (+) thêm giao dịch ở giữa
       floatingActionButton: Container(

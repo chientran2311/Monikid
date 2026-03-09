@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 
-class CalendarDialog extends StatelessWidget {
+class CalendarDialog extends StatefulWidget {
   final DateTime initialMonth;
-  final Function(DateTime) onMonthSelected;
+
+  /// Callback khi người dùng nhấn "Xác nhận" với ngày đã chọn.
+  final Function(DateTime) onDateConfirmed;
 
   const CalendarDialog({
     Key? key,
     required this.initialMonth,
-    required this.onMonthSelected,
+    required this.onDateConfirmed,
   }) : super(key: key);
+
+  @override
+  State<CalendarDialog> createState() => _CalendarDialogState();
+}
+
+class _CalendarDialogState extends State<CalendarDialog> {
+  late DateTime _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.initialMonth;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +60,7 @@ class CalendarDialog extends StatelessWidget {
               ),
             ),
 
-            // Header -> Chọn ngày
+            // Header → Chọn ngày
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Text(
@@ -78,37 +93,73 @@ class CalendarDialog extends StatelessWidget {
                         ),
                 ),
                 child: CalendarDatePicker(
-                  initialDate: initialMonth,
+                  initialDate: _selectedDate,
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100),
+                  // Chỉ cập nhật state nội bộ, KHÔNG đóng dialog
                   onDateChanged: (date) {
-                    onMonthSelected(date);
-                    Navigator.pop(context);
+                    setState(() => _selectedDate = date);
                   },
                 ),
               ),
             ),
 
-            // Footer / Cancel button
+            // Footer: Hủy + Xác nhận
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFF1F5F9),
-                  foregroundColor: textColor,
-                  elevation: 0,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              child: Row(
+                children: [
+                  // Nút Hủy
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFF1F5F9),
+                        foregroundColor: textColor,
+                        elevation: 0,
+                        minimumSize: const Size(double.infinity, 52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'Hủy',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'Hủy',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                  const SizedBox(width: 12),
+                  // Nút Xác nhận → gọi onDateConfirmed với ngày đã chọn
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        widget.onDateConfirmed(_selectedDate);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        minimumSize: const Size(double.infinity, 52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'Xác nhận',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

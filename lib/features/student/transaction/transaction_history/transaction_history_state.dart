@@ -8,15 +8,16 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
   const factory TransactionHistoryState({
     @Default([]) List<TransactionModel> transactions,
     @Default(true) bool isLoading,
-    @Default(false) bool isLoadingMore,
-    @Default(false) bool isRefreshing,
     @Default(false) bool isListLoading,
+    @Default(false) bool isLoadingMore,
     @Default(true) bool hasMore,
     DateTime? selectedDate,
     String? selectedCategory,
-    // Mặc định là 'expense' hoặc 'income', không còn null
-    @Default('expense') String transactionTypeFilter,
+    // 'all' | 'income' | 'expense'
+    @Default('all') String transactionTypeFilter,
     @Default(8) int monthLimit,
     String? errorMessage,
   }) = _TransactionHistoryState;
+
+  const TransactionHistoryState._();
 }

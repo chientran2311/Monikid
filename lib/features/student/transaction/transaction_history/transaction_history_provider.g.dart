@@ -6,7 +6,7 @@ part of 'transaction_history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamSummaryCardHash() => r'd998ebbf39f2c0b72793d6da548ec1460fd4eeea';
+String _$streamSummaryCardHash() => r'50d81ba808e6ef49206989c955565d6c93641b20';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -178,7 +178,7 @@ class _StreamSummaryCardProviderElement
 }
 
 String _$transactionHistoryHash() =>
-    r'e2b370f20bc3a84433743231c2a3e6e266902bea';
+    r'18fcce25f01a4de08154506c1234a8679a1292c8';
 
 /// See also [TransactionHistory].
 @ProviderFor(TransactionHistory)

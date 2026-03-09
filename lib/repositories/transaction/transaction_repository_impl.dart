@@ -248,6 +248,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
                      .where('date', isLessThanOrEqualTo: endOfMonth);
       }
 
+      query = query.orderBy('date', descending: true);
+
       final snapshot = await query.get();
 
       double totalIncome = 0;
@@ -278,19 +280,21 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }) {
     var query = _transactions.where('userId', isEqualTo: userId);
 
-    if (date != null) {
-      final startOfDay = DateTime(date.year, date.month, date.day).toIso8601String();
-      final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999).toIso8601String();
-      query = query.where('date', isGreaterThanOrEqualTo: startOfDay)
-                   .where('date', isLessThanOrEqualTo: endOfDay);
-    } else if (month != null) {
-      final startOfMonth = DateTime(month.year, month.month, 1).toIso8601String();
-      final endOfMonth = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999).toIso8601String();
-      query = query.where('date', isGreaterThanOrEqualTo: startOfMonth)
-                   .where('date', isLessThanOrEqualTo: endOfMonth);
-    }
+      if (date != null) {
+        final startOfDay = DateTime(date.year, date.month, date.day).toIso8601String();
+        final endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59, 999).toIso8601String();
+        query = query.where('date', isGreaterThanOrEqualTo: startOfDay)
+                     .where('date', isLessThanOrEqualTo: endOfDay);
+      } else if (month != null) {
+        final startOfMonth = DateTime(month.year, month.month, 1).toIso8601String();
+        final endOfMonth = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999).toIso8601String();
+        query = query.where('date', isGreaterThanOrEqualTo: startOfMonth)
+                     .where('date', isLessThanOrEqualTo: endOfMonth);
+      }
 
-    return query.snapshots().map((snapshot) {
+      query = query.orderBy('date', descending: true);
+
+      return query.snapshots().map((snapshot) {
       double totalIncome = 0;
       double totalExpense = 0;
 

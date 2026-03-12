@@ -15,6 +15,7 @@ abstract class StatisticState with _$StatisticState {
     @Default(8) int pageLimit,
     /// 0: Theo tuần, 1: Theo tháng
     @Default(1) int selectedMonthIndex,
+    DateTime? selectedDate,
     @Default(0.0) double totalExpense,
     @Default(0.0) double previousPeriodTotalExpense,
     String? errorMessage,

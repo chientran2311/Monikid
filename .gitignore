@@ -50,3 +50,9 @@ app.*.map.json
 .*
 !/.gitignore
 !/.git/
+
+fqa_response.dart
+setting_fqa_page.dart
+setting_fqa_provider.dart
+setting_fqa_repository.dart
+setting_fqa_state.dart

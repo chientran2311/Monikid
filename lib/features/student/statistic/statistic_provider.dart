@@ -37,34 +37,38 @@ class Statistic extends _$Statistic {
   
   ({DateTime start, DateTime end}) _getPeriodRange() {
     final now = DateTime.now();
+    final targetDate = state.selectedDate ?? now;
     if (state.selectedMonthIndex == 0) {
       // Theo tuần (By Week): Monday to Sunday
-      final int currentDay = now.weekday;
-      final DateTime startOfWeek = now.subtract(Duration(days: currentDay - 1));
+      final referenceDate = DateTime(targetDate.year, targetDate.month, targetDate.day);
+      final int currentDay = referenceDate.weekday;
+      final DateTime startOfWeek = referenceDate.subtract(Duration(days: currentDay - 1));
       final DateTime start = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
       final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
       return (start: start, end: end);
     } else {
       // Theo tháng (By Month)
-      final start = DateTime(now.year, now.month, 1);
-      final end = DateTime(now.year, now.month + 1, 0, 23, 59, 59, 999);
+      final start = DateTime(targetDate.year, targetDate.month, 1);
+      final end = DateTime(targetDate.year, targetDate.month + 1, 0, 23, 59, 59, 999);
       return (start: start, end: end);
     }
   }
   
   ({DateTime start, DateTime end}) _getPreviousPeriodRange() {
     final now = DateTime.now();
+    final targetDate = state.selectedDate ?? now;
     if (state.selectedMonthIndex == 0) {
       // Previous week
-      final int currentDay = now.weekday;
-      final DateTime startOfPrevWeek = now.subtract(Duration(days: currentDay - 1 + 7));
+      final referenceDate = DateTime(targetDate.year, targetDate.month, targetDate.day);
+      final int currentDay = referenceDate.weekday;
+      final DateTime startOfPrevWeek = referenceDate.subtract(Duration(days: currentDay - 1 + 7));
       final DateTime start = DateTime(startOfPrevWeek.year, startOfPrevWeek.month, startOfPrevWeek.day);
       final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
       return (start: start, end: end);
     } else {
       // Previous month
-      final start = DateTime(now.year, now.month - 1, 1);
-      final end = DateTime(now.year, now.month, 0, 23, 59, 59, 999);
+      final start = DateTime(targetDate.year, targetDate.month - 1, 1);
+      final end = DateTime(targetDate.year, targetDate.month, 0, 23, 59, 59, 999);
       return (start: start, end: end);
     }
   }
@@ -186,7 +190,14 @@ class Statistic extends _$Statistic {
 
   Future<void> setMonthIndex(int index) async {
     if (state.selectedMonthIndex == index) return;
-    state = state.copyWith(selectedMonthIndex: index);
+    state = state.copyWith(selectedMonthIndex: index, selectedDate: DateTime.now());
+    await loadFirstPage();
+  }
+
+  Future<void> setSelectedDate(DateTime date) async {
+    final currentTarget = state.selectedDate ?? DateTime.now();
+    if (currentTarget.year == date.year && currentTarget.month == date.month && currentTarget.day == date.day) return;
+    state = state.copyWith(selectedDate: date);
     await loadFirstPage();
   }
 }

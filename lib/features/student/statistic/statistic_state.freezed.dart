@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$StatisticState {
 
  List<TransactionModel> get transactions; List<TransactionModel> get previousPeriodTransactions; bool get isLoading; bool get isLoadingMore; bool get isRefreshing; bool get hasMore; int get pageLimit;/// 0: Theo tuần, 1: Theo tháng
- int get selectedMonthIndex; double get totalExpense; double get previousPeriodTotalExpense; String? get errorMessage;
+ int get selectedMonthIndex; DateTime? get selectedDate; double get totalExpense; double get previousPeriodTotalExpense; String? get errorMessage;
 /// Create a copy of StatisticState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +27,16 @@ $StatisticStateCopyWith<StatisticState> get copyWith => _$StatisticStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticState&&const DeepCollectionEquality().equals(other.transactions, transactions)&&const DeepCollectionEquality().equals(other.previousPeriodTransactions, previousPeriodTransactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.isRefreshing, isRefreshing) || other.isRefreshing == isRefreshing)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.pageLimit, pageLimit) || other.pageLimit == pageLimit)&&(identical(other.selectedMonthIndex, selectedMonthIndex) || other.selectedMonthIndex == selectedMonthIndex)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.previousPeriodTotalExpense, previousPeriodTotalExpense) || other.previousPeriodTotalExpense == previousPeriodTotalExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticState&&const DeepCollectionEquality().equals(other.transactions, transactions)&&const DeepCollectionEquality().equals(other.previousPeriodTransactions, previousPeriodTransactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.isRefreshing, isRefreshing) || other.isRefreshing == isRefreshing)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.pageLimit, pageLimit) || other.pageLimit == pageLimit)&&(identical(other.selectedMonthIndex, selectedMonthIndex) || other.selectedMonthIndex == selectedMonthIndex)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.previousPeriodTotalExpense, previousPeriodTotalExpense) || other.previousPeriodTotalExpense == previousPeriodTotalExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(transactions),const DeepCollectionEquality().hash(previousPeriodTransactions),isLoading,isLoadingMore,isRefreshing,hasMore,pageLimit,selectedMonthIndex,totalExpense,previousPeriodTotalExpense,errorMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(transactions),const DeepCollectionEquality().hash(previousPeriodTransactions),isLoading,isLoadingMore,isRefreshing,hasMore,pageLimit,selectedMonthIndex,selectedDate,totalExpense,previousPeriodTotalExpense,errorMessage);
 
 @override
 String toString() {
-  return 'StatisticState(transactions: $transactions, previousPeriodTransactions: $previousPeriodTransactions, isLoading: $isLoading, isLoadingMore: $isLoadingMore, isRefreshing: $isRefreshing, hasMore: $hasMore, pageLimit: $pageLimit, selectedMonthIndex: $selectedMonthIndex, totalExpense: $totalExpense, previousPeriodTotalExpense: $previousPeriodTotalExpense, errorMessage: $errorMessage)';
+  return 'StatisticState(transactions: $transactions, previousPeriodTransactions: $previousPeriodTransactions, isLoading: $isLoading, isLoadingMore: $isLoadingMore, isRefreshing: $isRefreshing, hasMore: $hasMore, pageLimit: $pageLimit, selectedMonthIndex: $selectedMonthIndex, selectedDate: $selectedDate, totalExpense: $totalExpense, previousPeriodTotalExpense: $previousPeriodTotalExpense, errorMessage: $errorMessage)';
 }
 
 
@@ -47,7 +47,7 @@ abstract mixin class $StatisticStateCopyWith<$Res>  {
   factory $StatisticStateCopyWith(StatisticState value, $Res Function(StatisticState) _then) = _$StatisticStateCopyWithImpl;
 @useResult
 $Res call({
- List<TransactionModel> transactions, List<TransactionModel> previousPeriodTransactions, bool isLoading, bool isLoadingMore, bool isRefreshing, bool hasMore, int pageLimit, int selectedMonthIndex, double totalExpense, double previousPeriodTotalExpense, String? errorMessage
+ List<TransactionModel> transactions, List<TransactionModel> previousPeriodTransactions, bool isLoading, bool isLoadingMore, bool isRefreshing, bool hasMore, int pageLimit, int selectedMonthIndex, DateTime? selectedDate, double totalExpense, double previousPeriodTotalExpense, String? errorMessage
 });
 
 
@@ -64,7 +64,7 @@ class _$StatisticStateCopyWithImpl<$Res>
 
 /// Create a copy of StatisticState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? transactions = null,Object? previousPeriodTransactions = null,Object? isLoading = null,Object? isLoadingMore = null,Object? isRefreshing = null,Object? hasMore = null,Object? pageLimit = null,Object? selectedMonthIndex = null,Object? totalExpense = null,Object? previousPeriodTotalExpense = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? transactions = null,Object? previousPeriodTransactions = null,Object? isLoading = null,Object? isLoadingMore = null,Object? isRefreshing = null,Object? hasMore = null,Object? pageLimit = null,Object? selectedMonthIndex = null,Object? selectedDate = freezed,Object? totalExpense = null,Object? previousPeriodTotalExpense = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 transactions: null == transactions ? _self.transactions : transactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,previousPeriodTransactions: null == previousPeriodTransactions ? _self.previousPeriodTransactions : previousPeriodTransactions // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,8 @@ as bool,isRefreshing: null == isRefreshing ? _self.isRefreshing : isRefreshing /
 as bool,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
 as bool,pageLimit: null == pageLimit ? _self.pageLimit : pageLimit // ignore: cast_nullable_to_non_nullable
 as int,selectedMonthIndex: null == selectedMonthIndex ? _self.selectedMonthIndex : selectedMonthIndex // ignore: cast_nullable_to_non_nullable
-as int,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
+as int,selectedDate: freezed == selectedDate ? _self.selectedDate : selectedDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
 as double,previousPeriodTotalExpense: null == previousPeriodTotalExpense ? _self.previousPeriodTotalExpense : previousPeriodTotalExpense // ignore: cast_nullable_to_non_nullable
 as double,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -88,7 +89,7 @@ as String?,
 
 
 class _StatisticState implements StatisticState {
-  const _StatisticState({final  List<TransactionModel> transactions = const [], final  List<TransactionModel> previousPeriodTransactions = const [], this.isLoading = true, this.isLoadingMore = false, this.isRefreshing = false, this.hasMore = true, this.pageLimit = 8, this.selectedMonthIndex = 1, this.totalExpense = 0.0, this.previousPeriodTotalExpense = 0.0, this.errorMessage}): _transactions = transactions,_previousPeriodTransactions = previousPeriodTransactions;
+  const _StatisticState({final  List<TransactionModel> transactions = const [], final  List<TransactionModel> previousPeriodTransactions = const [], this.isLoading = true, this.isLoadingMore = false, this.isRefreshing = false, this.hasMore = true, this.pageLimit = 8, this.selectedMonthIndex = 1, this.selectedDate, this.totalExpense = 0.0, this.previousPeriodTotalExpense = 0.0, this.errorMessage}): _transactions = transactions,_previousPeriodTransactions = previousPeriodTransactions;
   
 
  final  List<TransactionModel> _transactions;
@@ -112,6 +113,7 @@ class _StatisticState implements StatisticState {
 @override@JsonKey() final  int pageLimit;
 /// 0: Theo tuần, 1: Theo tháng
 @override@JsonKey() final  int selectedMonthIndex;
+@override final  DateTime? selectedDate;
 @override@JsonKey() final  double totalExpense;
 @override@JsonKey() final  double previousPeriodTotalExpense;
 @override final  String? errorMessage;
@@ -126,16 +128,16 @@ _$StatisticStateCopyWith<_StatisticState> get copyWith => __$StatisticStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticState&&const DeepCollectionEquality().equals(other._transactions, _transactions)&&const DeepCollectionEquality().equals(other._previousPeriodTransactions, _previousPeriodTransactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.isRefreshing, isRefreshing) || other.isRefreshing == isRefreshing)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.pageLimit, pageLimit) || other.pageLimit == pageLimit)&&(identical(other.selectedMonthIndex, selectedMonthIndex) || other.selectedMonthIndex == selectedMonthIndex)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.previousPeriodTotalExpense, previousPeriodTotalExpense) || other.previousPeriodTotalExpense == previousPeriodTotalExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticState&&const DeepCollectionEquality().equals(other._transactions, _transactions)&&const DeepCollectionEquality().equals(other._previousPeriodTransactions, _previousPeriodTransactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.isRefreshing, isRefreshing) || other.isRefreshing == isRefreshing)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.pageLimit, pageLimit) || other.pageLimit == pageLimit)&&(identical(other.selectedMonthIndex, selectedMonthIndex) || other.selectedMonthIndex == selectedMonthIndex)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.totalExpense, totalExpense) || other.totalExpense == totalExpense)&&(identical(other.previousPeriodTotalExpense, previousPeriodTotalExpense) || other.previousPeriodTotalExpense == previousPeriodTotalExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_transactions),const DeepCollectionEquality().hash(_previousPeriodTransactions),isLoading,isLoadingMore,isRefreshing,hasMore,pageLimit,selectedMonthIndex,totalExpense,previousPeriodTotalExpense,errorMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_transactions),const DeepCollectionEquality().hash(_previousPeriodTransactions),isLoading,isLoadingMore,isRefreshing,hasMore,pageLimit,selectedMonthIndex,selectedDate,totalExpense,previousPeriodTotalExpense,errorMessage);
 
 @override
 String toString() {
-  return 'StatisticState(transactions: $transactions, previousPeriodTransactions: $previousPeriodTransactions, isLoading: $isLoading, isLoadingMore: $isLoadingMore, isRefreshing: $isRefreshing, hasMore: $hasMore, pageLimit: $pageLimit, selectedMonthIndex: $selectedMonthIndex, totalExpense: $totalExpense, previousPeriodTotalExpense: $previousPeriodTotalExpense, errorMessage: $errorMessage)';
+  return 'StatisticState(transactions: $transactions, previousPeriodTransactions: $previousPeriodTransactions, isLoading: $isLoading, isLoadingMore: $isLoadingMore, isRefreshing: $isRefreshing, hasMore: $hasMore, pageLimit: $pageLimit, selectedMonthIndex: $selectedMonthIndex, selectedDate: $selectedDate, totalExpense: $totalExpense, previousPeriodTotalExpense: $previousPeriodTotalExpense, errorMessage: $errorMessage)';
 }
 
 
@@ -146,7 +148,7 @@ abstract mixin class _$StatisticStateCopyWith<$Res> implements $StatisticStateCo
   factory _$StatisticStateCopyWith(_StatisticState value, $Res Function(_StatisticState) _then) = __$StatisticStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<TransactionModel> transactions, List<TransactionModel> previousPeriodTransactions, bool isLoading, bool isLoadingMore, bool isRefreshing, bool hasMore, int pageLimit, int selectedMonthIndex, double totalExpense, double previousPeriodTotalExpense, String? errorMessage
+ List<TransactionModel> transactions, List<TransactionModel> previousPeriodTransactions, bool isLoading, bool isLoadingMore, bool isRefreshing, bool hasMore, int pageLimit, int selectedMonthIndex, DateTime? selectedDate, double totalExpense, double previousPeriodTotalExpense, String? errorMessage
 });
 
 
@@ -163,7 +165,7 @@ class __$StatisticStateCopyWithImpl<$Res>
 
 /// Create a copy of StatisticState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? transactions = null,Object? previousPeriodTransactions = null,Object? isLoading = null,Object? isLoadingMore = null,Object? isRefreshing = null,Object? hasMore = null,Object? pageLimit = null,Object? selectedMonthIndex = null,Object? totalExpense = null,Object? previousPeriodTotalExpense = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? transactions = null,Object? previousPeriodTransactions = null,Object? isLoading = null,Object? isLoadingMore = null,Object? isRefreshing = null,Object? hasMore = null,Object? pageLimit = null,Object? selectedMonthIndex = null,Object? selectedDate = freezed,Object? totalExpense = null,Object? previousPeriodTotalExpense = null,Object? errorMessage = freezed,}) {
   return _then(_StatisticState(
 transactions: null == transactions ? _self._transactions : transactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,previousPeriodTransactions: null == previousPeriodTransactions ? _self._previousPeriodTransactions : previousPeriodTransactions // ignore: cast_nullable_to_non_nullable
@@ -173,7 +175,8 @@ as bool,isRefreshing: null == isRefreshing ? _self.isRefreshing : isRefreshing /
 as bool,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
 as bool,pageLimit: null == pageLimit ? _self.pageLimit : pageLimit // ignore: cast_nullable_to_non_nullable
 as int,selectedMonthIndex: null == selectedMonthIndex ? _self.selectedMonthIndex : selectedMonthIndex // ignore: cast_nullable_to_non_nullable
-as int,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
+as int,selectedDate: freezed == selectedDate ? _self.selectedDate : selectedDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,totalExpense: null == totalExpense ? _self.totalExpense : totalExpense // ignore: cast_nullable_to_non_nullable
 as double,previousPeriodTotalExpense: null == previousPeriodTotalExpense ? _self.previousPeriodTotalExpense : previousPeriodTotalExpense // ignore: cast_nullable_to_non_nullable
 as double,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,

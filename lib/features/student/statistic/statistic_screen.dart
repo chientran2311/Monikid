@@ -6,6 +6,8 @@ import 'package:monikid/features/student/statistic/statistic_provider.dart';
 import 'widgets/month_tab.dart';
 import 'widgets/legend_item.dart';
 import 'widgets/category_progress_item.dart';
+import 'widgets/custom_scroll_month.dart';
+import 'widgets/custom_scroll_week.dart';
 
 class StatisticScreen extends ConsumerStatefulWidget {
   const StatisticScreen({Key? key}) : super(key: key);
@@ -187,6 +189,11 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    if (statState.selectedMonthIndex == 0)
+                      const CustomScrollWeek()
+                    else
+                      const CustomScrollMonth(),
                     const SizedBox(height: 24),
 
                     // Error Message

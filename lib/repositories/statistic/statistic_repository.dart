@@ -8,6 +8,11 @@ abstract class StatisticRepository {
     int? limit,
   });
 
-  /// Retrieves the total expense amount for a specific month
-  Future<double> getTotalExpenseByMonth(String userId, DateTime month);
+  /// Retrieves a stream of expense transactions for a specific user within a given date range
+  Stream<({List<TransactionModel> transactions, DateTime start, DateTime end})> getExpenseTransactionsByDateRange(
+    String userId,
+    DateTime start,
+    DateTime end, {
+    int? limit,
+  });
 }

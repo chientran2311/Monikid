@@ -63,39 +63,32 @@ class StatisticRepositoryImpl implements StatisticRepository {
   }
 
   @override
-  Future<double> getTotalExpenseByMonth(String userId, DateTime month) async {
-    try {
-      _logger.i('📊 getTotalExpenseByMonth: $userId | ${month.month}/${month.year}');
+  Stream<({List<TransactionModel> transactions, DateTime start, DateTime end})> getExpenseTransactionsByDateRange(
+    String userId,
+    DateTime start,
+    DateTime end, {
+    int? limit,
+  }) {
+    _logger.i(
+      '📡 Listening to expense transactions for user: $userId from ${start.toIso8601String()} to ${end.toIso8601String()}',
+    );
 
-      final startOfMonth = DateTime(month.year, month.month, 1);
-      final endOfMonth = DateTime(
-        month.year,
-        month.month + 1,
-        0,
-        23,
-        59,
-        59,
-        999,
-      );
+    var query = _transactions
+        .where('userId', isEqualTo: userId)
+        .where('type', isEqualTo: 'expense')
+        .where('date', isGreaterThanOrEqualTo: start.toIso8601String())
+        .where('date', isLessThanOrEqualTo: end.toIso8601String())
+        .orderBy('date', descending: true);
 
-      final snapshot = await _transactions
-          .where('userId', isEqualTo: userId)
-          .where('type', isEqualTo: 'expense')
-          .where('date', isGreaterThanOrEqualTo: startOfMonth.toIso8601String())
-          .where('date', isLessThanOrEqualTo: endOfMonth.toIso8601String())
-          .get();
-
-      double totalExpense = 0;
-      for (final doc in snapshot.docs) {
-        final tx = TransactionModel.fromJson(doc.data());
-        totalExpense += tx.amount;
-      }
-
-      _logger.i('✅ Total expense for ${month.month}/${month.year}: $totalExpense');
-      return totalExpense;
-    } catch (e) {
-      _logger.e('❌ getTotalExpenseByMonth failed: $e');
-      rethrow;
+    if (limit != null) {
+      query = query.limit(limit);
     }
+
+    return query.snapshots().map((snapshot) {
+      final txs = snapshot.docs.map((doc) {
+        return TransactionModel.fromJson(doc.data());
+      }).toList();
+      return (transactions: txs, start: start, end: end);
+    });
   }
 }

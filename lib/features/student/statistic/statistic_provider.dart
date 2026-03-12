@@ -15,7 +15,7 @@ const _kPageSize = 8;
 @riverpod
 class Statistic extends _$Statistic {
   late final StatisticRepository _repository;
-  StreamSubscription<({List<TransactionModel> transactions, DateTime month})>? _subscription;
+  StreamSubscription<({List<TransactionModel> transactions, DateTime start, DateTime end})>? _subscription;
 
   @override
   StatisticState build() {
@@ -35,18 +35,38 @@ class Statistic extends _$Statistic {
     return authState.isAuthenticated ? authState.user?.uid : null;
   }
   
-  DateTime _getSelectedMonth() {
+  ({DateTime start, DateTime end}) _getPeriodRange() {
     final now = DateTime.now();
-    // 0: Tháng trước, 1: Tháng này
     if (state.selectedMonthIndex == 0) {
-      return DateTime(now.year, now.month - 1);
+      // Theo tuần (By Week): Monday to Sunday
+      final int currentDay = now.weekday;
+      final DateTime startOfWeek = now.subtract(Duration(days: currentDay - 1));
+      final DateTime start = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+      final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
+      return (start: start, end: end);
+    } else {
+      // Theo tháng (By Month)
+      final start = DateTime(now.year, now.month, 1);
+      final end = DateTime(now.year, now.month + 1, 0, 23, 59, 59, 999);
+      return (start: start, end: end);
     }
-    return now;
   }
   
-  DateTime _getPreviousMonthOfSelected() {
-    final target = _getSelectedMonth();
-    return DateTime(target.year, target.month - 1);
+  ({DateTime start, DateTime end}) _getPreviousPeriodRange() {
+    final now = DateTime.now();
+    if (state.selectedMonthIndex == 0) {
+      // Previous week
+      final int currentDay = now.weekday;
+      final DateTime startOfPrevWeek = now.subtract(Duration(days: currentDay - 1 + 7));
+      final DateTime start = DateTime(startOfPrevWeek.year, startOfPrevWeek.month, startOfPrevWeek.day);
+      final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
+      return (start: start, end: end);
+    } else {
+      // Previous month
+      final start = DateTime(now.year, now.month - 1, 1);
+      final end = DateTime(now.year, now.month, 0, 23, 59, 59, 999);
+      return (start: start, end: end);
+    }
   }
 
   Future<void> loadFirstPage() async {
@@ -59,35 +79,33 @@ class Statistic extends _$Statistic {
       isLoading: true,
       transactions: [],
       hasMore: true,
-      monthLimit: _kPageSize,
+      pageLimit: _kPageSize,
       errorMessage: null,
     );
 
     try {
-      final targetMonth = _getSelectedMonth();
-      final prevMonth = _getPreviousMonthOfSelected();
+      final targetRange = _getPeriodRange();
+      final prevRange = _getPreviousPeriodRange();
       
-      // Fetch transactions of previous month for comparison
-      // Because we just need all of them to calculate category difference, we can use a high limit or no limit if it's not paginated.
-      // But we need a new repository method to fetch list instead of total, or just fetch the list.
-      // Wait, TransactionRepository doesn't have a simple future get all transactions method for a month... Oh, wait! I can just listen to the stream or better yet, maybe I should just use `FirebaseFirestore` here? No, let's use the repository.
-      // I can add `Future<List<TransactionModel>> getExpenseTransactionsListByMonth` to the repository.
-      // Since I don't want to change repository again, I'll just use the stream and get the first event:
-      final prevRecord = await _repository.getExpenseTransactionsByMonth(uid, prevMonth, limit: 1000).first;
+      final prevRecord = await _repository.getExpenseTransactionsByDateRange(
+        uid, 
+        prevRange.start, 
+        prevRange.end, 
+        limit: 1000
+      ).first;
       
-      double prevMonthTotal = 0;
+      double prevPeriodTotal = 0;
       for (var tx in prevRecord.transactions) {
-        prevMonthTotal += tx.amount;
+        prevPeriodTotal += tx.amount;
       }
       
-      // Realtime for selected month
-      _subscription = _repository.getExpenseTransactionsByMonth(
+      _subscription = _repository.getExpenseTransactionsByDateRange(
         uid,
-        targetMonth,
+        targetRange.start,
+        targetRange.end,
         limit: _kPageSize,
       ).listen(
         (record) {
-          // Calculate current month total
           double currentTotal = 0;
           for (var tx in record.transactions) {
             currentTotal += tx.amount;
@@ -96,9 +114,9 @@ class Statistic extends _$Statistic {
           state = state.copyWith(
             isLoading: false,
             transactions: record.transactions,
-            previousMonthTransactions: prevRecord.transactions,
+            previousPeriodTransactions: prevRecord.transactions,
             totalExpense: currentTotal,
-            previousMonthTotalExpense: prevMonthTotal,
+            previousPeriodTotalExpense: prevPeriodTotal,
             hasMore: record.transactions.length >= _kPageSize,
           );
         },
@@ -119,7 +137,7 @@ class Statistic extends _$Statistic {
 
   Future<void> loadMore() async {
     if (state.isLoading || state.isLoadingMore || state.isRefreshing || !state.hasMore) return;
-    state = state.copyWith(isLoadingMore: true, monthLimit: state.monthLimit + _kPageSize);
+    state = state.copyWith(isLoadingMore: true, pageLimit: state.pageLimit + _kPageSize);
       
     final uid = _userId;
     if (uid == null) {
@@ -129,12 +147,13 @@ class Statistic extends _$Statistic {
     
     _subscription?.cancel();
     
-    final targetMonth = _getSelectedMonth();
+    final targetRange = _getPeriodRange();
     
-    _subscription = _repository.getExpenseTransactionsByMonth(
+    _subscription = _repository.getExpenseTransactionsByDateRange(
       uid,
-      targetMonth,
-      limit: state.monthLimit,
+      targetRange.start,
+      targetRange.end,
+      limit: state.pageLimit,
     ).listen(
       (record) {
         double currentTotal = 0;
@@ -145,7 +164,7 @@ class Statistic extends _$Statistic {
         state = state.copyWith(
           transactions: record.transactions,
           totalExpense: currentTotal,
-          hasMore: record.transactions.length >= state.monthLimit,
+          hasMore: record.transactions.length >= state.pageLimit,
           isLoadingMore: false,
         );
       },

@@ -52,33 +52,35 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
 
     final statState = ref.watch(statisticProvider);
     final txs = statState.transactions;
-    final prevTxs = statState.previousMonthTransactions;
+    final prevTxs = statState.previousPeriodTransactions;
 
     // Currency formatter
     final formatCurrency = NumberFormat.currency(locale: 'vi', symbol: 'đ');
 
+    final periodName = statState.selectedMonthIndex == 0 ? "tuần" : "tháng";
+
     // Determine diff percentage and text
     double curTotal = statState.totalExpense;
-    double prevTotal = statState.previousMonthTotalExpense;
+    double prevTotal = statState.previousPeriodTotalExpense;
     double percentDiff = 0;
-    String diffText = "Chưa có dữ liệu tháng trước";
+    String diffText = "Chưa có dữ liệu $periodName trước";
     IconData diffIcon = Icons.remove;
     Color diffColor = Colors.white; // Default for no-data
 
     if (prevTotal > 0) {
       if (curTotal > prevTotal) {
         percentDiff = ((curTotal - prevTotal) / prevTotal) * 100;
-        diffText = "Cao hơn ${percentDiff.toStringAsFixed(1)}% so với tháng trước";
+        diffText = "Cao hơn ${percentDiff.toStringAsFixed(1)}% so với $periodName trước";
         diffIcon = Icons.trending_up;
         diffColor = Colors.redAccent;
       } else {
         percentDiff = ((prevTotal - curTotal) / prevTotal) * 100;
-        diffText = "Thấp hơn ${percentDiff.toStringAsFixed(1)}% so với tháng trước";
+        diffText = "Thấp hơn ${percentDiff.toStringAsFixed(1)}% so với $periodName trước";
         diffIcon = Icons.trending_down;
         diffColor = Colors.white;
       }
     } else if (prevTotal == 0 && curTotal > 0) {
-      diffText = "Không có chi tiêu tháng trước";
+      diffText = "Không có chi tiêu $periodName trước";
       diffIcon = Icons.trending_up;
       diffColor = Colors.redAccent;
     }
@@ -165,7 +167,7 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                       child: Row(
                         children: [
                           MonthTab(
-                            title: "Tháng trước",
+                            title: "Theo tuần",
                             index: 0,
                             isDark: isDark,
                             selectedMonthIndex: statState.selectedMonthIndex,
@@ -174,7 +176,7 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                                 .setMonthIndex(idx),
                           ),
                           MonthTab(
-                            title: "Tháng này",
+                            title: "Theo tháng",
                             index: 1,
                             isDark: isDark,
                             selectedMonthIndex: statState.selectedMonthIndex,
@@ -240,9 +242,7 @@ class _StatisticScreenState extends ConsumerState<StatisticScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  statState.selectedMonthIndex == 1
-                                      ? "Tổng chi tiêu tháng này"
-                                      : "Tổng chi tiêu tháng trước",
+                                  "Tổng chi tiêu $periodName này",
                                   style: const TextStyle(
                                     color: Color(0xFFeaf5ea),
                                     fontSize: 14,

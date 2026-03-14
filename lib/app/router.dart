@@ -9,8 +9,10 @@ import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/auth/login/login_screen.dart';
 import 'package:monikid/features/auth/register/register.dart';
+import 'package:monikid/features/fqa/fqa_screen.dart';
 import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_screen.dart';
+import 'package:monikid/features/change_profile/profile_edit_screen.dart';
 
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_screen.dart';
 import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_screen.dart';
@@ -26,6 +28,10 @@ import 'package:monikid/features/student/transaction/add_transaction/add_transac
 import 'package:monikid/features/student/transaction/update_transaction/update_transaction_screen.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_screen.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/features/student/request_money/request_money_history/request_money_history_screen.dart';
+import 'package:monikid/models/entities/request_money/request_money_model.dart';
+import 'package:monikid/features/student/request_money/add_new_request/add_request_money_screen.dart';
+import 'package:monikid/features/student/request_money/update_request/update_request_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -40,6 +46,8 @@ class AppRoutes {
   static const String joinFamily = '/join-family';
   static const String forgotPassword = '/forgot-password';
   static const String updatePassword = '/update-password';
+  static const String fqa = '/fqa';
+  static const String profileEdit = '/profile-edit';
 
   // PIN routes
   static const String createNewPin = '/create-new-pin';
@@ -57,6 +65,11 @@ class AppRoutes {
   static const String addTransaction = '/add-transaction';
   static const String updateTransaction = '/update-transaction';
   static const String detailTransaction = '/detail-transaction';
+
+  // Request Money
+  static const String requestMoneyHistory = '/request-money-history';
+  static const String addRequestMoney = '/add-request-money';
+  static const String updateRequest = '/update-request';
 }
 
 /// Global Key để quản lý Navigator
@@ -82,6 +95,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) =>
+            const Placeholder(), // Placeholder for notifications
+      ),
+      GoRoute(
+        path: AppRoutes.fqa,
+        builder: (context, state) => const FQAScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profileEdit,
+        builder: (context, state) => const ProfileEditScreen(),
       ),
       GoRoute(
         path: AppRoutes.onboard1,
@@ -157,6 +183,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final transaction = state.extra as TransactionModel;
           return DetailTransactionScreen(transaction: transaction);
+        },
+      ),
+
+      // --- REQUEST MONEY ---
+      GoRoute(
+        path: AppRoutes.addRequestMoney,
+        builder: (context, state) => const AddRequestMoneyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.requestMoneyHistory,
+        builder: (context, state) {
+          final request = state.extra as RequestMoneyModel;
+          return RequestMoneyHistoryScreen(request: request);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.updateRequest,
+        builder: (context, state) {
+          final request = state.extra as RequestMoneyModel;
+          return UpdateRequestScreen(request: request);
         },
       ),
     ],

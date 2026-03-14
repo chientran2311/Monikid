@@ -1,0 +1,60 @@
+{
+  "@@locale": "en",
+  "language": "Language",
+  "vietnamese": "Vietnamese",
+  "english": "English",
+  "close": "Close",
+  "validationEmptyFields": "Please fill in all fields (Name, Email, Password)",
+  "registerFailed": "Registration failed: {error}",
+  "@registerFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "noTransactionsYet": "No transactions yet.",
+  "errorGeneric": "Error: {error}",
+  "settingFQA": "Frequently Asked Questions",
+  "msgNoData": "No data found",
+  "helpStillNeedHelp": "Still need help?",
+  "helpContactSupportDesc": "If you cannot find the answer, contact our support team 24/7.",
+  "actionChatWithUs": "Chat with us",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "actionRetry": "Retry",
+  "validationEnterAmount": "Please enter amount",
+  "validationAmountGreaterThanZero": "Amount must be greater than 0",
+  "msgAddTransactionSuccess": "Transaction added successfully!",
+  "msgTransactionDeleted": "Transaction deleted",
+  "actionCancel": "Cancel",
+  "actionConfirm": "Confirm",
+  "validationInvalidAmount": "Invalid amount",
+  "msgUpdateSuccess": "Update successful",
+  "profileEditTitle": "Edit Profile",
+  "profileEditAvatarLabel": "Change Avatar",
+  "profileEditFullName": "Full Name",
+  "profileEditFullNameHint": "Enter your full name",
+  "profileEditPhone": "Phone Number",
+  "profileEditPhoneHint": "Enter phone number",
+  "profileEditEmail": "Email",
+  "profileEditEmailWarning": "Email cannot be changed for security reasons.",
+  "profileEditDob": "Date of Birth",
+  "profileEditDobHint": "DD/MM/YYYY",
+  "actionSaveChanges": "Save Changes",
+  "editRequestTitle": "Edit Request",
+  "requestAmountLabel": "Requested Amount",
+  "requestReasonLabel": "Reason",
+  "categoryBooks": "Buy books/notebooks",
+  "categorySnacks": "Snacks",
+  "categoryGames": "Top up games",
+  "categoryGifts": "Gifts",
+  "additionalNoteLabel": "Additional Note",
+  "whatDoYouNeedToBuyHint": "What do you need to buy?",
+  "requestRecipientLabel": "Recipients",
+  "recipientDad": "Dad",
+  "recipientMom": "Mom",
+  "actionUpdateRequest": "Update Request",
+  "actionDeleteRequest": "Delete Request"
+}

@@ -8,6 +8,7 @@ import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:uuid/uuid.dart';
 import '../transaction_history/widgets/category_dialog.dart';
+import 'package:monikid/App/app.dart';
 import 'widgets/transaction_type_tab.dart';
 import 'widgets/transaction_form_field.dart';
 
@@ -44,7 +45,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (_amountController.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập số tiền')));
+      ).showSnackBar(SnackBar(content: Text(s.validationEnterAmount)));
       return;
     }
 
@@ -54,7 +55,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     if (amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Số tiền phải lớn hơn 0')));
+      ).showSnackBar(SnackBar(content: Text(s.validationAmountGreaterThanZero)));
       return;
     }
 
@@ -89,7 +90,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         setState(() => _isLoading = false);
         context.pop(); // Return to previous screen
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Thêm giao dịch thành công!')),
+          SnackBar(content: Text(s.msgAddTransactionSuccess)),
         );
       }
     } catch (e) {
@@ -97,7 +98,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: ${e.toString()}')));
+        ).showSnackBar(SnackBar(content: Text(s.errorGeneric(e.toString()))));
       }
     }
   }

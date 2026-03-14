@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_item.dart';
 import 'package:monikid/features/parent/home/home_tab_provider.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/features/auth/pin/pin_checker.dart';
@@ -307,8 +308,8 @@ class HomeTabParent extends HookConsumerWidget {
                           return Container(
                             color: surfaceColor,
                             padding: const EdgeInsets.symmetric(vertical: 32.0),
-                            child: const Center(
-                              child: Text("Chưa có giao dịch nào."),
+                            child: Center(
+                              child: Text(s.noTransactionsYet),
                             ),
                           );
                         }
@@ -339,7 +340,7 @@ class HomeTabParent extends HookConsumerWidget {
                     child: Container(
                       color: surfaceColor,
                       padding: const EdgeInsets.all(32.0),
-                      child: Center(child: Text("Lỗi: $err")),
+                      child: Center(child: Text(s.errorGeneric(err.toString()))),
                     ),
                   ),
                 ),
@@ -352,7 +353,7 @@ class HomeTabParent extends HookConsumerWidget {
           );
         },
         loading: () => const HomeTabSkeleton(),
-        error: (err, stack) => Center(child: Text("Lỗi: $err")),
+        error: (err, stack) => Center(child: Text(s.errorGeneric(err.toString()))),
       ),
     );
   }

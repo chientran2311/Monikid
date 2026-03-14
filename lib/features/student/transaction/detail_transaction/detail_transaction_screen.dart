@@ -6,6 +6,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_provider.dart';
 
 class DetailTransactionScreen extends ConsumerWidget {
@@ -262,14 +263,14 @@ class DetailTransactionScreen extends ConsumerWidget {
                   if (context.mounted) {
                     context.pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đã xóa giao dịch')),
+                      SnackBar(content: Text(s.msgTransactionDeleted)),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
                     ScaffoldMessenger.of(
                       context,
-                    ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+                    ).showSnackBar(SnackBar(content: Text(s.errorGeneric(e.toString()))));
                   }
                 }
               }, // delete action

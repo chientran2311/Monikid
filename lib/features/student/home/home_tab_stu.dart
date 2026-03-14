@@ -7,6 +7,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_item.dart';
 import 'package:monikid/features/student/home/home_tab_provider.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/features/auth/pin/pin_checker.dart';
@@ -355,11 +356,11 @@ class HomeTabStudent extends HookConsumerWidget {
                     data: (txState) {
                       final recentTxs = txState.transactions;
                       if (txState.isEmpty) {
-                        return const SliverToBoxAdapter(
+                        return SliverToBoxAdapter(
                           child: Padding(
-                            padding: EdgeInsets.all(24.0),
+                            padding: const EdgeInsets.all(24.0),
                             child: Center(
-                              child: Text("Chưa có giao dịch nào."),
+                              child: Text(s.noTransactionsYet),
                             ),
                           ),
                         );
@@ -393,7 +394,7 @@ class HomeTabStudent extends HookConsumerWidget {
                     error: (err, stack) => SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(32.0),
-                        child: Center(child: Text("Lỗi: $err")),
+                        child: Center(child: Text(s.errorGeneric(err.toString()))),
                       ),
                     ),
                   ),
@@ -430,13 +431,13 @@ class HomeTabStudent extends HookConsumerWidget {
                             style: TextStyle(color: textColor),
                           ),
                           const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: () {
-                              ref.invalidate(transactionStreamProvider);
-                              ref.read(homeTabNotifierProvider.notifier).refresh();
-                            },
-                            child: const Text("Thử lại"),
-                          )
+                            ElevatedButton(
+                              onPressed: () {
+                                ref.invalidate(transactionStreamProvider);
+                                ref.read(homeTabNotifierProvider.notifier).refresh();
+                              },
+                              child: Text(s.actionRetry),
+                            )
                         ],
                       ),
                     ),

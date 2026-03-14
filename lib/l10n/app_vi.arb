@@ -1,0 +1,60 @@
+{
+  "@@locale": "vi",
+  "language": "Ngôn ngữ",
+  "vietnamese": "Tiếng Việt",
+  "english": "Tiếng Anh",
+  "close": "Đóng",
+  "validationEmptyFields": "Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)",
+  "registerFailed": "Đăng ký thất bại: {error}",
+  "@registerFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "noTransactionsYet": "Chưa có giao dịch nào.",
+  "errorGeneric": "Lỗi: {error}",
+  "settingFQA": "Câu hỏi thường gặp",
+  "msgNoData": "Không có dữ liệu",
+  "helpStillNeedHelp": "Vẫn cần trợ giúp?",
+  "helpContactSupportDesc": "Nếu bạn không tìm thấy câu trả lời, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi 24/7.",
+  "actionChatWithUs": "Chat với chúng tôi",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "actionRetry": "Thử lại",
+  "validationEnterAmount": "Vui lòng nhập số tiền",
+  "validationAmountGreaterThanZero": "Số tiền phải lớn hơn 0",
+  "msgAddTransactionSuccess": "Thêm giao dịch thành công!",
+  "msgTransactionDeleted": "Đã xóa giao dịch",
+  "actionCancel": "Hủy",
+  "actionConfirm": "Xác nhận",
+  "validationInvalidAmount": "Số tiền không hợp lệ",
+  "msgUpdateSuccess": "Cập nhật thành công",
+  "profileEditTitle": "Chỉnh sửa hồ sơ",
+  "profileEditAvatarLabel": "Thay đổi ảnh đại diện",
+  "profileEditFullName": "Họ và tên",
+  "profileEditFullNameHint": "Nhập họ và tên của bạn",
+  "profileEditPhone": "Số điện thoại",
+  "profileEditPhoneHint": "Nhập số điện thoại",
+  "profileEditEmail": "Email",
+  "profileEditEmailWarning": "Email không thể thay đổi để bảo mật tài khoản.",
+  "profileEditDob": "Ngày sinh",
+  "profileEditDobHint": "DD/MM/YYYY",
+  "actionSaveChanges": "Lưu thay đổi",
+  "editRequestTitle": "Chỉnh sửa yêu cầu",
+  "requestAmountLabel": "Số tiền yêu cầu",
+  "requestReasonLabel": "Lý do của con",
+  "categoryBooks": "Mua sách/vở",
+  "categorySnacks": "Ăn vặt",
+  "categoryGames": "Nạp game",
+  "categoryGifts": "Quà tặng",
+  "additionalNoteLabel": "Ghi chú thêm",
+  "whatDoYouNeedToBuyHint": "Con cần mua gì?",
+  "requestRecipientLabel": "Người nhận yêu cầu",
+  "recipientDad": "Bố",
+  "recipientMom": "Mẹ",
+  "actionUpdateRequest": "Cập nhật yêu cầu",
+  "actionDeleteRequest": "Xóa yêu cầu"
+}

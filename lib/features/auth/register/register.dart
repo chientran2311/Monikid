@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/auth/providers/auth_provider.dart';
 import 'package:monikid/features/auth/domain/params/auth_param.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
@@ -41,8 +42,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)'),
+        SnackBar(
+          content: Text(s.validationEmptyFields),
           backgroundColor: AppTheme.redAlert,
         ),
       );
@@ -66,7 +67,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng ký thất bại: ${e.toString()}'),
+            content: Text(s.registerFailed(e.toString())),
             backgroundColor: AppTheme.redAlert,
           ),
         );

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/student/setting/widgets/setting_item.dart';
 import 'package:monikid/features/student/setting/widgets/setting_group.dart';
+import 'package:monikid/features/change_language/change_language_dialog.dart';
+import 'package:monikid/features/change_language/change_language_provider.dart';
 
-class SettingTabStudent extends StatelessWidget {
+class SettingTabStudent extends ConsumerWidget {
   const SettingTabStudent({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final bgColor = isDark ? const Color(0xFF141E15) : const Color(0xFFF6F8F6);
@@ -164,6 +168,41 @@ class SettingTabStudent extends StatelessWidget {
                         // Group 1: Features
                         SettingGroup(
                           children: [
+                            SettingItem(
+                              icon: Icons.language,
+                              iconColor: primaryColor,
+                              iconBgColor: primaryLightBg,
+                              title: s.language,
+                              showBorder: true,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    ref.watch(changeLanguageProvider).localeCode == 'vi' ? s.vietnamese : s.english,
+                                    style: TextStyle(
+                                      color: textSubColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: isDark
+                                        ? const Color(0xFF64748B)
+                                        : const Color(0xFF94A3B8),
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) => const ChangeLanguageDialog(),
+                                );
+                              },
+                            ),
                             SettingItem(
                               icon: Icons.account_balance_wallet,
                               iconColor: primaryColor,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/App/app.dart';
 import 'package:monikid/features/student/transaction/update_transaction/update_transaction_provider.dart';
 
 class UpdateTransactionScreen extends ConsumerStatefulWidget {
@@ -211,7 +212,7 @@ class _UpdateTransactionScreenState
           actions: [
             TextButton(
               onPressed: () => context.pop(),
-              child: const Text("Hủy"),
+              child: Text(s.actionCancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -225,7 +226,7 @@ class _UpdateTransactionScreenState
                 }
                 context.pop();
               },
-              child: const Text("Xác nhận"),
+              child: Text(s.actionConfirm),
             ),
           ],
         );
@@ -238,7 +239,7 @@ class _UpdateTransactionScreenState
     if (amountText.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Vui lòng nhập số tiền')));
+      ).showSnackBar(SnackBar(content: Text(s.validationEnterAmount)));
       return;
     }
 
@@ -246,7 +247,7 @@ class _UpdateTransactionScreenState
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Số tiền không hợp lệ')));
+      ).showSnackBar(SnackBar(content: Text(s.validationInvalidAmount)));
       return;
     }
 
@@ -272,7 +273,7 @@ class _UpdateTransactionScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Cập nhật thành công')));
+        ).showSnackBar(SnackBar(content: Text(s.msgUpdateSuccess)));
 
         // Go back twice to return to history screen (since detail screen might be outdated now)
         context.pop(); // pop update
@@ -282,7 +283,7 @@ class _UpdateTransactionScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        ).showSnackBar(SnackBar(content: Text(s.errorGeneric(e.toString()))));
       }
     } finally {
       if (mounted) {

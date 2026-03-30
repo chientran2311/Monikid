@@ -155,4 +155,25 @@ class SVi extends S {
 
   @override
   String get actionDeleteRequest => 'Xóa yêu cầu';
+
+  @override
+  String get scanbill => 'Quét Hóa Đơn';
+
+  @override
+  String get chatting => 'Trò Chuyện';
+
+  @override
+  String get requestmoney => 'Xin Tiền';
+
+  @override
+  String get takePicture => 'Chụp ảnh';
+
+  @override
+  String get chooseFromGallery => 'Tải ảnh lên';
+
+  @override
+  String get scanReceiptTitle => 'Quét hoá đơn';
+
+  @override
+  String get scanReceiptDesc => 'Chọn cách thêm ảnh hoá đơn để xử lý.';
 }

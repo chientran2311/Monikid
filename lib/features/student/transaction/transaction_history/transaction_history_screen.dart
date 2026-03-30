@@ -104,6 +104,9 @@ class TransactionHistoryScreen extends HookConsumerWidget {
     final selectedCategory = ref.watch(
       transactionHistoryProvider.select((v) => v.selectedCategory),
     );
+    final transactionTypeFilter = ref.watch(
+      transactionHistoryProvider.select((v) => v.transactionTypeFilter),
+    );
 
     final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
 
@@ -166,7 +169,13 @@ class TransactionHistoryScreen extends HookConsumerWidget {
               ),
               // Filter icon (category)
               GestureDetector(
-                onTap: () => _showCategoryDialog(context, selectedCategory, notifier, isDark),
+                onTap: () => _showCategoryDialog(
+                  context,
+                  selectedCategory,
+                  notifier,
+                  isDark,
+                  transactionTypeFilter,
+                ),
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -535,6 +544,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
     String? currentCategory,
     TransactionHistory notifier,
     bool isDark,
+    String transactionTypeFilter,
   ) {
     showModalBottomSheet(
       context: context,
@@ -542,6 +552,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => CategoryDialog(
         selectedCategory: currentCategory,
+        categoryType: transactionTypeFilter == 'all' ? null : transactionTypeFilter,
         // Khi chọn category: giữ nguyên filter date + type, fetch lại trans
         onCategorySelected: (category) =>
             notifier.getTransByCategory(category?.label),

@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>MoniKid cần quyền truy cập camera để chụp ảnh hóa đơn</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MoniKid cần quyền truy cập thư viện ảnh để chọn ảnh hóa đơn</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MoniKid cần quyền lưu ảnh vào thư viện</string>
 </dict>
 </plist>

@@ -6,7 +6,7 @@ import 'package:monikid/features/student/transaction/widgets/transaction_item.da
 import 'package:monikid/features/parent/home/home_tab_provider.dart';
 import 'package:monikid/App/app.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/auth/pin/pin_checker.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/quick_action.dart';
@@ -36,7 +36,7 @@ class HomeTabParent extends HookConsumerWidget {
         ? const Color(0xFF94A3B8)
         : const Color(0xFF64748B);
 
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authSessionProvider);
     final user = authState.user;
     final userName = user?.displayName ?? "Phụ huynh";
 

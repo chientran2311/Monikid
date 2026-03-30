@@ -6,7 +6,7 @@ part of 'category_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$categoryStreamHash() => r'f3490c33fa8acbc9af5139e26c58824b935f7a9f';
+String _$categoryStreamHash() => r'163bdc89db1c7de152897d96199db21629217db6';
 
 /// See also [categoryStream].
 @ProviderFor(categoryStream)

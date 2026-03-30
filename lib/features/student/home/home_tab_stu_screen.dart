@@ -8,9 +8,10 @@ import 'package:monikid/features/student/transaction/widgets/transaction_item.da
 import 'package:monikid/features/student/home/home_tab_provider.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
 import 'package:monikid/App/app.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/features/auth/pin/pin_checker.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
 import 'widgets/summary_mini_card.dart';
 import 'widgets/quick_action.dart';
 
@@ -32,7 +33,7 @@ class HomeTabStudent extends HookConsumerWidget {
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authSessionProvider);
     final user = authState.user;
     final userName = user?.displayName ?? "Học sinh";
 
@@ -286,27 +287,38 @@ class HomeTabStudent extends HookConsumerWidget {
                         children: [
                           QuickAction(
                             icon: Icons.qr_code_scanner,
-                            label: "Quét QR",
+                            label: s.scanbill,
                             color: Colors.orange,
                             isDark: isDark,
+                            onTap: () {
+                              showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => const UploadPicDialog(),
+                              );
+                            },
                           ),
                           QuickAction(
                             icon: Icons.account_balance_wallet,
-                            label: "Nạp tiền",
+                            label: s.chatting,
                             color: Colors.blue,
                             isDark: isDark,
+                             onTap: () {},
                           ),
                           QuickAction(
                             icon: Icons.savings,
-                            label: "Tiết kiệm",
+                            label: s.requestmoney,
                             color: Colors.purple,
                             isDark: isDark,
+                             onTap: () {},
                           ),
                           QuickAction(
                             icon: Icons.more_horiz,
                             label: "Xem thêm",
                             color: Colors.pink,
                             isDark: isDark,
+                             onTap: () {},
                           ),
                         ],
                       ),

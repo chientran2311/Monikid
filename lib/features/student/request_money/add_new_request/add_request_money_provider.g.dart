@@ -6,7 +6,7 @@ part of 'add_request_money_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$addRequestMoneyHash() => r'e533c011216b7267ec276ffff2dd6a6691217602';
+String _$addRequestMoneyHash() => r'd98d34745d3b4d67c4f3abce06072857961782f9';
 
 /// See also [AddRequestMoney].
 @ProviderFor(AddRequestMoney)

@@ -4,12 +4,14 @@ class Skeleton extends StatefulWidget {
   final double height;
   final double width;
   final double borderRadius;
+  final Color? color;
 
   const Skeleton({
     super.key,
     required this.height,
     required this.width,
     this.borderRadius = 8.0,
+     this.color,
   });
 
   @override

@@ -56,5 +56,12 @@
   "recipientDad": "Bố",
   "recipientMom": "Mẹ",
   "actionUpdateRequest": "Cập nhật yêu cầu",
-  "actionDeleteRequest": "Xóa yêu cầu"
+  "actionDeleteRequest": "Xóa yêu cầu",
+  "scanbill": "Quét Hóa Đơn",
+  "chatting": "Trò Chuyện",
+  "requestmoney": "Xin Tiền",
+  "takePicture": "Chụp ảnh",
+  "chooseFromGallery": "Tải ảnh lên",
+  "scanReceiptTitle": "Quét hoá đơn",
+  "scanReceiptDesc": "Chọn cách thêm ảnh hoá đơn để xử lý."
 }

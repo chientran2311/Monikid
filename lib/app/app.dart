@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/l10n/app_localizations.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
 
@@ -28,6 +29,10 @@ class MoniKidApp extends ConsumerWidget {
 
       // Router
       routerConfig: router,
+      builder: (context, child) {
+        ScreenUtils.init(context);
+        return child ?? const SizedBox.shrink();
+      },
 
       // Localization
       localizationsDelegates: S.localizationsDelegates,

@@ -8,6 +8,7 @@ abstract class CreateNewPINState with _$CreateNewPINState {
   const factory CreateNewPINState({
     required String pinCode,
     required EnterPINCodeEnum type,
+    String? pendingPinCodeHash,
     @Default(false) bool isLoading,
   }) = _CreateNewPINState;
 

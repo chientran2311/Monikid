@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:monikid/app/router.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_provider.dart';
-import 'package:monikid/features/auth/pin/widgets/pin_screen_body.dart';
 import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
+import 'package:monikid/features/auth/pin/widgets/pin_screen_body.dart';
 
-/// Màn hình TẠO mã PIN mới — toàn màn hình (không phải dialog).
-/// [HookConsumerWidget] + [useTextEditingController] + [useEffect] đúng theo guide.
-class CreateNewPinScreen extends HookConsumerWidget {
+class CreateNewPinScreen extends ConsumerWidget {
   const CreateNewPinScreen({
     required this.type,
     this.pinCode,
@@ -21,45 +20,47 @@ class CreateNewPinScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(createNewPINProvider(type, pinCode: pinCode));
-    final notifier = ref.read(
-      createNewPINProvider(type, pinCode: pinCode).notifier,
-    );
-    final enterPINCtrl = useTextEditingController();
+    final provider = createNewPINProvider(type, pinCode: pinCode);
+    final state = ref.watch(provider);
+    final notifier = ref.read(provider.notifier);
 
-    // Lắng nghe thay đổi text — chỉ add listener 1 lần nhờ dependency list rỗng
-    useEffect(() {
-      void listener() {
-        final text = enterPINCtrl.text;
-        // Đồng bộ state với controller (để PinScreenBody hiển thị đúng dots)
-        notifier.onTextChanged(text);
-        // Khi đủ 6 số: bcrypt + navigate (isLoading guard trong provider)
-        if (text.length == 6) {
-          notifier.navigationReEnterPinCode(text, context);
-        }
+    ref.listen(provider, (previous, next) async {
+      final shouldNavigate =
+          previous?.pendingPinCodeHash == null && next.pendingPinCodeHash != null;
+
+      if (!shouldNavigate || !context.mounted) {
+        return;
       }
 
-      enterPINCtrl.addListener(listener);
-      return () => enterPINCtrl.removeListener(listener);
-    }, const []);
+      final pinCodeHash = next.pendingPinCodeHash!;
+      notifier.clearPendingPinCodeHash();
 
-    // Reset controller khi bắt đầu lại (ví dụ: từ error)
-    useEffect(() {
-      if (state.pinCode.isEmpty && enterPINCtrl.text.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          enterPINCtrl.clear();
-        });
+      final result = await context.push<bool>(
+        AppRoutes.reEnterPin,
+        extra: {
+          'pinCodeHash': pinCodeHash,
+          'canCancel': canCancel,
+        },
+      );
+
+      if (!context.mounted) {
+        return;
       }
-      return null;
-    }, [state.pinCode]);
 
-    final title = type == EnterPINCodeEnum.createdNew
+      if (result == true) {
+        Navigator.of(context).pop(true);
+      } else {
+        notifier.reset();
+      }
+    });
+
+    final title = type == EnterPINCodeEnum.createNew
         ? 'Tạo mã PIN mới'
         : 'Nhập mã PIN';
-    const description = 'Tạo mã PIN 6 chữ số để bảo mật tài khoản CỦA BẠN.';
+    const description = 'Tạo mã PIN 6 chữ số để bảo mật tài khoản của bạn.';
 
     return PopScope(
-      canPop: canCancel,
+      canPop: canCancel && !state.isLoading,
       child: Scaffold(
         appBar: AppBar(automaticallyImplyLeading: false),
         body: SafeArea(
@@ -67,29 +68,11 @@ class CreateNewPinScreen extends HookConsumerWidget {
             child: PinScreenBody(
               title: title,
               description: description,
-              // PIN hiển thị qua state (Riverpod) — controller chỉ làm trigger
-              currentPin: state.pinCode.length > 6
-                  ? state.pinCode.substring(0, 6)
-                  : state.pinCode,
+              currentPin: state.pinCode,
               hasError: false,
               isLoading: state.isLoading,
-              onAddNumber: (digit) {
-                if (enterPINCtrl.text.length < 6) {
-                  enterPINCtrl.value = TextEditingValue(
-                    text: enterPINCtrl.text + digit,
-                  );
-                }
-              },
-              onRemoveNumber: () {
-                if (enterPINCtrl.text.isNotEmpty) {
-                  enterPINCtrl.value = TextEditingValue(
-                    text: enterPINCtrl.text.substring(
-                      0,
-                      enterPINCtrl.text.length - 1,
-                    ),
-                  );
-                }
-              },
+              onAddNumber: notifier.addNumber,
+              onRemoveNumber: notifier.removeNumber,
             ),
           ),
         ),

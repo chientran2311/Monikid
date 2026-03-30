@@ -35,6 +35,11 @@ class AppTheme {
   static const Color inputBackground = surfaceDark;
   static const Color primaryGreen = primary;
 
+  // Additional colors used in UI
+  static const Color surfaceVariant = Color(0xFF1E293B); // Dark surface variant
+  static const Color borderDark = Color(0xFF334155); // Dark border
+  static const Color borderLight = Color(0xFFE2E8F0); // Light border
+
   // ==========================================================================
   // DARK THEME
   // ==========================================================================

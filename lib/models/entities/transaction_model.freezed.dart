@@ -93,8 +93,8 @@ as String?,
 /// @nodoc
 @JsonSerializable()
 
-class _TransactionModel implements TransactionModel {
-  const _TransactionModel({required this.transactionId, required this.userId, required this.amount, required this.type, required this.category, this.categoryEmoji, this.note, this.source, this.paymentMethod, this.receiptImageUrl, @TimestampConverter() required this.date, @TimestampConverter() this.createdAt, @TimestampConverter() this.updatedAt, this.location});
+class _TransactionModel extends TransactionModel {
+  const _TransactionModel({required this.transactionId, required this.userId, required this.amount, required this.type, required this.category, this.categoryEmoji, this.note, this.source, this.paymentMethod, this.receiptImageUrl, @TimestampConverter() required this.date, @TimestampConverter() this.createdAt, @TimestampConverter() this.updatedAt, this.location}): super._();
   factory _TransactionModel.fromJson(Map<String, dynamic> json) => _$TransactionModelFromJson(json);
 
 @override final  String transactionId;

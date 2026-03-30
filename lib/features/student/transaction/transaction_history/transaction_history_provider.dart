@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:logger/logger.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'transaction_history_state.dart';
 
@@ -24,7 +23,7 @@ Stream<({double totalIncome, double totalExpense})> streamSummaryCard(
   DateTime? month,
 }) {
   final log = Logger();
-  final uid = ref.watch(authProvider).user?.uid;
+  final uid = ref.watch(authSessionProvider).user?.uid;
 
   log.i('🔍 streamSummaryCard | uid=$uid | date=$date | month=$month');
 
@@ -33,7 +32,8 @@ Stream<({double totalIncome, double totalExpense})> streamSummaryCard(
     return Stream.value((totalIncome: 0.0, totalExpense: 0.0));
   }
 
-  return getIt<TransactionRepository>()
+  return ref
+      .watch(transactionRepositoryProvider)
       .watchSummary(uid, date: date, month: month)
       .map((data) {
         log.i('✅ watchSummary emit | income=${data.totalIncome} | expense=${data.totalExpense}');
@@ -57,7 +57,7 @@ class TransactionHistory extends _$TransactionHistory {
 
   @override
   TransactionHistoryState build() {
-    _repository = getIt<TransactionRepository>();
+    _repository = ref.read(transactionRepositoryProvider);
     ref.onDispose(() => _subscription?.cancel());
     return const TransactionHistoryState(selectedDate: null);
   }
@@ -67,7 +67,7 @@ class TransactionHistory extends _$TransactionHistory {
   // ---------------------------------------------------------------------------
 
   String? get _userId {
-    final auth = ref.read(authProvider);
+    final auth = ref.read(authSessionProvider);
     return auth.isAuthenticated ? auth.user?.uid : null;
   }
 
@@ -93,17 +93,7 @@ class TransactionHistory extends _$TransactionHistory {
   /// 1. PUBLIC METHOD: Initialize data
   Future<void> init() async {
     if (state.transactions.isNotEmpty && !state.isLoading) return;
-
-    if (_userId != null) {
-      await ref
-          .read(
-            streamSummaryCardProvider(
-              month: DateTime(DateTime.now().year, DateTime.now().month),
-            ).future,
-          )
-          .catchError((_) => (totalIncome: 0.0, totalExpense: 0.0));
-    }
-
+    ref.invalidate(streamSummaryCardProvider);
     await _loadData(reset: true);
   }
 
@@ -149,7 +139,18 @@ class TransactionHistory extends _$TransactionHistory {
 
   Future<void> _loadData({required bool reset, bool isRefresh = false}) async {
     final uid = _userId;
-    if (uid == null) return;
+    if (uid == null) {
+      _cancelStream();
+      state = state.copyWith(
+        transactions: [],
+        hasMore: false,
+        isLoading: false,
+        isListLoading: false,
+        isLoadingMore: false,
+        errorMessage: null,
+      );
+      return;
+    }
 
     _updateLoadingState(reset: reset, isRefresh: isRefresh);
 
@@ -167,11 +168,14 @@ class TransactionHistory extends _$TransactionHistory {
           category: state.selectedCategory,
           type: _activeType,
           lastTransaction: lastTx,
-          limit: _kPageSize,
+          limit: _kPageSize + 1,
         );
 
-        final hasMore = results.length >= _kPageSize;
-        final finalList = reset ? results : [...state.transactions, ...results];
+        final hasMore = results.length > _kPageSize;
+        final visibleResults = hasMore ? results.take(_kPageSize).toList() : results;
+        final finalList = reset
+            ? visibleResults
+            : [...state.transactions, ...visibleResults];
 
         state = state.copyWith(
           transactions: finalList,
@@ -192,15 +196,24 @@ class TransactionHistory extends _$TransactionHistory {
         }
 
         _subscription = _repository
-            .getTransactionsByMonth(uid, DateTime.now(), limit: state.monthLimit)
+            .getTransactionsByMonth(
+              uid,
+              DateTime.now(),
+              limit: state.monthLimit + 1,
+            )
             .listen(
           (record) {
+            final hasMore = record.transactions.length > state.monthLimit;
+            final visibleTransactions = hasMore
+                ? record.transactions.take(state.monthLimit).toList()
+                : record.transactions;
+
             state = state.copyWith(
               isLoading: false,
               isListLoading: false,
               isLoadingMore: false,
-              transactions: record.transactions,
-              hasMore: record.transactions.length >= state.monthLimit,
+              transactions: visibleTransactions,
+              hasMore: hasMore,
               errorMessage: null,
             );
           },

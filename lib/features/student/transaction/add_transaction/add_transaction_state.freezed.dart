@@ -15,169 +15,38 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AddTransactionState {
 
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTransactionState);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'AddTransactionState()';
-}
-
-
-}
-
-/// @nodoc
-class $AddTransactionStateCopyWith<$Res>  {
-$AddTransactionStateCopyWith(AddTransactionState _, $Res Function(AddTransactionState) __);
-}
-
-
-/// @nodoc
-
-
-class _Initial implements AddTransactionState {
-  const _Initial();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'AddTransactionState.initial()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Loading implements AddTransactionState {
-  const _Loading();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loading);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'AddTransactionState.loading()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Success implements AddTransactionState {
-  const _Success();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Success);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'AddTransactionState.success()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Error implements AddTransactionState {
-  const _Error(this.message);
-  
-
- final  String message;
-
+ TransactionStatus get status; String? get errorMessage;
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$identity);
+$AddTransactionStateCopyWith<AddTransactionState> get copyWith => _$AddTransactionStateCopyWithImpl<AddTransactionState>(this as AddTransactionState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message);
+int get hashCode => Object.hash(runtimeType,status,errorMessage);
 
 @override
 String toString() {
-  return 'AddTransactionState.error(message: $message)';
+  return 'AddTransactionState(status: $status, errorMessage: $errorMessage)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$ErrorCopyWith<$Res> implements $AddTransactionStateCopyWith<$Res> {
-  factory _$ErrorCopyWith(_Error value, $Res Function(_Error) _then) = __$ErrorCopyWithImpl;
+abstract mixin class $AddTransactionStateCopyWith<$Res>  {
+  factory $AddTransactionStateCopyWith(AddTransactionState value, $Res Function(AddTransactionState) _then) = _$AddTransactionStateCopyWithImpl;
 @useResult
 $Res call({
- String message
+ TransactionStatus status, String? errorMessage
 });
 
 
@@ -185,19 +54,88 @@ $Res call({
 
 }
 /// @nodoc
-class __$ErrorCopyWithImpl<$Res>
-    implements _$ErrorCopyWith<$Res> {
-  __$ErrorCopyWithImpl(this._self, this._then);
+class _$AddTransactionStateCopyWithImpl<$Res>
+    implements $AddTransactionStateCopyWith<$Res> {
+  _$AddTransactionStateCopyWithImpl(this._self, this._then);
 
-  final _Error _self;
-  final $Res Function(_Error) _then;
+  final AddTransactionState _self;
+  final $Res Function(AddTransactionState) _then;
 
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
-  return _then(_Error(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,}) {
+  return _then(_self.copyWith(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as TransactionStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// @nodoc
+
+
+class _AddTransactionState extends AddTransactionState {
+  const _AddTransactionState({this.status = TransactionStatus.initial, this.errorMessage}): super._();
+  
+
+@override@JsonKey() final  TransactionStatus status;
+@override final  String? errorMessage;
+
+/// Create a copy of AddTransactionState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AddTransactionStateCopyWith<_AddTransactionState> get copyWith => __$AddTransactionStateCopyWithImpl<_AddTransactionState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,status,errorMessage);
+
+@override
+String toString() {
+  return 'AddTransactionState(status: $status, errorMessage: $errorMessage)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AddTransactionStateCopyWith<$Res> implements $AddTransactionStateCopyWith<$Res> {
+  factory _$AddTransactionStateCopyWith(_AddTransactionState value, $Res Function(_AddTransactionState) _then) = __$AddTransactionStateCopyWithImpl;
+@override @useResult
+$Res call({
+ TransactionStatus status, String? errorMessage
+});
+
+
+
+
+}
+/// @nodoc
+class __$AddTransactionStateCopyWithImpl<$Res>
+    implements _$AddTransactionStateCopyWith<$Res> {
+  __$AddTransactionStateCopyWithImpl(this._self, this._then);
+
+  final _AddTransactionState _self;
+  final $Res Function(_AddTransactionState) _then;
+
+/// Create a copy of AddTransactionState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,}) {
+  return _then(_AddTransactionState(
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as TransactionStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

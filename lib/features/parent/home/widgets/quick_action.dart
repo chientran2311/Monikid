@@ -6,6 +6,7 @@ class QuickAction extends StatelessWidget {
   final bool isPrimary;
   final Color parentPrimary;
   final bool isDark;
+  final VoidCallback? onTap;
 
   const QuickAction({
     Key? key,
@@ -14,6 +15,7 @@ class QuickAction extends StatelessWidget {
     required this.isPrimary,
     required this.parentPrimary,
     required this.isDark,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -34,23 +36,32 @@ class QuickAction extends StatelessWidget {
 
     return Column(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: bgColor,
+        Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              if (!isDark && !isPrimary)
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-            ],
+            child: Ink(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: borderColor),
+                boxShadow: [
+                  if (!isDark && !isPrimary)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                ],
+              ),
+              child: Icon(icon, color: iconColor, size: 28),
+            ),
           ),
-          child: Icon(icon, color: iconColor, size: 28),
         ),
         const SizedBox(height: 8),
         Text(

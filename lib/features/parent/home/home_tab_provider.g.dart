@@ -6,7 +6,7 @@ part of 'home_tab_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$transactionStreamHash() => r'a1452070a4ca3d480d2f12f7ca04c0e3e677baad';
+String _$transactionStreamHash() => r'b37f7c140d14c5eab35093b072541334e7a00c50';
 
 /// See also [transactionStream].
 @ProviderFor(transactionStream)
@@ -25,7 +25,7 @@ final transactionStreamProvider =
 // ignore: unused_element
 typedef TransactionStreamRef =
     AutoDisposeStreamProviderRef<List<TransactionModel>>;
-String _$homeTabNotifierHash() => r'e0762d03b12fbf98ccec2ba23166a2cc6a0609f4';
+String _$homeTabNotifierHash() => r'5778b5fa496aff1024f09c7f79d45c7a92b9d920';
 
 /// See also [HomeTabNotifier].
 @ProviderFor(HomeTabNotifier)

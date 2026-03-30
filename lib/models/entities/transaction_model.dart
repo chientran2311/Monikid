@@ -50,4 +50,73 @@ abstract class TransactionModel with _$TransactionModel {
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) =>
       _$TransactionModelFromJson(json);
+
+  factory TransactionModel.fromFirestore(Map<String, dynamic> json) {
+    final transactionId = (json['transactionId'] ?? json['id'] ?? '') as String;
+
+    return TransactionModel(
+      transactionId: transactionId,
+      userId: (json['userId'] ?? '') as String,
+      amount: _parseAmount(json['amount']),
+      type: (json['type'] ?? 'expense') as String,
+      category: (json['category'] ?? 'Khac') as String,
+      categoryEmoji: json['categoryEmoji'] as String?,
+      note: json['note'] as String?,
+      source: json['source'] as String?,
+      paymentMethod: json['paymentMethod'] as String?,
+      receiptImageUrl: json['receiptImageUrl'] as String?,
+      date: _parseDate(json['dateTs'] ?? json['date']) ?? DateTime.now(),
+      createdAt: _parseDate(json['createdAt']),
+      updatedAt: _parseDate(json['updatedAt']),
+      location: json['location'] as String?,
+    );
+  }
+
+  const TransactionModel._();
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'transactionId': transactionId,
+      'userId': userId,
+      'amount': amount,
+      'type': type,
+      'category': category,
+      'categoryEmoji': categoryEmoji,
+      'note': note,
+      'source': source,
+      'paymentMethod': paymentMethod,
+      'receiptImageUrl': receiptImageUrl,
+      'date': date.toIso8601String(),
+      'dateTs': Timestamp.fromDate(date),
+      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
+      'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+      'location': location,
+    };
+  }
+}
+
+double _parseAmount(Object? value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  if (value is String) {
+    return double.tryParse(value) ?? 0;
+  }
+  return 0;
+}
+
+DateTime? _parseDate(Object? value) {
+  if (value == null) {
+    return null;
+  }
+  if (value is Timestamp) {
+    return value.toDate();
+  }
+  if (value is DateTime) {
+    return value;
+  }
+  if (value is String && value.isNotEmpty) {
+    return DateTime.tryParse(value);
+  }
+  return null;
 }

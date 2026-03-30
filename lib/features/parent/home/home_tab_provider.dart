@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 
 import 'home_tab_state.dart';
 
@@ -17,7 +17,7 @@ class HomeTabNotifier extends _$HomeTabNotifier {
   }
 
   Future<List<TransactionModel>> _fetchPage() async {
-    final authState = ref.read(authProvider);
+    final authState = ref.read(authSessionProvider);
     if (!authState.isAuthenticated || authState.user == null) {
       return [];
     }
@@ -59,7 +59,7 @@ class HomeTabNotifier extends _$HomeTabNotifier {
 
 @riverpod
 Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
-  final authState = ref.watch(authProvider);
+  final authState = ref.watch(authSessionProvider);
   if (authState.isAuthenticated && authState.user != null) {
     return getIt<TransactionRepository>()
         .getTransactionsByMonth(authState.user!.uid, DateTime.now(), limit: 4)

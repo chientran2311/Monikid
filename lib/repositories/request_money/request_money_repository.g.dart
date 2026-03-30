@@ -7,7 +7,7 @@ part of 'request_money_repository.dart';
 // **************************************************************************
 
 String _$requestMoneyRepositoryHash() =>
-    r'6bab6e6a48bad7d84ea27cdfb6230ae808ae8f1f';
+    r'd804a70d8bca354ffe83a875da28108f3f2db62e';
 
 /// See also [requestMoneyRepository].
 @ProviderFor(requestMoneyRepository)

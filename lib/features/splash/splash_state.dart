@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:monikid/features/auth/auth_status.dart';
 
 part 'splash_state.freezed.dart';
 
@@ -8,6 +9,6 @@ abstract class SplashState with _$SplashState {
     @Default(true) bool isLoading,
     @Default(0) int loadingProgress, // Splash progress (0-100)
     @Default(false) bool onboardingComplete,
-    @Default(false) bool isAuthenticated,
+    @Default(AuthStatus.initial) AuthStatus authStatus,
   }) = _SplashState;
 }

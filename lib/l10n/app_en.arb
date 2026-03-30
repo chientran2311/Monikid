@@ -56,5 +56,12 @@
   "recipientDad": "Dad",
   "recipientMom": "Mom",
   "actionUpdateRequest": "Update Request",
-  "actionDeleteRequest": "Delete Request"
+  "actionDeleteRequest": "Delete Request",
+  "scanbill" : "Scan Bill",
+  "chatting": "Family Chat",
+  "requestmoney" : "Request Money",
+  "takePicture": "Take Photo",
+  "chooseFromGallery": "Upload from Gallery",
+  "scanReceiptTitle": "Scan Receipt",
+  "scanReceiptDesc": "Choose how to add receipt image to process."
 }

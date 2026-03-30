@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:monikid/core/utils/logger.dart';
-import 'package:monikid/features/fqa/domain/fqa_model.dart';
+import 'package:logger/logger.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/models/entities/fqa/fqa_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fqa_repository.g.dart';
@@ -10,24 +11,30 @@ abstract class FQARepository {
 }
 
 class FQARepositoryImpl implements FQARepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FQARepositoryImpl(this._firestore, this._logger);
+
+  final FirebaseFirestore _firestore;
+  final Logger _logger;
 
   @override
   Future<List<FQAModel>> getFAQs({required String langCode}) async {
     try {
+      _logger.i('Loading FAQs for language: $langCode');
       final querySnapshot = await _firestore
           .collection('faqs')
           .where('language', isEqualTo: langCode)
           .orderBy('orderIndex')
           .get();
 
-      return querySnapshot.docs.map((doc) {
+      final faqs = querySnapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id; // Inject document ID into data
         return FQAModel.fromJson(data);
       }).toList();
+      _logger.i('Loaded ${faqs.length} FAQs successfully');
+      return faqs;
     } catch (e, stackTrace) {
-      logger.e('Error loading FAQs', error: e, stackTrace: stackTrace);
+      _logger.e('Error loading FAQs', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -35,5 +42,5 @@ class FQARepositoryImpl implements FQARepository {
 
 @riverpod
 FQARepository fqaRepository(FqaRepositoryRef ref) {
-  return FQARepositoryImpl();
+  return getIt<FQARepository>();
 }

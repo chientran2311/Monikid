@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/utils/logger.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/student/request_money/add_new_request/add_request_money_state.dart';
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 import 'package:monikid/repositories/request_money/request_money_repository.dart';
@@ -52,14 +53,17 @@ class AddRequestMoney extends _$AddRequestMoney {
     state = state.copyWith(isLoading: true, errorMessage: null, isSuccess: false);
     try {
       final repository = ref.read(requestMoneyRepositoryProvider);
-      final authState = ref.read(authProvider);
+      final authState = ref.read(authSessionProvider);
       
       final studentId = authState.user?.uid ?? '';
       // Fetch linkedParentId from Firestore as familyCode
       String familyCode = '';
       if (studentId.isNotEmpty) {
         try {
-          final doc = await FirebaseFirestore.instance.collection('users').doc(studentId).get();
+          final doc = await getIt<FirebaseFirestore>()
+              .collection('users')
+              .doc(studentId)
+              .get();
           familyCode = (doc.data()?['linkedParentId'] as String?) ?? '';
         } catch (e) {
           logger.w('Could not fetch linkedParentId: $e');

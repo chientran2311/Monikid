@@ -378,6 +378,48 @@ abstract class S {
   /// In vi, this message translates to:
   /// **'Xóa yêu cầu'**
   String get actionDeleteRequest;
+
+  /// No description provided for @scanbill.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét Hóa Đơn'**
+  String get scanbill;
+
+  /// No description provided for @chatting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trò Chuyện'**
+  String get chatting;
+
+  /// No description provided for @requestmoney.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xin Tiền'**
+  String get requestmoney;
+
+  /// No description provided for @takePicture.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chụp ảnh'**
+  String get takePicture;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tải ảnh lên'**
+  String get chooseFromGallery;
+
+  /// No description provided for @scanReceiptTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét hoá đơn'**
+  String get scanReceiptTitle;
+
+  /// No description provided for @scanReceiptDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn cách thêm ảnh hoá đơn để xử lý.'**
+  String get scanReceiptDesc;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

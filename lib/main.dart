@@ -6,7 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:monikid/firebase_options.dart';
 
 import 'app/app.dart';
-import 'package:monikid/core/di/locator.dart';
+import 'package:monikid/core/di/di.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized

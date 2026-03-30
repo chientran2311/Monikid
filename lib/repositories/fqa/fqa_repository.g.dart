@@ -6,7 +6,7 @@ part of 'fqa_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$fqaRepositoryHash() => r'03db73bb38226dcc9a9b6bf6de14e42dc2c3e23a';
+String _$fqaRepositoryHash() => r'9327d6da2652fac03bd4a86f02d4f1b435fb9d9d';
 
 /// See also [fqaRepository].
 @ProviderFor(fqaRepository)

@@ -1,69 +1,73 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:logger/logger.dart';
-import 'package:monikid/core/utils/bcrypt_util.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
+import 'package:monikid/repositories/auth/pin_code_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:monikid/app/router.dart';
-
-import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
 import 'create_new_pin_state.dart';
 
 part 'create_new_pin_provider.g.dart';
 
 @riverpod
 class CreateNewPIN extends _$CreateNewPIN {
-  final _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 50,
-      colors: true,
-      printEmojis: true,
-    ),
-  );
+  late final PinCodeRepository _pinCodeRepository = getIt<PinCodeRepository>();
 
   @override
   CreateNewPINState build(EnterPINCodeEnum type, {String? pinCode}) {
     return CreateNewPINState(pinCode: pinCode ?? '', type: type);
   }
 
-  void onTextChanged(String text) {
-    state = state.copyWith(pinCode: text);
+  Future<void> addNumber(String digit) async {
+    if (state.isLoading || state.pinCode.length >= 6) {
+      return;
+    }
+
+    final newPin = state.pinCode + digit;
+    state = state.copyWith(pinCode: newPin);
+
+    if (newPin.length == 6) {
+      await preparePinCodeConfirmation(newPin);
+    }
   }
 
-  /// Bcrypt PIN ngay tại đây, rồi navigate sang Re-Enter PIN screen.
-  /// [context] dùng để GoRouter navigate.
-  Future<void> navigationReEnterPinCode(
-    String text,
-    BuildContext context,
-  ) async {
-    if (!state.isLoading) {
-      state = state.copyWith(isLoading: true);
-      try {
-        _logger.i('🔐 Hashing PIN with bcrypt before navigation...');
-        // Hash PIN trước khi truyền sang màn re-enter. PIN thô chỉ tồn tại trong RAM.
-        final pinCodeHash = await bcryptPin(text);
-        _logger.i('✅ PIN hashed. Navigating to Re-Enter PIN screen.');
-
-        if (context.mounted) {
-          final result = await context.push<bool>(
-            AppRoutes.reEnterPin,
-            extra: {'pinCodeHash': pinCodeHash},
-          );
-          if (result == true && context.mounted) {
-            Navigator.of(context).pop(true);
-          }
-        }
-      } catch (e, stack) {
-        _logger.e(
-          '❌ Failed to hash PIN or navigate',
-          error: e,
-          stackTrace: stack,
-        );
-      } finally {
-        state = state.copyWith(isLoading: false);
-      }
+  void removeNumber() {
+    if (state.isLoading || state.pinCode.isEmpty) {
+      return;
     }
+
+    state = state.copyWith(
+      pinCode: state.pinCode.substring(0, state.pinCode.length - 1),
+    );
+  }
+
+  Future<void> preparePinCodeConfirmation(String pinCode) async {
+    if (state.isLoading || pinCode.length != 6) {
+      return;
+    }
+
+    state = state.copyWith(isLoading: true);
+    try {
+      final pinCodeHash = await _pinCodeRepository.hashPinCode(pinCode);
+      state = state.copyWith(
+        pinCode: '',
+        isLoading: false,
+        pendingPinCodeHash: pinCodeHash,
+      );
+    } catch (_) {
+      state = state.copyWith(
+        pinCode: '',
+        isLoading: false,
+      );
+    }
+  }
+
+  void clearPendingPinCodeHash() {
+    state = state.copyWith(pendingPinCodeHash: null);
+  }
+
+  void reset() {
+    state = CreateNewPINState(
+      pinCode: '',
+      type: state.type,
+    );
   }
 }

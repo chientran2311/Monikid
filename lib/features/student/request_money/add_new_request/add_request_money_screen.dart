@@ -167,7 +167,7 @@ class _AddRequestMoneyScreenState extends ConsumerState<AddRequestMoneyScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
       margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+         color: isDarkMode ? AppTheme.surfaceVariant : Colors.white,
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -320,7 +320,7 @@ class _AddRequestMoneyScreenState extends ConsumerState<AddRequestMoneyScreen> {
                   }
                 },
                 selectedColor: isDarkMode ? AppTheme.primary.withValues(alpha: 0.2) : Colors.green.shade50,
-                backgroundColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                 backgroundColor: isDarkMode ? AppTheme.surfaceVariant : Colors.white,
                 labelStyle: TextStyle(
                   color: isSelected
                       ? AppTheme.primary
@@ -331,7 +331,7 @@ class _AddRequestMoneyScreenState extends ConsumerState<AddRequestMoneyScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                   side: BorderSide(
-                    color: isSelected ? AppTheme.primary : (isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                     color: isSelected ? AppTheme.primary : (isDarkMode ? AppTheme.borderDark : AppTheme.borderLight),
                   ),
                 ),
                 showCheckmark: false,
@@ -347,7 +347,7 @@ class _AddRequestMoneyScreenState extends ConsumerState<AddRequestMoneyScreen> {
                 hintText: 'Nhập lý do cụ thể của con nhé...',
                 hintStyle: TextStyle(color: isDarkMode ? Colors.grey.shade500 : AppTheme.textGrey, fontSize: 14),
                 filled: true,
-                fillColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                 fillColor: isDarkMode ? AppTheme.surfaceVariant : Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide(color: isDarkMode ? Colors.grey.shade600 : Colors.grey.shade200),
@@ -416,7 +416,7 @@ class _AddRequestMoneyScreenState extends ConsumerState<AddRequestMoneyScreen> {
             ),
             child: CircleAvatar(
               radius: 24,
-              backgroundColor: isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+               backgroundColor: isDarkMode ? AppTheme.surfaceVariant : Colors.white,
               backgroundImage: NetworkImage(url),
             ),
           ),

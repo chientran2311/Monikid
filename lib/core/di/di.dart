@@ -1,26 +1,30 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
-import 'package:monikid/repositories/transaction/transaction_repository.dart'
-    as monikid_tx_repo;
-import 'package:monikid/repositories/transaction/transaction_repository_impl.dart'
-    as monikid_tx_impl;
+import 'package:monikid/core/utils/logger.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
-import 'package:monikid/repositories/auth/auth_repository_impl.dart';
+import 'package:monikid/repositories/auth/onboarding_repository.dart';
+import 'package:monikid/repositories/auth/pin_code_repository.dart';
 import 'package:monikid/repositories/category/category_repository.dart';
-import 'package:monikid/repositories/category/category_repository_impl.dart';
+import 'package:monikid/repositories/fqa/fqa_repository.dart';
+import 'package:monikid/repositories/profile/profile_repository.dart';
+import 'package:monikid/repositories/request_money/request_money_repository.dart';
+import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/transaction/transaction_repository.dart';
 
-final getIt = GetIt.instance;
+final GetIt getIt = GetIt.instance;
 
-Future<void> configureDependencies() async {
+Future<void> setupLocator() async {
   // Initialize local storage first
   final localStorage = await AppLocalStorage.create();
   getIt.registerSingleton<AppLocalStorage>(localStorage);
 
   // Register secure storage as lazy singleton
   getIt.registerLazySingleton<AppSecureStorage>(() => AppSecureStorage());
+  getIt.registerLazySingleton<Logger>(createAppLogger);
 
   // Register Firebase instances
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
@@ -30,14 +34,66 @@ Future<void> configureDependencies() async {
 
   // Register Repositories
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt<FirebaseAuth>(), getIt<FirebaseFirestore>()),
+    () => AuthRepositoryImpl(
+      getIt<FirebaseAuth>(),
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
   );
 
-  getIt.registerLazySingleton<monikid_tx_repo.TransactionRepository>(
-    () => monikid_tx_impl.TransactionRepositoryImpl(getIt<FirebaseFirestore>()),
+  getIt.registerLazySingleton<PinCodeRepository>(
+    () => PinCodeRepositoryImpl(
+      getIt<AppSecureStorage>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(
+      getIt<AppLocalStorage>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<TransactionRepository>(
+    () => TransactionRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
   );
 
   getIt.registerLazySingleton<CategoryRepository>(
-    () => CategoryRepositoryImpl(getIt<FirebaseFirestore>()),
+    () => CategoryRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<FQARepository>(
+    () => FQARepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<RequestMoneyRepository>(
+    () => RequestMoneyRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<StatisticRepository>(
+    () => StatisticRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
   );
 }

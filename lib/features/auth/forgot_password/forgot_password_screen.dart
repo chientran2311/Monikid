@@ -3,17 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/validators.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
-import 'package:monikid/features/auth/domain/params/auth_param.dart';
+import 'package:monikid/features/auth/forgot_password/forgot_password_provider.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
 import 'package:monikid/shared/widgets/success_dialog.dart';
+
 import 'widgets/illustration_section.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   ConsumerState<ForgotPasswordScreen> createState() =>
@@ -22,7 +21,6 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,57 +29,46 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _handleResetPassword() async {
-    final email = _emailController.text.trim();
+    await ref.read(forgotPasswordProvider.notifier).submit(
+          _emailController.text.trim(),
+        );
 
-    // Validate
-    final emailError = Validators.email(email);
-    if (emailError != null) {
-      AppSnackBar.warning(context, emailError);
+    if (!mounted) return;
+
+    final forgotPasswordState = ref.read(forgotPasswordProvider);
+    if (forgotPasswordState.isSuccess) {
+      final email = _emailController.text.trim();
+      SuccessDialog.show(
+        context,
+        title: 'Email đã được gửi!',
+        message:
+            'Chúng tôi đã gửi link đặt lại mật khẩu đến\n$email\n\nVui lòng kiểm tra hộp thư rồi nhấn vào link để đổi mật khẩu.',
+        buttonText: 'Quay về Đăng nhập',
+        icon: Icons.mark_email_read_rounded,
+        onPressed: () {
+          Navigator.of(context).pop();
+          context.go(AppRoutes.login);
+        },
+      );
       return;
     }
 
-    setState(() => _isLoading = true);
-
-    try {
-      await ref
-          .read(authProvider.notifier)
-          .resetUserPassword(ResetPasswordParam(email: email));
-      if (mounted) {
-        setState(() => _isLoading = false);
-        SuccessDialog.show(
-          context,
-          title: 'Email đã được gửi!',
-          message:
-              'Chúng tôi đã gửi link đặt lại mật khẩu đến\n$email\n\nVui lòng kiểm tra hộp thư rồi nhấn vào link để đổi mật khẩu.',
-          buttonText: 'Quay về Đăng nhập',
-          icon: Icons.mark_email_read_rounded,
-          onPressed: () {
-            Navigator.of(context).pop();
-            context.go(AppRoutes.login);
-          },
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        final authState = ref.read(authProvider);
-        AppSnackBar.error(context, authState.errorMessage ?? 'Có lỗi xảy ra');
-      }
+    if (forgotPasswordState.errorMessage != null) {
+      AppSnackBar.error(context, forgotPasswordState.errorMessage!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final forgotPasswordState = ref.watch(forgotPasswordProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppTheme.backgroundDark
-          : AppTheme.backgroundLight,
+      backgroundColor:
+          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
       body: SafeArea(
         child: Column(
           children: [
-            // Header Navigation (matching HTML p-4 pb-2 justify-between)
             Padding(
               padding: const EdgeInsets.only(
                 left: 16,
@@ -106,16 +93,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                        right: 48.0,
-                      ), // center balancing
+                      padding: const EdgeInsets.only(right: 48),
                       child: Text(
                         'Quên mật khẩu?',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Manrope',
-                          fontSize: 18, // text-lg
-                          fontWeight: FontWeight.w700, // font-bold
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF0F172A),
@@ -126,26 +111,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ],
               ),
             ),
-
-            // Scrollable content
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 16), // pt-4
-                    // Illustration Container
+                    const SizedBox(height: 16),
                     const IllustrationSection(),
                     const SizedBox(height: 32),
-
-                    // Content text
                     Text(
                       'Quên mật khẩu?',
                       style: TextStyle(
                         fontFamily: 'Manrope',
-                        fontSize: 28, // text-3xl approx
-                        fontWeight: FontWeight.w800, // font-bold
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                         letterSpacing: -0.5,
                       ),
@@ -159,12 +139,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         height: 1.5,
                         color: isDark
                             ? const Color(0xFF94A3B8)
-                            : const Color(0xFF475569), // text-slate-600
+                            : const Color(0xFF475569),
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Form Section
                     CustomInputWidget(
                       label: 'Email',
                       placeholder: 'Nhập email của bạn',
@@ -172,27 +150,22 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
-
                     const SizedBox(height: 24),
-
-                    // Primary Action Button
                     PrimaryButton(
                       text: 'Gửi mã xác thực',
                       icon: Icons.send_rounded,
                       onPressed: _handleResetPassword,
-                      isLoading: _isLoading,
+                      isLoading: forgotPasswordState.isLoading,
                     ),
                   ],
                 ),
               ),
             ),
-
-            // Footer - Back to Login
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 32),
               child: GestureDetector(
                 onTap: () => context.go(AppRoutes.login),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -200,8 +173,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       size: 18,
                       color: AppTheme.primary,
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
+                     SizedBox(width: 8),
+                     Text(
                       'Quay lại Đăng nhập',
                       style: TextStyle(
                         fontFamily: 'Manrope',

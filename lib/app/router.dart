@@ -3,12 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Auth provider
-import 'package:monikid/features/auth/providers/auth_provider.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 
 // Import screens
 import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/auth/login/login_screen.dart';
-import 'package:monikid/features/auth/register/register.dart';
+import 'package:monikid/features/auth/register/register_screen.dart';
 import 'package:monikid/features/fqa/fqa_screen.dart';
 import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_screen.dart';
@@ -56,7 +56,6 @@ class AppRoutes {
 
   // Parent routes
   static const String parent = '/parent';
-  static const String parentHome = '/home';
 
   // Student routes
   static const String studentMain = '/student-main';
@@ -130,31 +129,46 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.createNewPin,
         builder: (context, state) {
-          return const CreateNewPinScreen(type: EnterPINCodeEnum.createdNew);
+          final extra = state.extra as Map<String, dynamic>?;
+          final canCancel = extra?['canCancel'] as bool? ?? true;
+          return CreateNewPinScreen(
+            type: EnterPINCodeEnum.createNew,
+            canCancel: canCancel,
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.reEnterPin,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
+          final extra = state.extra as Map<String, dynamic>?;
+          if (extra == null || extra['pinCodeHash'] == null) {
+            return const CreateNewPinScreen(type: EnterPINCodeEnum.createNew);
+          }
           final pinCodeHash = extra['pinCodeHash'] as String;
-          return ReEnterPinScreen(pinCodeHash: pinCodeHash);
+          final canCancel = extra['canCancel'] as bool? ?? true;
+          return ReEnterPinScreen(
+            pinCodeHash: pinCodeHash,
+            canCancel: canCancel,
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.enterPinCode,
         builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>;
+          final extra = state.extra as Map<String, dynamic>?;
+          if (extra == null || extra['expectedPinHash'] == null) {
+            return const SplashScreen();
+          }
           final expectedPinHash = extra['expectedPinHash'] as String;
-          return EnterPinCodeScreen(expectedPinHash: expectedPinHash);
+          final canCancel = extra['canCancel'] as bool? ?? true;
+          return EnterPinCodeScreen(
+            expectedPinHash: expectedPinHash,
+            canCancel: canCancel,
+          );
         },
       ),
 
       // --- PARENT GROUP ---
-      GoRoute(
-        path: AppRoutes.parentHome,
-        builder: (context, state) => const ParentBottomNavBar(),
-      ),
       GoRoute(
         path: AppRoutes.parent,
         builder: (context, state) => const ParentBottomNavBar(),
@@ -210,7 +224,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     // Xử lý chuyển hướng (Redirect)
     redirect: (context, state) {
       // Đọc auth state hiện tại mà không subscribe vào
-      final authState = ref.read(authProvider);
+      final authState = ref.read(authSessionProvider);
       final currentPath = state.uri.path;
       final isAuthenticated = authState.isAuthenticated;
       final isInitial = authState.isInitial;
@@ -258,7 +272,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 /// Helper class để refresh GoRouter khi Riverpod state thay đổi
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(this._ref) {
-    _ref.listen(authProvider, (previous, next) {
+    _ref.listen(authSessionProvider, (previous, next) {
       notifyListeners();
     });
   }

@@ -9,7 +9,7 @@ import 'package:logger/logger.dart';
 /// logger.e("Error", error: e, stackTrace: stack); // Log lỗi (màu đỏ)
 /// logger.f("Fatal");     // Log lỗi nghiêm trọng (màu tím)
 
-final logger = Logger(
+Logger createAppLogger() => Logger(
   // 1. Filter: Quyết định log nào được hiển thị
   // DevelopmentFilter: Chỉ log khi đang chạy debug (kReleaseMode = false)
   // ProductionFilter: Log tất cả (kể cả release).
@@ -27,6 +27,8 @@ final logger = Logger(
     dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart, 
   ),
 );
+
+final logger = createAppLogger();
 
 // --- (Tùy chọn) Hàm Log chặn dòng dài ---
 // Đôi khi log JSON quá dài bị cắt, dùng hàm này để in hết

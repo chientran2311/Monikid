@@ -1,70 +1,76 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:logger/logger.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/core/utils/validators.dart';
+import 'package:monikid/features/auth/auth_status.dart';
+import 'package:monikid/models/entities/auth/params/auth_param.dart';
+import 'package:monikid/repositories/auth/auth_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'login_state.dart';
-import 'package:monikid/core/utils/validators.dart';
-import 'package:monikid/features/auth/domain/params/auth_param.dart';
-import 'package:monikid/features/auth/providers/auth_provider.dart';
 
 part 'login_provider.g.dart';
 
 @riverpod
 class Login extends _$Login {
-  final Logger _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 50,
-      colors: true,
-      printEmojis: true,
-    ),
-  );
+  late final Logger _logger;
+  late final AuthRepository _authRepository;
 
   @override
   LoginState build() {
+    _logger = getIt<Logger>();
+    _authRepository = getIt<AuthRepository>();
     return const LoginState();
   }
 
-  /// Xóa thông báo lỗi
   void clearError() {
     state = state.copyWith(errorMessage: null);
   }
 
-  /// Đăng nhập: validate → fetch role từ email → so sánh → signIn Firebase
   Future<void> signIn({required String email, required String password}) async {
-    // --- 1. Local validation ---
     final emailError = Validators.email(email);
     if (emailError != null) {
-      state = state.copyWith(errorMessage: emailError);
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: emailError,
+      );
       return;
     }
+
     final passwordError = Validators.password(password);
     if (passwordError != null) {
-      state = state.copyWith(errorMessage: passwordError);
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: passwordError,
+      );
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(
+      status: AuthStatus.isLoading,
+      errorMessage: null,
+    );
 
     try {
-      _logger.i('✅ Login Provider: Signing in...');
-      await ref
-          .read(authProvider.notifier)
-          .validateUser(SignInParam(email: email.trim(), password: password));
-
-      _logger.i('✅ Login Provider: Sign in successful');
-      state = state.copyWith(isLoading: false);
-    } on FirebaseAuthException catch (e) {
-      _logger.e('❌ Login Provider: FirebaseAuthException: ${e.code}');
+      _logger.i('Login provider signing in ${email.trim()}');
+      await _authRepository.signIn(
+        SignInParam(email: email.trim(), password: password),
+      );
+      state = state.copyWith(status: AuthStatus.success);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      _logger.e(
+        'Login provider Firebase error',
+        error: e,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
-        isLoading: false,
+        status: AuthStatus.error,
         errorMessage: _mapFirebaseError(e),
       );
-    } catch (e) {
-      _logger.e('❌ Login Provider: Error: $e');
+    } catch (e, stackTrace) {
+      _logger.e('Login provider error', error: e, stackTrace: stackTrace);
       state = state.copyWith(
-        isLoading: false,
+        status: AuthStatus.error,
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
     }

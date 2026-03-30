@@ -4,7 +4,7 @@ part 'fqa_model.freezed.dart';
 part 'fqa_model.g.dart';
 
 @freezed
-class FQAModel with _$FQAModel {
+abstract class FQAModel with _$FQAModel {
   const factory FQAModel({
     required String id,
     required String question,

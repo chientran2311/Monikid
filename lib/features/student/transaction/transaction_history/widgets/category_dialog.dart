@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/features/student/transaction/providers/category_provider.dart';
+import 'package:monikid/features/student/transaction/widgets/transaction_loading_skeleton.dart';
 import 'package:monikid/models/entities/category_model.dart';
 
 class CategoryDialog extends HookConsumerWidget {
-  final String? selectedCategory; // This is the label
-  final Function(CategoryModel?) onCategorySelected;
-  final bool showAllOption;
-
   const CategoryDialog({
-    Key? key,
+    super.key,
     this.selectedCategory,
     required this.onCategorySelected,
     this.showAllOption = true,
-  }) : super(key: key);
+    this.categoryType,
+  });
+
+  final String? selectedCategory;
+  final void Function(CategoryModel?) onCategorySelected;
+  final bool showAllOption;
+  final String? categoryType;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-
     final categoriesAsync = ref.watch(categoryStreamProvider);
 
     return Container(
@@ -35,7 +37,6 @@ class CategoryDialog extends HookConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // iOS Style Handle
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
@@ -49,15 +50,13 @@ class CategoryDialog extends HookConsumerWidget {
                 ),
               ),
             ),
-
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Chọn danh mục chi tiêu',
+                    _dialogTitle,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -79,14 +78,14 @@ class CategoryDialog extends HookConsumerWidget {
                 ],
               ),
             ),
-
             const Divider(height: 1),
-
-            // Category Grid
             Flexible(
               child: categoriesAsync.when(
                 data: (categories) {
-                  // Prepend "Tất cả" option if requested
+                  final filteredCategories = filterCategoriesByType(
+                    categories,
+                    categoryType,
+                  );
                   final allCategories = [
                     if (showAllOption)
                       const CategoryModel(
@@ -96,7 +95,7 @@ class CategoryDialog extends HookConsumerWidget {
                         colorHex: '0xFF9E9E9E',
                         isDefault: true,
                       ),
-                    ...categories,
+                    ...filteredCategories,
                   ];
 
                   return SingleChildScrollView(
@@ -114,12 +113,10 @@ class CategoryDialog extends HookConsumerWidget {
                       itemCount: allCategories.length,
                       itemBuilder: (context, index) {
                         final category = allCategories[index];
-                        // If "Tất cả" is selected, selectedCategory is null
                         final isSelected = category.id == 'all'
                             ? selectedCategory == null
                             : selectedCategory == category.label;
 
-                        // Parse color from hex
                         Color baseColor = Colors.grey;
                         if (category.colorHex != null) {
                           try {
@@ -129,9 +126,7 @@ class CategoryDialog extends HookConsumerWidget {
 
                         return GestureDetector(
                           onTap: () {
-                            onCategorySelected(
-                              category.id == 'all' ? null : category,
-                            );
+                            onCategorySelected(category.id == 'all' ? null : category);
                             Navigator.pop(context);
                           },
                           child: Container(
@@ -141,9 +136,7 @@ class CategoryDialog extends HookConsumerWidget {
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: isSelected
-                                    ? baseColor
-                                    : Colors.transparent,
+                                color: isSelected ? baseColor : Colors.transparent,
                                 width: 2,
                               ),
                             ),
@@ -217,8 +210,8 @@ class CategoryDialog extends HookConsumerWidget {
                   );
                 },
                 loading: () => const SizedBox(
-                  height: 200,
-                  child: Center(child: CircularProgressIndicator()),
+                  height: 240,
+                  child: CategoryDialogLoadingSkeleton(),
                 ),
                 error: (error, _) => SizedBox(
                   height: 200,
@@ -231,8 +224,6 @@ class CategoryDialog extends HookConsumerWidget {
                 ),
               ),
             ),
-
-            // Footer Action
             Padding(
               padding: const EdgeInsets.all(24),
               child: ElevatedButton(
@@ -258,5 +249,15 @@ class CategoryDialog extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  String get _dialogTitle {
+    if (categoryType == 'income') {
+      return 'Chọn danh mục thu';
+    }
+    if (categoryType == 'expense') {
+      return 'Chọn danh mục chi';
+    }
+    return 'Chọn danh mục';
   }
 }

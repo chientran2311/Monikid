@@ -4,7 +4,7 @@ part 'request_money_model.freezed.dart';
 part 'request_money_model.g.dart';
 
 @freezed
-class RequestMoneyModel with _$RequestMoneyModel {
+abstract class RequestMoneyModel with _$RequestMoneyModel {
   const factory RequestMoneyModel({
     required String id,
     required double amount,

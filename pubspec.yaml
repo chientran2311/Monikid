@@ -73,6 +73,7 @@ dependencies:
   bcrypt: ^1.2.0
   lazy_load_indexed_stack: ^1.2.1
   shimmer: ^3.0.0
+  image_picker: ^1.2.1
 
 
 dev_dependencies:

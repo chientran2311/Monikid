@@ -155,4 +155,25 @@ class SEn extends S {
 
   @override
   String get actionDeleteRequest => 'Delete Request';
+
+  @override
+  String get scanbill => 'Scan Bill';
+
+  @override
+  String get chatting => 'Family Chat';
+
+  @override
+  String get requestmoney => 'Request Money';
+
+  @override
+  String get takePicture => 'Take Photo';
+
+  @override
+  String get chooseFromGallery => 'Upload from Gallery';
+
+  @override
+  String get scanReceiptTitle => 'Scan Receipt';
+
+  @override
+  String get scanReceiptDesc => 'Choose how to add receipt image to process.';
 }

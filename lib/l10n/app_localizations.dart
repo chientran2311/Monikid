@@ -347,6 +347,108 @@ abstract class AppLocalizations {
   /// **'Cash'**
   String get updateTransactionCashWalletValue;
 
+  /// No description provided for @transactionDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction details'**
+  String get transactionDetailTitle;
+
+  /// No description provided for @transactionDetailNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No transaction data available.'**
+  String get transactionDetailNoData;
+
+  /// No description provided for @transactionDetailTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TIME'**
+  String get transactionDetailTimeLabel;
+
+  /// No description provided for @transactionDetailSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SOURCE'**
+  String get transactionDetailSourceLabel;
+
+  /// No description provided for @transactionDetailNoteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTE'**
+  String get transactionDetailNoteLabel;
+
+  /// No description provided for @transactionEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit transaction'**
+  String get transactionEditAction;
+
+  /// No description provided for @transactionDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transaction'**
+  String get transactionDeleteAction;
+
+  /// No description provided for @transactionEvidenceSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence image'**
+  String get transactionEvidenceSectionTitle;
+
+  /// No description provided for @transactionEvidenceOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Add one proof image for this transaction.'**
+  String get transactionEvidenceOptionalLabel;
+
+  /// No description provided for @transactionEvidenceAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add image'**
+  String get transactionEvidenceAddAction;
+
+  /// No description provided for @transactionEvidenceReplaceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace image'**
+  String get transactionEvidenceReplaceAction;
+
+  /// No description provided for @transactionEvidenceRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get transactionEvidenceRemoveAction;
+
+  /// No description provided for @transactionEvidenceSelectedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected image'**
+  String get transactionEvidenceSelectedLabel;
+
+  /// No description provided for @transactionEvidenceAttachedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Image attached'**
+  String get transactionEvidenceAttachedLabel;
+
+  /// No description provided for @transactionEvidenceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No evidence image attached yet.'**
+  String get transactionEvidenceEmpty;
+
+  /// No description provided for @transactionEvidenceLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load the evidence image.'**
+  String get transactionEvidenceLoadError;
+
+  /// No description provided for @transactionEvidenceUploadTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Image upload timed out. Please try again.'**
+  String get transactionEvidenceUploadTimeout;
+
   /// No description provided for @profileEditTitle.
   ///
   /// In en, this message translates to:

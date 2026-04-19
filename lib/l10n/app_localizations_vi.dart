@@ -139,6 +139,57 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updateTransactionCashWalletValue => 'Tiền mặt';
 
   @override
+  String get transactionDetailTitle => 'Chi tiết giao dịch';
+
+  @override
+  String get transactionDetailNoData => 'Không có dữ liệu giao dịch.';
+
+  @override
+  String get transactionDetailTimeLabel => 'THỜI GIAN';
+
+  @override
+  String get transactionDetailSourceLabel => 'NGUỒN TIỀN';
+
+  @override
+  String get transactionDetailNoteLabel => 'GHI CHÚ';
+
+  @override
+  String get transactionEditAction => 'Chỉnh sửa giao dịch';
+
+  @override
+  String get transactionDeleteAction => 'Xóa giao dịch';
+
+  @override
+  String get transactionEvidenceSectionTitle => 'Ảnh minh chứng';
+
+  @override
+  String get transactionEvidenceOptionalLabel => 'Tùy chọn. Thêm 1 ảnh minh chứng cho giao dịch này.';
+
+  @override
+  String get transactionEvidenceAddAction => 'Thêm ảnh';
+
+  @override
+  String get transactionEvidenceReplaceAction => 'Thay ảnh';
+
+  @override
+  String get transactionEvidenceRemoveAction => 'Gỡ ảnh';
+
+  @override
+  String get transactionEvidenceSelectedLabel => 'Ảnh đã chọn';
+
+  @override
+  String get transactionEvidenceAttachedLabel => 'Đã có ảnh minh chứng';
+
+  @override
+  String get transactionEvidenceEmpty => 'Chưa có ảnh minh chứng.';
+
+  @override
+  String get transactionEvidenceLoadError => 'Không thể tải ảnh minh chứng.';
+
+  @override
+  String get transactionEvidenceUploadTimeout => 'Tải ảnh lên quá lâu. Vui lòng thử lại.';
+
+  @override
   String get profileEditTitle => 'Chỉnh sửa hồ sơ';
 
   @override

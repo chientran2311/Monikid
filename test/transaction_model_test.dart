@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monikid/features/student/transaction/providers/category_provider.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
@@ -37,6 +37,67 @@ void main() {
       expect(firestoreData['amount_minor'], 25000);
       expect(firestoreData['category_label'], 'Reward');
       expect(firestoreData['date_ts'], isA<Timestamp>());
+    });
+
+    test('fromFirestore reads evidence image metadata', () {
+      final uploadedAt = Timestamp.fromDate(DateTime(2026, 4, 19, 9, 30));
+      final transaction = TransactionModel.fromFirestore({
+        'transaction_id': 'tx-3',
+        'user_id': 'user-1',
+        'amount_minor': 42000,
+        'type': 'expense',
+        'category_key': 'snacks',
+        'category_label': 'Snacks',
+        'date_ts': Timestamp.fromDate(DateTime(2026, 4, 19, 10, 0)),
+        'evidence_image': {
+          'storage_path': 'transactions/user-1/tx-3/evidence.jpg',
+          'file_name': 'evidence.jpg',
+          'mime_type': 'image/jpeg',
+          'uploaded_at': uploadedAt,
+        },
+      });
+
+      expect(transaction.evidenceImage, isNotNull);
+      expect(
+        transaction.evidenceImage?.storagePath,
+        'transactions/user-1/tx-3/evidence.jpg',
+      );
+      expect(transaction.evidenceImage?.fileName, 'evidence.jpg');
+      expect(transaction.evidenceImage?.mimeType, 'image/jpeg');
+      expect(
+        transaction.evidenceImage?.uploadedAt,
+        DateTime(2026, 4, 19, 9, 30),
+      );
+    });
+
+    test('toFirestore writes evidence image metadata without download url', () {
+      final transaction = TransactionModel(
+        transactionId: 'tx-4',
+        userId: 'user-1',
+        amountMinor: 18000,
+        type: 'expense',
+        categoryKey: 'books',
+        categoryLabel: 'Books',
+        dateTs: DateTime(2026, 4, 19, 14, 30),
+        evidenceImage: const TransactionEvidenceImage(
+          storagePath: 'transactions/user-1/tx-4/evidence.png',
+          fileName: 'evidence.png',
+          mimeType: 'image/png',
+        ),
+      );
+
+      final firestoreData = transaction.toFirestore();
+      final evidenceImage =
+          firestoreData['evidence_image'] as Map<String, dynamic>?;
+
+      expect(evidenceImage, isNotNull);
+      expect(
+        evidenceImage?['storage_path'],
+        'transactions/user-1/tx-4/evidence.png',
+      );
+      expect(evidenceImage?['file_name'], 'evidence.png');
+      expect(evidenceImage?['mime_type'], 'image/png');
+      expect(evidenceImage?.containsKey('download_url'), isFalse);
     });
   });
 

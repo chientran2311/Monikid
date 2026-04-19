@@ -25,6 +25,51 @@ class TimestampConverter implements JsonConverter<DateTime?, Timestamp?> {
 }
 
 @freezed
+abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
+  const factory TransactionEvidenceImage({
+    required String storagePath,
+    String? fileName,
+    String? mimeType,
+    @TimestampConverter() DateTime? uploadedAt,
+  }) = _TransactionEvidenceImage;
+
+  const TransactionEvidenceImage._();
+
+  factory TransactionEvidenceImage.fromJson(Map<String, dynamic> json) =>
+      _$TransactionEvidenceImageFromJson(json);
+
+  factory TransactionEvidenceImage.fromFirestore(Map<String, dynamic> json) {
+    return TransactionEvidenceImage(
+      storagePath: _readString(
+        json,
+        snakeKey: 'storage_path',
+        camelKey: 'storagePath',
+      ),
+      fileName: _readNullableString(
+        json,
+        snakeKey: 'file_name',
+        camelKey: 'fileName',
+      ),
+      mimeType: _readNullableString(
+        json,
+        snakeKey: 'mime_type',
+        camelKey: 'mimeType',
+      ),
+      uploadedAt: _parseDate(json['uploaded_at'] ?? json['uploadedAt']),
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'storage_path': storagePath,
+      'file_name': fileName,
+      'mime_type': mimeType,
+      'uploaded_at': uploadedAt != null ? Timestamp.fromDate(uploadedAt!) : null,
+    };
+  }
+}
+
+@freezed
 abstract class TransactionModel with _$TransactionModel {
   const factory TransactionModel({
     required String transactionId,
@@ -45,6 +90,7 @@ abstract class TransactionModel with _$TransactionModel {
     @TimestampConverter() DateTime? updatedAt,
     bool? ocrUsed,
     double? ocrConfidence,
+    TransactionEvidenceImage? evidenceImage,
   }) = _TransactionModel;
 
   const TransactionModel._();
@@ -63,6 +109,10 @@ abstract class TransactionModel with _$TransactionModel {
 
     final ocrMeta = json['ocr_meta'];
     final ocrData = ocrMeta is Map<String, dynamic> ? ocrMeta : null;
+    final evidenceImage = json['evidence_image'];
+    final evidenceData = evidenceImage is Map<String, dynamic>
+        ? evidenceImage
+        : null;
 
     return TransactionModel(
       transactionId: transactionId,
@@ -114,6 +164,9 @@ abstract class TransactionModel with _$TransactionModel {
       updatedAt: _parseDate(json['updated_at'] ?? json['updatedAt']),
       ocrUsed: _parseBool(ocrData?['used']),
       ocrConfidence: _parseDouble(ocrData?['confidence']),
+      evidenceImage: evidenceData == null
+          ? null
+          : TransactionEvidenceImage.fromFirestore(evidenceData),
     );
   }
 
@@ -139,6 +192,7 @@ abstract class TransactionModel with _$TransactionModel {
         'used': ocrUsed ?? false,
         'confidence': ocrConfidence,
       },
+      'evidence_image': evidenceImage?.toFirestore(),
     };
   }
 
@@ -147,6 +201,8 @@ abstract class TransactionModel with _$TransactionModel {
   String? get categoryEmoji => categoryIcon;
   DateTime get date => dateTs;
   String? get location => merchantName;
+  bool get hasEvidenceImage =>
+      evidenceImage != null && evidenceImage!.storagePath.isNotEmpty;
 
   TransactionModel copyWithUi({
     double? amount,

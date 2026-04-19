@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/student/statistic/statistic_models.dart';
+import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

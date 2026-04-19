@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monikid/features/student/statistic/statistic_models.dart';
+import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
 

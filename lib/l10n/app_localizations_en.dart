@@ -139,6 +139,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateTransactionCashWalletValue => 'Cash';
 
   @override
+  String get transactionDetailTitle => 'Transaction details';
+
+  @override
+  String get transactionDetailNoData => 'No transaction data available.';
+
+  @override
+  String get transactionDetailTimeLabel => 'TIME';
+
+  @override
+  String get transactionDetailSourceLabel => 'SOURCE';
+
+  @override
+  String get transactionDetailNoteLabel => 'NOTE';
+
+  @override
+  String get transactionEditAction => 'Edit transaction';
+
+  @override
+  String get transactionDeleteAction => 'Delete transaction';
+
+  @override
+  String get transactionEvidenceSectionTitle => 'Evidence image';
+
+  @override
+  String get transactionEvidenceOptionalLabel => 'Optional. Add one proof image for this transaction.';
+
+  @override
+  String get transactionEvidenceAddAction => 'Add image';
+
+  @override
+  String get transactionEvidenceReplaceAction => 'Replace image';
+
+  @override
+  String get transactionEvidenceRemoveAction => 'Remove image';
+
+  @override
+  String get transactionEvidenceSelectedLabel => 'Selected image';
+
+  @override
+  String get transactionEvidenceAttachedLabel => 'Image attached';
+
+  @override
+  String get transactionEvidenceEmpty => 'No evidence image attached yet.';
+
+  @override
+  String get transactionEvidenceLoadError => 'Unable to load the evidence image.';
+
+  @override
+  String get transactionEvidenceUploadTimeout => 'Image upload timed out. Please try again.';
+
+  @override
   String get profileEditTitle => 'Edit Profile';
 
   @override

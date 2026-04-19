@@ -14,14 +14,14 @@ import 'package:monikid/features/change_profile/profile_edit_screen.dart';
 import 'package:monikid/features/fqa/fqa_screen.dart';
 import 'package:monikid/features/parent/bottom_nav_bar_par.dart';
 import 'package:monikid/features/splash/splash_screen.dart';
-import 'package:monikid/features/student/bottom_nav_bar.dart';
-import 'package:monikid/features/student/request_money/add_new_request/add_request_money_screen.dart';
-import 'package:monikid/features/student/request_money/request_money_history/request_money_history_screen.dart';
-import 'package:monikid/features/student/request_money/update_request/update_request_screen.dart';
-import 'package:monikid/features/student/transaction/add_transaction/add_transaction_screen.dart';
-import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_screen.dart';
-import 'package:monikid/features/student/transaction/transaction_history/transaction_history_screen.dart';
-import 'package:monikid/features/student/transaction/update_transaction/update_transaction_screen.dart';
+import 'package:monikid/features/child/bottom_nav_bar.dart';
+import 'package:monikid/features/child/request_money/add_new_request/add_request_money_screen.dart';
+import 'package:monikid/features/child/request_money/request_money_history/request_money_history_screen.dart';
+import 'package:monikid/features/child/request_money/update_request/update_request_screen.dart';
+import 'package:monikid/features/child/transaction/add_transaction/add_transaction_screen.dart';
+import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_screen.dart';
+import 'package:monikid/features/child/transaction/transaction_history/transaction_history_screen.dart';
+import 'package:monikid/features/child/transaction/update_transaction/update_transaction_screen.dart';
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 
 class AppRoutes {

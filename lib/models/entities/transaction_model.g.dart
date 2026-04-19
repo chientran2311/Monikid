@@ -6,6 +6,26 @@ part of 'transaction_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_TransactionEvidenceImage _$TransactionEvidenceImageFromJson(
+  Map<String, dynamic> json,
+) => _TransactionEvidenceImage(
+  storagePath: json['storagePath'] as String,
+  fileName: json['fileName'] as String?,
+  mimeType: json['mimeType'] as String?,
+  uploadedAt: const TimestampConverter().fromJson(
+    json['uploadedAt'] as Timestamp?,
+  ),
+);
+
+Map<String, dynamic> _$TransactionEvidenceImageToJson(
+  _TransactionEvidenceImage instance,
+) => <String, dynamic>{
+  'storagePath': instance.storagePath,
+  'fileName': instance.fileName,
+  'mimeType': instance.mimeType,
+  'uploadedAt': const TimestampConverter().toJson(instance.uploadedAt),
+};
+
 _TransactionModel _$TransactionModelFromJson(Map<String, dynamic> json) =>
     _TransactionModel(
       transactionId: json['transactionId'] as String,
@@ -30,6 +50,11 @@ _TransactionModel _$TransactionModelFromJson(Map<String, dynamic> json) =>
       ),
       ocrUsed: json['ocrUsed'] as bool?,
       ocrConfidence: (json['ocrConfidence'] as num?)?.toDouble(),
+      evidenceImage: json['evidenceImage'] == null
+          ? null
+          : TransactionEvidenceImage.fromJson(
+              json['evidenceImage'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$TransactionModelToJson(_TransactionModel instance) =>
@@ -52,4 +77,5 @@ Map<String, dynamic> _$TransactionModelToJson(_TransactionModel instance) =>
       'updatedAt': const TimestampConverter().toJson(instance.updatedAt),
       'ocrUsed': instance.ocrUsed,
       'ocrConfidence': instance.ocrConfidence,
+      'evidenceImage': instance.evidenceImage,
     };

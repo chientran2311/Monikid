@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'transaction_repository.g.dart';
@@ -16,11 +17,23 @@ typedef TransactionSummary = ({double totalIncome, double totalExpense});
 typedef TransactionMonthRecord = ({List<TransactionModel> transactions, DateTime month});
 
 abstract class TransactionRepository {
-  Future<void> addTransaction(TransactionModel transaction);
+  Future<TransactionModel> addTransaction(
+    TransactionModel transaction, {
+    TransactionEvidenceUploadPayload? evidenceUpload,
+    Duration uploadTimeout = const Duration(seconds: 30),
+  });
 
-  Future<void> updateTransaction(TransactionModel transaction);
+  Future<TransactionModel> updateTransaction(
+    TransactionModel transaction, {
+    TransactionEvidenceUploadPayload? newEvidenceUpload,
+    TransactionEvidenceImage? previousEvidenceImage,
+    bool removeExistingEvidence = false,
+    Duration uploadTimeout = const Duration(seconds: 30),
+  });
 
   Future<void> deleteTransaction(String userId, String transactionId);
+
+  Future<String?> getEvidenceDownloadUrl(TransactionEvidenceImage? evidenceImage);
 
   Future<TransactionModel?> getTransactionById(
     String userId,
@@ -67,9 +80,14 @@ abstract class TransactionRepository {
 }
 
 class TransactionRepositoryImpl implements TransactionRepository {
-  TransactionRepositoryImpl(this._firestore, this._logger);
+  TransactionRepositoryImpl(
+    this._firestore,
+    this._evidenceStorage,
+    this._logger,
+  );
 
   final FirebaseFirestore _firestore;
+  final TransactionEvidenceStorage _evidenceStorage;
   final Logger _logger;
 
   CollectionReference<Map<String, dynamic>> _transactionsOfUser(String userId) {
@@ -77,13 +95,38 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> addTransaction(TransactionModel transaction) async {
+  Future<TransactionModel> addTransaction(
+    TransactionModel transaction, {
+    TransactionEvidenceUploadPayload? evidenceUpload,
+    Duration uploadTimeout = const Duration(seconds: 30),
+  }) async {
+    TransactionEvidenceImage? uploadedEvidenceImage;
+
     try {
+      if (evidenceUpload != null) {
+        uploadedEvidenceImage = await _evidenceStorage
+            .uploadEvidenceImage(
+              userId: transaction.userId,
+              transactionId: transaction.transactionId,
+              payload: evidenceUpload,
+            )
+            .timeout(uploadTimeout);
+      }
+
+      final transactionToSave = transaction.copyWith(
+        updatedAt: transaction.updatedAt ?? DateTime.now(),
+        evidenceImage: uploadedEvidenceImage ?? transaction.evidenceImage,
+      );
+
       _logger.i('Adding transaction ${transaction.transactionId}.');
       await _transactionsOfUser(transaction.userId)
           .doc(transaction.transactionId)
-          .set(transaction.toFirestore());
+          .set(transactionToSave.toFirestore());
+      return transactionToSave;
     } catch (error, stackTrace) {
+      if (uploadedEvidenceImage != null) {
+        await _cleanupUploadedEvidence(uploadedEvidenceImage.storagePath);
+      }
       _logger.e(
         'Failed to add transaction.',
         error: error,
@@ -94,16 +137,50 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> updateTransaction(TransactionModel transaction) async {
+  Future<TransactionModel> updateTransaction(
+    TransactionModel transaction, {
+    TransactionEvidenceUploadPayload? newEvidenceUpload,
+    TransactionEvidenceImage? previousEvidenceImage,
+    bool removeExistingEvidence = false,
+    Duration uploadTimeout = const Duration(seconds: 30),
+  }) async {
+    TransactionEvidenceImage? uploadedEvidenceImage;
+
     try {
+      if (newEvidenceUpload != null) {
+        uploadedEvidenceImage = await _evidenceStorage
+            .uploadEvidenceImage(
+              userId: transaction.userId,
+              transactionId: transaction.transactionId,
+              payload: newEvidenceUpload,
+            )
+            .timeout(uploadTimeout);
+      }
+
       final updatedTransaction = transaction.copyWith(
         updatedAt: DateTime.now(),
+        evidenceImage: uploadedEvidenceImage ??
+            (removeExistingEvidence ? null : transaction.evidenceImage),
       );
       _logger.i('Updating transaction ${transaction.transactionId}.');
       await _transactionsOfUser(transaction.userId)
           .doc(transaction.transactionId)
           .update(updatedTransaction.toFirestore());
+
+      if (uploadedEvidenceImage != null &&
+          previousEvidenceImage != null &&
+          previousEvidenceImage.storagePath != uploadedEvidenceImage.storagePath) {
+        await _cleanupUploadedEvidence(previousEvidenceImage.storagePath);
+      }
+
+      if (removeExistingEvidence && previousEvidenceImage != null) {
+        await _cleanupUploadedEvidence(previousEvidenceImage.storagePath);
+      }
+      return updatedTransaction;
     } catch (error, stackTrace) {
+      if (uploadedEvidenceImage != null) {
+        await _cleanupUploadedEvidence(uploadedEvidenceImage.storagePath);
+      }
       _logger.e(
         'Failed to update transaction.',
         error: error,
@@ -117,7 +194,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<void> deleteTransaction(String userId, String transactionId) async {
     try {
       _logger.i('Deleting transaction $transactionId.');
+      final existingTransaction = await getTransactionById(userId, transactionId);
       await _transactionsOfUser(userId).doc(transactionId).delete();
+      if (existingTransaction?.evidenceImage != null) {
+        await _cleanupUploadedEvidence(
+          existingTransaction!.evidenceImage!.storagePath,
+        );
+      }
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to delete transaction.',
@@ -125,6 +208,28 @@ class TransactionRepositoryImpl implements TransactionRepository {
         stackTrace: stackTrace,
       );
       rethrow;
+    }
+  }
+
+  @override
+  Future<String?> getEvidenceDownloadUrl(
+    TransactionEvidenceImage? evidenceImage,
+  ) async {
+    if (evidenceImage == null || evidenceImage.storagePath.trim().isEmpty) {
+      return null;
+    }
+
+    try {
+      return await _evidenceStorage.getEvidenceDownloadUrl(
+        evidenceImage.storagePath,
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to get evidence download url.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return null;
     }
   }
 
@@ -400,5 +505,17 @@ class TransactionRepositoryImpl implements TransactionRepository {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 0, 23, 59, 59, 999);
     return (start: start, end: end);
+  }
+
+  Future<void> _cleanupUploadedEvidence(String storagePath) async {
+    try {
+      await _evidenceStorage.deleteEvidenceImage(storagePath);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Evidence cleanup failed for $storagePath.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 }

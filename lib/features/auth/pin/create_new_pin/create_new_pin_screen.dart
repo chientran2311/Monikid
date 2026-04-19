@@ -2,75 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_provider.dart';
-import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
+import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_state.dart';
 import 'package:monikid/features/auth/pin/widgets/pin_screen_body.dart';
 
 class CreateNewPinScreen extends ConsumerWidget {
-  const CreateNewPinScreen({
-    required this.type,
-    this.pinCode,
-    this.canCancel = true,
-    super.key,
-  });
-
-  final EnterPINCodeEnum type;
-  final String? pinCode;
-  final bool canCancel;
+  const CreateNewPinScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = createNewPINProvider(type, pinCode: pinCode);
-    final state = ref.watch(provider);
-    final notifier = ref.read(provider.notifier);
+    final state = ref.watch(createNewPINProvider);
+    final notifier = ref.read(createNewPINProvider.notifier);
+    final s = context.l10n;
 
-    ref.listen(provider, (previous, next) async {
+    ref.listen<CreateNewPINState>(createNewPINProvider, (previous, next) {
       final shouldNavigate =
-          previous?.pendingPinCodeHash == null && next.pendingPinCodeHash != null;
+          previous?.status != CreateNewPinStatus.readyForConfirmation &&
+          next.status == CreateNewPinStatus.readyForConfirmation;
 
       if (!shouldNavigate || !context.mounted) {
         return;
       }
 
-      final pinCodeHash = next.pendingPinCodeHash!;
-      notifier.clearPendingPinCodeHash();
-
-      final result = await context.push<bool>(
-        AppRoutes.reEnterPin,
-        extra: {
-          'pinCodeHash': pinCodeHash,
-          'canCancel': canCancel,
-        },
-      );
-
-      if (!context.mounted) {
-        return;
-      }
-
-      if (result == true) {
-        Navigator.of(context).pop(true);
-      } else {
-        notifier.reset();
-      }
+      notifier.consumeReadyForConfirmation();
+      context.go(AppRoutes.reEnterPin);
     });
 
-    final title = type == EnterPINCodeEnum.createNew
-        ? 'Tạo mã PIN mới'
-        : 'Nhập mã PIN';
-    const description = 'Tạo mã PIN 6 chữ số để bảo mật tài khoản của bạn.';
-
     return PopScope(
-      canPop: canCancel && !state.isLoading,
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(automaticallyImplyLeading: false),
         body: SafeArea(
           child: SingleChildScrollView(
             child: PinScreenBody(
-              title: title,
-              description: description,
-              currentPin: state.pinCode,
+              title: s.pinCreateTitle,
+              description: s.pinCreateDescription,
+              currentPin: state.currentPin,
               hasError: false,
-              isLoading: state.isLoading,
+              isLoading: false,
               onAddNumber: notifier.addNumber,
               onRemoveNumber: notifier.removeNumber,
             ),

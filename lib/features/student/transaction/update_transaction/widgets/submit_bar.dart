@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 
 class SubmitBar extends StatelessWidget {
@@ -21,8 +22,8 @@ class SubmitBar extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark
-            ? AppTheme.backgroundDark.withOpacity(0.9)
-            : AppTheme.backgroundLight.withOpacity(0.9),
+            ? AppTheme.backgroundDark.withValues(alpha: 0.9)
+            : AppTheme.backgroundLight.withValues(alpha: 0.9),
         border: Border(
           top: BorderSide(
             color: isDark
@@ -48,14 +49,14 @@ class SubmitBar extends StatelessWidget {
                 width: 24,
                 child: CircularProgressIndicator(color: Colors.white),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check, size: 24),
-                  SizedBox(width: 8),
+                  const Icon(Icons.check, size: 24),
+                  const SizedBox(width: 8),
                   Text(
-                    'Cập nhật giao dịch',
-                    style: TextStyle(
+                    s.updateTransactionAction,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SplashState {
 
- bool get isLoading; int get loadingProgress;// Splash progress (0-100)
- bool get onboardingComplete; AuthStatus get authStatus;
+ bool get isLoading; int get loadingProgress; SplashRouteTarget get routeTarget;
 /// Create a copy of SplashState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +26,16 @@ $SplashStateCopyWith<SplashState> get copyWith => _$SplashStateCopyWithImpl<Spla
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SplashState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.loadingProgress, loadingProgress) || other.loadingProgress == loadingProgress)&&(identical(other.onboardingComplete, onboardingComplete) || other.onboardingComplete == onboardingComplete)&&(identical(other.authStatus, authStatus) || other.authStatus == authStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SplashState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.loadingProgress, loadingProgress) || other.loadingProgress == loadingProgress)&&(identical(other.routeTarget, routeTarget) || other.routeTarget == routeTarget));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,loadingProgress,onboardingComplete,authStatus);
+int get hashCode => Object.hash(runtimeType,isLoading,loadingProgress,routeTarget);
 
 @override
 String toString() {
-  return 'SplashState(isLoading: $isLoading, loadingProgress: $loadingProgress, onboardingComplete: $onboardingComplete, authStatus: $authStatus)';
+  return 'SplashState(isLoading: $isLoading, loadingProgress: $loadingProgress, routeTarget: $routeTarget)';
 }
 
 
@@ -47,7 +46,7 @@ abstract mixin class $SplashStateCopyWith<$Res>  {
   factory $SplashStateCopyWith(SplashState value, $Res Function(SplashState) _then) = _$SplashStateCopyWithImpl;
 @useResult
 $Res call({
- bool isLoading, int loadingProgress, bool onboardingComplete, AuthStatus authStatus
+ bool isLoading, int loadingProgress, SplashRouteTarget routeTarget
 });
 
 
@@ -64,13 +63,12 @@ class _$SplashStateCopyWithImpl<$Res>
 
 /// Create a copy of SplashState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? loadingProgress = null,Object? onboardingComplete = null,Object? authStatus = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? loadingProgress = null,Object? routeTarget = null,}) {
   return _then(_self.copyWith(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,loadingProgress: null == loadingProgress ? _self.loadingProgress : loadingProgress // ignore: cast_nullable_to_non_nullable
-as int,onboardingComplete: null == onboardingComplete ? _self.onboardingComplete : onboardingComplete // ignore: cast_nullable_to_non_nullable
-as bool,authStatus: null == authStatus ? _self.authStatus : authStatus // ignore: cast_nullable_to_non_nullable
-as AuthStatus,
+as int,routeTarget: null == routeTarget ? _self.routeTarget : routeTarget // ignore: cast_nullable_to_non_nullable
+as SplashRouteTarget,
   ));
 }
 
@@ -81,14 +79,12 @@ as AuthStatus,
 
 
 class _SplashState implements SplashState {
-  const _SplashState({this.isLoading = true, this.loadingProgress = 0, this.onboardingComplete = false, this.authStatus = AuthStatus.initial});
+  const _SplashState({this.isLoading = true, this.loadingProgress = 0, this.routeTarget = SplashRouteTarget.none});
   
 
 @override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  int loadingProgress;
-// Splash progress (0-100)
-@override@JsonKey() final  bool onboardingComplete;
-@override@JsonKey() final  AuthStatus authStatus;
+@override@JsonKey() final  SplashRouteTarget routeTarget;
 
 /// Create a copy of SplashState
 /// with the given fields replaced by the non-null parameter values.
@@ -100,16 +96,16 @@ _$SplashStateCopyWith<_SplashState> get copyWith => __$SplashStateCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SplashState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.loadingProgress, loadingProgress) || other.loadingProgress == loadingProgress)&&(identical(other.onboardingComplete, onboardingComplete) || other.onboardingComplete == onboardingComplete)&&(identical(other.authStatus, authStatus) || other.authStatus == authStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SplashState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.loadingProgress, loadingProgress) || other.loadingProgress == loadingProgress)&&(identical(other.routeTarget, routeTarget) || other.routeTarget == routeTarget));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,loadingProgress,onboardingComplete,authStatus);
+int get hashCode => Object.hash(runtimeType,isLoading,loadingProgress,routeTarget);
 
 @override
 String toString() {
-  return 'SplashState(isLoading: $isLoading, loadingProgress: $loadingProgress, onboardingComplete: $onboardingComplete, authStatus: $authStatus)';
+  return 'SplashState(isLoading: $isLoading, loadingProgress: $loadingProgress, routeTarget: $routeTarget)';
 }
 
 
@@ -120,7 +116,7 @@ abstract mixin class _$SplashStateCopyWith<$Res> implements $SplashStateCopyWith
   factory _$SplashStateCopyWith(_SplashState value, $Res Function(_SplashState) _then) = __$SplashStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLoading, int loadingProgress, bool onboardingComplete, AuthStatus authStatus
+ bool isLoading, int loadingProgress, SplashRouteTarget routeTarget
 });
 
 
@@ -137,13 +133,12 @@ class __$SplashStateCopyWithImpl<$Res>
 
 /// Create a copy of SplashState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? loadingProgress = null,Object? onboardingComplete = null,Object? authStatus = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? loadingProgress = null,Object? routeTarget = null,}) {
   return _then(_SplashState(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,loadingProgress: null == loadingProgress ? _self.loadingProgress : loadingProgress // ignore: cast_nullable_to_non_nullable
-as int,onboardingComplete: null == onboardingComplete ? _self.onboardingComplete : onboardingComplete // ignore: cast_nullable_to_non_nullable
-as bool,authStatus: null == authStatus ? _self.authStatus : authStatus // ignore: cast_nullable_to_non_nullable
-as AuthStatus,
+as int,routeTarget: null == routeTarget ? _self.routeTarget : routeTarget // ignore: cast_nullable_to_non_nullable
+as SplashRouteTarget,
   ));
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class SocialButton extends StatelessWidget {
   final String text;
@@ -18,22 +19,13 @@ class SocialButton extends StatelessWidget {
 
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(12), // rounded-xl
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 10,
-        ), // px-4 py-2.5
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF1E293B)
-              : Colors.white, // bg-slate-800 : bg-white
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           border: Border.all(
-            color: isDark
-                ? const Color(0xFF334155)
-                : const Color(
-                    0xFFE2E8F0,
-                  ), // border-slate-700 : border-slate-200
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -41,17 +33,13 @@ class SocialButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon,
-            const SizedBox(width: 8), // mr-2 equivalent
+            const SizedBox(width: 8),
             Text(
               text,
-              style: TextStyle(
-                fontSize: 14, // text-sm
-                fontWeight: FontWeight.w500, // font-medium
+              style: context.typo.label.large.copyWith(
                 color: isDark
                     ? const Color(0xFFCBD5E1)
-                    : const Color(
-                        0xFF334155,
-                      ), // text-slate-300 : text-slate-700
+                    : const Color(0xFF334155),
               ),
             ),
           ],

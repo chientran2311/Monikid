@@ -4,10 +4,14 @@ class StorageKeys {
 
   // Local Storage Keys
   static const String isOnboarded = 'is_onboarded';
+  static const String hasSignedInBefore = 'has_signed_in_before';
   static const String themeModeKey = 'theme_mode';
+  static const String monthlyLimitMinorPrefix = 'student_monthly_limit_minor';
 
   // Secure Storage Keys
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String hashedPinKey = 'hashed_pin';
+  static const String pinFailedCountKey = 'pin_failed_count';
+  static const String pinLockedUntilKey = 'pin_locked_until';
 }

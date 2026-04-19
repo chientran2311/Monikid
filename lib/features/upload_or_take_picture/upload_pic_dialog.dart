@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
-import 'package:monikid/l10n/app_localizations.dart';
 
 class UploadPicDialog extends ConsumerWidget {
   const UploadPicDialog({super.key});
@@ -10,7 +10,7 @@ class UploadPicDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final s = S.of(context)!;
+    final s = context.l10n;
     
     return SafeArea(
       bottom: false,

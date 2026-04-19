@@ -1,6 +1,8 @@
 import 'package:logger/logger.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/student/transaction/providers/category_provider.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -17,42 +19,42 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
   late final Logger _logger;
 
   @override
-  UpdateTransactionState build(TransactionModel transaction) {
+  UpdateTransactionState build() {
     _repository = ref.read(transactionRepositoryProvider);
     _logger = getIt<Logger>();
-
-    _listenCategories(transaction);
-
-    return UpdateTransactionState(
-      originalTransaction: transaction,
-      status: TransactionStatus.loading,
-      selectedCategory: transaction.category,
-      selectedCategoryEmoji: transaction.categoryEmoji ?? '',
-      amountText: _formatAmount(transaction.amount),
-      note: transaction.note ?? '',
-      selectedDate: transaction.date,
-      transactionType: transactionTypeFromValue(transaction.type),
-    );
+    final initialCategories =
+        ref.read(categoryStreamProvider).value ?? defaultCategories;
+    _listenCategories();
+    return UpdateTransactionState(categories: initialCategories);
   }
 
-  void _listenCategories(TransactionModel transaction) {
+  void _listenCategories() {
     ref.listen(categoryStreamProvider, (previous, next) {
       next.whenData((categories) {
+        final originalTransaction = state.originalTransaction;
+        if (originalTransaction == null) {
+          state = state.copyWith(
+            categories: categories,
+            errorMessage: null,
+          );
+          return;
+        }
+
         final nextCategory = _resolveCurrentCategory(
           categories: categories,
           currentType: state.currentType,
-          selectedCategory: state.selectedCategory,
           selectedCategoryEmoji: state.selectedCategoryEmoji,
-          originalTransaction: transaction,
+          originalTransaction: originalTransaction,
         );
 
         state = state.copyWith(
+          categories: categories,
+          selectedCategoryKey: transactionCategoryKeyForCategory(nextCategory),
+          selectedCategory: nextCategory.label,
+          selectedCategoryEmoji: nextCategory.icon,
           status: state.isSubmitting
               ? TransactionStatus.submitting
               : TransactionStatus.ready,
-          categories: categories,
-          selectedCategory: nextCategory.label,
-          selectedCategoryEmoji: nextCategory.icon,
           errorMessage: null,
         );
       });
@@ -66,11 +68,34 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
           );
           state = state.copyWith(
             status: TransactionStatus.error,
-            errorMessage: 'Không thể tải danh mục. Vui lòng thử lại.',
+            errorMessage: s.transactionCategoryLoadError,
           );
         },
       );
     });
+  }
+
+  Future<void> initialize(String transactionId) async {
+    state = state.copyWith(
+      currentTransactionId: transactionId,
+      status: TransactionStatus.loading,
+      errorMessage: null,
+    );
+
+    final transaction = await ref
+        .read(transactionHistoryProvider.notifier)
+        .ensureSelectedTransaction(transactionId);
+
+    if (transaction == null) {
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        originalTransaction: null,
+        errorMessage: s.transactionLoadError,
+      );
+      return;
+    }
+
+    _applyTransaction(transaction);
   }
 
   void updateAmount(String amountText) {
@@ -99,6 +124,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
 
   void updateCategory(CategoryModel category) {
     state = state.copyWith(
+      selectedCategoryKey: transactionCategoryKeyForCategory(category),
       selectedCategory: category.label,
       selectedCategoryEmoji: category.icon,
       status: TransactionStatus.ready,
@@ -115,6 +141,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
 
     state = state.copyWith(
       transactionType: type,
+      selectedCategoryKey: transactionCategoryKeyForCategory(fallbackCategory),
       selectedCategory: fallbackCategory.label,
       selectedCategoryEmoji: fallbackCategory.icon,
       status: TransactionStatus.ready,
@@ -123,12 +150,20 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
   }
 
   Future<void> submit() async {
-    final amountText = state.amountText.replaceAll(RegExp(r'[^0-9]'), '').trim();
+    final originalTransaction = state.originalTransaction;
+    if (originalTransaction == null) {
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        errorMessage: s.updateTransactionMissingError,
+      );
+      return;
+    }
 
+    final amountText = state.amountText.replaceAll(RegExp(r'[^0-9]'), '').trim();
     if (amountText.isEmpty) {
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: 'Vui lòng nhập số tiền.',
+        errorMessage: s.validationEnterAmount,
       );
       return;
     }
@@ -137,7 +172,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     if (amount == null || amount <= 0) {
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: 'Số tiền không hợp lệ.',
+        errorMessage: s.validationInvalidAmount,
       );
       return;
     }
@@ -148,18 +183,22 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     );
 
     final trimmedNote = state.note.trim();
-    final updatedTransaction = state.originalTransaction.copyWith(
-      amount: amount,
+    final updatedTransaction = originalTransaction.copyWith(
+      amountMinor: amount.round(),
       type: state.transactionType.value,
-      category: state.selectedCategory,
-      categoryEmoji: state.selectedCategoryEmoji,
-      date: state.effectiveSelectedDate,
+      categoryLabel: state.selectedCategory,
+      categoryKey: state.selectedCategoryKey,
+      categoryIcon: state.selectedCategoryEmoji,
+      dateTs: state.effectiveSelectedDate,
       note: trimmedNote.isEmpty ? null : trimmedNote,
     );
 
     try {
       _logger.i('Updating transaction ${updatedTransaction.transactionId}');
       await _repository.updateTransaction(updatedTransaction);
+      ref
+          .read(transactionHistoryProvider.notifier)
+          .applyUpdatedTransaction(updatedTransaction);
       state = state.copyWith(
         status: TransactionStatus.success,
         errorMessage: null,
@@ -173,24 +212,58 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       );
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: 'Không thể cập nhật giao dịch. Vui lòng thử lại.',
+        errorMessage: s.updateTransactionFailed,
       );
     }
+  }
+
+  void _applyTransaction(TransactionModel transaction) {
+    final transactionType = transactionTypeFromValue(transaction.type);
+    final resolvedCategory = _resolveCurrentCategory(
+      categories: state.categories,
+      currentType: transaction.type,
+      selectedCategoryEmoji: transaction.categoryEmoji ?? '',
+      originalTransaction: transaction,
+    );
+
+    state = state.copyWith(
+      currentTransactionId: transaction.transactionId,
+      originalTransaction: transaction,
+      status: TransactionStatus.ready,
+      selectedCategoryKey: transactionCategoryKeyForCategory(resolvedCategory),
+      selectedCategory: resolvedCategory.label,
+      selectedCategoryEmoji: resolvedCategory.icon,
+      amountText: _formatAmount(transaction.amount),
+      note: transaction.note ?? '',
+      selectedDate: transaction.date,
+      transactionType: transactionType,
+      errorMessage: null,
+    );
   }
 
   CategoryModel _resolveCurrentCategory({
     required List<CategoryModel> categories,
     required String currentType,
-    required String selectedCategory,
     required String selectedCategoryEmoji,
     required TransactionModel originalTransaction,
   }) {
     final exactMatches = categories.where((category) {
-      return category.type == currentType && category.label == selectedCategory;
+      return category.type == currentType &&
+          transactionCategoryKeyForCategory(category) ==
+              originalTransaction.categoryKey;
     }).toList();
 
     if (exactMatches.isNotEmpty) {
       return exactMatches.first;
+    }
+
+    final keyMatch = findCategoryByTransactionKey(
+      categories,
+      originalTransaction.categoryKey,
+      type: currentType,
+    );
+    if (keyMatch != null) {
+      return keyMatch;
     }
 
     final originalMatches = categories.where((category) {
@@ -208,7 +281,8 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     );
 
     return fallback.copyWith(
-      icon: selectedCategoryEmoji.isNotEmpty ? selectedCategoryEmoji : fallback.icon,
+      icon:
+          selectedCategoryEmoji.isNotEmpty ? selectedCategoryEmoji : fallback.icon,
     );
   }
 
@@ -235,12 +309,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       return sameTypeCategories.first;
     }
 
-    return CategoryModel(
-      id: '',
-      label: type == TransactionType.income ? 'Thu nhập' : 'Chi tiêu',
-      type: type.value,
-      icon: type == TransactionType.income ? '💵' : '💸',
-    );
+    return getDefaultCategoryForType(type.value, categories: defaultCategories);
   }
 
   String _formatAmount(double amount) {

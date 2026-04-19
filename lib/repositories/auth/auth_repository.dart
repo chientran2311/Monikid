@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/models/entities/account/account_model.dart';
 import 'package:monikid/models/entities/auth/params/auth_param.dart';
 import 'package:monikid/models/entities/auth/responses/auth_response.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,7 +14,6 @@ part 'auth_repository.g.dart';
 AuthRepository authRepository(Ref ref) {
   return getIt<AuthRepository>();
 }
-
 
 abstract class AuthRepository {
   User? get currentUser;
@@ -27,134 +26,124 @@ abstract class AuthRepository {
 
   Future<void> signOut();
 
-  /// Gửi email đặt lại mật khẩu qua Firebase
   Future<void> resetPassword(ResetPasswordParam param);
 
-  /// Lấy role của user từ Firestore theo UID
-  Future<String?> getUserRole(String uid);
+  Future<AccountModel?> fetchAccountByUid(String uid);
 
-  /// Lấy role của user từ Firestore theo email (dùng trước khi đăng nhập)
-  Future<String?> getRoleByEmail(String email);
+  Future<AccountModel> createInitialAccount({
+    required String uid,
+    required String email,
+    required String displayName,
+    required String role,
+  });
 }
 
-
 class AuthRepositoryImpl implements AuthRepository {
+  AuthRepositoryImpl(this._firebaseAuth, this._firestore, this._logger);
+
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
   final Logger _logger;
 
-  // Inject Firebase instances thông qua Module của bạn
-  AuthRepositoryImpl(this._firebaseAuth, this._firestore, this._logger);
-
-  // 1. Getter: Lấy user hiện tại
   @override
   User? get currentUser => _firebaseAuth.currentUser;
 
-  // 2. Getter: Lắng nghe trạng thái đăng nhập
   @override
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
-  // 3. Hàm Đăng nhập
   @override
   Future<AuthResponse> signIn(SignInParam param) async {
     try {
-      _logger.i('🔐 Attempting sign in for email: ${param.email}');
+      _logger.i('Attempting sign in for email: ${param.email}');
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: param.email,
         password: param.password,
       );
 
-      if (credential.user == null) {
-        throw Exception('Sign in failed. No user found.');
+      final user = credential.user;
+      if (user == null) {
+        throw Exception('Sign in failed. Firebase did not return a user.');
       }
 
-      _logger.i('✅ Sign in successful for uid: ${credential.user?.uid}');
+      final account = await fetchAccountByUid(user.uid);
+      if (account == null) {
+        _logger.w(
+          'Sign in blocked: no Firestore account document for uid=${user.uid}.',
+        );
+        await signOut();
+        throw Exception('Account setup is incomplete.');
+      }
 
-      // Fetch user role
-      final role = await getUserRole(credential.user!.uid);
-      _logger.i('✅ Fetched role: $role');
+      if (!account.isValid) {
+        _logger.w(
+          'Sign in blocked: invalid Firestore account for uid=${user.uid}. '
+          'Issues: ${account.validationIssues.join(', ')}',
+        );
+        await signOut();
+        throw Exception('Account setup is incomplete.');
+      }
 
-      return AuthResponse(user: credential.user!, role: role);
-    } catch (e) {
-      _logger.e('❌ Sign in failed: $e');
+      return AuthResponse(user: user, role: account.role);
+    } catch (e, stackTrace) {
+      _logger.e('Sign in failed', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
 
-  // 4. Hàm Đăng ký & Đồng bộ Storage (Ví 1.000.000đ)
   @override
   Future<AuthResponse> signUp(SignUpParam param) async {
+    User? createdUser;
     try {
-      _logger.i('📝 Starting sign up process for email: ${param.email}');
-      _logger.d(
-        'Sign up details - Name: ${param.fullName}, Phone: ${param.phone}, Role: ${param.role}',
+      _logger.i('Starting sign up process for email: ${param.email}');
+
+      final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: param.email,
+        password: param.password,
       );
 
-      // A. Tạo tài khoản trên Authentication
-      _logger.i('🔐 Creating Firebase Auth account...');
-      UserCredential credential = await _firebaseAuth
-          .createUserWithEmailAndPassword(
-            email: param.email,
-            password: param.password,
-          );
-
-      if (credential.user == null) {
-        throw Exception('Sign up failed. No user found.');
+      createdUser = credential.user;
+      if (createdUser == null) {
+        throw Exception('Sign up failed. Firebase did not return a user.');
       }
 
-      final String uid = credential.user!.uid;
-      _logger.i('✅ Auth account created with UID: $uid');
+      final account = await createInitialAccount(
+        uid: createdUser.uid,
+        email: param.email,
+        displayName: param.fullName,
+        role: param.role,
+      );
 
-      await credential.user!.updateDisplayName(param.fullName);
-      await credential.user!.reload();
-
-      // B. Đồng bộ hóa Storage/Database ngay lập tức (Thay thế Trigger SQL cũ)
-      _logger.i('💾 Syncing user data to Firestore...');
-
-      final userData = {
-        'uid': uid,
-        'email': param.email,
-        'full_name': param.fullName,
-        'phone': param.phone,
-        'role': param.role,
-        'avatar_url': "https://i.pravatar.cc/150?img=11",
-        'created_at': FieldValue.serverTimestamp(),
-        'wallet': {
-          'balance': 1000000.0, // Khởi tạo 1 triệu VND
-          'currency': 'VND',
-          'is_locked': false,
-        },
-        // Chỉ khởi tạo bank_account nếu là phụ huynh
-        if (param.role == 'parent')
-          'bank_account': {
-            'account_number': 'BK-${DateTime.now().millisecondsSinceEpoch}',
-            'bank_balance': 1000000.0,
-            'is_verified': true,
-          },
-      };
-
-      _logger.d('User data to save: $userData');
-
-      await _firestore.collection('users').doc(uid).set(userData);
-
-      _logger.i('✅ Firestore sync completed successfully!');
-      _logger.i('💰 Wallet initialized with 1,000,000 VND');
-      if (param.role == 'parent') {
-        _logger.i('🏦 Bank account created for parent');
+      if (!account.isValid) {
+        _logger.w(
+          'Sign up produced an invalid Firestore account for uid=${createdUser.uid}. '
+          'Issues: ${account.validationIssues.join(', ')}',
+        );
+        await signOut();
+        throw Exception('Sign up failed. The account document is incomplete.');
       }
 
-      final updatedUser = _firebaseAuth.currentUser!;
-
-      return AuthResponse(user: updatedUser, role: param.role);
-    } on FirebaseAuthException catch (e) {
-      _logger.e('❌ Firebase Auth Error: ${e.code} - ${e.message}');
+      final resolvedUser = _firebaseAuth.currentUser ?? createdUser;
+      return AuthResponse(user: resolvedUser, role: account.role);
+    } on FirebaseAuthException catch (e, stackTrace) {
+      await _signOutAfterFailedSignUp(createdUser);
+      _logger.e(
+        'Firebase Auth error during sign up',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
-    } on FirebaseException catch (e) {
-      _logger.e('❌ Firestore Error: ${e.code} - ${e.message}');
+    } on FirebaseException catch (e, stackTrace) {
+      await _signOutAfterFailedSignUp(createdUser);
+      _logger.e(
+        'Firestore error during sign up',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
     } catch (e, stackTrace) {
+      await _signOutAfterFailedSignUp(createdUser);
       _logger.e(
-        '❌ Unexpected error during sign up',
+        'Unexpected error during sign up',
         error: e,
         stackTrace: stackTrace,
       );
@@ -162,89 +151,138 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // 5. Hàm Đăng xuất
   @override
   Future<void> signOut() async {
     try {
-      _logger.i('🚪 Signing out user: ${_firebaseAuth.currentUser?.email}');
+      _logger.i('Signing out user: ${_firebaseAuth.currentUser?.email}');
       await _firebaseAuth.signOut();
-      _logger.i('✅ Sign out successful');
-    } catch (e) {
-      _logger.e('❌ Sign out failed: $e');
+    } catch (e, stackTrace) {
+      _logger.e('Sign out failed', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
 
-  // 6. Hàm Reset Password (gửi email đặt lại mật khẩu qua Firebase)
   @override
   Future<void> resetPassword(ResetPasswordParam param) async {
     try {
-      _logger.i('📧 Sending password reset email to: ${param.email}');
       await _firebaseAuth.sendPasswordResetEmail(email: param.email);
-      _logger.i('✅ Password reset email sent successfully');
     } on FirebaseAuthException catch (e) {
-      _logger.e('❌ Reset password failed: ${e.code} - ${e.message}');
       String errorMessage;
       switch (e.code) {
         case 'user-not-found':
-          errorMessage = 'Không tìm thấy tài khoản với email này.';
+          errorMessage = 'No account was found for this email address.';
           break;
         case 'invalid-email':
-          errorMessage = 'Địa chỉ email không hợp lệ.';
+          errorMessage = 'Please enter a valid email address.';
           break;
         case 'too-many-requests':
-          errorMessage = 'Quá nhiều yêu cầu. Vui lòng thử lại sau.';
+          errorMessage = 'Too many requests. Please try again later.';
           break;
         default:
           errorMessage =
-              e.message ?? 'Đã xảy ra lỗi khi gửi email đặt lại mật khẩu.';
+              e.message ?? 'An unexpected error occurred while sending the reset email.';
       }
       throw Exception(errorMessage);
     } catch (e) {
-      _logger.e('❌ Reset password failed: $e');
-      throw Exception('Lỗi hệ thống: ${e.toString()}');
+      throw Exception('System error: ${e.toString()}');
     }
   }
 
-  // 7. Lấy role của user từ Firestore theo UID
   @override
-  Future<String?> getUserRole(String uid) async {
+  Future<AccountModel?> fetchAccountByUid(String uid) async {
     try {
-      _logger.i('👤 Fetching user role for uid: $uid');
       final doc = await _firestore.collection('users').doc(uid).get();
-      if (doc.exists) {
-        final role = doc.data()?['role'] as String?;
-        _logger.i('✅ User role: $role');
-        return role;
+      if (!doc.exists) {
+        _logger.w('No user document found in Firestore for uid=$uid.');
+        return null;
       }
-      _logger.w('⚠️ User document not found for uid: $uid');
-      return null;
-    } catch (e) {
-      _logger.e('❌ getUserRole failed: $e');
+
+      final data = doc.data();
+      if (data == null) {
+        _logger.w('Firestore returned null data for uid=$uid.');
+        return null;
+      }
+
+      final account = AccountModel.fromFirestore(data);
+      _logger.i(
+        'Fetched account uid=$uid role=${account.role} memberStatus=${account.memberStatus} '
+        'hasSpendingAlert=${account.spendingAlert != null}',
+      );
+      if (!account.isValid) {
+        _logger.w(
+          'Fetched account has validation issues for uid=$uid: '
+          '${account.validationIssues.join(', ')}',
+        );
+      }
+      return account;
+    } catch (e, stackTrace) {
+      _logger.e('fetchAccountByUid failed', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
 
-  // 8. Lấy role của user từ Firestore theo email (dùng trước khi đăng nhập)
   @override
-  Future<String?> getRoleByEmail(String email) async {
+  Future<AccountModel> createInitialAccount({
+    required String uid,
+    required String email,
+    required String displayName,
+    required String role,
+  }) async {
     try {
-      _logger.i('📬 Fetching user role for email: $email');
-      final query = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email.trim().toLowerCase())
-          .limit(1)
-          .get();
-      if (query.docs.isNotEmpty) {
-        final role = query.docs.first.data()['role'] as String?;
-        _logger.i('✅ Role found for email: $role');
-        return role;
+      final normalizedRole = role.trim().toLowerCase();
+      final now = DateTime.now();
+
+      final account = AccountModel(
+        uid: uid,
+        email: email.trim().toLowerCase(),
+        displayName: displayName.trim(),
+        photoUrl: 'https://i.pravatar.cc/150?img=11',
+        role: normalizedRole,
+        familyId: null,
+        memberStatus: 'active',
+        createdAt: now,
+        updatedAt: now,
+        spendingAlert: normalizedRole == 'child'
+            ? const SpendingAlertModel(
+                enabled: true,
+                dailyLimitMinor: 100000,
+                monthlyLimitMinor: 1500000,
+              )
+            : null,
+      );
+
+      await _firestore.collection('users').doc(uid).set(account.toFirestore());
+
+      final createdAccount = await fetchAccountByUid(uid);
+      if (createdAccount == null) {
+        throw Exception('Failed to read back the account after creation.');
       }
-      _logger.w('⚠️ No user found for email: $email');
-      return null;
-    } catch (e) {
-      _logger.e('❌ getRoleByEmail failed: $e');
+
+      return createdAccount;
+    } catch (e, stackTrace) {
+      _logger.e('createInitialAccount failed', error: e, stackTrace: stackTrace);
       rethrow;
+    }
+  }
+
+  Future<void> _signOutAfterFailedSignUp(User? createdUser) async {
+    if (createdUser == null) {
+      return;
+    }
+
+    final currentUser = _firebaseAuth.currentUser;
+    if (currentUser?.uid != createdUser.uid) {
+      return;
+    }
+
+    try {
+      await _firebaseAuth.signOut();
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to clean up Firebase session after sign up error.',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

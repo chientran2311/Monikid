@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/update_transaction/widgets/section_label.dart';
 
@@ -18,7 +19,7 @@ class AmountField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel(text: 'Số tiền'),
+        SectionLabel(text: s.transactionAmountLabel),
         TextField(
           controller: controller,
           keyboardType: TextInputType.number,
@@ -40,7 +41,7 @@ class AmountField extends StatelessWidget {
             ),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-                color: AppTheme.primary.withOpacity(0.3),
+                color: AppTheme.primary.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),

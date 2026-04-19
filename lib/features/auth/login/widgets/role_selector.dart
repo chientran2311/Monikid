@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class RoleSelector extends StatelessWidget {
-  final String selectedRole;
-  final ValueChanged<String> onRoleChanged;
-
   const RoleSelector({
-    Key? key,
+    super.key,
     required this.selectedRole,
     required this.onRoleChanged,
-  }) : super(key: key);
+  });
+
+  final String selectedRole;
+  final ValueChanged<String> onRoleChanged;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(4), // p-1
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-        borderRadius: BorderRadius.circular(12), // rounded-lg
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
@@ -27,12 +28,12 @@ class RoleSelector extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onRoleChanged('parent'),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8), // py-2
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: selectedRole == 'parent'
                       ? (isDark ? const Color(0xFF334155) : Colors.white)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8), // rounded-md
+                  borderRadius: BorderRadius.circular(8),
                   boxShadow: selectedRole == 'parent'
                       ? [
                           BoxShadow(
@@ -40,7 +41,7 @@ class RoleSelector extends StatelessWidget {
                             blurRadius: 4,
                           ),
                         ]
-                      : [],
+                      : const [],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -56,10 +57,8 @@ class RoleSelector extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Phụ huynh",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600, // font-semibold
+                      'Phá»¥ huynh',
+                      style: context.typo.subtitle.small.copyWith(
                         color: selectedRole == 'parent'
                             ? (isDark ? Colors.white : const Color(0xFF0F172A))
                             : (isDark
@@ -74,22 +73,22 @@ class RoleSelector extends StatelessWidget {
           ),
           Expanded(
             child: GestureDetector(
-              onTap: () => onRoleChanged('student'),
+              onTap: () => onRoleChanged('child'),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8), // py-2
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: selectedRole == 'student'
+                  color: selectedRole == 'child'
                       ? (isDark ? const Color(0xFF334155) : Colors.white)
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8), // rounded-md
-                  boxShadow: selectedRole == 'student'
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: selectedRole == 'child'
                       ? [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
                             blurRadius: 4,
                           ),
                         ]
-                      : [],
+                      : const [],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +96,7 @@ class RoleSelector extends StatelessWidget {
                     Icon(
                       Icons.school,
                       size: 16,
-                      color: selectedRole == 'student'
+                      color: selectedRole == 'child'
                           ? AppTheme.primary
                           : (isDark
                                 ? const Color(0xFF94A3B8)
@@ -105,11 +104,9 @@ class RoleSelector extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Học sinh",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600, // font-semibold
-                        color: selectedRole == 'student'
+                      'Há»c sinh',
+                      style: context.typo.subtitle.small.copyWith(
+                        color: selectedRole == 'child'
                             ? (isDark ? Colors.white : const Color(0xFF0F172A))
                             : (isDark
                                   ? const Color(0xFF94A3B8)

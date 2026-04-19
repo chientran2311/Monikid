@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 /// Loại SnackBar — khớp với design trong snackbars.html
 enum SnackBarType { success, error, warning, info }
@@ -59,10 +60,8 @@ class AppSnackBar {
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(
+                style: context.typo.label.large.copyWith(
                   color: textColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -76,9 +75,8 @@ class AppSnackBar {
                 },
                 child: Text(
                   actionLabel,
-                  style: TextStyle(
+                  style: context.typo.title.small.copyWith(
                     color: textColor,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

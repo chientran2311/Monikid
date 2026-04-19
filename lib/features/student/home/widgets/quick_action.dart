@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
 class QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final MaterialColor color;
-  final bool isDark;
-  final VoidCallback? onTap;
-
   const QuickAction({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.color,
     required this.isDark,
+    required this.circleSize,
+    required this.iconSize,
+    required this.labelFontSize,
     this.onTap,
-  }) : super(key: key);
+  });
+
+  final IconData icon;
+  final String label;
+  final MaterialColor color;
+  final bool isDark;
+  final double circleSize;
+  final double iconSize;
+  final double labelFontSize;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Material(
           color: Colors.transparent,
@@ -28,27 +36,35 @@ class QuickAction extends StatelessWidget {
             onTap: onTap,
             customBorder: const CircleBorder(),
             child: Ink(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: isDark ? color.shade900.withOpacity(0.3) : color.shade100,
-              shape: BoxShape.circle,
+              width: circleSize,
+              height: circleSize,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? color.shade900.withValues(alpha: 0.3)
+                    : color.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isDark ? color.shade400 : color.shade600,
+                size: iconSize,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: isDark ? color.shade400 : color.shade600,
-              size: 24,
-            ),
-          ),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+        SizedBox(height: 10.h),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: labelFontSize,
+              fontWeight: FontWeight.w500,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+            ),
           ),
         ),
       ],

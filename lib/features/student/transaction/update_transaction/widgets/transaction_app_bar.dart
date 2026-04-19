@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 
 class TransactionAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -21,15 +22,15 @@ class TransactionAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: isDark
-          ? AppTheme.backgroundDark.withOpacity(0.95)
-          : AppTheme.backgroundLight.withOpacity(0.95),
+          ? AppTheme.backgroundDark.withValues(alpha: 0.95)
+          : AppTheme.backgroundLight.withValues(alpha: 0.95),
       elevation: 0,
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: textColor),
         onPressed: canPop ? () => context.pop() : null,
       ),
       title: Text(
-        'Chỉnh sửa Giao dịch',
+        s.updateTransactionTitle,
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,

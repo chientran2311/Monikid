@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/shared/widgets/social_button.dart';
 
 class AuthSocialSection extends StatelessWidget {
@@ -32,11 +33,10 @@ class AuthSocialSection extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 label,
-                style: TextStyle(
+                style: context.typo.text.medium.copyWith(
                   color: isDark
                       ? const Color(0xFF94A3B8)
                       : const Color(0xFF64748B),
-                  fontSize: 14,
                 ),
               ),
             ),

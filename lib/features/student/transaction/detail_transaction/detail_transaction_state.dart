@@ -8,6 +8,7 @@ part 'detail_transaction_state.freezed.dart';
 abstract class DetailTransactionState with _$DetailTransactionState {
   const factory DetailTransactionState({
     @Default(TransactionStatus.initial) TransactionStatus status,
+    String? currentTransactionId,
     TransactionModel? transaction,
     String? errorMessage,
   }) = _DetailTransactionState;

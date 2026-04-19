@@ -12,7 +12,7 @@ void main() {
         'userId': 'user-1',
         'amount': 15000,
         'type': 'expense',
-        'category': 'Ăn uống',
+        'category': 'Food',
         'date': '2026-03-29T10:30:00.000',
       });
 
@@ -20,23 +20,23 @@ void main() {
       expect(transaction.date, DateTime.parse('2026-03-29T10:30:00.000'));
     });
 
-    test('toFirestore writes both date and dateTs', () {
+    test('toFirestore writes schema transaction fields', () {
       final transaction = TransactionModel(
         transactionId: 'tx-2',
         userId: 'user-1',
-        amount: 25000,
+        amountMinor: 25000,
         type: 'income',
-        category: 'Thưởng',
-        date: DateTime(2026, 3, 29, 12, 45),
+        categoryKey: 'reward',
+        categoryLabel: 'Reward',
+        dateTs: DateTime(2026, 3, 29, 12, 45),
       );
 
       final firestoreData = transaction.toFirestore();
 
-      expect(
-        firestoreData['date'],
-        DateTime(2026, 3, 29, 12, 45).toIso8601String(),
-      );
-      expect(firestoreData['dateTs'], isA<Timestamp>());
+      expect(firestoreData['transaction_id'], 'tx-2');
+      expect(firestoreData['amount_minor'], 25000);
+      expect(firestoreData['category_label'], 'Reward');
+      expect(firestoreData['date_ts'], isA<Timestamp>());
     });
   });
 
@@ -44,24 +44,28 @@ void main() {
     test('mergeTransactionCategories deduplicates by label and type', () {
       final merged = mergeTransactionCategories([
         const CategoryModel(
-          id: 'custom-expense-an-uong',
-          label: 'Ăn uống',
+          id: 'custom-expense-food',
+          label: 'Food',
           icon: '🍲',
           type: 'expense',
         ),
         const CategoryModel(
-          id: 'custom-income-thuong',
-          label: 'Thưởng',
+          id: 'custom-income-reward',
+          label: 'Reward',
           icon: '🎉',
           type: 'income',
         ),
       ]);
 
       final expenseMatches = merged
-          .where((category) => category.label == 'Ăn uống' && category.type == 'expense')
+          .where(
+            (category) => category.label == 'Food' && category.type == 'expense',
+          )
           .toList();
       final incomeMatches = merged
-          .where((category) => category.label == 'Thưởng' && category.type == 'income')
+          .where(
+            (category) => category.label == 'Reward' && category.type == 'income',
+          )
           .toList();
 
       expect(expenseMatches, hasLength(1));
@@ -73,6 +77,17 @@ void main() {
     test('getDefaultCategoryForType returns matching category', () {
       expect(getDefaultCategoryForType('income').type, 'income');
       expect(getDefaultCategoryForType('expense').type, 'expense');
+    });
+
+    test('transactionCategoryKeyForCategory slugifies category label', () {
+      const category = CategoryModel(
+        id: 'expense-an-uong',
+        label: 'Ăn uống',
+        icon: '🍜',
+        type: 'expense',
+      );
+
+      expect(transactionCategoryKeyForCategory(category), 'n_u_ng');
     });
   });
 }

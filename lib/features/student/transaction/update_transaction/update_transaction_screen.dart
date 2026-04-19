@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/transaction_history/widgets/category_dialog.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
@@ -15,12 +15,11 @@ import 'package:monikid/features/student/transaction/update_transaction/widgets/
 import 'package:monikid/features/student/transaction/update_transaction/widgets/transaction_app_bar.dart';
 import 'package:monikid/features/student/transaction/update_transaction/widgets/transaction_type_selector.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_loading_skeleton.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
 
 class UpdateTransactionScreen extends ConsumerStatefulWidget {
-  const UpdateTransactionScreen({super.key, required this.transaction});
+  const UpdateTransactionScreen({super.key, required this.transactionId});
 
-  final TransactionModel transaction;
+  final String transactionId;
 
   @override
   ConsumerState<UpdateTransactionScreen> createState() =>
@@ -31,19 +30,21 @@ class _UpdateTransactionScreenState
     extends ConsumerState<UpdateTransactionScreen> {
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
-
-  UpdateTransactionNotifierProvider get _provider =>
-      updateTransactionNotifierProvider(widget.transaction);
+  bool _isSyncingControllers = false;
 
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(
-      text: _formatAmount(widget.transaction.amount),
-    );
-    _noteController = TextEditingController(text: widget.transaction.note ?? '');
+    _amountController = TextEditingController();
+    _noteController = TextEditingController();
     _amountController.addListener(_onAmountChanged);
     _noteController.addListener(_onNoteChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(updateTransactionNotifierProvider.notifier)
+          .initialize(widget.transactionId);
+    });
   }
 
   @override
@@ -56,11 +57,43 @@ class _UpdateTransactionScreenState
   }
 
   void _onAmountChanged() {
-    ref.read(_provider.notifier).updateAmount(_amountController.text);
+    if (_isSyncingControllers) {
+      return;
+    }
+
+    ref.read(updateTransactionNotifierProvider.notifier).updateAmount(
+          _amountController.text,
+        );
   }
 
   void _onNoteChanged() {
-    ref.read(_provider.notifier).updateNote(_noteController.text);
+    if (_isSyncingControllers) {
+      return;
+    }
+
+    ref.read(updateTransactionNotifierProvider.notifier).updateNote(
+          _noteController.text,
+        );
+  }
+
+  void _syncControllers(UpdateTransactionState state) {
+    _isSyncingControllers = true;
+
+    if (_amountController.text != state.amountText) {
+      _amountController.value = TextEditingValue(
+        text: state.amountText,
+        selection: TextSelection.collapsed(offset: state.amountText.length),
+      );
+    }
+
+    if (_noteController.text != state.note) {
+      _noteController.value = TextEditingValue(
+        text: state.note,
+        selection: TextSelection.collapsed(offset: state.note.length),
+      );
+    }
+
+    _isSyncingControllers = false;
   }
 
   Future<void> _selectDate(BuildContext context, DateTime selectedDate) async {
@@ -73,20 +106,31 @@ class _UpdateTransactionScreenState
         return Theme(
           data: Theme.of(
             context,
-          ).copyWith(colorScheme: ColorScheme.light(primary: AppTheme.primary)),
+          ).copyWith(
+            colorScheme: const ColorScheme.light(primary: AppTheme.primary),
+          ),
           child: child!,
         );
       },
     );
 
     if (picked != null) {
-      ref.read(_provider.notifier).updateDate(picked);
+      ref.read(updateTransactionNotifierProvider.notifier).updateDate(picked);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<UpdateTransactionState>(_provider, (previous, next) {
+    ref.listen<UpdateTransactionState>(updateTransactionNotifierProvider, (
+      previous,
+      next,
+    ) {
+      final hasNewTransaction =
+          previous?.originalTransaction != next.originalTransaction;
+      if (hasNewTransaction && next.originalTransaction != null) {
+        _syncControllers(next);
+      }
+
       if (!context.mounted || previous?.status == next.status) {
         return;
       }
@@ -96,7 +140,7 @@ class _UpdateTransactionScreenState
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(s.msgUpdateSuccess)));
-          context.pop(next.originalTransaction);
+          context.pop();
           return;
         case TransactionStatus.error:
           if (next.errorMessage != null) {
@@ -113,9 +157,16 @@ class _UpdateTransactionScreenState
       }
     });
 
-    final state = ref.watch(_provider);
-    final notifier = ref.read(_provider.notifier);
+    final state = ref.watch(updateTransactionNotifierProvider);
+    final notifier = ref.read(updateTransactionNotifierProvider.notifier);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (!state.hasTransaction && state.status == TransactionStatus.error) {
+      return _MissingTransactionScaffold(
+        isDark: isDark,
+        errorMessage: state.errorMessage,
+      );
+    }
 
     return switch (state.status) {
       TransactionStatus.initial || TransactionStatus.loading => _LoadingScaffold(
@@ -160,6 +211,41 @@ class _UpdateTransactionScreenState
           },
         );
       },
+    );
+  }
+}
+
+class _MissingTransactionScaffold extends StatelessWidget {
+  const _MissingTransactionScaffold({
+    required this.isDark,
+    required this.errorMessage,
+  });
+
+  final bool isDark;
+  final String? errorMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: TransactionAppBar(
+        isDark: isDark,
+        textColor: textColor,
+        canPop: true,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            errorMessage ?? s.transactionLoadError,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: textColor),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -246,7 +332,7 @@ class _UpdateTransactionView extends StatelessWidget {
                 const SizedBox(height: 24),
                 ActionTile(
                   iconStr: state.selectedCategoryEmoji,
-                  label: 'Danh mục',
+                  label: s.transactionCategoryLabel,
                   value: state.selectedCategory,
                   iconBgColor: state.transactionType == TransactionType.expense
                       ? Colors.orange.shade100
@@ -259,11 +345,11 @@ class _UpdateTransactionView extends StatelessWidget {
                 const SizedBox(height: 16),
                 ActionTile(
                   iconData: Icons.calendar_today,
-                  label: 'Ngày',
+                  label: s.transactionDateLabel,
                   value: DateFormat(
                     'dd/MM/yyyy',
                   ).format(state.effectiveSelectedDate),
-                  iconBgColor: AppTheme.primary.withOpacity(0.1),
+                  iconBgColor: AppTheme.primary.withValues(alpha: 0.1),
                   iconColor: AppTheme.primary,
                   isDark: isDark,
                   surfaceColor: surfaceColor,
@@ -281,8 +367,8 @@ class _UpdateTransactionView extends StatelessWidget {
                 const SizedBox(height: 16),
                 ActionTile(
                   iconData: Icons.account_balance_wallet,
-                  label: 'Ví nguồn',
-                  value: 'Tiền mặt',
+                  label: s.updateTransactionWalletLabel,
+                  value: s.updateTransactionCashWalletValue,
                   iconBgColor: Colors.blue.shade100,
                   iconColor: Colors.blue.shade700,
                   isDark: isDark,
@@ -310,12 +396,4 @@ class _UpdateTransactionView extends StatelessWidget {
       ),
     );
   }
-}
-
-String _formatAmount(double amount) {
-  if (amount == amount.truncateToDouble()) {
-    return amount.toInt().toString();
-  }
-
-  return amount.toString();
 }

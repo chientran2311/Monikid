@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/app/app.dart';
 
 class NoteCard extends StatelessWidget {
   const NoteCard({
@@ -26,7 +27,7 @@ class NoteCard extends StatelessWidget {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 4,
             ),
         ],
@@ -53,9 +54,9 @@ class NoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Ghi chú',
-                  style: TextStyle(
+                Text(
+                  s.transactionNoteLabel,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF64748B),
@@ -69,12 +70,12 @@ class NoteCard extends StatelessWidget {
                     color: textColor,
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
-                    hintText: 'Thêm ghi chú...',
-                    hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+                  decoration: InputDecoration(
+                    hintText: s.updateTransactionNoteHint,
+                    hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
                     border: InputBorder.none,
                     isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 4),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 4),
                   ),
                 ),
               ],

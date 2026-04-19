@@ -1,5 +1,8 @@
-import 'package:monikid/core/di/di.dart';
+import 'dart:async';
+
+import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_provider.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 're_enter_pin_state.dart';
@@ -8,22 +11,31 @@ part 're_enter_pin_provider.g.dart';
 
 @riverpod
 class ReEnterPIN extends _$ReEnterPIN {
-  late final PinCodeRepository _pinCodeRepository = getIt<PinCodeRepository>();
+  late final PinCodeRepository _pinCodeRepository;
+  Timer? _errorResetTimer;
 
   @override
-  ReEnterPINState build(String pinCodeHash) {
-    return ReEnterPINState.initial(pinCodeHash);
+  ReEnterPINState build() {
+    _pinCodeRepository = ref.read(pinCodeRepositoryProvider);
+    ref.onDispose(() {
+      _errorResetTimer?.cancel();
+    });
+    return const ReEnterPINState();
   }
 
   Future<void> addNumber(String digit) async {
-    if (state.isLoading) {
+    if (state.isLoading || !_isDigit(digit)) {
       return;
     }
 
     var currentPin = state.currentPin;
     if (state.hasError) {
       currentPin = '';
-      state = state.copyWith(hasError: false, currentPin: '');
+      state = state.copyWith(
+        status: ReEnterPINCodeStatus.initial,
+        errorMessage: null,
+        currentPin: '',
+      );
     }
 
     if (currentPin.length >= 6) {
@@ -44,7 +56,11 @@ class ReEnterPIN extends _$ReEnterPIN {
     }
 
     if (state.hasError) {
-      state = state.copyWith(hasError: false, currentPin: '');
+      state = state.copyWith(
+        status: ReEnterPINCodeStatus.initial,
+        errorMessage: null,
+        currentPin: '',
+      );
       return;
     }
 
@@ -58,55 +74,73 @@ class ReEnterPIN extends _$ReEnterPIN {
   }
 
   Future<void> confirmAndSavePinCode(String pin) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      final correct = await _pinCodeRepository.verifyPinCode(
-        plainPinCode: pin,
-        pinCodeHash: state.pinCodeHash,
+    final draftPinCode = ref.read(createNewPINProvider).draftPinCode;
+    if (draftPinCode == null || draftPinCode.length != 6) {
+      state = state.copyWith(
+        currentPin: '',
+        status: ReEnterPINCodeStatus.error,
+        errorMessage: 'PIN draft is missing.',
       );
+      return;
+    }
 
-      if (correct) {
-        await _pinCodeRepository.savePinCodeHash(state.pinCodeHash);
+    state = state.copyWith(
+      isLoading: true,
+      status: ReEnterPINCodeStatus.loading,
+      errorMessage: null,
+    );
+
+    try {
+      if (pin != draftPinCode) {
         state = state.copyWith(
           currentPin: '',
           isLoading: false,
-          status: ReEnterPINCodeStatus.correct,
-          isSuccess: true,
+          status: ReEnterPINCodeStatus.mismatch,
+          errorMessage: null,
         );
+        _scheduleResetAfterError();
         return;
       }
 
+      final pinCodeHash = await _pinCodeRepository.hashPinCode(draftPinCode);
+      await _pinCodeRepository.savePinCodeHash(pinCodeHash);
+      ref.read(createNewPINProvider.notifier).reset();
+      ref.read(authSessionProvider.notifier).markPinVerified();
       state = state.copyWith(
         currentPin: '',
         isLoading: false,
-        status: ReEnterPINCodeStatus.incorrect,
-        hasError: true,
+        status: ReEnterPINCodeStatus.success,
+        errorMessage: null,
       );
-      _scheduleResetAfterError();
     } catch (_) {
       state = state.copyWith(
         currentPin: '',
         isLoading: false,
-        status: ReEnterPINCodeStatus.incorrect,
-        hasError: true,
+        status: ReEnterPINCodeStatus.error,
+        errorMessage: 'Failed to save the PIN code.',
       );
-      _scheduleResetAfterError();
     }
   }
 
   void reset() {
-    state = ReEnterPINState.initial(state.pinCodeHash);
+    _errorResetTimer?.cancel();
+    state = const ReEnterPINState();
   }
 
   void _scheduleResetAfterError() {
-    Future.delayed(const Duration(milliseconds: 600), () {
+    _errorResetTimer?.cancel();
+    _errorResetTimer = Timer(const Duration(milliseconds: 600), () {
       if (state.hasError) {
         state = state.copyWith(
           currentPin: '',
-          hasError: false,
           status: ReEnterPINCodeStatus.initial,
+          errorMessage: null,
         );
       }
     });
+  }
+
+  bool _isDigit(String value) {
+    return RegExp(r'^\d$').hasMatch(value);
   }
 }

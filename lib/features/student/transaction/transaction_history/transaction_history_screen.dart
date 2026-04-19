@@ -102,13 +102,17 @@ class TransactionHistoryScreen extends HookConsumerWidget {
       transactionHistoryProvider.select((v) => v.selectedDate),
     );
     final selectedCategory = ref.watch(
-      transactionHistoryProvider.select((v) => v.selectedCategory),
+      transactionHistoryProvider.select((v) => v.selectedCategoryKey),
     );
     final transactionTypeFilter = ref.watch(
       transactionHistoryProvider.select((v) => v.transactionTypeFilter),
     );
 
     final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final selectedCategoryModel = findCategoryByTransactionKey(
+      categories,
+      selectedCategory,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -220,7 +224,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
                         Text(
                           categories
                               .firstWhere(
-                                (c) => c.label == selectedCategory,
+                                (c) => c.label == selectedCategoryModel?.label,
                                 orElse: () => const CategoryModel(id: '', label: '', icon: '📦'),
                               )
                               .icon,
@@ -228,7 +232,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          selectedCategory,
+                          selectedCategoryModel?.label ?? selectedCategory,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
@@ -277,6 +281,9 @@ class TransactionHistoryScreen extends HookConsumerWidget {
     final transactionTypeFilter = ref.watch(
       transactionHistoryProvider.select((v) => v.transactionTypeFilter),
     );
+    final selectedCategoryKey = ref.watch(
+      transactionHistoryProvider.select((v) => v.selectedCategoryKey),
+    );
     final hasMore = ref.watch(
       transactionHistoryProvider.select((v) => v.hasMore),
     );
@@ -287,6 +294,8 @@ class TransactionHistoryScreen extends HookConsumerWidget {
       streamSummaryCardProvider(
         date: selectedDate,
         month: selectedDate == null ? currentMonth : null,
+        categoryKey: selectedCategoryKey,
+        type: transactionTypeFilter == 'all' ? null : transactionTypeFilter,
       ),
     );
 
@@ -421,7 +430,12 @@ class TransactionHistoryScreen extends HookConsumerWidget {
               GroupedTransactionList(
                 grouped: sortAndGroup(transactions),
                 isDark: isDark,
-                onTap: (tx) => context.push(AppRoutes.detailTransaction, extra: tx),
+                onTap: (tx) {
+                  notifier.selectTransaction(tx);
+                  context.push(
+                    AppRoutes.detailTransactionPath(tx.transactionId),
+                  );
+                },
               ),
 
             // Load-more indicator at the bottom
@@ -555,7 +569,9 @@ class TransactionHistoryScreen extends HookConsumerWidget {
         categoryType: transactionTypeFilter == 'all' ? null : transactionTypeFilter,
         // Khi chọn category: giữ nguyên filter date + type, fetch lại trans
         onCategorySelected: (category) =>
-            notifier.getTransByCategory(category?.label),
+            notifier.getTransByCategory(
+              category != null ? transactionCategoryKeyForCategory(category) : null,
+            ),
       ),
     );
   }

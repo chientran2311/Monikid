@@ -6,7 +6,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/request_money/request_money_history/request_money_history_provider.dart';
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 import 'package:monikid/shared/widgets/success_dialog.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 
 class RequestMoneyHistoryScreen extends HookConsumerWidget {
   final RequestMoneyModel request;

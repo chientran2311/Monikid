@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeTabState {
 
- List<TransactionModel> get transactions; bool get isLoading;
+ HomeTabStatus get status; double get monthlyIncome; double get monthlyExpense; String? get errorMessage;
 /// Create a copy of HomeTabState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $HomeTabStateCopyWith<HomeTabState> get copyWith => _$HomeTabStateCopyWithImpl<H
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeTabState&&const DeepCollectionEquality().equals(other.transactions, transactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeTabState&&(identical(other.status, status) || other.status == status)&&(identical(other.monthlyIncome, monthlyIncome) || other.monthlyIncome == monthlyIncome)&&(identical(other.monthlyExpense, monthlyExpense) || other.monthlyExpense == monthlyExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(transactions),isLoading);
+int get hashCode => Object.hash(runtimeType,status,monthlyIncome,monthlyExpense,errorMessage);
 
 @override
 String toString() {
-  return 'HomeTabState(transactions: $transactions, isLoading: $isLoading)';
+  return 'HomeTabState(status: $status, monthlyIncome: $monthlyIncome, monthlyExpense: $monthlyExpense, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $HomeTabStateCopyWith<$Res>  {
   factory $HomeTabStateCopyWith(HomeTabState value, $Res Function(HomeTabState) _then) = _$HomeTabStateCopyWithImpl;
 @useResult
 $Res call({
- List<TransactionModel> transactions, bool isLoading
+ HomeTabStatus status, double monthlyIncome, double monthlyExpense, String? errorMessage
 });
 
 
@@ -63,11 +63,13 @@ class _$HomeTabStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeTabState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? transactions = null,Object? isLoading = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? monthlyIncome = null,Object? monthlyExpense = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
-transactions: null == transactions ? _self.transactions : transactions // ignore: cast_nullable_to_non_nullable
-as List<TransactionModel>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as HomeTabStatus,monthlyIncome: null == monthlyIncome ? _self.monthlyIncome : monthlyIncome // ignore: cast_nullable_to_non_nullable
+as double,monthlyExpense: null == monthlyExpense ? _self.monthlyExpense : monthlyExpense // ignore: cast_nullable_to_non_nullable
+as double,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -78,17 +80,13 @@ as bool,
 
 
 class _HomeTabState extends HomeTabState {
-  const _HomeTabState({required final  List<TransactionModel> transactions, this.isLoading = false}): _transactions = transactions,super._();
+  const _HomeTabState({this.status = HomeTabStatus.initial, this.monthlyIncome = 0, this.monthlyExpense = 0, this.errorMessage}): super._();
   
 
- final  List<TransactionModel> _transactions;
-@override List<TransactionModel> get transactions {
-  if (_transactions is EqualUnmodifiableListView) return _transactions;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_transactions);
-}
-
-@override@JsonKey() final  bool isLoading;
+@override@JsonKey() final  HomeTabStatus status;
+@override@JsonKey() final  double monthlyIncome;
+@override@JsonKey() final  double monthlyExpense;
+@override final  String? errorMessage;
 
 /// Create a copy of HomeTabState
 /// with the given fields replaced by the non-null parameter values.
@@ -100,16 +98,16 @@ _$HomeTabStateCopyWith<_HomeTabState> get copyWith => __$HomeTabStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeTabState&&const DeepCollectionEquality().equals(other._transactions, _transactions)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeTabState&&(identical(other.status, status) || other.status == status)&&(identical(other.monthlyIncome, monthlyIncome) || other.monthlyIncome == monthlyIncome)&&(identical(other.monthlyExpense, monthlyExpense) || other.monthlyExpense == monthlyExpense)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_transactions),isLoading);
+int get hashCode => Object.hash(runtimeType,status,monthlyIncome,monthlyExpense,errorMessage);
 
 @override
 String toString() {
-  return 'HomeTabState(transactions: $transactions, isLoading: $isLoading)';
+  return 'HomeTabState(status: $status, monthlyIncome: $monthlyIncome, monthlyExpense: $monthlyExpense, errorMessage: $errorMessage)';
 }
 
 
@@ -120,7 +118,7 @@ abstract mixin class _$HomeTabStateCopyWith<$Res> implements $HomeTabStateCopyWi
   factory _$HomeTabStateCopyWith(_HomeTabState value, $Res Function(_HomeTabState) _then) = __$HomeTabStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<TransactionModel> transactions, bool isLoading
+ HomeTabStatus status, double monthlyIncome, double monthlyExpense, String? errorMessage
 });
 
 
@@ -137,11 +135,13 @@ class __$HomeTabStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeTabState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? transactions = null,Object? isLoading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? monthlyIncome = null,Object? monthlyExpense = null,Object? errorMessage = freezed,}) {
   return _then(_HomeTabState(
-transactions: null == transactions ? _self._transactions : transactions // ignore: cast_nullable_to_non_nullable
-as List<TransactionModel>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,
+status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as HomeTabStatus,monthlyIncome: null == monthlyIncome ? _self.monthlyIncome : monthlyIncome // ignore: cast_nullable_to_non_nullable
+as double,monthlyExpense: null == monthlyExpense ? _self.monthlyExpense : monthlyExpense // ignore: cast_nullable_to_non_nullable
+as double,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

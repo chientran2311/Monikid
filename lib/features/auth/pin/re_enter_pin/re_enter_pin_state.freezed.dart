@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReEnterPINState {
 
- String get pinCodeHash; String get currentPin; ReEnterPINCodeStatus get status; bool get isLoading; bool get isSuccess; bool get hasError;
+ String get currentPin; ReEnterPINCodeStatus get status; bool get isLoading; String? get errorMessage;
 /// Create a copy of ReEnterPINState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ReEnterPINStateCopyWith<ReEnterPINState> get copyWith => _$ReEnterPINStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReEnterPINState&&(identical(other.pinCodeHash, pinCodeHash) || other.pinCodeHash == pinCodeHash)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.hasError, hasError) || other.hasError == hasError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReEnterPINState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pinCodeHash,currentPin,status,isLoading,isSuccess,hasError);
+int get hashCode => Object.hash(runtimeType,currentPin,status,isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'ReEnterPINState(pinCodeHash: $pinCodeHash, currentPin: $currentPin, status: $status, isLoading: $isLoading, isSuccess: $isSuccess, hasError: $hasError)';
+  return 'ReEnterPINState(currentPin: $currentPin, status: $status, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ReEnterPINStateCopyWith<$Res>  {
   factory $ReEnterPINStateCopyWith(ReEnterPINState value, $Res Function(ReEnterPINState) _then) = _$ReEnterPINStateCopyWithImpl;
 @useResult
 $Res call({
- String pinCodeHash, String currentPin, ReEnterPINCodeStatus status, bool isLoading, bool isSuccess, bool hasError
+ String currentPin, ReEnterPINCodeStatus status, bool isLoading, String? errorMessage
 });
 
 
@@ -63,15 +63,13 @@ class _$ReEnterPINStateCopyWithImpl<$Res>
 
 /// Create a copy of ReEnterPINState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pinCodeHash = null,Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? isSuccess = null,Object? hasError = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
-pinCodeHash: null == pinCodeHash ? _self.pinCodeHash : pinCodeHash // ignore: cast_nullable_to_non_nullable
-as String,currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
+currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ReEnterPINCodeStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
-as bool,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -82,15 +80,13 @@ as bool,
 
 
 class _ReEnterPINState extends ReEnterPINState {
-  const _ReEnterPINState({required this.pinCodeHash, this.currentPin = '', this.status = ReEnterPINCodeStatus.initial, this.isLoading = false, this.isSuccess = false, this.hasError = false}): super._();
+  const _ReEnterPINState({this.currentPin = '', this.status = ReEnterPINCodeStatus.initial, this.isLoading = false, this.errorMessage}): super._();
   
 
-@override final  String pinCodeHash;
 @override@JsonKey() final  String currentPin;
 @override@JsonKey() final  ReEnterPINCodeStatus status;
 @override@JsonKey() final  bool isLoading;
-@override@JsonKey() final  bool isSuccess;
-@override@JsonKey() final  bool hasError;
+@override final  String? errorMessage;
 
 /// Create a copy of ReEnterPINState
 /// with the given fields replaced by the non-null parameter values.
@@ -102,16 +98,16 @@ _$ReEnterPINStateCopyWith<_ReEnterPINState> get copyWith => __$ReEnterPINStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReEnterPINState&&(identical(other.pinCodeHash, pinCodeHash) || other.pinCodeHash == pinCodeHash)&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.hasError, hasError) || other.hasError == hasError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReEnterPINState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pinCodeHash,currentPin,status,isLoading,isSuccess,hasError);
+int get hashCode => Object.hash(runtimeType,currentPin,status,isLoading,errorMessage);
 
 @override
 String toString() {
-  return 'ReEnterPINState(pinCodeHash: $pinCodeHash, currentPin: $currentPin, status: $status, isLoading: $isLoading, isSuccess: $isSuccess, hasError: $hasError)';
+  return 'ReEnterPINState(currentPin: $currentPin, status: $status, isLoading: $isLoading, errorMessage: $errorMessage)';
 }
 
 
@@ -122,7 +118,7 @@ abstract mixin class _$ReEnterPINStateCopyWith<$Res> implements $ReEnterPINState
   factory _$ReEnterPINStateCopyWith(_ReEnterPINState value, $Res Function(_ReEnterPINState) _then) = __$ReEnterPINStateCopyWithImpl;
 @override @useResult
 $Res call({
- String pinCodeHash, String currentPin, ReEnterPINCodeStatus status, bool isLoading, bool isSuccess, bool hasError
+ String currentPin, ReEnterPINCodeStatus status, bool isLoading, String? errorMessage
 });
 
 
@@ -139,15 +135,13 @@ class __$ReEnterPINStateCopyWithImpl<$Res>
 
 /// Create a copy of ReEnterPINState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pinCodeHash = null,Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? isSuccess = null,Object? hasError = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? errorMessage = freezed,}) {
   return _then(_ReEnterPINState(
-pinCodeHash: null == pinCodeHash ? _self.pinCodeHash : pinCodeHash // ignore: cast_nullable_to_non_nullable
-as String,currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
+currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ReEnterPINCodeStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
-as bool,hasError: null == hasError ? _self.hasError : hasError // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

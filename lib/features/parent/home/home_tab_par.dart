@@ -4,10 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_item.dart';
 import 'package:monikid/features/parent/home/home_tab_provider.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/features/student/home/home_tab_skeleton.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/features/auth/pin/pin_checker.dart';
 import 'widgets/summary_card.dart';
 import 'widgets/quick_action.dart';
 
@@ -17,13 +16,6 @@ class HomeTabParent extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isBalanceVisible = useState(true);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        checkAndShowPinScreens(context);
-      });
-      return null;
-    }, const []);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -38,7 +30,7 @@ class HomeTabParent extends HookConsumerWidget {
 
     final authState = ref.watch(authSessionProvider);
     final user = authState.user;
-    final userName = user?.displayName ?? "Phụ huynh";
+    final userName = authState.account?.displayName ?? "Phụ huynh";
 
     final transactionAsync = ref.watch(transactionStreamProvider);
     final recentTxsAsync = ref.watch(homeTabNotifierProvider);

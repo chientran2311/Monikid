@@ -1,42 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// Auth provider
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-
-// Import screens
-import 'package:monikid/features/splash/splash_screen.dart';
-import 'package:monikid/features/auth/login/login_screen.dart';
-import 'package:monikid/features/auth/register/register_screen.dart';
-import 'package:monikid/features/fqa/fqa_screen.dart';
-import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_screen.dart';
-import 'package:monikid/features/change_profile/profile_edit_screen.dart';
-
+import 'package:monikid/features/auth/login/login_screen.dart';
+import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_screen.dart';
-import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_screen.dart';
 import 'package:monikid/features/auth/pin/enter_pin_code/enter_pin_code_screen.dart';
-import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
-
-// Main screens (Bottom Nav)
+import 'package:monikid/features/auth/pin/pin_gateway/pin_gateway_screen.dart';
+import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_screen.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/register/register_screen.dart';
+import 'package:monikid/features/change_profile/profile_edit_screen.dart';
+import 'package:monikid/features/fqa/fqa_screen.dart';
 import 'package:monikid/features/parent/bottom_nav_bar_par.dart';
+import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/student/bottom_nav_bar.dart';
-
-// Student transaction screens
-import 'package:monikid/features/student/transaction/add_transaction/add_transaction_screen.dart';
-import 'package:monikid/features/student/transaction/update_transaction/update_transaction_screen.dart';
-import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_screen.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
-import 'package:monikid/features/student/request_money/request_money_history/request_money_history_screen.dart';
-import 'package:monikid/models/entities/request_money/request_money_model.dart';
 import 'package:monikid/features/student/request_money/add_new_request/add_request_money_screen.dart';
+import 'package:monikid/features/student/request_money/request_money_history/request_money_history_screen.dart';
 import 'package:monikid/features/student/request_money/update_request/update_request_screen.dart';
+import 'package:monikid/features/student/transaction/add_transaction/add_transaction_screen.dart';
+import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_screen.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_screen.dart';
+import 'package:monikid/features/student/transaction/update_transaction/update_transaction_screen.dart';
+import 'package:monikid/models/entities/request_money/request_money_model.dart';
 
 class AppRoutes {
   AppRoutes._();
 
-  // Auth routes
   static const String splash = '/';
   static const String welcome = '/welcome';
   static const String login = '/login';
@@ -49,29 +39,32 @@ class AppRoutes {
   static const String fqa = '/fqa';
   static const String profileEdit = '/profile-edit';
 
-  // PIN routes
+  static const String pinGateway = '/pin-gateway';
   static const String createNewPin = '/create-new-pin';
   static const String reEnterPin = '/re-enter-pin';
   static const String enterPinCode = '/enter-pin-code';
 
-  // Parent routes
   static const String parent = '/parent';
-
-  // Student routes
   static const String studentMain = '/student-main';
 
-  // Transaction routes
   static const String addTransaction = '/add-transaction';
-  static const String updateTransaction = '/update-transaction';
-  static const String detailTransaction = '/detail-transaction';
+  static const String transactionHistory = '/transaction-history';
+  static const String updateTransaction = '/update-transaction/:transactionId';
+  static const String detailTransaction = '/detail-transaction/:transactionId';
 
-  // Request Money
   static const String requestMoneyHistory = '/request-money-history';
   static const String addRequestMoney = '/add-request-money';
   static const String updateRequest = '/update-request';
+
+  static String updateTransactionPath(String transactionId) {
+    return '/update-transaction/$transactionId';
+  }
+
+  static String detailTransactionPath(String transactionId) {
+    return '/detail-transaction/$transactionId';
+  }
 }
 
-/// Global Key để quản lý Navigator
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 const authRoutes = [
@@ -81,24 +74,27 @@ const authRoutes = [
   AppRoutes.updatePassword,
 ];
 
-/// 🟢 ROUTER PROVIDER
+const pinRoutes = [
+  AppRoutes.pinGateway,
+  AppRoutes.createNewPin,
+  AppRoutes.reEnterPin,
+  AppRoutes.enterPinCode,
+];
+
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(ref),
-
     routes: [
-      // --- AUTH GROUP ---
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
         path: '/notifications',
-        builder: (context, state) =>
-            const Placeholder(), // Placeholder for notifications
+        builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
         path: AppRoutes.fqa,
@@ -124,83 +120,52 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-
-      // --- PIN GROUP ---
+      GoRoute(
+        path: AppRoutes.pinGateway,
+        builder: (context, state) => const PinGatewayScreen(),
+      ),
       GoRoute(
         path: AppRoutes.createNewPin,
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          final canCancel = extra?['canCancel'] as bool? ?? true;
-          return CreateNewPinScreen(
-            type: EnterPINCodeEnum.createNew,
-            canCancel: canCancel,
-          );
-        },
+        builder: (context, state) => const CreateNewPinScreen(),
       ),
       GoRoute(
         path: AppRoutes.reEnterPin,
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          if (extra == null || extra['pinCodeHash'] == null) {
-            return const CreateNewPinScreen(type: EnterPINCodeEnum.createNew);
-          }
-          final pinCodeHash = extra['pinCodeHash'] as String;
-          final canCancel = extra['canCancel'] as bool? ?? true;
-          return ReEnterPinScreen(
-            pinCodeHash: pinCodeHash,
-            canCancel: canCancel,
-          );
-        },
+        builder: (context, state) => const ReEnterPinScreen(),
       ),
       GoRoute(
         path: AppRoutes.enterPinCode,
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>?;
-          if (extra == null || extra['expectedPinHash'] == null) {
-            return const SplashScreen();
-          }
-          final expectedPinHash = extra['expectedPinHash'] as String;
-          final canCancel = extra['canCancel'] as bool? ?? true;
-          return EnterPinCodeScreen(
-            expectedPinHash: expectedPinHash,
-            canCancel: canCancel,
-          );
-        },
+        builder: (context, state) => const EnterPinCodeScreen(),
       ),
-
-      // --- PARENT GROUP ---
       GoRoute(
         path: AppRoutes.parent,
         builder: (context, state) => const ParentBottomNavBar(),
       ),
-
-      // --- STUDENT GROUP ---
       GoRoute(
         path: AppRoutes.studentMain,
         builder: (context, state) => const StudentBottomNavBar(),
       ),
-
-      // --- TRANSACTION GROUP ---
       GoRoute(
         path: AppRoutes.addTransaction,
         builder: (context, state) => const AddTransactionScreen(),
       ),
       GoRoute(
+        path: AppRoutes.transactionHistory,
+        builder: (context, state) => const TransactionHistoryScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.updateTransaction,
         builder: (context, state) {
-          final transaction = state.extra as TransactionModel;
-          return UpdateTransactionScreen(transaction: transaction);
+          final transactionId = state.pathParameters['transactionId'] ?? '';
+          return UpdateTransactionScreen(transactionId: transactionId);
         },
       ),
       GoRoute(
         path: AppRoutes.detailTransaction,
         builder: (context, state) {
-          final transaction = state.extra as TransactionModel;
-          return DetailTransactionScreen(transaction: transaction);
+          final transactionId = state.pathParameters['transactionId'] ?? '';
+          return DetailTransactionScreen(transactionId: transactionId);
         },
       ),
-
-      // --- REQUEST MONEY ---
       GoRoute(
         path: AppRoutes.addRequestMoney,
         builder: (context, state) => const AddRequestMoneyScreen(),
@@ -220,48 +185,59 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-
-    // Xử lý chuyển hướng (Redirect)
     redirect: (context, state) {
-      // Đọc auth state hiện tại mà không subscribe vào
       final authState = ref.read(authSessionProvider);
       final currentPath = state.uri.path;
       final isAuthenticated = authState.isAuthenticated;
       final isInitial = authState.isInitial;
-
-      // Auth chưa khởi tạo xong -> đợi
-      if (isInitial) return null;
-
-      // Đang trong quá trình xử lý auth (isLoading) -> chặn redirect tạm thời
-      if (authState.isLoading) return null;
-
+      final accountRole = authState.account?.role;
+      final requiresPinVerification = authState.requiresPinVerification;
       final isAuthRoute = authRoutes.contains(currentPath);
+      final isPinRoute = pinRoutes.contains(currentPath);
+      final homeRoute = _resolveHomeRoute(accountRole);
 
-      // Nếu đã đăng nhập mà đang ở trang auth (Login/Register...) -> redirect thẳng vào màn hình tương ứng
-      if (isAuthenticated && isAuthRoute) {
-        final role = authState.userRole;
-        if (role == 'parent') {
-          return AppRoutes.parent;
-        } else if (role == 'student') {
-          return AppRoutes.studentMain;
-        } else {
-          return AppRoutes.parent;
-        }
-      }
-
-      // Đang ở onboarding hoặc splash -> cho phép access
-      if (currentPath == AppRoutes.splash ||
-          currentPath == AppRoutes.onboard1) {
-        if (isAuthenticated && currentPath == AppRoutes.onboard1) {
-          final role = authState.userRole;
-          return role == 'parent' ? AppRoutes.parent : AppRoutes.studentMain;
-        }
+      if (isInitial) {
         return null;
       }
 
-      // Chưa đăng nhập và đang ở trang private -> redirect về login
-      if (!isAuthenticated && !isAuthRoute) {
+      if (authState.isLoading) {
+        return null;
+      }
+
+      if (authState.isAccountIncomplete) {
         return AppRoutes.login;
+      }
+
+      if (currentPath == AppRoutes.splash) {
+        return null;
+      }
+
+      if (currentPath == AppRoutes.onboard1) {
+        if (!isAuthenticated) {
+          return null;
+        }
+
+        return requiresPinVerification ? AppRoutes.pinGateway : homeRoute;
+      }
+
+      if (!isAuthenticated) {
+        if (isAuthRoute) {
+          return null;
+        }
+
+        return AppRoutes.login;
+      }
+
+      if (requiresPinVerification) {
+        if (isPinRoute) {
+          return null;
+        }
+
+        return AppRoutes.pinGateway;
+      }
+
+      if (isAuthRoute || isPinRoute) {
+        return homeRoute;
       }
 
       return null;
@@ -269,7 +245,18 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Helper class để refresh GoRouter khi Riverpod state thay đổi
+String _resolveHomeRoute(String? accountRole) {
+  if (accountRole == 'parent') {
+    return AppRoutes.parent;
+  }
+
+  if (accountRole == 'child') {
+    return AppRoutes.studentMain;
+  }
+
+  return AppRoutes.login;
+}
+
 class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(this._ref) {
     _ref.listen(authSessionProvider, (previous, next) {

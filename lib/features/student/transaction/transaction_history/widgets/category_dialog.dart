@@ -115,7 +115,9 @@ class CategoryDialog extends HookConsumerWidget {
                         final category = allCategories[index];
                         final isSelected = category.id == 'all'
                             ? selectedCategory == null
-                            : selectedCategory == category.label;
+                            : selectedCategory == category.label ||
+                                  selectedCategory ==
+                                      transactionCategoryKeyForCategory(category);
 
                         Color baseColor = Colors.grey;
                         if (category.colorHex != null) {

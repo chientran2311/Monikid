@@ -8,21 +8,25 @@
   "registerFailed": "Đăng ký thất bại: {error}",
   "@registerFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "noTransactionsYet": "Chưa có giao dịch nào.",
   "errorGeneric": "Lỗi: {error}",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "settingFQA": "Câu hỏi thường gặp",
   "msgNoData": "Không có dữ liệu",
   "helpStillNeedHelp": "Vẫn cần trợ giúp?",
   "helpContactSupportDesc": "Nếu bạn không tìm thấy câu trả lời, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi 24/7.",
   "actionChatWithUs": "Chat với chúng tôi",
-  "@errorGeneric": {
-    "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
   "actionRetry": "Thử lại",
   "validationEnterAmount": "Vui lòng nhập số tiền",
   "validationAmountGreaterThanZero": "Số tiền phải lớn hơn 0",
@@ -32,6 +36,26 @@
   "actionConfirm": "Xác nhận",
   "validationInvalidAmount": "Số tiền không hợp lệ",
   "msgUpdateSuccess": "Cập nhật thành công",
+  "addTransactionFailed": "Không thể thêm giao dịch. Vui lòng thử lại.",
+  "updateTransactionFailed": "Không thể cập nhật giao dịch. Vui lòng thử lại.",
+  "updateTransactionMissingError": "Không tìm thấy giao dịch để cập nhật.",
+  "transactionLoadError": "Không thể tải giao dịch.",
+  "transactionCategoryLoadError": "Không thể tải danh mục. Vui lòng thử lại.",
+  "transactionUserNotAuthenticated": "Người dùng chưa được xác thực.",
+  "transactionAmountLabel": "Số tiền",
+  "transactionCategoryLabel": "Danh mục",
+  "transactionDateLabel": "Ngày",
+  "transactionNoteLabel": "Ghi chú",
+  "transactionExpenseType": "Tiền chi",
+  "transactionIncomeType": "Tiền thu",
+  "transactionSaveAction": "Lưu giao dịch",
+  "transactionAiAutoLabel": "AI tự động",
+  "addTransactionNoteHint": "Nhập ghi chú, AI sẽ tự động phân loại...",
+  "updateTransactionTitle": "Chỉnh sửa giao dịch",
+  "updateTransactionAction": "Cập nhật giao dịch",
+  "updateTransactionNoteHint": "Thêm ghi chú...",
+  "updateTransactionWalletLabel": "Ví nguồn",
+  "updateTransactionCashWalletValue": "Tiền mặt",
   "profileEditTitle": "Chỉnh sửa hồ sơ",
   "profileEditAvatarLabel": "Thay đổi ảnh đại diện",
   "profileEditFullName": "Họ và tên",
@@ -63,5 +87,165 @@
   "takePicture": "Chụp ảnh",
   "chooseFromGallery": "Tải ảnh lên",
   "scanReceiptTitle": "Quét hoá đơn",
-  "scanReceiptDesc": "Chọn cách thêm ảnh hoá đơn để xử lý."
+  "scanReceiptDesc": "Chọn cách thêm ảnh hoá đơn để xử lý.",
+  "authPasswordLabel": "Mật khẩu",
+  "authPasswordPlaceholder": "Nhập mật khẩu của bạn",
+  "authSignUpAction": "Đăng ký",
+  "authSignInAction": "Đăng nhập",
+  "authNoAccountPrompt": "Chưa có tài khoản? ",
+  "authHaveAccountPrompt": "Đã có tài khoản? ",
+  "pinCreateTitle": "Tạo mã PIN mới",
+  "pinCreateDescription": "Tạo mã PIN 6 chữ số để bảo vệ tài khoản của bạn.",
+  "pinReEnterTitle": "Xác nhận lại mã PIN",
+  "pinReEnterDescription": "Nhập lại mã PIN vừa tạo để xác nhận.",
+  "pinEnterTitle": "Nhập mã PIN",
+  "pinEnterDescription": "Nhập mã PIN 6 chữ số để tiếp tục.",
+  "pinMismatchError": "Mã PIN xác nhận không khớp.",
+  "pinIncorrectError": "Mã PIN bạn nhập không đúng.",
+  "pinLockedMessage": "Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau {seconds} giây.",
+  "@pinLockedMessage": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pinGenericError": "Đã xảy ra lỗi với mã PIN. Vui lòng thử lại.",
+  "pinGatewayLoading": "Đang kiểm tra bảo mật mã PIN...",
+  "pinGatewayError": "Không thể khởi động luồng xác thực mã PIN.",
+  "homeStudentGreeting": "Chào buổi sáng,",
+  "homeStudentDefaultName": "Học sinh",
+  "homeStudentMonthlySummaryTitleWithMonth": "Tổng quan tháng {monthLabel}",
+  "@homeStudentMonthlySummaryTitleWithMonth": {
+    "placeholders": {
+      "monthLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "homeStudentMonthlyIncome": "Tổng thu",
+  "homeStudentMonthlyExpense": "Tổng chi",
+  "homeStudentRemainingBudget": "Số dư còn lại",
+  "homeStudentRecentTransactions": "Giao dịch gần đây",
+  "homeStudentViewAll": "Xem tất cả",
+  "homeStudentLoadError": "Không thể tải màn hình chính. Vui lòng thử lại.",
+  "homeStudentAddTransaction": "Thêm giao dịch",
+  "homeStudentSetMonthlyLimit": "Hạn mức tháng",
+  "homeStudentMonthlyLimitNotSet": "Hãy thiết lập hạn mức tháng",
+  "setMoneyLimitTitle": "Thiết lập hạn mức tháng",
+  "setMoneyLimitDescription": "Hạn mức này giúp bạn kiểm soát chi tiêu tốt hơn mỗi tháng.",
+  "setMoneyLimitSkipAction": "Bỏ qua",
+  "setMoneyLimitUnauthenticated": "Vui lòng đăng nhập lại để thiết lập hạn mức tháng.",
+  "setMoneyLimitSaveFailed": "Không thể lưu hạn mức tháng. Vui lòng thử lại.",
+  "setMoneyLimitQuickAmount": "+{millionCount}.000.000đ",
+  "@setMoneyLimitQuickAmount": {
+    "placeholders": {
+      "millionCount": {
+        "type": "int"
+      }
+    }
+  }
+,
+  "statisticTitle": "Thống kê chi tiêu",
+  "statisticByWeek": "Theo tuần",
+  "statisticByMonth": "Theo tháng",
+  "statisticWeekNoun": "tuần",
+  "statisticMonthNoun": "tháng",
+  "statisticThisWeek": "Tuần này",
+  "statisticLastWeek": "Tuần trước",
+  "statisticThisMonth": "Tháng này",
+  "statisticLastMonth": "Tháng trước",
+  "statisticSmartInsightFallback": "Chưa có biến động chi tiêu nổi bật trong kỳ này.",
+  "statisticSmartInsightMessage": "{periodLabel} này bạn chi cho {categoryLabel} nhiều hơn {percent}% so với {periodLabel} trước. Đây là danh mục tăng mạnh nhất.",
+  "@statisticSmartInsightMessage": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "categoryLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpendingLimitLabel": "Hạn mức chi tiêu",
+  "statisticSpentLabel": "Đã chi",
+  "statisticRemainingLabel": "Còn lại",
+  "statisticBudgetOnTrack": "Đang trong kế hoạch",
+  "statisticBudgetWarning": "Cần chú ý",
+  "statisticBudgetExceeded": "Vượt hạn mức",
+  "statisticBudgetNoLimitTitle": "Thiết lập hạn mức tháng",
+  "statisticBudgetNoLimitDescription": "Thêm hạn mức tháng để so sánh ngân sách với chi tiêu trong kỳ hiện tại.",
+  "statisticSavedComparedToPrevious": "Tiết kiệm {percent}% so với {periodLabel} trước",
+  "@statisticSavedComparedToPrevious": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpentComparedToPrevious": "Chi nhiều hơn {percent}% so với {periodLabel} trước",
+  "@statisticSpentComparedToPrevious": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticNoPreviousData": "Chưa có dữ liệu {periodLabel} trước",
+  "@statisticNoPreviousData": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpendingTrendTitle": "Xu hướng chi tiêu",
+  "statisticCurrentPeriodTotal": "Tổng chi {periodLabel} này",
+  "@statisticCurrentPeriodTotal": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticComparedToPrevious": "So với {periodLabel} trước",
+  "@statisticComparedToPrevious": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticHigher": "Cao hơn",
+  "statisticLower": "Thấp hơn",
+  "statisticStable": "Ổn định",
+  "statisticTopCategoriesTitle": "Chi tiêu nhiều nhất",
+  "statisticStrongestIncrease": "Tăng mạnh nhất",
+  "statisticStrongestDecrease": "Giảm nhiều nhất",
+  "statisticNoCategoryChange": "Chưa có biến động danh mục",
+  "statisticSpendingAllocationTitle": "Phân bổ chi tiêu",
+  "statisticTotalSpentShort": "Tổng chi",
+  "statisticTransactionCount": "{count} giao dịch",
+  "@statisticTransactionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticTrendIncrease": "Tăng mạnh nhất",
+  "statisticTrendDecrease": "Giảm",
+  "statisticTrendStable": "Ổn định",
+  "statisticNoDataTitle": "Chưa có dữ liệu chi tiêu",
+  "statisticNoDataDescription": "Hãy thêm giao dịch để xem xu hướng chi tiêu và phân tích danh mục.",
+  "statisticSelectPeriodTitle": "Chọn mốc thời gian"
 }

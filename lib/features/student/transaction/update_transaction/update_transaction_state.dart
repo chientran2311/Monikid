@@ -8,9 +8,11 @@ part 'update_transaction_state.freezed.dart';
 @freezed
 abstract class UpdateTransactionState with _$UpdateTransactionState {
   const factory UpdateTransactionState({
-    required TransactionModel originalTransaction,
+    String? currentTransactionId,
+    TransactionModel? originalTransaction,
     @Default(TransactionStatus.initial) TransactionStatus status,
     @Default([]) List<CategoryModel> categories,
+    @Default('') String selectedCategoryKey,
     @Default('') String selectedCategory,
     @Default('') String selectedCategoryEmoji,
     @Default('') String amountText,
@@ -22,9 +24,11 @@ abstract class UpdateTransactionState with _$UpdateTransactionState {
 
   const UpdateTransactionState._();
 
+  bool get hasTransaction => originalTransaction != null;
   bool get isLoading => status == TransactionStatus.loading;
   bool get isSubmitting => status == TransactionStatus.submitting;
   bool get isSuccess => status == TransactionStatus.success;
   String get currentType => transactionType.value;
-  DateTime get effectiveSelectedDate => selectedDate ?? originalTransaction.date;
+  DateTime get effectiveSelectedDate =>
+      selectedDate ?? originalTransaction?.date ?? DateTime.now();
 }

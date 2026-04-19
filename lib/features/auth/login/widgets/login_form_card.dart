@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/shared/widgets/auth_card.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
@@ -53,12 +54,10 @@ class LoginFormCard extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
+              child: Text(
                 'Quên mật khẩu?',
-                style: TextStyle(
+                style: context.typo.subtitle.small.copyWith(
                   color: AppTheme.primary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
                 ),
               ),
             ),
@@ -70,9 +69,8 @@ class LoginFormCard extends StatelessWidget {
               child: Text(
                 errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: context.typo.text.medium.copyWith(
                   color: AppTheme.redAlert,
-                  fontSize: 14,
                 ),
               ),
             ),

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class SplashBrandSection extends StatelessWidget {
   const SplashBrandSection({super.key});
@@ -32,20 +33,16 @@ class SplashBrandSection extends StatelessWidget {
               Text(
                 'SmartSpending',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
+                style: context.typo.bigTitle.medium.copyWith(
                   letterSpacing: -0.5,
                   color: isDark ? AppTheme.primaryLight : AppTheme.primary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Quản lý thông minh, tương lai vững bền',
+                'Quáº£n lÃ½ thÃ´ng minh, tÆ°Æ¡ng lai vá»¯ng bá»n',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                style: context.typo.label.large.copyWith(
                   letterSpacing: 0.25,
                   color:
                       isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -73,14 +70,14 @@ class _SplashLogo extends StatelessWidget {
       height: 112,
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: AppTheme.primary.withOpacity(0.1),
+        color: AppTheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.primary.withOpacity(0.2),
+          color: AppTheme.primary.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -110,7 +107,7 @@ class _SplashLogo extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 1,
                         ),
                       ],

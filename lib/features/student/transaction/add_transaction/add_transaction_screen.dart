@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/student/transaction/add_transaction/add_transaction_provider.dart';
@@ -11,8 +11,8 @@ import 'package:monikid/features/student/transaction/add_transaction/widgets/add
 import 'package:monikid/features/student/transaction/add_transaction/widgets/transaction_form_field.dart';
 import 'package:monikid/features/student/transaction/add_transaction/widgets/transaction_type_tab.dart';
 import 'package:monikid/features/student/transaction/providers/category_provider.dart';
-import 'package:monikid/features/student/transaction/transaction_status.dart';
 import 'package:monikid/features/student/transaction/transaction_history/widgets/category_dialog.dart';
+import 'package:monikid/features/student/transaction/transaction_status.dart';
 import 'package:monikid/features/student/transaction/widgets/transaction_loading_skeleton.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -31,6 +31,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  String _selectedCategoryKey =
+      transactionCategoryKeyForCategory(getDefaultCategoryForType('expense'));
   String _selectedCategory = getDefaultCategoryForType('expense').label;
   String _selectedEmoji = getDefaultCategoryForType('expense').icon;
 
@@ -62,6 +64,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           return;
         }
         setState(() {
+          _selectedCategoryKey = transactionCategoryKeyForCategory(nextCategory);
           _selectedCategory = nextCategory.label;
           _selectedEmoji = nextCategory.icon;
         });
@@ -102,6 +105,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
     setState(() {
       _transactionType = index;
+      _selectedCategoryKey = transactionCategoryKeyForCategory(category);
       _selectedCategory = category.label;
       _selectedEmoji = category.icon;
     });
@@ -123,6 +127,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         onCategorySelected: (category) {
           if (category != null) {
             setState(() {
+              _selectedCategoryKey = transactionCategoryKeyForCategory(category);
               _selectedCategory = category.label;
               _selectedEmoji = category.icon;
             });
@@ -150,10 +155,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       return;
     }
 
-    final user = ref.read(authSessionProvider).user;
+    final authState = ref.read(authSessionProvider);
+    final user = authState.user;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(s.errorGeneric('User not authenticated'))),
+        SnackBar(content: Text(s.transactionUserNotAuthenticated)),
       );
       return;
     }
@@ -162,13 +168,15 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     final transaction = TransactionModel(
       transactionId: const Uuid().v4(),
       userId: user.uid,
-      amount: amount,
+      familyId: authState.account?.familyId,
+      amountMinor: amount.round(),
       type: _currentType,
-      category: _selectedCategory,
-      categoryEmoji: _selectedEmoji,
+      categoryKey: _selectedCategoryKey,
+      categoryLabel: _selectedCategory,
+      categoryIcon: _selectedEmoji,
       note: _noteController.text.trim(),
       source: 'manual',
-      date: _selectedDate,
+      dateTs: _selectedDate,
       createdAt: now,
       updatedAt: now,
     );
@@ -230,7 +238,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         leading: TextButton(
           onPressed: isLoading ? null : () => context.pop(),
           child: Text(
-            'Hủy',
+            s.actionCancel,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -240,7 +248,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         ),
         centerTitle: true,
         title: Text(
-          'Thêm Giao dịch',
+          s.homeStudentAddTransaction,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -268,7 +276,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   child: Row(
                     children: [
                       TransactionTypeTab(
-                        title: 'Tiền Chi',
+                        title: s.transactionExpenseType,
                         index: 0,
                         selectedIndex: _transactionType,
                         onTabSelected: isLoading
@@ -277,7 +285,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 _handleTransactionTypeChanged(index, categories),
                       ),
                       TransactionTypeTab(
-                        title: 'Tiền Thu',
+                        title: s.transactionIncomeType,
                         index: 1,
                         selectedIndex: _transactionType,
                         onTabSelected: isLoading
@@ -298,7 +306,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 GestureDetector(
                   onTap: () => _showCategoryDialog(isLoading),
                   child: TransactionFormField(
-                    label: 'Danh mục',
+                    label: s.transactionCategoryLabel,
                     value: _selectedCategory,
                     iconOrEmoji: _selectedEmoji,
                     iconColor: Colors.orange,
@@ -309,7 +317,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 GestureDetector(
                   onTap: isLoading ? null : () => _selectDate(context),
                   child: TransactionFormField(
-                    label: 'Ngày',
+                    label: s.transactionDateLabel,
                     value:
                         '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
                     iconOrEmoji: '📅',
@@ -338,7 +346,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [bgColor.withOpacity(0.0), bgColor, bgColor],
+                  colors: [bgColor.withValues(alpha: 0.0), bgColor, bgColor],
                 ),
               ),
               child: ElevatedButton(
@@ -351,7 +359,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 8,
-                  shadowColor: AppTheme.primary.withOpacity(0.4),
+                  shadowColor: AppTheme.primary.withValues(alpha: 0.4),
                 ),
                 child: isLoading
                     ? const SizedBox(
@@ -362,14 +370,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Row(
+                    : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.check, size: 24),
-                          SizedBox(width: 8),
+                          const Icon(Icons.check, size: 24),
+                          const SizedBox(width: 8),
                           Text(
-                            'Lưu giao dịch',
-                            style: TextStyle(
+                            s.transactionSaveAction,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),

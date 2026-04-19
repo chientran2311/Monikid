@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/auth/pin/widgets/pin_keypad_widget.dart';
 
 class PinScreenBody extends StatelessWidget {
@@ -11,6 +12,8 @@ class PinScreenBody extends StatelessWidget {
     required this.onRemoveNumber,
     this.hasError = false,
     this.isLoading = false,
+    this.isInputDisabled = false,
+    this.message,
     super.key,
   });
 
@@ -21,6 +24,8 @@ class PinScreenBody extends StatelessWidget {
   final VoidCallback onRemoveNumber;
   final bool hasError;
   final bool isLoading;
+  final bool isInputDisabled;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +56,7 @@ class PinScreenBody extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Manrope',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                style: context.typo.title.medium.copyWith(
                   color: isDark
                       ? const Color(0xFFF1F5F9)
                       : const Color(0xFF0F172A),
@@ -65,9 +67,7 @@ class PinScreenBody extends StatelessWidget {
               Text(
                 description,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Manrope',
-                  fontSize: 14,
+                style: context.typo.text.medium.copyWith(
                   color:
                       isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
@@ -75,10 +75,28 @@ class PinScreenBody extends StatelessWidget {
             ],
           ),
         ),
+        if (message != null) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              message!,
+              textAlign: TextAlign.center,
+              style: context.typo.subtitle.small.copyWith(
+                color: hasError
+                    ? AppTheme.redAlert
+                    : (isDark
+                          ? const Color(0xFFCBD5E1)
+                          : const Color(0xFF334155)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
         PinKeypadWidget(
           currentPin: currentPin,
           hasError: hasError,
           isLoading: isLoading,
+          isDisabled: isInputDisabled,
           onAddNumber: onAddNumber,
           onRemoveNumber: onRemoveNumber,
         ),
@@ -96,10 +114,7 @@ class PinScreenBody extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'KẾT NỐI BẢO MẬT BỞI MONIKID',
-                style: TextStyle(
-                  fontFamily: 'Manrope',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
+                style: context.typo.caption.small.copyWith(
                   letterSpacing: 1.2,
                   color: AppTheme.primary.withOpacity(0.8),
                 ),

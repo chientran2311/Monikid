@@ -25,7 +25,7 @@ final transactionStreamProvider =
 // ignore: unused_element
 typedef TransactionStreamRef =
     AutoDisposeStreamProviderRef<List<TransactionModel>>;
-String _$homeTabNotifierHash() => r'5778b5fa496aff1024f09c7f79d45c7a92b9d920';
+String _$homeTabNotifierHash() => r'936b8b4ae140751d48863f9b8074ae47c9fda1e8';
 
 /// See also [HomeTabNotifier].
 @ProviderFor(HomeTabNotifier)

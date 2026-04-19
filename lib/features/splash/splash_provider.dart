@@ -1,8 +1,9 @@
 import 'package:logger/logger.dart';
+import 'package:monikid/core/config/storage_keys.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/auth_status.dart';
+import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/repositories/auth/onboarding_repository.dart';
+import 'package:monikid/features/auth/providers/auth_session_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'splash_state.dart';
@@ -11,71 +12,82 @@ part 'splash_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class SplashNotifier extends _$SplashNotifier {
-  late final OnboardingRepository _onboardingRepository =
-      getIt<OnboardingRepository>();
-  late final Logger _logger = getIt<Logger>();
+  late final Logger _logger;
+  late final AppLocalStorage _localStorage;
 
   @override
   SplashState build() {
+    _logger = getIt<Logger>();
+    _localStorage = getIt<AppLocalStorage>();
     return const SplashState();
   }
 
-  Future<void> init() async {
-    if (state.loadingProgress == 100 && !state.isLoading) {
-      _navigateOut();
+  Future<void> validateUserForRoute() async {
+    if (state.routeTarget != SplashRouteTarget.none && !state.isLoading) {
       return;
     }
 
-    _logger.i(
-      'Splash init bắt đầu. isLoading=${state.isLoading}, progress=${state.loadingProgress}',
+    _logger.i('Start splash route validation.');
+    state = state.copyWith(
+      isLoading: true,
+      loadingProgress: 0,
+      routeTarget: SplashRouteTarget.none,
     );
-    state = state.copyWith(isLoading: true, loadingProgress: 0);
 
     try {
-      state = state.copyWith(loadingProgress: 30);
+      state = state.copyWith(loadingProgress: 25);
       await Future.delayed(const Duration(milliseconds: 300));
 
-      final isComplete = await _onboardingRepository.isOnboardingComplete();
-      state = state.copyWith(onboardingComplete: isComplete);
+      final hasSignedInBefore =
+          await _localStorage.readBool(StorageKeys.hasSignedInBefore) ?? false;
+
+      if (!hasSignedInBefore) {
+        state = state.copyWith(
+          isLoading: false,
+          loadingProgress: 100,
+          routeTarget: SplashRouteTarget.login,
+        );
+        return;
+      }
 
       state = state.copyWith(loadingProgress: 60);
       await Future.delayed(const Duration(milliseconds: 300));
 
-      int waits = 0;
-      while (ref.read(authSessionProvider).status == AuthStatus.initial &&
-          waits < 10) {
-        await Future.delayed(const Duration(milliseconds: 200));
-        waits++;
-      }
+      final authState = await _waitForResolvedAuthState();
+      final routeTarget =
+          authState.isAuthenticated
+              ? SplashRouteTarget.pinGateway
+              : SplashRouteTarget.login;
 
-      final authStatus = ref.read(authSessionProvider).status;
       state = state.copyWith(
+        isLoading: false,
         loadingProgress: 100,
-        authStatus: authStatus,
+        routeTarget: routeTarget,
       );
-
-      await Future.delayed(const Duration(milliseconds: 200));
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.e(
-        'Splash init lỗi, dùng fallback an toàn cho onboarding.',
-        error: e,
+        'Splash route validation failed.',
+        error: error,
         stackTrace: stackTrace,
       );
       state = state.copyWith(
+        isLoading: false,
         loadingProgress: 100,
-        onboardingComplete: false,
+        routeTarget: SplashRouteTarget.login,
       );
-    } finally {
-      state = state.copyWith(isLoading: false);
     }
   }
 
-  void _navigateOut() {
-    final authStatus = ref.read(authSessionProvider).status;
-    state = state.copyWith(
-      isLoading: false,
-      loadingProgress: 100,
-      authStatus: authStatus,
-    );
+  Future<AuthSessionState> _waitForResolvedAuthState() async {
+    var authState = ref.read(authSessionProvider);
+    var attempts = 0;
+
+    while ((authState.isInitial || authState.isLoading) && attempts < 15) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      authState = ref.read(authSessionProvider);
+      attempts++;
+    }
+
+    return authState;
   }
 }

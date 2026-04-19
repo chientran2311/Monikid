@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/features/student/setting/widgets/setting_item.dart';
 import 'package:monikid/features/student/setting/widgets/setting_group.dart';
 import 'package:monikid/features/change_language/change_language_dialog.dart';

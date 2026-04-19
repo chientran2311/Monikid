@@ -3,7 +3,7 @@ import 'package:monikid/features/student/request_money/request_money_history/req
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 import 'package:monikid/repositories/request_money/request_money_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 
 part 'request_money_history_provider.g.dart';
 

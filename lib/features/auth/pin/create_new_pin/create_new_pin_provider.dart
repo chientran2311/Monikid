@@ -1,73 +1,58 @@
-import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/pin/enum/enter_pin_code_enum.dart';
-import 'package:monikid/repositories/auth/pin_code_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'create_new_pin_state.dart';
 
 part 'create_new_pin_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CreateNewPIN extends _$CreateNewPIN {
-  late final PinCodeRepository _pinCodeRepository = getIt<PinCodeRepository>();
-
   @override
-  CreateNewPINState build(EnterPINCodeEnum type, {String? pinCode}) {
-    return CreateNewPINState(pinCode: pinCode ?? '', type: type);
+  CreateNewPINState build() {
+    return const CreateNewPINState();
   }
 
-  Future<void> addNumber(String digit) async {
-    if (state.isLoading || state.pinCode.length >= 6) {
+  void addNumber(String digit) {
+    if (!_isDigit(digit) || state.currentPin.length >= 6) {
       return;
     }
 
-    final newPin = state.pinCode + digit;
-    state = state.copyWith(pinCode: newPin);
+    final newPin = state.currentPin + digit;
 
     if (newPin.length == 6) {
-      await preparePinCodeConfirmation(newPin);
+      state = state.copyWith(
+        currentPin: '',
+        draftPinCode: newPin,
+        status: CreateNewPinStatus.readyForConfirmation,
+      );
+      return;
     }
+
+    state = state.copyWith(currentPin: newPin);
   }
 
   void removeNumber() {
-    if (state.isLoading || state.pinCode.isEmpty) {
+    if (state.currentPin.isEmpty) {
       return;
     }
 
     state = state.copyWith(
-      pinCode: state.pinCode.substring(0, state.pinCode.length - 1),
+      currentPin: state.currentPin.substring(0, state.currentPin.length - 1),
     );
   }
 
-  Future<void> preparePinCodeConfirmation(String pinCode) async {
-    if (state.isLoading || pinCode.length != 6) {
+  void consumeReadyForConfirmation() {
+    if (state.status != CreateNewPinStatus.readyForConfirmation) {
       return;
     }
 
-    state = state.copyWith(isLoading: true);
-    try {
-      final pinCodeHash = await _pinCodeRepository.hashPinCode(pinCode);
-      state = state.copyWith(
-        pinCode: '',
-        isLoading: false,
-        pendingPinCodeHash: pinCodeHash,
-      );
-    } catch (_) {
-      state = state.copyWith(
-        pinCode: '',
-        isLoading: false,
-      );
-    }
-  }
-
-  void clearPendingPinCodeHash() {
-    state = state.copyWith(pendingPinCodeHash: null);
+    state = state.copyWith(status: CreateNewPinStatus.editing);
   }
 
   void reset() {
-    state = CreateNewPINState(
-      pinCode: '',
-      type: state.type,
-    );
+    state = const CreateNewPINState();
+  }
+
+  bool _isDigit(String value) {
+    return RegExp(r'^\d$').hasMatch(value);
   }
 }

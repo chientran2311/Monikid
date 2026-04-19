@@ -1,11 +1,10 @@
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_state.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import 'detail_transaction_state.dart';
 
 part 'detail_transaction_provider.g.dart';
 
@@ -16,10 +15,59 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
   @override
   DetailTransactionState build() {
     _logger = getIt<Logger>();
+
+    ref.listen(transactionHistoryProvider, (previous, next) {
+      final currentTransactionId = state.currentTransactionId;
+      if (currentTransactionId == null) {
+        return;
+      }
+
+      if (next.selectedTransaction?.transactionId == currentTransactionId) {
+        state = state.copyWith(
+          status: state.isDeleting
+              ? TransactionStatus.submitting
+              : TransactionStatus.ready,
+          transaction: next.selectedTransaction,
+          errorMessage: null,
+        );
+        return;
+      }
+
+      if (next.selectedTransactionId == currentTransactionId &&
+          next.selectionErrorMessage != null &&
+          !state.isDeleting) {
+        state = state.copyWith(
+          status: TransactionStatus.error,
+          transaction: null,
+          errorMessage: next.selectionErrorMessage,
+        );
+      }
+    });
+
     return const DetailTransactionState();
   }
 
-  void setTransaction(TransactionModel transaction) {
+  Future<void> initialize(String transactionId) async {
+    state = state.copyWith(
+      status: TransactionStatus.loading,
+      currentTransactionId: transactionId,
+      transaction: null,
+      errorMessage: null,
+    );
+
+    final transaction = await ref
+        .read(transactionHistoryProvider.notifier)
+        .ensureSelectedTransaction(transactionId);
+
+    if (transaction == null) {
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        transaction: null,
+        errorMessage: 'Unable to load transaction.',
+      );
+      return;
+    }
+
     state = state.copyWith(
       status: TransactionStatus.ready,
       transaction: transaction,
@@ -27,15 +75,28 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
     );
   }
 
-  Future<void> deleteTransaction(String transactionId) async {
+  Future<void> deleteTransaction() async {
+    final transaction = state.transaction;
+    if (transaction == null) {
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        errorMessage: 'Missing transaction to delete.',
+      );
+      return;
+    }
+
     state = state.copyWith(
       status: TransactionStatus.submitting,
       errorMessage: null,
     );
 
     try {
+      final transactionId = transaction.transactionId;
       _logger.i('Deleting transaction $transactionId');
-      await ref.read(transactionRepositoryProvider).deleteTransaction(transactionId);
+      await ref
+          .read(transactionRepositoryProvider)
+          .deleteTransaction(transaction.userId, transactionId);
+      ref.read(transactionHistoryProvider.notifier).removeTransaction(transactionId);
       state = state.copyWith(
         status: TransactionStatus.success,
         errorMessage: null,
@@ -48,7 +109,7 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
       );
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: 'Không thể xóa giao dịch. Vui lòng thử lại.',
+        errorMessage: 'Khong the xoa giao dich. Vui long thu lai.',
       );
     }
   }

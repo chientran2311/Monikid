@@ -6,7 +6,7 @@ import 'package:monikid/features/student/request_money/add_new_request/add_reque
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 import 'package:monikid/repositories/request_money/request_money_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:uuid/uuid.dart';
 
 part 'add_request_money_provider.g.dart';

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
-/// Dialog thông báo thành công - Reusable ở nhiều screens
-/// Có backdrop blur, icon, title, message, và action button
 class SuccessDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -19,7 +18,6 @@ class SuccessDialog extends StatelessWidget {
     this.icon = Icons.task_alt_rounded,
   }) : super(key: key);
 
-  /// Hiển thị dialog dưới dạng overlay
   static Future<void> show(
     BuildContext context, {
     String title = 'Thành công!',
@@ -65,7 +63,6 @@ class SuccessDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
             Container(
               width: 80,
               height: 80,
@@ -76,24 +73,17 @@ class SuccessDialog extends StatelessWidget {
               child: Icon(icon, color: AppTheme.primary, size: 40),
             ),
             const SizedBox(height: 24),
-
-            // Title
             Text(
               title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+              style: context.typo.title.medium.copyWith(
                 color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
-
-            // Message
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
+              style: context.typo.text.medium.copyWith(
                 height: 1.5,
                 color: isDark
                     ? const Color(0xFF94A3B8)
@@ -101,8 +91,6 @@ class SuccessDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -118,9 +106,8 @@ class SuccessDialog extends StatelessWidget {
                 ),
                 child: Text(
                   buttonText,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: context.typo.button.medium.copyWith(
+                    color: Colors.white,
                   ),
                 ),
               ),

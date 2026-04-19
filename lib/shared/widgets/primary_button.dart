@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
@@ -19,16 +20,16 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 56, // py-4 / py-3.5 average tap target size
+      height: 56,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.primary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), // rounded-xl
+            borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 4, // shadow-md effectively
+          elevation: 4,
           shadowColor: AppTheme.primary.withOpacity(0.25),
         ),
         child: isLoading
@@ -49,10 +50,8 @@ class PrimaryButton extends StatelessWidget {
                   ],
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: context.typo.button.medium.copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
                     ),
                   ),
                 ],

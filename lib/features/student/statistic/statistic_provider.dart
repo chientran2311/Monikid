@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/core/di/di.dart';
+
+import 'package:logger/logger.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/features/auth/providers/auth_session_state.dart';
+import 'package:monikid/features/student/statistic/statistic_models.dart';
+import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'statistic_state.dart';
 
@@ -15,189 +17,316 @@ const _kPageSize = 8;
 @riverpod
 class Statistic extends _$Statistic {
   late final StatisticRepository _repository;
-  StreamSubscription<({List<TransactionModel> transactions, DateTime start, DateTime end})>? _subscription;
+  late final SetMoneyLimitRepository _setMoneyLimitRepository;
+  late final Logger _logger;
 
   @override
   StatisticState build() {
-    _repository = getIt<StatisticRepository>();
-    ref.onDispose(() {
-      _subscription?.cancel();
+    _repository = ref.read(statisticRepositoryProvider);
+    _setMoneyLimitRepository = ref.read(setMoneyLimitRepositoryProvider);
+    _logger = Logger();
+
+    ref.listen<AuthSessionState>(authSessionProvider, (previous, next) {
+      final previousUid = previous?.user?.uid;
+      final nextUid = next.user?.uid;
+      final hasAuthTransition =
+          previous?.isAuthenticated != next.isAuthenticated ||
+          previousUid != nextUid;
+
+      if (!hasAuthTransition) {
+        return;
+      }
+
+      unawaited(_handleAuthStateChanged(next));
     });
-    
-    // Auto load on init if authenticated
-    Future.microtask(() => loadFirstPage());
-    
-    return const StatisticState();
+
+    final authState = ref.read(authSessionProvider);
+    if (authState.isAuthenticated && authState.user?.uid != null) {
+      Future.microtask(loadFirstPage);
+    }
+
+    return StatisticState(selectedDate: DateTime.now());
   }
 
   String? get _userId {
     final authState = ref.read(authSessionProvider);
     return authState.isAuthenticated ? authState.user?.uid : null;
   }
-  
-  ({DateTime start, DateTime end}) _getPeriodRange() {
-    final now = DateTime.now();
-    final targetDate = state.selectedDate ?? now;
-    if (state.selectedMonthIndex == 0) {
-      // Theo tuần (By Week): Monday to Sunday
-      final referenceDate = DateTime(targetDate.year, targetDate.month, targetDate.day);
-      final int currentDay = referenceDate.weekday;
-      final DateTime startOfWeek = referenceDate.subtract(Duration(days: currentDay - 1));
-      final DateTime start = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
-      final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
-      return (start: start, end: end);
-    } else {
-      // Theo tháng (By Month)
-      final start = DateTime(targetDate.year, targetDate.month, 1);
-      final end = DateTime(targetDate.year, targetDate.month + 1, 0, 23, 59, 59, 999);
-      return (start: start, end: end);
+
+  Future<void> _handleAuthStateChanged(AuthSessionState authState) async {
+    if (authState.isAuthenticated && authState.user?.uid != null) {
+      await loadFirstPage();
+      return;
     }
-  }
-  
-  ({DateTime start, DateTime end}) _getPreviousPeriodRange() {
-    final now = DateTime.now();
-    final targetDate = state.selectedDate ?? now;
-    if (state.selectedMonthIndex == 0) {
-      // Previous week
-      final referenceDate = DateTime(targetDate.year, targetDate.month, targetDate.day);
-      final int currentDay = referenceDate.weekday;
-      final DateTime startOfPrevWeek = referenceDate.subtract(Duration(days: currentDay - 1 + 7));
-      final DateTime start = DateTime(startOfPrevWeek.year, startOfPrevWeek.month, startOfPrevWeek.day);
-      final DateTime end = DateTime(start.year, start.month, start.day + 6, 23, 59, 59, 999);
-      return (start: start, end: end);
-    } else {
-      // Previous month
-      final start = DateTime(targetDate.year, targetDate.month - 1, 1);
-      final end = DateTime(targetDate.year, targetDate.month, 0, 23, 59, 59, 999);
-      return (start: start, end: end);
-    }
+
+    state = state.copyWith(
+      transactions: const [],
+      previousPeriodTransactions: const [],
+      visibleTransactions: const [],
+      status: StatisticStatus.initial,
+      isLoadingMore: false,
+      isRefreshing: false,
+      hasMore: true,
+      pageLimit: _kPageSize,
+      totalExpense: 0,
+      previousPeriodTotalExpense: 0,
+      currentOverview: null,
+      previousOverview: null,
+      budgetOverview: null,
+      errorMessage: null,
+    );
   }
 
   Future<void> loadFirstPage() async {
     final uid = _userId;
-    if (uid == null) return;
+    if (uid == null) {
+      return;
+    }
 
-    _subscription?.cancel();
+    final anchorDate = state.selectedDate ?? DateTime.now();
+    final range = statisticGetPeriodRange(
+      selectedMonthIndex: state.selectedMonthIndex,
+      anchorDate: anchorDate,
+    );
 
     state = state.copyWith(
-      isLoading: true,
-      transactions: [],
-      hasMore: true,
+      status: StatisticStatus.loading,
+      isLoadingMore: false,
       pageLimit: _kPageSize,
       errorMessage: null,
     );
 
     try {
-      final targetRange = _getPeriodRange();
-      final prevRange = _getPreviousPeriodRange();
-      
-      final prevRecord = await _repository.getExpenseTransactionsByDateRange(
-        uid, 
-        prevRange.start, 
-        prevRange.end, 
-        limit: 1000
-      ).first;
-      
-      double prevPeriodTotal = 0;
-      for (var tx in prevRecord.transactions) {
-        prevPeriodTotal += tx.amount;
-      }
-      
-      _subscription = _repository.getExpenseTransactionsByDateRange(
-        uid,
-        targetRange.start,
-        targetRange.end,
-        limit: _kPageSize,
-      ).listen(
-        (record) {
-          double currentTotal = 0;
-          for (var tx in record.transactions) {
-            currentTotal += tx.amount;
-          }
-          
-          state = state.copyWith(
-            isLoading: false,
-            transactions: record.transactions,
-            previousPeriodTransactions: prevRecord.transactions,
-            totalExpense: currentTotal,
-            previousPeriodTotalExpense: prevPeriodTotal,
-            hasMore: record.transactions.length >= _kPageSize,
-          );
-        },
-        onError: (e) {
-          state = state.copyWith(
-            isLoading: false,
-            errorMessage: e.toString(),
-          );
-        },
+      final overviewFuture = _repository.getOverview(
+        userId: uid,
+        selectedMonthIndex: state.selectedMonthIndex,
+        anchorDate: anchorDate,
       );
-    } catch (e) {
+      final pageFuture = _repository.getExpenseTransactionsPage(
+        userId: uid,
+        start: range.start,
+        end: range.end,
+        limit: _kPageSize,
+      );
+      final limitFuture = _setMoneyLimitRepository.readMonthlyLimitMinor(uid);
+
+      final overview = await overviewFuture;
+      final page = await pageFuture;
+      final limitMinor = await limitFuture;
+
+      if (overview == null) {
+        state = state.copyWith(
+          status: StatisticStatus.error,
+          errorMessage: 'Unable to load statistic data.',
+        );
+        return;
+      }
+
+      final budgetOverview = _buildBudgetOverview(
+        limitMinor: limitMinor,
+        currentTotalExpenseMinor: overview.currentPeriod.totalExpenseMinor,
+        previousTotalExpenseMinor: overview.previousPeriod.totalExpenseMinor,
+      );
+      final nextStatus = overview.currentTransactions.isEmpty
+          ? StatisticStatus.empty
+          : StatisticStatus.success;
+
       state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString().replaceAll('Exception: ', ''),
+        transactions: overview.currentTransactions,
+        previousPeriodTransactions: overview.previousTransactions,
+        visibleTransactions: page.transactions,
+        status: nextStatus,
+        hasMore: page.hasMore,
+        totalExpense: _minorToDouble(overview.currentPeriod.totalExpenseMinor),
+        previousPeriodTotalExpense: _minorToDouble(
+          overview.previousPeriod.totalExpenseMinor,
+        ),
+        currentOverview: overview.currentPeriod,
+        previousOverview: overview.previousPeriod,
+        budgetOverview: budgetOverview,
+        errorMessage: null,
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to load the statistic first page.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        status: StatisticStatus.error,
+        errorMessage: 'Unable to load statistic data.',
       );
     }
   }
 
   Future<void> loadMore() async {
-    if (state.isLoading || state.isLoadingMore || state.isRefreshing || !state.hasMore) return;
-    state = state.copyWith(isLoadingMore: true, pageLimit: state.pageLimit + _kPageSize);
-      
-    final uid = _userId;
-    if (uid == null) {
-      state = state.copyWith(isLoadingMore: false);
+    if (state.isLoading || state.isLoadingMore || state.isRefreshing || !state.hasMore) {
       return;
     }
-    
-    _subscription?.cancel();
-    
-    final targetRange = _getPeriodRange();
-    
-    _subscription = _repository.getExpenseTransactionsByDateRange(
-      uid,
-      targetRange.start,
-      targetRange.end,
-      limit: state.pageLimit,
-    ).listen(
-      (record) {
-        double currentTotal = 0;
-        for (var tx in record.transactions) {
-          currentTotal += tx.amount;
-        }
 
-        state = state.copyWith(
-          transactions: record.transactions,
-          totalExpense: currentTotal,
-          hasMore: record.transactions.length >= state.pageLimit,
-          isLoadingMore: false,
-        );
-      },
-      onError: (e) {
-        state = state.copyWith(
-          errorMessage: e.toString(),
-          isLoadingMore: false,
-        );
-      }
+    final uid = _userId;
+    if (uid == null) {
+      return;
+    }
+
+    final anchorDate = state.selectedDate ?? DateTime.now();
+    final range = statisticGetPeriodRange(
+      selectedMonthIndex: state.selectedMonthIndex,
+      anchorDate: anchorDate,
     );
+    final lastVisibleTransaction = state.visibleTransactions.isNotEmpty
+        ? state.visibleTransactions.last
+        : null;
+
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final page = await _repository.getExpenseTransactionsPage(
+        userId: uid,
+        start: range.start,
+        end: range.end,
+        lastTransaction: lastVisibleTransaction,
+        limit: _kPageSize,
+      );
+
+      state = state.copyWith(
+        visibleTransactions: [
+          ...state.visibleTransactions,
+          ...page.transactions,
+        ],
+        hasMore: page.hasMore,
+        isLoadingMore: false,
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to load more statistic transactions.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        isLoadingMore: false,
+        errorMessage: 'Unable to load more statistic transactions.',
+      );
+    }
   }
 
   Future<void> refresh() async {
-    if (state.isRefreshing) return;
+    if (state.isRefreshing) {
+      return;
+    }
+
     state = state.copyWith(isRefreshing: true);
     await loadFirstPage();
     state = state.copyWith(isRefreshing: false);
   }
 
   Future<void> setMonthIndex(int index) async {
-    if (state.selectedMonthIndex == index) return;
-    state = state.copyWith(selectedMonthIndex: index, selectedDate: DateTime.now());
+    if (state.selectedMonthIndex == index) {
+      return;
+    }
+
+    state = state.copyWith(
+      selectedMonthIndex: index,
+      selectedDate: DateTime.now(),
+    );
     await loadFirstPage();
   }
 
   Future<void> setSelectedDate(DateTime date) async {
     final currentTarget = state.selectedDate ?? DateTime.now();
-    if (currentTarget.year == date.year && currentTarget.month == date.month && currentTarget.day == date.day) return;
+    if (currentTarget.year == date.year &&
+        currentTarget.month == date.month &&
+        currentTarget.day == date.day) {
+      return;
+    }
+
     state = state.copyWith(selectedDate: date);
     await loadFirstPage();
+  }
+
+  StatisticBudgetOverview _buildBudgetOverview({
+    required int? limitMinor,
+    required int currentTotalExpenseMinor,
+    required int previousTotalExpenseMinor,
+  }) {
+    if (limitMinor == null || limitMinor <= 0) {
+      return StatisticBudgetOverview(
+        spentMinor: currentTotalExpenseMinor,
+        comparisonDirection: _comparisonDirection(
+          currentTotalExpenseMinor,
+          previousTotalExpenseMinor,
+        ),
+        comparisonPercent: _comparisonPercent(
+          currentTotalExpenseMinor,
+          previousTotalExpenseMinor,
+        ),
+      );
+    }
+
+    final remainingMinor = limitMinor - currentTotalExpenseMinor;
+    final usageRatio = currentTotalExpenseMinor <= 0
+        ? 0.0
+        : currentTotalExpenseMinor / limitMinor;
+
+    return StatisticBudgetOverview(
+      limitMinor: limitMinor,
+      spentMinor: currentTotalExpenseMinor,
+      remainingMinor: remainingMinor,
+      usageRatio: usageRatio.clamp(0.0, 1.0),
+      status: _budgetStatus(usageRatio, remainingMinor),
+      comparisonDirection: _comparisonDirection(
+        currentTotalExpenseMinor,
+        previousTotalExpenseMinor,
+      ),
+      comparisonPercent: _comparisonPercent(
+        currentTotalExpenseMinor,
+        previousTotalExpenseMinor,
+      ),
+    );
+  }
+
+  StatisticBudgetStatus _budgetStatus(double usageRatio, int remainingMinor) {
+    if (remainingMinor < 0) {
+      return StatisticBudgetStatus.exceeded;
+    }
+    if (usageRatio >= 0.8) {
+      return StatisticBudgetStatus.warning;
+    }
+    return StatisticBudgetStatus.onTrack;
+  }
+
+  StatisticTrendDirection _comparisonDirection(
+    int currentTotalExpenseMinor,
+    int previousTotalExpenseMinor,
+  ) {
+    if (currentTotalExpenseMinor > previousTotalExpenseMinor) {
+      return StatisticTrendDirection.up;
+    }
+    if (currentTotalExpenseMinor < previousTotalExpenseMinor) {
+      return StatisticTrendDirection.down;
+    }
+    if (currentTotalExpenseMinor == 0 && previousTotalExpenseMinor == 0) {
+      return StatisticTrendDirection.none;
+    }
+    return StatisticTrendDirection.stable;
+  }
+
+  double? _comparisonPercent(
+    int currentTotalExpenseMinor,
+    int previousTotalExpenseMinor,
+  ) {
+    if (previousTotalExpenseMinor <= 0) {
+      if (currentTotalExpenseMinor <= 0) {
+        return null;
+      }
+      return 100.0;
+    }
+
+    final difference = (currentTotalExpenseMinor - previousTotalExpenseMinor).abs();
+    return (difference / previousTotalExpenseMinor) * 100;
+  }
+
+  double _minorToDouble(int amountMinor) {
+    return amountMinor.toDouble();
   }
 }

@@ -8,21 +8,25 @@
   "registerFailed": "Registration failed: {error}",
   "@registerFailed": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "noTransactionsYet": "No transactions yet.",
   "errorGeneric": "Error: {error}",
+  "@errorGeneric": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "settingFQA": "Frequently Asked Questions",
   "msgNoData": "No data found",
   "helpStillNeedHelp": "Still need help?",
   "helpContactSupportDesc": "If you cannot find the answer, contact our support team 24/7.",
   "actionChatWithUs": "Chat with us",
-  "@errorGeneric": {
-    "placeholders": {
-      "error": { "type": "String" }
-    }
-  },
   "actionRetry": "Retry",
   "validationEnterAmount": "Please enter amount",
   "validationAmountGreaterThanZero": "Amount must be greater than 0",
@@ -32,6 +36,26 @@
   "actionConfirm": "Confirm",
   "validationInvalidAmount": "Invalid amount",
   "msgUpdateSuccess": "Update successful",
+  "addTransactionFailed": "Unable to add transaction. Please try again.",
+  "updateTransactionFailed": "Unable to update transaction. Please try again.",
+  "updateTransactionMissingError": "Missing transaction to update.",
+  "transactionLoadError": "Unable to load transaction.",
+  "transactionCategoryLoadError": "Unable to load categories. Please try again.",
+  "transactionUserNotAuthenticated": "User is not authenticated.",
+  "transactionAmountLabel": "Amount",
+  "transactionCategoryLabel": "Category",
+  "transactionDateLabel": "Date",
+  "transactionNoteLabel": "Note",
+  "transactionExpenseType": "Expense",
+  "transactionIncomeType": "Income",
+  "transactionSaveAction": "Save transaction",
+  "transactionAiAutoLabel": "AI auto",
+  "addTransactionNoteHint": "Enter a note, AI will categorize it automatically...",
+  "updateTransactionTitle": "Edit transaction",
+  "updateTransactionAction": "Update transaction",
+  "updateTransactionNoteHint": "Add a note...",
+  "updateTransactionWalletLabel": "Source wallet",
+  "updateTransactionCashWalletValue": "Cash",
   "profileEditTitle": "Edit Profile",
   "profileEditAvatarLabel": "Change Avatar",
   "profileEditFullName": "Full Name",
@@ -57,11 +81,171 @@
   "recipientMom": "Mom",
   "actionUpdateRequest": "Update Request",
   "actionDeleteRequest": "Delete Request",
-  "scanbill" : "Scan Bill",
+  "scanbill": "Scan Bill",
   "chatting": "Family Chat",
-  "requestmoney" : "Request Money",
+  "requestmoney": "Request Money",
   "takePicture": "Take Photo",
   "chooseFromGallery": "Upload from Gallery",
   "scanReceiptTitle": "Scan Receipt",
-  "scanReceiptDesc": "Choose how to add receipt image to process."
+  "scanReceiptDesc": "Choose how to add receipt image to process.",
+  "authPasswordLabel": "Password",
+  "authPasswordPlaceholder": "Enter your password",
+  "authSignUpAction": "Sign up",
+  "authSignInAction": "Sign in",
+  "authNoAccountPrompt": "Don't have an account? ",
+  "authHaveAccountPrompt": "Already have an account? ",
+  "pinCreateTitle": "Create a new PIN",
+  "pinCreateDescription": "Create a 6-digit PIN to protect your account.",
+  "pinReEnterTitle": "Confirm your PIN",
+  "pinReEnterDescription": "Enter your new PIN again to confirm it.",
+  "pinEnterTitle": "Enter your PIN",
+  "pinEnterDescription": "Enter your 6-digit PIN to continue.",
+  "pinMismatchError": "The PIN confirmation does not match.",
+  "pinIncorrectError": "The PIN you entered is incorrect.",
+  "pinLockedMessage": "Too many incorrect attempts. Try again in {seconds}s.",
+  "@pinLockedMessage": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pinGenericError": "A PIN error occurred. Please try again.",
+  "pinGatewayLoading": "Checking your PIN security...",
+  "pinGatewayError": "Unable to start the PIN verification flow.",
+  "homeStudentGreeting": "Good morning,",
+  "homeStudentDefaultName": "Student",
+  "homeStudentMonthlySummaryTitleWithMonth": "Overview for {monthLabel}",
+  "@homeStudentMonthlySummaryTitleWithMonth": {
+    "placeholders": {
+      "monthLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "homeStudentMonthlyIncome": "Income",
+  "homeStudentMonthlyExpense": "Expense",
+  "homeStudentRemainingBudget": "Remaining budget",
+  "homeStudentRecentTransactions": "Recent transactions",
+  "homeStudentViewAll": "View all",
+  "homeStudentLoadError": "Unable to load the home dashboard. Please try again.",
+  "homeStudentAddTransaction": "Add transaction",
+  "homeStudentSetMonthlyLimit": "Set limit",
+  "homeStudentMonthlyLimitNotSet": "Set your monthly limit",
+  "setMoneyLimitTitle": "Set monthly limit",
+  "setMoneyLimitDescription": "This limit helps you stay in control of your spending every month.",
+  "setMoneyLimitSkipAction": "Skip",
+  "setMoneyLimitUnauthenticated": "Please sign in again to set a monthly limit.",
+  "setMoneyLimitSaveFailed": "Unable to save the monthly limit. Please try again.",
+  "setMoneyLimitQuickAmount": "+{millionCount},000,000đ",
+  "@setMoneyLimitQuickAmount": {
+    "placeholders": {
+      "millionCount": {
+        "type": "int"
+      }
+    }
+  }
+,
+  "statisticTitle": "Spending statistics",
+  "statisticByWeek": "By week",
+  "statisticByMonth": "By month",
+  "statisticWeekNoun": "week",
+  "statisticMonthNoun": "month",
+  "statisticThisWeek": "This week",
+  "statisticLastWeek": "Last week",
+  "statisticThisMonth": "This month",
+  "statisticLastMonth": "Last month",
+  "statisticSmartInsightFallback": "No standout spending insight yet for this period.",
+  "statisticSmartInsightMessage": "This {periodLabel}, you spent {percent}% more on {categoryLabel} than the previous {periodLabel}. This category increased the most.",
+  "@statisticSmartInsightMessage": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "categoryLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpendingLimitLabel": "Spending limit",
+  "statisticSpentLabel": "Spent",
+  "statisticRemainingLabel": "Remaining",
+  "statisticBudgetOnTrack": "On track",
+  "statisticBudgetWarning": "Needs attention",
+  "statisticBudgetExceeded": "Limit exceeded",
+  "statisticBudgetNoLimitTitle": "Set your monthly limit",
+  "statisticBudgetNoLimitDescription": "Add a monthly limit to compare your budget against this period's spending.",
+  "statisticSavedComparedToPrevious": "Saved {percent}% compared to the previous {periodLabel}",
+  "@statisticSavedComparedToPrevious": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpentComparedToPrevious": "Spent {percent}% more than the previous {periodLabel}",
+  "@statisticSpentComparedToPrevious": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticNoPreviousData": "No previous {periodLabel} data",
+  "@statisticNoPreviousData": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticSpendingTrendTitle": "Spending trend",
+  "statisticCurrentPeriodTotal": "Total spent this {periodLabel}",
+  "@statisticCurrentPeriodTotal": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticComparedToPrevious": "Compared to previous {periodLabel}",
+  "@statisticComparedToPrevious": {
+    "placeholders": {
+      "periodLabel": {
+        "type": "String"
+      }
+    }
+  },
+  "statisticHigher": "Higher",
+  "statisticLower": "Lower",
+  "statisticStable": "Stable",
+  "statisticTopCategoriesTitle": "Top spending categories",
+  "statisticStrongestIncrease": "Strongest increase",
+  "statisticStrongestDecrease": "Biggest decrease",
+  "statisticNoCategoryChange": "No category change yet",
+  "statisticSpendingAllocationTitle": "Spending allocation",
+  "statisticTotalSpentShort": "Total spent",
+  "statisticTransactionCount": "{count} transactions",
+  "@statisticTransactionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticTrendIncrease": "Biggest increase",
+  "statisticTrendDecrease": "Decrease",
+  "statisticTrendStable": "Stable",
+  "statisticNoDataTitle": "No spending data yet",
+  "statisticNoDataDescription": "Add transactions to see your spending trends and category insights.",
+  "statisticSelectPeriodTitle": "Select period"
 }

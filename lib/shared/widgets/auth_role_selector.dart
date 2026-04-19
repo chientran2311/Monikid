@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class AuthRoleSelector extends StatelessWidget {
   const AuthRoleSelector({
@@ -25,7 +26,7 @@ class AuthRoleSelector extends StatelessWidget {
         children: [
           Expanded(
             child: _RoleOption(
-              label: 'Phụ huynh',
+              label: 'Phá»¥ huynh',
               icon: Icons.family_restroom,
               isSelected: selectedRole == 'parent',
               isDark: isDark,
@@ -34,11 +35,11 @@ class AuthRoleSelector extends StatelessWidget {
           ),
           Expanded(
             child: _RoleOption(
-              label: 'Học sinh',
+              label: 'Há»c sinh',
               icon: Icons.school,
-              isSelected: selectedRole == 'student',
+              isSelected: selectedRole == 'child',
               isDark: isDark,
-              onTap: () => onRoleChanged('student'),
+              onTap: () => onRoleChanged('child'),
             ),
           ),
         ],
@@ -96,9 +97,7 @@ class _RoleOption extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              style: context.typo.subtitle.small.copyWith(
                 color: isSelected
                     ? (isDark ? Colors.white : const Color(0xFF0F172A))
                     : inactiveColor,

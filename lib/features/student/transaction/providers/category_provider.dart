@@ -1,5 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/category/category_repository.dart';
@@ -114,7 +114,7 @@ const defaultCategories = [
 ];
 
 @riverpod
-Stream<List<CategoryModel>> categoryStream(CategoryStreamRef ref) {
+Stream<List<CategoryModel>> categoryStream(Ref ref) {
   final authState = ref.watch(authSessionProvider);
   final userId = authState.user?.uid;
 
@@ -122,7 +122,7 @@ Stream<List<CategoryModel>> categoryStream(CategoryStreamRef ref) {
     return Stream.value(defaultCategories);
   }
 
-  final repo = getIt<CategoryRepository>();
+  final repo = ref.watch(categoryRepositoryProvider);
   return repo.getUserCategories(userId).map(mergeTransactionCategories);
 }
 
@@ -161,6 +161,33 @@ List<CategoryModel> filterCategoriesByType(
   return categories.where((category) => category.type == type).toList();
 }
 
+String transactionCategoryKeyForCategory(CategoryModel category) {
+  return _slugifyCategoryLabel(category.label);
+}
+
+CategoryModel? findCategoryByTransactionKey(
+  Iterable<CategoryModel> categories,
+  String? categoryKey, {
+  String? type,
+}) {
+  if (categoryKey == null || categoryKey.trim().isEmpty) {
+    return null;
+  }
+
+  for (final category in categories) {
+    final typeMatches = type == null || type == 'all' || category.type == type;
+    if (!typeMatches) {
+      continue;
+    }
+
+    if (transactionCategoryKeyForCategory(category) == categoryKey) {
+      return category;
+    }
+  }
+
+  return null;
+}
+
 CategoryModel getDefaultCategoryForType(
   String type, {
   Iterable<CategoryModel>? categories,
@@ -194,4 +221,12 @@ String _categoryKey(CategoryModel category) {
   final normalizedLabel = category.label.trim().toLowerCase();
   final normalizedType = category.type.trim().isEmpty ? 'expense' : category.type;
   return '$normalizedType::$normalizedLabel';
+}
+
+String _slugifyCategoryLabel(String value) {
+  return value
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
 }

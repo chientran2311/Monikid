@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_provider.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
@@ -97,10 +98,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       child: Text(
                         'Quên mật khẩu?',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Manrope',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                        style: context.typo.title.small.copyWith(
                           color: isDark
                               ? Colors.white
                               : const Color(0xFF0F172A),
@@ -122,10 +120,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     const SizedBox(height: 32),
                     Text(
                       'Quên mật khẩu?',
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
+                      style: context.typo.bigTitle.small.copyWith(
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                         letterSpacing: -0.5,
                       ),
@@ -133,9 +128,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     const SizedBox(height: 12),
                     Text(
                       'Đừng lo lắng! Hãy nhập email đã đăng ký, chúng tôi sẽ gửi mã xác thực để bạn đặt lại mật khẩu.',
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 16,
+                      style: context.typo.text.large.copyWith(
                         height: 1.5,
                         color: isDark
                             ? const Color(0xFF94A3B8)
@@ -165,21 +158,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               padding: const EdgeInsets.symmetric(vertical: 32),
               child: GestureDetector(
                 onTap: () => context.go(AppRoutes.login),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.arrow_back_rounded,
                       size: 18,
                       color: AppTheme.primary,
                     ),
-                     SizedBox(width: 8),
-                     Text(
+                    const SizedBox(width: 8),
+                    Text(
                       'Quay lại Đăng nhập',
-                      style: TextStyle(
-                        fontFamily: 'Manrope',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      style: context.typo.subtitle.small.copyWith(
                         color: AppTheme.primary,
                       ),
                     ),

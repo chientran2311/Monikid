@@ -5,11 +5,6 @@ class AppConstants {
   static const String appName = 'MoniKid';
   static const String appVersion = '1.0.0';
 
-  // Mock Bank Defaults (Hardcode URL cho simulator/emulator là ok)
-  static const double initialMockBankBalance = 10000000; // 10M VND
-  static const String defaultBankName = 'Mock Bank';
-  static const String mockBankApiUrlAndroid = 'http://10.0.2.2:3001/api/v1';
-  static const String mockBankApiUrlIos = 'http://127.0.0.1:3001/api/v1';
 
   // Location Rules
   static const int locationIntervalMinutes = 15;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
 
 class ChangeLanguageDialog extends ConsumerWidget {

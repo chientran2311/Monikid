@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CreateNewPINState {
 
- String get pinCode; EnterPINCodeEnum get type; String? get pendingPinCodeHash; bool get isLoading;
+ String get currentPin; String? get draftPinCode; CreateNewPinStatus get status;
 /// Create a copy of CreateNewPINState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $CreateNewPINStateCopyWith<CreateNewPINState> get copyWith => _$CreateNewPINStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateNewPINState&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.type, type) || other.type == type)&&(identical(other.pendingPinCodeHash, pendingPinCodeHash) || other.pendingPinCodeHash == pendingPinCodeHash)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateNewPINState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.draftPinCode, draftPinCode) || other.draftPinCode == draftPinCode)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pinCode,type,pendingPinCodeHash,isLoading);
+int get hashCode => Object.hash(runtimeType,currentPin,draftPinCode,status);
 
 @override
 String toString() {
-  return 'CreateNewPINState(pinCode: $pinCode, type: $type, pendingPinCodeHash: $pendingPinCodeHash, isLoading: $isLoading)';
+  return 'CreateNewPINState(currentPin: $currentPin, draftPinCode: $draftPinCode, status: $status)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $CreateNewPINStateCopyWith<$Res>  {
   factory $CreateNewPINStateCopyWith(CreateNewPINState value, $Res Function(CreateNewPINState) _then) = _$CreateNewPINStateCopyWithImpl;
 @useResult
 $Res call({
- String pinCode, EnterPINCodeEnum type, String? pendingPinCodeHash, bool isLoading
+ String currentPin, String? draftPinCode, CreateNewPinStatus status
 });
 
 
@@ -63,13 +63,12 @@ class _$CreateNewPINStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateNewPINState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? pinCode = null,Object? type = null,Object? pendingPinCodeHash = freezed,Object? isLoading = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentPin = null,Object? draftPinCode = freezed,Object? status = null,}) {
   return _then(_self.copyWith(
-pinCode: null == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as EnterPINCodeEnum,pendingPinCodeHash: freezed == pendingPinCodeHash ? _self.pendingPinCodeHash : pendingPinCodeHash // ignore: cast_nullable_to_non_nullable
-as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,
+currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
+as String,draftPinCode: freezed == draftPinCode ? _self.draftPinCode : draftPinCode // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as CreateNewPinStatus,
   ));
 }
 
@@ -80,13 +79,12 @@ as bool,
 
 
 class _CreateNewPINState extends CreateNewPINState {
-  const _CreateNewPINState({required this.pinCode, required this.type, this.pendingPinCodeHash, this.isLoading = false}): super._();
+  const _CreateNewPINState({this.currentPin = '', this.draftPinCode, this.status = CreateNewPinStatus.editing}): super._();
   
 
-@override final  String pinCode;
-@override final  EnterPINCodeEnum type;
-@override final  String? pendingPinCodeHash;
-@override@JsonKey() final  bool isLoading;
+@override@JsonKey() final  String currentPin;
+@override final  String? draftPinCode;
+@override@JsonKey() final  CreateNewPinStatus status;
 
 /// Create a copy of CreateNewPINState
 /// with the given fields replaced by the non-null parameter values.
@@ -98,16 +96,16 @@ _$CreateNewPINStateCopyWith<_CreateNewPINState> get copyWith => __$CreateNewPINS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateNewPINState&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.type, type) || other.type == type)&&(identical(other.pendingPinCodeHash, pendingPinCodeHash) || other.pendingPinCodeHash == pendingPinCodeHash)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateNewPINState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.draftPinCode, draftPinCode) || other.draftPinCode == draftPinCode)&&(identical(other.status, status) || other.status == status));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,pinCode,type,pendingPinCodeHash,isLoading);
+int get hashCode => Object.hash(runtimeType,currentPin,draftPinCode,status);
 
 @override
 String toString() {
-  return 'CreateNewPINState(pinCode: $pinCode, type: $type, pendingPinCodeHash: $pendingPinCodeHash, isLoading: $isLoading)';
+  return 'CreateNewPINState(currentPin: $currentPin, draftPinCode: $draftPinCode, status: $status)';
 }
 
 
@@ -118,7 +116,7 @@ abstract mixin class _$CreateNewPINStateCopyWith<$Res> implements $CreateNewPINS
   factory _$CreateNewPINStateCopyWith(_CreateNewPINState value, $Res Function(_CreateNewPINState) _then) = __$CreateNewPINStateCopyWithImpl;
 @override @useResult
 $Res call({
- String pinCode, EnterPINCodeEnum type, String? pendingPinCodeHash, bool isLoading
+ String currentPin, String? draftPinCode, CreateNewPinStatus status
 });
 
 
@@ -135,13 +133,12 @@ class __$CreateNewPINStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateNewPINState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? pinCode = null,Object? type = null,Object? pendingPinCodeHash = freezed,Object? isLoading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentPin = null,Object? draftPinCode = freezed,Object? status = null,}) {
   return _then(_CreateNewPINState(
-pinCode: null == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
-as EnterPINCodeEnum,pendingPinCodeHash: freezed == pendingPinCodeHash ? _self.pendingPinCodeHash : pendingPinCodeHash // ignore: cast_nullable_to_non_nullable
-as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,
+currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
+as String,draftPinCode: freezed == draftPinCode ? _self.draftPinCode : draftPinCode // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as CreateNewPinStatus,
   ));
 }
 

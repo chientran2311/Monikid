@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class Card extends StatelessWidget {
   const Card({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        // Gradient nhẹ để tạo chiều sâu
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -33,38 +33,38 @@ class Card extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Total Balance",
-            style: TextStyle(color: AppTheme.textGrey, fontSize: 14),
+          Text(
+            'Total Balance',
+            style: context.typo.text.medium.copyWith(color: AppTheme.textGrey),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "\$12,450.00",
-                style: TextStyle(
+              Text(
+                '\$12,450.00',
+                style: context.typo.amount.medium.copyWith(
                   color: AppTheme.textWhite,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
-              // Icon mắt (ẩn hiện số dư)
-              Icon(Icons.visibility_outlined, color: AppTheme .textGrey.withOpacity(0.5)),
+              Icon(
+                Icons.visibility_outlined,
+                color: AppTheme.textGrey.withOpacity(0.5),
+              ),
             ],
           ),
           const SizedBox(height: 24),
-          // Divider ảo
           Container(height: 1, color: Colors.white10),
           const SizedBox(height: 16),
-          // Thông tin phụ
           Row(
-            children: const [
-              Icon(Icons.trending_up, color: AppTheme.primaryGreen, size: 16),
-              SizedBox(width: 4),
+            children: [
+              const Icon(Icons.trending_up, color: AppTheme.primaryGreen, size: 16),
+              const SizedBox(width: 4),
               Text(
-                "+ \$450.00 this month",
-                style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold),
+                '+ \$450.00 this month',
+                style: context.typo.button.small.copyWith(
+                  color: AppTheme.primaryGreen,
+                ),
               ),
             ],
           ),

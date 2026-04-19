@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/models/entities/fqa/fqa_model.dart';
 import 'package:monikid/features/fqa/widgets/fqa_skeleton_list.dart';
@@ -16,7 +16,7 @@ class FQAScreen extends ConsumerWidget {
     final notifier = ref.read(fQAProvider.notifier);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Scaffold(

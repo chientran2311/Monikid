@@ -1,57 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/features/auth/auth_status.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/splash/splash_provider.dart';
 import 'package:monikid/features/splash/splash_state.dart';
 import 'package:monikid/features/splash/widgets/splash_brand_section.dart';
 import 'package:monikid/features/splash/widgets/splash_loading_section.dart';
 
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends HookConsumerWidget {
   const SplashScreen({super.key});
 
   @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends ConsumerState<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(splashNotifierProvider.notifier).init();
-    });
-  }
-
-  void _navigateToHome(SplashState state) {
-    if (state.authStatus == AuthStatus.isAuthenticated) {
-      final role = ref.read(authSessionProvider).userRole;
-      if (role == 'parent') {
-        context.go(AppRoutes.parent);
-      } else {
-        context.go(AppRoutes.studentMain);
-      }
-      return;
-    }
-
-    if (state.onboardingComplete) {
-      context.go(AppRoutes.login);
-    } else {
-      context.go(AppRoutes.onboard1);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(splashNotifierProvider.notifier);
     final splashState = ref.watch(splashNotifierProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    useEffect(() {
+      Future.microtask(notifier.validateUserForRoute);
+      return null;
+    }, [notifier]);
 
     ref.listen<SplashState>(splashNotifierProvider, (previous, next) {
-      if (previous?.isLoading == true && next.isLoading == false) {
-        _navigateToHome(next);
+      final targetChanged = previous?.routeTarget != next.routeTarget;
+      if (!targetChanged || next.isLoading) {
+        return;
+      }
+
+      if (next.routeTarget == SplashRouteTarget.pinGateway) {
+        context.go(AppRoutes.pinGateway);
+        return;
+      }
+
+      if (next.routeTarget == SplashRouteTarget.login) {
+        context.go(AppRoutes.login);
       }
     });
 
@@ -69,12 +53,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   ? [
                       AppTheme.backgroundDark,
                       AppTheme.backgroundDark,
-                      AppTheme.primary.withOpacity(0.20),
+                      AppTheme.primary.withValues(alpha: 0.20),
                     ]
                   : [
                       Colors.white,
                       Colors.white,
-                      AppTheme.primary.withOpacity(0.10),
+                      AppTheme.primary.withValues(alpha: 0.10),
                     ],
             ),
           ),
@@ -92,7 +76,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          AppTheme.primary.withOpacity(0.05),
+                          AppTheme.primary.withValues(alpha: 0.05),
                           Colors.transparent,
                         ],
                       ),

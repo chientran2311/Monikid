@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DetailTransactionState {
 
- TransactionStatus get status; TransactionModel? get transaction; String? get errorMessage;
+ TransactionStatus get status; String? get currentTransactionId; TransactionModel? get transaction; String? get errorMessage;
 /// Create a copy of DetailTransactionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $DetailTransactionStateCopyWith<DetailTransactionState> get copyWith => _$Detail
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DetailTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.transaction, transaction) || other.transaction == transaction)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DetailTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.transaction, transaction) || other.transaction == transaction)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,transaction,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,currentTransactionId,transaction,errorMessage);
 
 @override
 String toString() {
-  return 'DetailTransactionState(status: $status, transaction: $transaction, errorMessage: $errorMessage)';
+  return 'DetailTransactionState(status: $status, currentTransactionId: $currentTransactionId, transaction: $transaction, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $DetailTransactionStateCopyWith<$Res>  {
   factory $DetailTransactionStateCopyWith(DetailTransactionState value, $Res Function(DetailTransactionState) _then) = _$DetailTransactionStateCopyWithImpl;
 @useResult
 $Res call({
- TransactionStatus status, TransactionModel? transaction, String? errorMessage
+ TransactionStatus status, String? currentTransactionId, TransactionModel? transaction, String? errorMessage
 });
 
 
@@ -63,10 +63,11 @@ class _$DetailTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of DetailTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? transaction = freezed,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? currentTransactionId = freezed,Object? transaction = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as TransactionStatus,transaction: freezed == transaction ? _self.transaction : transaction // ignore: cast_nullable_to_non_nullable
+as TransactionStatus,currentTransactionId: freezed == currentTransactionId ? _self.currentTransactionId : currentTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,transaction: freezed == transaction ? _self.transaction : transaction // ignore: cast_nullable_to_non_nullable
 as TransactionModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -91,10 +92,11 @@ $TransactionModelCopyWith<$Res>? get transaction {
 
 
 class _DetailTransactionState extends DetailTransactionState {
-  const _DetailTransactionState({this.status = TransactionStatus.initial, this.transaction, this.errorMessage}): super._();
+  const _DetailTransactionState({this.status = TransactionStatus.initial, this.currentTransactionId, this.transaction, this.errorMessage}): super._();
   
 
 @override@JsonKey() final  TransactionStatus status;
+@override final  String? currentTransactionId;
 @override final  TransactionModel? transaction;
 @override final  String? errorMessage;
 
@@ -108,16 +110,16 @@ _$DetailTransactionStateCopyWith<_DetailTransactionState> get copyWith => __$Det
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DetailTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.transaction, transaction) || other.transaction == transaction)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DetailTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.transaction, transaction) || other.transaction == transaction)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,transaction,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,currentTransactionId,transaction,errorMessage);
 
 @override
 String toString() {
-  return 'DetailTransactionState(status: $status, transaction: $transaction, errorMessage: $errorMessage)';
+  return 'DetailTransactionState(status: $status, currentTransactionId: $currentTransactionId, transaction: $transaction, errorMessage: $errorMessage)';
 }
 
 
@@ -128,7 +130,7 @@ abstract mixin class _$DetailTransactionStateCopyWith<$Res> implements $DetailTr
   factory _$DetailTransactionStateCopyWith(_DetailTransactionState value, $Res Function(_DetailTransactionState) _then) = __$DetailTransactionStateCopyWithImpl;
 @override @useResult
 $Res call({
- TransactionStatus status, TransactionModel? transaction, String? errorMessage
+ TransactionStatus status, String? currentTransactionId, TransactionModel? transaction, String? errorMessage
 });
 
 
@@ -145,10 +147,11 @@ class __$DetailTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of DetailTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? transaction = freezed,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? currentTransactionId = freezed,Object? transaction = freezed,Object? errorMessage = freezed,}) {
   return _then(_DetailTransactionState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as TransactionStatus,transaction: freezed == transaction ? _self.transaction : transaction // ignore: cast_nullable_to_non_nullable
+as TransactionStatus,currentTransactionId: freezed == currentTransactionId ? _self.currentTransactionId : currentTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,transaction: freezed == transaction ? _self.transaction : transaction // ignore: cast_nullable_to_non_nullable
 as TransactionModel?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

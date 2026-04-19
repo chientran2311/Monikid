@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:monikid/core/font/font.dart';
 
 /// MoniKid App Theme - Updated to exactly match HTML reference
 class AppTheme {
@@ -39,6 +40,20 @@ class AppTheme {
   static const Color surfaceVariant = Color(0xFF1E293B); // Dark surface variant
   static const Color borderDark = Color(0xFF334155); // Dark border
   static const Color borderLight = Color(0xFFE2E8F0); // Light border
+  static const Color amberSurface = Color(0xFFFFFBEB);
+  static const Color amberBorder = Color(0xFFFDE68A);
+  static const Color amberFill = Color(0xFFFEF3C7);
+  static const Color amberText = Color(0xFFD97706);
+  static const Color chartOrange = Color(0xFFF59E0B);
+  static const Color chartBlue = Color(0xFF3B82F6);
+  static const Color chartPurple = Color(0xFF8B5CF6);
+  static const Color chartGreen = Color(0xFF22C55E);
+  static const Color successSurface = Color(0xFFECFDF3);
+  static const Color successBorder = Color(0xFF86EFAC);
+  static const Color dangerSurface = Color(0xFFFEF2F2);
+  static const Color dangerBorder = Color(0xFFFECACA);
+  static const Color infoSurface = Color(0xFFEFF6FF);
+  static const Color infoBorder = Color(0xFFBFDBFE);
 
   // ==========================================================================
   // DARK THEME
@@ -66,15 +81,16 @@ class AppTheme {
       ).apply(bodyColor: textWhite, displayColor: textWhite),
 
       // Style cho AppBar
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: textWhite),
-        titleTextStyle: TextStyle(
+        iconTheme: const IconThemeData(color: textWhite),
+        titleTextStyle: AppTextStyleFactory.style(
+          size: AppFontSizes.titleMedium,
+          weight: FontWeight.w700,
           color: textWhite,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+          scaled: false,
         ),
       ),
 
@@ -82,7 +98,12 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceDark,
-        hintStyle: const TextStyle(color: textGrey, fontSize: 14),
+        hintStyle: AppTextStyleFactory.style(
+          size: AppFontSizes.textMedium,
+          weight: FontWeight.w400,
+          color: textGrey,
+          scaled: false,
+        ),
         prefixIconColor: textGrey,
         suffixIconColor: textGrey,
         contentPadding: const EdgeInsets.symmetric(
@@ -113,7 +134,12 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
           ),
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          textStyle: AppTextStyleFactory.style(
+            size: AppFontSizes.buttonSmall,
+            weight: FontWeight.w700,
+            color: Colors.white,
+            scaled: false,
+          ),
         ),
       ),
     );
@@ -145,15 +171,16 @@ class AppTheme {
       ).apply(bodyColor: textBlack, displayColor: textBlack),
 
       // AppBar Light Mode
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: textBlack),
-        titleTextStyle: TextStyle(
+        iconTheme: const IconThemeData(color: textBlack),
+        titleTextStyle: AppTextStyleFactory.style(
+          size: AppFontSizes.titleMedium,
+          weight: FontWeight.w700,
           color: textBlack,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+          scaled: false,
         ),
       ),
 
@@ -161,7 +188,12 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceLight,
-        hintStyle: TextStyle(color: textGrey.withOpacity(0.8), fontSize: 14),
+        hintStyle: AppTextStyleFactory.style(
+          size: AppFontSizes.textMedium,
+          weight: FontWeight.w400,
+          color: textGrey.withValues(alpha: 0.8),
+          scaled: false,
+        ),
         prefixIconColor: textGrey,
         suffixIconColor: textGrey,
         contentPadding: const EdgeInsets.symmetric(
@@ -188,12 +220,17 @@ class AppTheme {
           backgroundColor: primary,
           foregroundColor: Colors.white,
           elevation: 2,
-          shadowColor: primary.withOpacity(0.4),
+          shadowColor: primary.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
           ),
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          textStyle: AppTextStyleFactory.style(
+            size: AppFontSizes.buttonSmall,
+            weight: FontWeight.w700,
+            color: Colors.white,
+            scaled: false,
+          ),
         ),
       ),
     );

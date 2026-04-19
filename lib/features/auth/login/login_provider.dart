@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:monikid/core/config/storage_keys.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/core/utils/validators.dart';
+import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/features/auth/auth_status.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/models/entities/auth/params/auth_param.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -15,11 +17,13 @@ part 'login_provider.g.dart';
 class Login extends _$Login {
   late final Logger _logger;
   late final AuthRepository _authRepository;
+  late final AppLocalStorage _localStorage;
 
   @override
   LoginState build() {
     _logger = getIt<Logger>();
-    _authRepository = getIt<AuthRepository>();
+    _authRepository = ref.read(authRepositoryProvider);
+    _localStorage = getIt<AppLocalStorage>();
     return const LoginState();
   }
 
@@ -27,8 +31,12 @@ class Login extends _$Login {
     state = state.copyWith(errorMessage: null);
   }
 
+  void reset() {
+    state = const LoginState();
+  }
+
   Future<void> signIn({required String email, required String password}) async {
-    final emailError = Validators.email(email);
+    final emailError = _validateEmail(email);
     if (emailError != null) {
       state = state.copyWith(
         status: AuthStatus.error,
@@ -37,7 +45,7 @@ class Login extends _$Login {
       return;
     }
 
-    final passwordError = Validators.password(password);
+    final passwordError = _validatePassword(password);
     if (passwordError != null) {
       state = state.copyWith(
         status: AuthStatus.error,
@@ -56,7 +64,11 @@ class Login extends _$Login {
       await _authRepository.signIn(
         SignInParam(email: email.trim(), password: password),
       );
-      state = state.copyWith(status: AuthStatus.success);
+      await ref.read(authSessionProvider.notifier).ensureAuthenticatedSession();
+      await _localStorage.writeBool(
+        key: StorageKeys.hasSignedInBefore,
+        value: true,
+      );
     } on FirebaseAuthException catch (e, stackTrace) {
       _logger.e(
         'Login provider Firebase error',
@@ -79,18 +91,44 @@ class Login extends _$Login {
   String _mapFirebaseError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return 'Không tìm thấy người dùng với email này.';
+        return 'No user was found for this email address.';
       case 'wrong-password':
       case 'invalid-credential':
-        return 'Email hoặc mật khẩu không chính xác.';
+        return 'The email or password is incorrect.';
       case 'invalid-email':
-        return 'Địa chỉ email không hợp lệ.';
+        return 'Please enter a valid email address.';
       case 'user-disabled':
-        return 'Tài khoản này đã bị vô hiệu hóa.';
+        return 'This account has been disabled.';
       case 'too-many-requests':
-        return 'Quá nhiều lần đăng nhập thất bại. Vui lòng thử lại sau.';
+        return 'Too many failed attempts. Please try again later.';
       default:
-        return e.message ?? 'Đã xảy ra lỗi hệ thống.';
+        return e.message ?? 'An unexpected system error occurred.';
     }
+  }
+
+  String? _validateEmail(String value) {
+    final trimmedValue = value.trim();
+    if (trimmedValue.isEmpty) {
+      return 'Please enter your email address.';
+    }
+
+    final emailRegex = RegExp(r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(trimmedValue)) {
+      return 'Please enter a valid email address.';
+    }
+
+    return null;
+  }
+
+  String? _validatePassword(String value) {
+    if (value.isEmpty) {
+      return 'Please enter your password.';
+    }
+
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters long.';
+    }
+
+    return null;
   }
 }

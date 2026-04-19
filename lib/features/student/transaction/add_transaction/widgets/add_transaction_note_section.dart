@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 
 class AddTransactionNoteSection extends StatelessWidget {
@@ -26,7 +27,7 @@ class AddTransactionNoteSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Ghi chú',
+              s.transactionNoteLabel,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -41,20 +42,20 @@ class AddTransactionNoteSection extends StatelessWidget {
                 vertical: 2,
               ),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.auto_awesome,
                     size: 14,
                     color: AppTheme.primary,
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
-                    'AI Tự động',
-                    style: TextStyle(
+                    s.transactionAiAutoLabel,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppTheme.primary,
@@ -78,7 +79,7 @@ class AddTransactionNoteSection extends StatelessWidget {
             boxShadow: [
               if (!isDark)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -89,11 +90,11 @@ class AddTransactionNoteSection extends StatelessWidget {
             enabled: enabled,
             maxLines: 3,
             style: TextStyle(color: textColor),
-            decoration: const InputDecoration(
-              hintText: 'Nhập ghi chú, AI sẽ tự động phân loại...',
-              hintStyle: TextStyle(color: Color(0xFF94A3B8)),
+            decoration: InputDecoration(
+              hintText: s.addTransactionNoteHint,
+              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.all(16),
+              contentPadding: const EdgeInsets.all(16),
             ),
           ),
         ),

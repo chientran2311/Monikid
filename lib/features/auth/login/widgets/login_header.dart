@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class LoginHeader extends StatelessWidget {
   const LoginHeader({Key? key}) : super(key: key);
@@ -77,10 +78,7 @@ class LoginHeader extends StatelessWidget {
         // Title & Tagline
         Text(
           "MoniKid",
-          style: TextStyle(
-            fontFamily: 'Manrope',
-            fontSize: 36, // text-4xl
-            fontWeight: FontWeight.w800, // font-extrabold
+          style: context.typo.bigTitle.large.copyWith(
             letterSpacing: -0.5,
             color: isDark ? AppTheme.primaryLight : AppTheme.primary,
           ),
@@ -89,9 +87,7 @@ class LoginHeader extends StatelessWidget {
         Text(
           "Quản lý tài chính an toàn cho gia đình bạn.",
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'Manrope',
-            fontSize: 14,
+          style: context.typo.text.medium.copyWith(
             color: isDark
                 ? const Color(0xFF94A3B8)
                 : const Color(0xFF64748B), // text-slate-500 / slate-400

@@ -1,9 +1,9 @@
-import 'package:monikid/core/utils/logger.dart';
+
 import 'package:monikid/features/change_language/change_language_provider.dart';
 import 'package:monikid/features/fqa/fqa_state.dart';
 import 'package:monikid/repositories/fqa/fqa_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 
 part 'fqa_provider.g.dart';
 

@@ -1,4 +1,5 @@
 import 'package:logger/logger.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -16,7 +17,7 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
 
   @override
   AddTransactionState build() {
-    _repository = getIt<TransactionRepository>();
+    _repository = ref.read(transactionRepositoryProvider);
     _logger = getIt<Logger>();
     return const AddTransactionState();
   }
@@ -42,7 +43,7 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
       );
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: 'Không thể thêm giao dịch. Vui lòng thử lại.',
+        errorMessage: s.addTransactionFailed,
       );
     }
   }

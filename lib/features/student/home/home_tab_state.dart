@@ -1,16 +1,28 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
 
 part 'home_tab_state.freezed.dart';
 
+enum HomeTabStatus {
+  initial,
+  loading,
+  success,
+  empty,
+  error,
+}
+
 @freezed
 abstract class HomeTabState with _$HomeTabState {
-  const HomeTabState._();
-
   const factory HomeTabState({
-    required List<TransactionModel> transactions,
-    @Default(false) bool isLoading,
+    @Default(HomeTabStatus.initial) HomeTabStatus status,
+    @Default(0) double monthlyIncome,
+    @Default(0) double monthlyExpense,
+    String? errorMessage,
   }) = _HomeTabState;
 
-  bool get isEmpty => transactions.isEmpty;
+  const HomeTabState._();
+
+  bool get isLoading => status == HomeTabStatus.loading;
+  bool get isSuccess => status == HomeTabStatus.success;
+  bool get isEmpty => status == HomeTabStatus.empty;
+  bool get isError => status == HomeTabStatus.error;
 }

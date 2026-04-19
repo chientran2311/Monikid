@@ -12,45 +12,57 @@ TransactionRepository transactionRepository(Ref ref) {
   return getIt<TransactionRepository>();
 }
 
+typedef TransactionSummary = ({double totalIncome, double totalExpense});
+typedef TransactionMonthRecord = ({List<TransactionModel> transactions, DateTime month});
+
 abstract class TransactionRepository {
   Future<void> addTransaction(TransactionModel transaction);
 
   Future<void> updateTransaction(TransactionModel transaction);
 
-  Future<void> deleteTransaction(String transactionId);
+  Future<void> deleteTransaction(String userId, String transactionId);
 
-  Stream<({List<TransactionModel> transactions, DateTime month})> getTransactionsByMonth(
+  Future<TransactionModel?> getTransactionById(
+    String userId,
+    String transactionId,
+  );
+
+  Stream<TransactionMonthRecord> getTransactionsByMonth(
     String userId,
     DateTime month, {
     int? limit,
     String? type,
   });
 
-  Future<List<TransactionModel>> getRecentTransactionsPaginated(
+  Future<List<TransactionModel>?> getRecentTransactionsPaginated(
     String userId, {
     TransactionModel? lastTransaction,
-    int limit = 4,
+    int limit = 6,
   });
 
   Future<List<TransactionModel>> getTransactionsByFilter(
     String userId, {
     DateTime? date,
-    String? category,
+    String? categoryKey,
     String? type,
     TransactionModel? lastTransaction,
     int limit = 8,
   });
 
-  Future<({double totalIncome, double totalExpense})> getSummary(
+  Future<TransactionSummary?> getSummary(
     String userId, {
     DateTime? month,
     DateTime? date,
+    String? categoryKey,
+    String? type,
   });
 
-  Stream<({double totalIncome, double totalExpense})> watchSummary(
+  Stream<TransactionSummary> watchSummary(
     String userId, {
     DateTime? month,
     DateTime? date,
+    String? categoryKey,
+    String? type,
   });
 }
 
@@ -60,18 +72,23 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final FirebaseFirestore _firestore;
   final Logger _logger;
 
-  CollectionReference<Map<String, dynamic>> get _transactions =>
-      _firestore.collection('transactions');
+  CollectionReference<Map<String, dynamic>> _transactionsOfUser(String userId) {
+    return _firestore.collection('users').doc(userId).collection('transactions');
+  }
 
   @override
   Future<void> addTransaction(TransactionModel transaction) async {
     try {
-      _logger.i('Adding transaction: ${transaction.transactionId}');
-      await _transactions
+      _logger.i('Adding transaction ${transaction.transactionId}.');
+      await _transactionsOfUser(transaction.userId)
           .doc(transaction.transactionId)
           .set(transaction.toFirestore());
-    } catch (e, stackTrace) {
-      _logger.e('Error adding transaction', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to add transaction.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
@@ -79,30 +96,67 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<void> updateTransaction(TransactionModel transaction) async {
     try {
-      final updatedTransaction = transaction.copyWith(updatedAt: DateTime.now());
-      _logger.i('Updating transaction: ${transaction.transactionId}');
-      await _transactions
+      final updatedTransaction = transaction.copyWith(
+        updatedAt: DateTime.now(),
+      );
+      _logger.i('Updating transaction ${transaction.transactionId}.');
+      await _transactionsOfUser(transaction.userId)
           .doc(transaction.transactionId)
           .update(updatedTransaction.toFirestore());
-    } catch (e, stackTrace) {
-      _logger.e('Error updating transaction', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to update transaction.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
 
   @override
-  Future<void> deleteTransaction(String transactionId) async {
+  Future<void> deleteTransaction(String userId, String transactionId) async {
     try {
-      _logger.i('Deleting transaction: $transactionId');
-      await _transactions.doc(transactionId).delete();
-    } catch (e, stackTrace) {
-      _logger.e('Error deleting transaction', error: e, stackTrace: stackTrace);
+      _logger.i('Deleting transaction $transactionId.');
+      await _transactionsOfUser(userId).doc(transactionId).delete();
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to delete transaction.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
 
   @override
-  Stream<({List<TransactionModel> transactions, DateTime month})> getTransactionsByMonth(
+  Future<TransactionModel?> getTransactionById(
+    String userId,
+    String transactionId,
+  ) async {
+    try {
+      _logger.i('Fetching transaction $transactionId.');
+      final snapshot = await _transactionsOfUser(userId).doc(transactionId).get();
+      final data = snapshot.data();
+      if (!snapshot.exists || data == null) {
+        return null;
+      }
+
+      return TransactionModel.fromFirestore({
+        ...data,
+        'transaction_id': data['transaction_id'] ?? snapshot.id,
+      });
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to fetch transaction by id.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return null;
+    }
+  }
+
+  @override
+  Stream<TransactionMonthRecord> getTransactionsByMonth(
     String userId,
     DateTime month, {
     int? limit,
@@ -110,11 +164,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }) {
     final range = _monthRange(month);
 
-    Query<Map<String, dynamic>> query = _transactions
-        .where('userId', isEqualTo: userId)
-        .where('dateTs', isGreaterThanOrEqualTo: Timestamp.fromDate(range.start))
-        .where('dateTs', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
-        .orderBy('dateTs', descending: true);
+    Query<Map<String, dynamic>> query = _transactionsOfUser(userId)
+        .where(
+          'date_ts',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
+        )
+        .where(
+          'date_ts',
+          isLessThanOrEqualTo: Timestamp.fromDate(range.end),
+        )
+        .orderBy('date_ts', descending: true);
 
     if (type != null && type != 'all') {
       query = query.where('type', isEqualTo: type);
@@ -129,7 +188,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       return (transactions: transactions, month: month);
     }).handleError((error, stackTrace) {
       _logger.e(
-        'Error listening transactions by month',
+        'Failed to listen transactions by month.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -138,30 +197,29 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<List<TransactionModel>> getRecentTransactionsPaginated(
+  Future<List<TransactionModel>?> getRecentTransactionsPaginated(
     String userId, {
     TransactionModel? lastTransaction,
-    int limit = 4,
+    int limit = 6,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _transactions
-          .where('userId', isEqualTo: userId)
-          .orderBy('dateTs', descending: true)
+      Query<Map<String, dynamic>> query = _transactionsOfUser(userId)
+          .orderBy('date_ts', descending: true)
           .limit(limit);
 
       if (lastTransaction != null) {
-        query = query.startAfter([Timestamp.fromDate(lastTransaction.date)]);
+        query = query.startAfter([Timestamp.fromDate(lastTransaction.dateTs)]);
       }
 
       final snapshot = await query.get();
       return snapshot.docs.map(_mapTransaction).toList();
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.e(
-        'Error fetching recent transactions',
-        error: e,
+        'Failed to fetch recent transactions.',
+        error: error,
         stackTrace: stackTrace,
       );
-      rethrow;
+      return null;
     }
   }
 
@@ -169,44 +227,30 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<List<TransactionModel>> getTransactionsByFilter(
     String userId, {
     DateTime? date,
-    String? category,
+    String? categoryKey,
     String? type,
     TransactionModel? lastTransaction,
     int limit = 8,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _transactions.where(
-        'userId',
-        isEqualTo: userId,
-      );
-
-      if (date != null) {
-        final range = _dayRange(date);
-        query = query
-            .where('dateTs', isGreaterThanOrEqualTo: Timestamp.fromDate(range.start))
-            .where('dateTs', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
-      }
-
-      if (category != null && category.isNotEmpty) {
-        query = query.where('category', isEqualTo: category);
-      }
-
-      if (type != null && type != 'all') {
-        query = query.where('type', isEqualTo: type);
-      }
-
-      query = query.orderBy('dateTs', descending: true).limit(limit);
+      Query<Map<String, dynamic>> query = _buildFilteredTransactionQuery(
+        userId,
+        date: date,
+        month: date == null ? DateTime.now() : null,
+        categoryKey: categoryKey,
+        type: type,
+      ).limit(limit);
 
       if (lastTransaction != null) {
-        query = query.startAfter([Timestamp.fromDate(lastTransaction.date)]);
+        query = query.startAfter([Timestamp.fromDate(lastTransaction.dateTs)]);
       }
 
       final snapshot = await query.get();
       return snapshot.docs.map(_mapTransaction).toList();
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.e(
-        'Error fetching transactions by filter',
-        error: e,
+        'Failed to fetch transactions by filter.',
+        error: error,
         stackTrace: stackTrace,
       );
       rethrow;
@@ -214,72 +258,124 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<({double totalIncome, double totalExpense})> getSummary(
+  Future<TransactionSummary?> getSummary(
     String userId, {
     DateTime? month,
     DateTime? date,
+    String? categoryKey,
+    String? type,
   }) async {
     try {
       final snapshot = await _buildSummaryQuery(
         userId,
         month: month,
         date: date,
+        categoryKey: categoryKey,
+        type: type,
       ).get();
       return _sumTransactions(snapshot.docs.map(_mapTransaction));
-    } catch (e, stackTrace) {
-      _logger.e('Error getting summary', error: e, stackTrace: stackTrace);
-      rethrow;
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to get summary.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return null;
     }
   }
 
   @override
-  Stream<({double totalIncome, double totalExpense})> watchSummary(
+  Stream<TransactionSummary> watchSummary(
     String userId, {
     DateTime? month,
     DateTime? date,
+    String? categoryKey,
+    String? type,
   }) {
-    return _buildSummaryQuery(userId, month: month, date: date)
+    return _buildSummaryQuery(
+      userId,
+      month: month,
+      date: date,
+      categoryKey: categoryKey,
+      type: type,
+    )
         .snapshots()
         .map((snapshot) => _sumTransactions(snapshot.docs.map(_mapTransaction)));
+  }
+
+  Query<Map<String, dynamic>> _buildFilteredTransactionQuery(
+    String userId, {
+    DateTime? month,
+    DateTime? date,
+    String? categoryKey,
+    String? type,
+  }) {
+    Query<Map<String, dynamic>> query = _transactionsOfUser(userId);
+
+    if (date != null) {
+      final range = _dayRange(date);
+      query = query
+          .where(
+            'date_ts',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
+          )
+          .where(
+            'date_ts',
+            isLessThanOrEqualTo: Timestamp.fromDate(range.end),
+          );
+    } else {
+      final range = _monthRange(month ?? DateTime.now());
+      query = query
+          .where(
+            'date_ts',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
+          )
+          .where(
+            'date_ts',
+            isLessThanOrEqualTo: Timestamp.fromDate(range.end),
+          );
+    }
+
+    if (categoryKey != null && categoryKey.isNotEmpty) {
+      query = query.where('category_key', isEqualTo: categoryKey);
+    }
+
+    if (type != null && type != 'all') {
+      query = query.where('type', isEqualTo: type);
+    }
+
+    return query.orderBy('date_ts', descending: true);
   }
 
   Query<Map<String, dynamic>> _buildSummaryQuery(
     String userId, {
     DateTime? month,
     DateTime? date,
+    String? categoryKey,
+    String? type,
   }) {
-    Query<Map<String, dynamic>> query = _transactions.where(
-      'userId',
-      isEqualTo: userId,
+    return _buildFilteredTransactionQuery(
+      userId,
+      month: month,
+      date: date,
+      categoryKey: categoryKey,
+      type: type,
     );
-
-    if (date != null) {
-      final range = _dayRange(date);
-      query = query
-          .where('dateTs', isGreaterThanOrEqualTo: Timestamp.fromDate(range.start))
-          .where('dateTs', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
-    } else if (month != null) {
-      final range = _monthRange(month);
-      query = query
-          .where('dateTs', isGreaterThanOrEqualTo: Timestamp.fromDate(range.start))
-          .where('dateTs', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
-    }
-
-    return query.orderBy('dateTs', descending: true);
   }
 
-  TransactionModel _mapTransaction(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+  TransactionModel _mapTransaction(
+    QueryDocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data();
     return TransactionModel.fromFirestore({
       ...data,
-      if ((data['transactionId'] as String?) == null || (data['transactionId'] as String).isEmpty)
-        'transactionId': doc.id,
+      if ((data['transaction_id'] as String?) == null ||
+          (data['transaction_id'] as String).isEmpty)
+        'transaction_id': doc.id,
     });
   }
 
-  ({double totalIncome, double totalExpense}) _sumTransactions(
-    Iterable<TransactionModel> transactions,
-  ) {
+  TransactionSummary _sumTransactions(Iterable<TransactionModel> transactions) {
     double totalIncome = 0;
     double totalExpense = 0;
 

@@ -3,7 +3,7 @@ import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/change_profile/change_profile_state.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 
 part 'change_profile_provider.g.dart';
 

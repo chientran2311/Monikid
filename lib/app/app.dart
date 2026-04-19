@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/l10n/app_localizations.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
+import 'package:monikid/l10n/app_localizations.dart';
 
-/// Global S accessor so S can be accessed anywhere
-S get s => S.of(rootNavigatorKey.currentContext!)!;
+/// Global localization accessor for legacy non-widget call sites.
+AppLocalizations get s => rootNavigatorKey.l10n;
 
 /// Main App Widget
 class MoniKidApp extends ConsumerWidget {
@@ -35,8 +36,8 @@ class MoniKidApp extends ConsumerWidget {
       },
 
       // Localization
-      localizationsDelegates: S.localizationsDelegates,
-      supportedLocales: S.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       locale: Locale(localeState.localeCode),
     );
   }

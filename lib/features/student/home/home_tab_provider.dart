@@ -1,9 +1,9 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
-import 'package:monikid/repositories/transaction/transaction_repository.dart';
+import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:logger/logger.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_provider.dart';
+import 'package:monikid/repositories/transaction/transaction_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'home_tab_state.dart';
 
@@ -11,81 +11,69 @@ part 'home_tab_provider.g.dart';
 
 @riverpod
 class HomeTabNotifier extends _$HomeTabNotifier {
+  late final Logger _logger;
+
   @override
-  FutureOr<HomeTabState> build() async {
-    final txs = await _fetchPage();
-    return HomeTabState(transactions: txs, isLoading: false);
+  HomeTabState build() {
+    _logger = getIt<Logger>();
+    return const HomeTabState();
   }
 
-  Future<List<TransactionModel>> _fetchPage() async {
-    final authState = ref.read(authSessionProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
-      return [];
+  Future<void> onInit() async {
+    if (state.status != HomeTabStatus.initial) {
+      return;
     }
-
-    final repo = getIt<TransactionRepository>();
-    return await repo.getRecentTransactionsPaginated(
-      authState.user!.uid,
-      limit: 4,
-    );
+    await refresh();
   }
 
   Future<void> refresh() async {
-    final currentState = state.valueOrNull;
-
-    // Nếu đang loading thì không load thêm nữa
-    if (currentState != null && currentState.isLoading) return;
-
-    if (currentState != null) {
-      state = AsyncValue.data(currentState.copyWith(isLoading: true));
-    } else {
-      state = const AsyncLoading();
+    final authState = ref.read(authSessionProvider);
+    final user = authState.user;
+    if (user == null) {
+      state = const HomeTabState(
+        status: HomeTabStatus.error,
+        errorMessage: 'Missing authenticated user.',
+      );
+      return;
     }
+
+    state = state.copyWith(
+      status: HomeTabStatus.loading,
+      errorMessage: null,
+    );
 
     try {
-      final txs = await _fetchPage();
-      state = AsyncValue.data(
-        HomeTabState(transactions: txs, isLoading: false),
+      final repository = ref.read(transactionRepositoryProvider);
+      await ref.read(transactionHistoryProvider.notifier).refreshSharedTransactions();
+      final summary = await repository.getSummary(
+        user.uid,
+        month: DateTime.now(),
       );
-    } catch (e, stack) {
-      print('Error refreshing transactions: $e');
-      if (currentState != null) {
-        state = AsyncValue.data(currentState.copyWith(isLoading: false));
-      } else {
-        state = AsyncValue.error(e, stack);
+
+      if (summary == null) {
+        state = state.copyWith(
+          status: HomeTabStatus.error,
+          errorMessage: 'Unable to load home dashboard data.',
+        );
+        return;
       }
+
+      state = state.copyWith(
+        status: HomeTabStatus.success,
+        monthlyIncome: summary.totalIncome,
+        monthlyExpense: summary.totalExpense,
+        errorMessage: null,
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to refresh home tab data.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        status: HomeTabStatus.error,
+        errorMessage: 'Unable to load home dashboard data.',
+      );
     }
   }
-}
-
-@riverpod
-Stream<List<TransactionModel>> transactionStream(TransactionStreamRef ref) {
-  final authState = ref.watch(authSessionProvider);
-  if (authState.isAuthenticated && authState.user != null) {
-    return getIt<TransactionRepository>()
-        .getTransactionsByMonth(authState.user!.uid, DateTime.now(), limit: 4)
-        .map((record) => record.transactions)
-        .handleError((error) {
-          final logger = getIt<Logger>();
-          logger.e('❌ Firebase Index Error (Click link below to create):\n$error');
-        });
-  }
-  return const Stream.empty();
-}
-
-@riverpod
-Stream<({double totalIncome, double totalExpense})> homeMonthlySummary(
-  HomeMonthlySummaryRef ref,
-) {
-  final uid = ref.watch(authSessionProvider.select((a) => a.user?.uid));
-  if (uid == null) {
-    return Stream.value((totalIncome: 0.0, totalExpense: 0.0));
-  }
-
-  // Luôn lấy summary của tháng hiện tại
-  final repository = getIt<TransactionRepository>();
-  return repository.watchSummary(
-    uid,
-    month: DateTime.now(),
-  );
 }

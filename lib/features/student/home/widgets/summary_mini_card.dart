@@ -1,70 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
 class SummaryMiniCard extends StatelessWidget {
-  final String title;
-  final String amount;
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBgColor;
-  final bool isVisible;
-
   const SummaryMiniCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.amount,
     required this.icon,
     required this.iconColor,
-    required this.iconBgColor,
-    required this.isVisible,
-  }) : super(key: key);
+  });
+
+  final String title;
+  final String amount;
+  final IconData icon;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTight = constraints.maxHeight < 88.h;
+        final iconSize = isTight ? 18.r : 22.r;
+        final titleFontSize = isTight ? 13.r : 16.r;
+        final amountFontSize = isTight ? 16.r : 20.r;
+        final textGap = isTight ? 6.w : 10.w;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    shape: BoxShape.circle,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(icon, size: iconSize, color: iconColor),
+                  SizedBox(width: textGap),
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF1E293B),
+                      ),
+                    ),
                   ),
-                  child: Icon(icon, size: 14, color: iconColor),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.green.shade100.withOpacity(0.9),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              isVisible ? amount : "*****",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            SizedBox(width: 10.w),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  amount,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: amountFontSize,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF0F172A),
+                  ),
+                ),
               ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class PinKeypadWidget extends StatefulWidget {
   const PinKeypadWidget({
@@ -8,6 +9,7 @@ class PinKeypadWidget extends StatefulWidget {
     required this.onRemoveNumber,
     this.hasError = false,
     this.isLoading = false,
+    this.isDisabled = false,
     super.key,
   });
 
@@ -16,6 +18,7 @@ class PinKeypadWidget extends StatefulWidget {
   final VoidCallback onRemoveNumber;
   final bool hasError;
   final bool isLoading;
+  final bool isDisabled;
 
   @override
   State<PinKeypadWidget> createState() => _PinKeypadWidgetState();
@@ -111,21 +114,22 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              _buildRow(['1', '2', '3'], isDark),
+              _buildRow(context, ['1', '2', '3'], isDark),
               const SizedBox(height: 12),
-              _buildRow(['4', '5', '6'], isDark),
+              _buildRow(context, ['4', '5', '6'], isDark),
               const SizedBox(height: 12),
-              _buildRow(['7', '8', '9'], isDark),
+              _buildRow(context, ['7', '8', '9'], isDark),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Expanded(child: SizedBox(height: 64)),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildKey('0', isDark)),
+                  Expanded(child: _buildKey(context, '0', isDark)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildKey(
+                      context,
                       'backspace',
                       isDark,
                       icon: Icons.backspace_outlined,
@@ -140,20 +144,20 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
     );
   }
 
-  Widget _buildRow(List<String> digits, bool isDark) {
+  Widget _buildRow(BuildContext context, List<String> digits, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _buildKey(digits[0], isDark)),
+        Expanded(child: _buildKey(context, digits[0], isDark)),
         const SizedBox(width: 12),
-        Expanded(child: _buildKey(digits[1], isDark)),
+        Expanded(child: _buildKey(context, digits[1], isDark)),
         const SizedBox(width: 12),
-        Expanded(child: _buildKey(digits[2], isDark)),
+        Expanded(child: _buildKey(context, digits[2], isDark)),
       ],
     );
   }
 
-  Widget _buildKey(String value, bool isDark, {IconData? icon}) {
+  Widget _buildKey(BuildContext context, String value, bool isDark, {IconData? icon}) {
     final bgColor = isDark
         ? const Color(0xFF1E293B).withOpacity(0.5)
         : const Color(0xFFF8FAFC);
@@ -166,6 +170,10 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
         onTap: () {
+          if (widget.isDisabled || widget.isLoading) {
+            return;
+          }
+
           if (value == 'backspace') {
             widget.onRemoveNumber();
           } else {
@@ -179,11 +187,7 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
                 ? Icon(icon, size: 28, color: textColor)
                 : Text(
                     value,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
+                    style: context.typo.title.large.copyWith(color: textColor),
                   ),
           ),
         ),

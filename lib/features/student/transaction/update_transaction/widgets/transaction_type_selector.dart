@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
 
@@ -36,7 +37,7 @@ class TransactionTypeSelector extends StatelessWidget {
       child: Row(
         children: [
           _TypeTab(
-            title: 'Tiền chi',
+            title: s.transactionExpenseType,
             type: TransactionType.expense,
             selectedType: selectedType,
             isDark: isDark,
@@ -44,7 +45,7 @@ class TransactionTypeSelector extends StatelessWidget {
             onTap: onSelectExpense,
           ),
           _TypeTab(
-            title: 'Tiền thu',
+            title: s.transactionIncomeType,
             type: TransactionType.income,
             selectedType: selectedType,
             isDark: isDark,

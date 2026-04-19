@@ -23,10 +23,11 @@ class HomeTabNotifier extends _$HomeTabNotifier {
     }
 
     final repo = getIt<TransactionRepository>();
-    return await repo.getRecentTransactionsPaginated(
+    final transactions = await repo.getRecentTransactionsPaginated(
       authState.user!.uid,
       limit: 4,
     );
+    return transactions ?? [];
   }
 
   Future<void> refresh() async {

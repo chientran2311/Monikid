@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class SplashLoadingSection extends StatelessWidget {
   const SplashLoadingSection({
@@ -33,21 +34,17 @@ class SplashLoadingSection extends StatelessWidget {
                   children: [
                     Text(
                       'LOADING',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                      style: context.typo.caption.large.copyWith(
                         color: isDark
-                            ? AppTheme.primaryLight.withOpacity(0.8)
-                            : AppTheme.primary.withOpacity(0.8),
+                            ? AppTheme.primaryLight.withValues(alpha: 0.8)
+                            : AppTheme.primary.withValues(alpha: 0.8),
                         letterSpacing: 1,
                       ),
                     ),
                     Text(
                       '${value.toInt()}%',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF94A3B8),
+                      style: context.typo.caption.large.copyWith(
+                        color: const Color(0xFF94A3B8),
                       ),
                     ),
                   ],
@@ -78,7 +75,7 @@ class SplashLoadingSection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(9999),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.5),
+                            color: AppTheme.primary.withValues(alpha: 0.5),
                             blurRadius: 10,
                           ),
                         ],
@@ -90,12 +87,10 @@ class SplashLoadingSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Phiên bản 1.0.2',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF94A3B8),
+          Text(
+            'PhiÃªn báº£n 1.0.2',
+            style: context.typo.caption.small.copyWith(
+              color: const Color(0xFF94A3B8),
             ),
           ),
         ],

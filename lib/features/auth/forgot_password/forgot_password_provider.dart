@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/core/utils/validators.dart';
 import 'package:monikid/features/auth/auth_status.dart';
 import 'package:monikid/models/entities/auth/params/auth_param.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
@@ -18,7 +17,7 @@ class ForgotPassword extends _$ForgotPassword {
 
   @override
   ForgotPasswordState build() {
-    _authRepository = getIt<AuthRepository>();
+    _authRepository = ref.read(authRepositoryProvider);
     _logger = getIt<Logger>();
     return const ForgotPasswordState();
   }
@@ -29,7 +28,7 @@ class ForgotPassword extends _$ForgotPassword {
 
   Future<void> submit(String email) async {
     final trimmedEmail = email.trim();
-    final emailError = Validators.email(trimmedEmail);
+    final emailError = _validateEmail(trimmedEmail);
     if (emailError != null) {
       state = state.copyWith(
         status: AuthStatus.error,
@@ -44,7 +43,9 @@ class ForgotPassword extends _$ForgotPassword {
     );
 
     try {
-      _logger.i('Forgot password provider sending reset email for $trimmedEmail');
+      _logger.i(
+        'Forgot password provider sending reset email for $trimmedEmail',
+      );
       await _authRepository.resetPassword(
         ResetPasswordParam(email: trimmedEmail),
       );
@@ -57,7 +58,7 @@ class ForgotPassword extends _$ForgotPassword {
       );
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: e.message ?? 'Đã xảy ra lỗi hệ thống.',
+        errorMessage: e.message ?? 'An unexpected system error occurred.',
       );
     } catch (e, stackTrace) {
       _logger.e(
@@ -70,5 +71,18 @@ class ForgotPassword extends _$ForgotPassword {
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
     }
+  }
+
+  String? _validateEmail(String value) {
+    if (value.isEmpty) {
+      return 'Please enter your email address.';
+    }
+
+    final emailRegex = RegExp(r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address.';
+    }
+
+    return null;
   }
 }

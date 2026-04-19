@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:monikid/App/app.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_provider.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/detail_transaction_state.dart';
+import 'package:monikid/features/student/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/widgets/detail_transaction_bottom_bar.dart';
 import 'package:monikid/features/student/transaction/detail_transaction/widgets/transaction_detail_row.dart';
 import 'package:monikid/features/student/transaction/transaction_status.dart';
@@ -15,9 +16,9 @@ import 'package:monikid/features/student/transaction/widgets/transaction_loading
 import 'package:monikid/models/entities/transaction_model.dart';
 
 class DetailTransactionScreen extends ConsumerStatefulWidget {
-  const DetailTransactionScreen({super.key, required this.transaction});
+  const DetailTransactionScreen({super.key, required this.transactionId});
 
-  final TransactionModel transaction;
+  final String transactionId;
 
   @override
   ConsumerState<DetailTransactionScreen> createState() =>
@@ -32,7 +33,7 @@ class _DetailTransactionScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(detailTransactionNotifierProvider.notifier)
-          .setTransaction(widget.transaction);
+          .initialize(widget.transactionId);
     });
   }
 
@@ -356,21 +357,17 @@ class _DetailTransactionScreenState
       bgColor: bgColor,
       isDeleting: state.isDeleting,
       onEdit: () async {
-        final updatedTransaction = await context.push<TransactionModel>(
-          AppRoutes.updateTransaction,
-          extra: transaction,
-        );
-        if (!mounted || updatedTransaction == null) {
-          return;
-        }
         ref
-            .read(detailTransactionNotifierProvider.notifier)
-            .setTransaction(updatedTransaction);
+            .read(transactionHistoryProvider.notifier)
+            .selectTransaction(transaction);
+        await context.push(
+          AppRoutes.updateTransactionPath(transaction.transactionId),
+        );
       },
       onDelete: () {
-        ref
-            .read(detailTransactionNotifierProvider.notifier)
-            .deleteTransaction(transaction.transactionId);
+            ref
+                .read(detailTransactionNotifierProvider.notifier)
+            .deleteTransaction();
       },
     );
   }

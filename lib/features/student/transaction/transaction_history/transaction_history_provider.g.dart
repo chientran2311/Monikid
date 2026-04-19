@@ -6,7 +6,7 @@ part of 'transaction_history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamSummaryCardHash() => r'e48d48362e1249d5002d9d92308c3b3ead004286';
+String _$streamSummaryCardHash() => r'9cf6b06b4d0588dbc9fcbc16d909667d017eaed9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,15 +40,30 @@ class StreamSummaryCardFamily
   const StreamSummaryCardFamily();
 
   /// See also [streamSummaryCard].
-  StreamSummaryCardProvider call({DateTime? date, DateTime? month}) {
-    return StreamSummaryCardProvider(date: date, month: month);
+  StreamSummaryCardProvider call({
+    DateTime? date,
+    DateTime? month,
+    String? categoryKey,
+    String? type,
+  }) {
+    return StreamSummaryCardProvider(
+      date: date,
+      month: month,
+      categoryKey: categoryKey,
+      type: type,
+    );
   }
 
   @override
   StreamSummaryCardProvider getProviderOverride(
     covariant StreamSummaryCardProvider provider,
   ) {
-    return call(date: provider.date, month: provider.month);
+    return call(
+      date: provider.date,
+      month: provider.month,
+      categoryKey: provider.categoryKey,
+      type: provider.type,
+    );
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -71,24 +86,32 @@ class StreamSummaryCardProvider
     extends
         AutoDisposeStreamProvider<({double totalIncome, double totalExpense})> {
   /// See also [streamSummaryCard].
-  StreamSummaryCardProvider({DateTime? date, DateTime? month})
-    : this._internal(
-        (ref) => streamSummaryCard(
-          ref as StreamSummaryCardRef,
-          date: date,
-          month: month,
-        ),
-        from: streamSummaryCardProvider,
-        name: r'streamSummaryCardProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$streamSummaryCardHash,
-        dependencies: StreamSummaryCardFamily._dependencies,
-        allTransitiveDependencies:
-            StreamSummaryCardFamily._allTransitiveDependencies,
-        date: date,
-        month: month,
-      );
+  StreamSummaryCardProvider({
+    DateTime? date,
+    DateTime? month,
+    String? categoryKey,
+    String? type,
+  }) : this._internal(
+         (ref) => streamSummaryCard(
+           ref as StreamSummaryCardRef,
+           date: date,
+           month: month,
+           categoryKey: categoryKey,
+           type: type,
+         ),
+         from: streamSummaryCardProvider,
+         name: r'streamSummaryCardProvider',
+         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+             ? null
+             : _$streamSummaryCardHash,
+         dependencies: StreamSummaryCardFamily._dependencies,
+         allTransitiveDependencies:
+             StreamSummaryCardFamily._allTransitiveDependencies,
+         date: date,
+         month: month,
+         categoryKey: categoryKey,
+         type: type,
+       );
 
   StreamSummaryCardProvider._internal(
     super._createNotifier, {
@@ -99,10 +122,14 @@ class StreamSummaryCardProvider
     required super.from,
     required this.date,
     required this.month,
+    required this.categoryKey,
+    required this.type,
   }) : super.internal();
 
   final DateTime? date;
   final DateTime? month;
+  final String? categoryKey;
+  final String? type;
 
   @override
   Override overrideWith(
@@ -122,6 +149,8 @@ class StreamSummaryCardProvider
         debugGetCreateSourceHash: null,
         date: date,
         month: month,
+        categoryKey: categoryKey,
+        type: type,
       ),
     );
   }
@@ -136,7 +165,9 @@ class StreamSummaryCardProvider
   bool operator ==(Object other) {
     return other is StreamSummaryCardProvider &&
         other.date == date &&
-        other.month == month;
+        other.month == month &&
+        other.categoryKey == categoryKey &&
+        other.type == type;
   }
 
   @override
@@ -144,6 +175,8 @@ class StreamSummaryCardProvider
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, date.hashCode);
     hash = _SystemHash.combine(hash, month.hashCode);
+    hash = _SystemHash.combine(hash, categoryKey.hashCode);
+    hash = _SystemHash.combine(hash, type.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -161,6 +194,12 @@ mixin StreamSummaryCardRef
 
   /// The parameter `month` of this provider.
   DateTime? get month;
+
+  /// The parameter `categoryKey` of this provider.
+  String? get categoryKey;
+
+  /// The parameter `type` of this provider.
+  String? get type;
 }
 
 class _StreamSummaryCardProviderElement
@@ -175,18 +214,19 @@ class _StreamSummaryCardProviderElement
   DateTime? get date => (origin as StreamSummaryCardProvider).date;
   @override
   DateTime? get month => (origin as StreamSummaryCardProvider).month;
+  @override
+  String? get categoryKey => (origin as StreamSummaryCardProvider).categoryKey;
+  @override
+  String? get type => (origin as StreamSummaryCardProvider).type;
 }
 
 String _$transactionHistoryHash() =>
-    r'f55d59fc655377b75260e0f35069b6266cce973c';
+    r'0ce4635c73533fcabe300cd784230f09454bdb79';
 
 /// See also [TransactionHistory].
 @ProviderFor(TransactionHistory)
 final transactionHistoryProvider =
-    AutoDisposeNotifierProvider<
-      TransactionHistory,
-      TransactionHistoryState
-    >.internal(
+    NotifierProvider<TransactionHistory, TransactionHistoryState>.internal(
       TransactionHistory.new,
       name: r'transactionHistoryProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -196,6 +236,6 @@ final transactionHistoryProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$TransactionHistory = AutoDisposeNotifier<TransactionHistoryState>;
+typedef _$TransactionHistory = Notifier<TransactionHistoryState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

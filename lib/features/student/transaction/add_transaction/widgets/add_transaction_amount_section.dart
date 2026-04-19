@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 
 class AddTransactionAmountSection extends StatelessWidget {
@@ -18,9 +19,9 @@ class AddTransactionAmountSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text(
-          'Số tiền',
-          style: TextStyle(
+        Text(
+          s.transactionAmountLabel,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xFF94A3B8),
@@ -66,7 +67,7 @@ class AddTransactionAmountSection extends StatelessWidget {
           width: 100,
           height: 4,
           decoration: BoxDecoration(
-            color: AppTheme.primary.withOpacity(0.2),
+            color: AppTheme.primary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Align(

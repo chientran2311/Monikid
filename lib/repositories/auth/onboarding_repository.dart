@@ -1,6 +1,16 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/config/storage_keys.dart';
+import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/storage/local_storage.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'onboarding_repository.g.dart';
+
+@riverpod
+OnboardingRepository onboardingRepository(Ref ref) {
+  return getIt<OnboardingRepository>();
+}
 
 abstract class OnboardingRepository {
   Future<bool> isOnboardingComplete();
@@ -18,10 +28,10 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   Future<bool> isOnboardingComplete() async {
     try {
       return _localStorage.readBoolSync(StorageKeys.isOnboarded) ?? false;
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.e(
-        'Không thể đọc trạng thái onboarding.',
-        error: e,
+        'Failed to read the onboarding status.',
+        error: error,
         stackTrace: stackTrace,
       );
       return false;
@@ -35,11 +45,11 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         key: StorageKeys.isOnboarded,
         value: true,
       );
-      _logger.i('Đã đánh dấu onboarding hoàn tất.');
-    } catch (e, stackTrace) {
+      _logger.i('Marked onboarding as completed.');
+    } catch (error, stackTrace) {
       _logger.e(
-        'Không thể lưu trạng thái onboarding.',
-        error: e,
+        'Failed to persist the onboarding status.',
+        error: error,
         stackTrace: stackTrace,
       );
       rethrow;

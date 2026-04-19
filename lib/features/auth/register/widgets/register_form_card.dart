@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
+
 import 'package:monikid/shared/widgets/auth_card.dart';
 import 'package:monikid/shared/widgets/auth_role_selector.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
@@ -15,6 +18,7 @@ class RegisterFormCard extends StatelessWidget {
     required this.phoneController,
     required this.passwordController,
     required this.isLoading,
+    required this.buttonText,
     required this.errorMessage,
     required this.onSubmit,
   });
@@ -26,11 +30,14 @@ class RegisterFormCard extends StatelessWidget {
   final TextEditingController phoneController;
   final TextEditingController passwordController;
   final bool isLoading;
+  final String buttonText;
   final String? errorMessage;
   final Future<void> Function() onSubmit;
 
   @override
   Widget build(BuildContext context) {
+    final s = context.l10n;
+
     return AuthCard(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -41,31 +48,31 @@ class RegisterFormCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           CustomInputWidget(
-            label: 'Họ và tên',
-            placeholder: 'Nguyễn Văn A',
+            label: s.profileEditFullName,
+            placeholder: s.profileEditFullNameHint,
             prefixIcon: Icons.person_outline,
             controller: fullNameController,
           ),
           const SizedBox(height: 20),
           CustomInputWidget(
-            label: 'Email',
-            placeholder: 'nguyenvana@example.com',
+            label: s.profileEditEmail,
+            placeholder: s.profileEditEmail,
             prefixIcon: Icons.mail_outline,
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 20),
           CustomInputWidget(
-            label: 'Số điện thoại (Tùy chọn)',
-            placeholder: '090xxxxxxx',
+            label: s.profileEditPhone,
+            placeholder: s.profileEditPhoneHint,
             prefixIcon: Icons.phone_android,
             controller: phoneController,
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: 20),
           CustomInputWidget(
-            label: 'Mật khẩu',
-            placeholder: '••••••••',
+            label: s.authPasswordLabel,
+            placeholder: s.authPasswordPlaceholder,
             prefixIcon: Icons.lock_outline,
             isPassword: true,
             controller: passwordController,
@@ -77,14 +84,13 @@ class RegisterFormCard extends StatelessWidget {
               child: Text(
                 errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: context.typo.text.medium.copyWith(
                   color: AppTheme.redAlert,
-                  fontSize: 14,
                 ),
               ),
             ),
           PrimaryButton(
-            text: 'Đăng ký',
+            text: buttonText,
             isLoading: isLoading,
             onPressed: onSubmit,
           ),

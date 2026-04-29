@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
-import 'package:monikid/repositories/category/category_repository.dart';
+import 'package:monikid/repositories/category/custom_category_repository.dart';
 
 part 'category_provider.g.dart';
 
@@ -122,8 +122,8 @@ Stream<List<CategoryModel>> categoryStream(Ref ref) {
     return Stream.value(defaultCategories);
   }
 
-  final repo = ref.watch(categoryRepositoryProvider);
-  return repo.getUserCategories(userId).map(mergeTransactionCategories);
+  final repo = ref.watch(customCategoryRepositoryProvider);
+  return repo.watchUserCategories(userId).map(mergeTransactionCategories);
 }
 
 List<CategoryModel> mergeTransactionCategories(List<CategoryModel> customCategories) {
@@ -162,7 +162,7 @@ List<CategoryModel> filterCategoriesByType(
 }
 
 String transactionCategoryKeyForCategory(CategoryModel category) {
-  return _slugifyCategoryLabel(category.label);
+  return category.id;
 }
 
 CategoryModel? findCategoryByTransactionKey(
@@ -180,7 +180,7 @@ CategoryModel? findCategoryByTransactionKey(
       continue;
     }
 
-    if (transactionCategoryKeyForCategory(category) == categoryKey) {
+    if (category.id == categoryKey) {
       return category;
     }
   }
@@ -218,15 +218,5 @@ CategoryModel? findCategoryByLabel(
 }
 
 String _categoryKey(CategoryModel category) {
-  final normalizedLabel = category.label.trim().toLowerCase();
-  final normalizedType = category.type.trim().isEmpty ? 'expense' : category.type;
-  return '$normalizedType::$normalizedLabel';
-}
-
-String _slugifyCategoryLabel(String value) {
-  return value
-      .trim()
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
-      .replaceAll(RegExp(r'^_+|_+$'), '');
+  return category.id;
 }

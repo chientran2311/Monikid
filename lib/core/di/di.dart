@@ -1,22 +1,24 @@
 import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:monikid/core/service/gemini_ai_service.dart';
+import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
 import 'package:monikid/repositories/auth/onboarding_repository.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
 import 'package:monikid/repositories/category/category_repository.dart';
+import 'package:monikid/repositories/category/custom_category_repository.dart';
 import 'package:monikid/repositories/fqa/fqa_repository.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:monikid/repositories/request_money/request_money_repository.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
-
 
 final getIt = GetIt.instance;
 
@@ -33,8 +35,15 @@ Future<void> setupLocator() async {
   getIt.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
-  getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
   getIt.registerLazySingleton<Logger>(() => Logger());
+
+  // Register AI Service
+  getIt.registerLazySingleton<GeminiAiService>(
+    () => GeminiAiService(),
+  );
+  getIt.registerLazySingleton<ReceiptOcrService>(
+    () => ReceiptOcrServiceImpl(getIt<Logger>()),
+  );
 
   // Register Repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -45,15 +54,16 @@ Future<void> setupLocator() async {
     () => OnboardingRepositoryImpl(getIt<AppLocalStorage>(), getIt<Logger>()),
   );
 
-  getIt.registerLazySingleton<PinCodeRepository>(
+getIt.registerLazySingleton<PinCodeRepository>(
     () => PinCodeRepositoryImpl(getIt<AppSecureStorage>(), getIt<Logger>()),
   );
 
   getIt.registerLazySingleton<TransactionEvidenceStorage>(
-    () => TransactionEvidenceStorageImpl(
-      getIt<FirebaseStorage>(),
-      getIt<Logger>(),
-    ),
+    () => TransactionEvidenceStorageImpl(getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<MonthlySummaryRepository>(
+    () => MonthlySummaryRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
   getIt.registerLazySingleton<TransactionRepository>(
@@ -61,11 +71,16 @@ Future<void> setupLocator() async {
       getIt<FirebaseFirestore>(),
       getIt<TransactionEvidenceStorage>(),
       getIt<Logger>(),
+      getIt<MonthlySummaryRepository>(),
     ),
   );
 
   getIt.registerLazySingleton<CategoryRepository>(
     () => CategoryRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<CustomCategoryRepository>(
+    () => CustomCategoryRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
   getIt.registerLazySingleton<FQARepository>(

@@ -1,28 +1,30 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'category_provider.dart';
+part of 'custom_category_repository.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$categoryStreamHash() => r'22ddae63af0decadcb8202758b7e399428e39fc8';
+String _$customCategoryRepositoryHash() =>
+    r'bb048b535f4271377facd19b13d521ebb4925738';
 
-/// See also [categoryStream].
-@ProviderFor(categoryStream)
-final categoryStreamProvider =
-    AutoDisposeStreamProvider<List<CategoryModel>>.internal(
-      categoryStream,
-      name: r'categoryStreamProvider',
+/// See also [customCategoryRepository].
+@ProviderFor(customCategoryRepository)
+final customCategoryRepositoryProvider =
+    AutoDisposeProvider<CustomCategoryRepository>.internal(
+      customCategoryRepository,
+      name: r'customCategoryRepositoryProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$categoryStreamHash,
+          : _$customCategoryRepositoryHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CategoryStreamRef = AutoDisposeStreamProviderRef<List<CategoryModel>>;
+typedef CustomCategoryRepositoryRef =
+    AutoDisposeProviderRef<CustomCategoryRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -14,7 +18,10 @@ TransactionRepository transactionRepository(Ref ref) {
 }
 
 typedef TransactionSummary = ({double totalIncome, double totalExpense});
-typedef TransactionMonthRecord = ({List<TransactionModel> transactions, DateTime month});
+typedef TransactionMonthRecord = ({
+  List<TransactionModel> transactions,
+  DateTime month,
+});
 
 abstract class TransactionRepository {
   Future<TransactionModel> addTransaction(
@@ -31,9 +38,9 @@ abstract class TransactionRepository {
     Duration uploadTimeout = const Duration(seconds: 30),
   });
 
-  Future<void> deleteTransaction(String userId, String transactionId);
-
-  Future<String?> getEvidenceDownloadUrl(TransactionEvidenceImage? evidenceImage);
+  Future<String?> getEvidenceDownloadUrl(
+    TransactionEvidenceImage? evidenceImage,
+  );
 
   Future<TransactionModel?> getTransactionById(
     String userId,
@@ -84,14 +91,21 @@ class TransactionRepositoryImpl implements TransactionRepository {
     this._firestore,
     this._evidenceStorage,
     this._logger,
+    this._summaryRepo,
   );
 
   final FirebaseFirestore _firestore;
   final TransactionEvidenceStorage _evidenceStorage;
   final Logger _logger;
+  final MonthlySummaryRepository _summaryRepo;
+
+  String _monthKey(DateTime date) => DateFormat('yyyy-MM').format(date);
 
   CollectionReference<Map<String, dynamic>> _transactionsOfUser(String userId) {
-    return _firestore.collection('users').doc(userId).collection('transactions');
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('transactions');
   }
 
   @override
@@ -119,13 +133,29 @@ class TransactionRepositoryImpl implements TransactionRepository {
       );
 
       _logger.i('Adding transaction ${transaction.transactionId}.');
-      await _transactionsOfUser(transaction.userId)
-          .doc(transaction.transactionId)
-          .set(transactionToSave.toFirestore());
+      await _transactionsOfUser(
+        transaction.userId,
+      ).doc(transaction.transactionId).set(transactionToSave.toFirestore());
+      unawaited(_summaryRepo.applyDelta(
+        userId: transactionToSave.userId,
+        familyId: transactionToSave.familyId,
+        monthKey: _monthKey(transactionToSave.date),
+        deltaExpenseMinor: transactionToSave.type == 'expense' ? transactionToSave.amountMinor : 0,
+        deltaIncomeMinor: transactionToSave.type == 'income' ? transactionToSave.amountMinor : 0,
+        deltaCount: 1,
+      ));
       return transactionToSave;
     } catch (error, stackTrace) {
       if (uploadedEvidenceImage != null) {
         await _cleanupUploadedEvidence(uploadedEvidenceImage.storagePath);
+      }
+      if (error is FirebaseException) {
+        _logger.e(
+          'Failed to add transaction with firebase code=${error.code} '
+          'message=${error.message} payloadKeys=${transactionToDebugKeys(transaction, uploadedEvidenceImage)}',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
       _logger.e(
         'Failed to add transaction.',
@@ -159,17 +189,27 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
       final updatedTransaction = transaction.copyWith(
         updatedAt: DateTime.now(),
-        evidenceImage: uploadedEvidenceImage ??
+        evidenceImage:
+            uploadedEvidenceImage ??
             (removeExistingEvidence ? null : transaction.evidenceImage),
       );
       _logger.i('Updating transaction ${transaction.transactionId}.');
-      await _transactionsOfUser(transaction.userId)
-          .doc(transaction.transactionId)
-          .update(updatedTransaction.toFirestore());
+      await _transactionsOfUser(
+        transaction.userId,
+      ).doc(transaction.transactionId).update(updatedTransaction.toFirestore());
+      unawaited(_summaryRepo.applyDelta(
+        userId: updatedTransaction.userId,
+        familyId: updatedTransaction.familyId,
+        monthKey: _monthKey(updatedTransaction.date),
+        deltaExpenseMinor: updatedTransaction.type == 'expense' ? updatedTransaction.amountMinor : 0,
+        deltaIncomeMinor: updatedTransaction.type == 'income' ? updatedTransaction.amountMinor : 0,
+        deltaCount: 0,
+      ));
 
       if (uploadedEvidenceImage != null &&
           previousEvidenceImage != null &&
-          previousEvidenceImage.storagePath != uploadedEvidenceImage.storagePath) {
+          previousEvidenceImage.storagePath !=
+              uploadedEvidenceImage.storagePath) {
         await _cleanupUploadedEvidence(previousEvidenceImage.storagePath);
       }
 
@@ -191,27 +231,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<void> deleteTransaction(String userId, String transactionId) async {
-    try {
-      _logger.i('Deleting transaction $transactionId.');
-      final existingTransaction = await getTransactionById(userId, transactionId);
-      await _transactionsOfUser(userId).doc(transactionId).delete();
-      if (existingTransaction?.evidenceImage != null) {
-        await _cleanupUploadedEvidence(
-          existingTransaction!.evidenceImage!.storagePath,
-        );
-      }
-    } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to delete transaction.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      rethrow;
-    }
-  }
-
-  @override
   Future<String?> getEvidenceDownloadUrl(
     TransactionEvidenceImage? evidenceImage,
   ) async {
@@ -225,7 +244,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       );
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to get evidence download url.',
+        'Failed to resolve evidence image URL.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -240,7 +259,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
   ) async {
     try {
       _logger.i('Fetching transaction $transactionId.');
-      final snapshot = await _transactionsOfUser(userId).doc(transactionId).get();
+      final snapshot = await _transactionsOfUser(
+        userId,
+      ).doc(transactionId).get();
       final data = snapshot.data();
       if (!snapshot.exists || data == null) {
         return null;
@@ -274,10 +295,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
           'date_ts',
           isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
         )
-        .where(
-          'date_ts',
-          isLessThanOrEqualTo: Timestamp.fromDate(range.end),
-        )
+        .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
         .orderBy('date_ts', descending: true);
 
     if (type != null && type != 'all') {
@@ -288,17 +306,20 @@ class TransactionRepositoryImpl implements TransactionRepository {
       query = query.limit(limit);
     }
 
-    return query.snapshots().map((snapshot) {
-      final transactions = snapshot.docs.map(_mapTransaction).toList();
-      return (transactions: transactions, month: month);
-    }).handleError((error, stackTrace) {
-      _logger.e(
-        'Failed to listen transactions by month.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      throw error;
-    });
+    return query
+        .snapshots()
+        .map((snapshot) {
+          final transactions = snapshot.docs.map(_mapTransaction).toList();
+          return (transactions: transactions, month: month);
+        })
+        .handleError((error, stackTrace) {
+          _logger.e(
+            'Failed to listen transactions by month.',
+            error: error,
+            stackTrace: stackTrace,
+          );
+          throw error;
+        });
   }
 
   @override
@@ -308,9 +329,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
     int limit = 6,
   }) async {
     try {
-      Query<Map<String, dynamic>> query = _transactionsOfUser(userId)
-          .orderBy('date_ts', descending: true)
-          .limit(limit);
+      Query<Map<String, dynamic>> query = _transactionsOfUser(
+        userId,
+      ).orderBy('date_ts', descending: true).limit(limit);
 
       if (lastTransaction != null) {
         query = query.startAfter([Timestamp.fromDate(lastTransaction.dateTs)]);
@@ -380,11 +401,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       ).get();
       return _sumTransactions(snapshot.docs.map(_mapTransaction));
     } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to get summary.',
-        error: error,
-        stackTrace: stackTrace,
-      );
+      _logger.e('Failed to get summary.', error: error, stackTrace: stackTrace);
       return null;
     }
   }
@@ -403,9 +420,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
       date: date,
       categoryKey: categoryKey,
       type: type,
-    )
-        .snapshots()
-        .map((snapshot) => _sumTransactions(snapshot.docs.map(_mapTransaction)));
+    ).snapshots().map(
+      (snapshot) => _sumTransactions(snapshot.docs.map(_mapTransaction)),
+    );
   }
 
   Query<Map<String, dynamic>> _buildFilteredTransactionQuery(
@@ -424,10 +441,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
             'date_ts',
             isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
           )
-          .where(
-            'date_ts',
-            isLessThanOrEqualTo: Timestamp.fromDate(range.end),
-          );
+          .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
     } else {
       final range = _monthRange(month ?? DateTime.now());
       query = query
@@ -435,10 +449,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
             'date_ts',
             isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
           )
-          .where(
-            'date_ts',
-            isLessThanOrEqualTo: Timestamp.fromDate(range.end),
-          );
+          .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
     }
 
     if (categoryKey != null && categoryKey.isNotEmpty) {
@@ -517,5 +528,17 @@ class TransactionRepositoryImpl implements TransactionRepository {
         stackTrace: stackTrace,
       );
     }
+  }
+
+  String transactionToDebugKeys(
+    TransactionModel transaction,
+    TransactionEvidenceImage? uploadedEvidenceImage,
+  ) {
+    final payload = transaction
+        .copyWith(
+          evidenceImage: uploadedEvidenceImage ?? transaction.evidenceImage,
+        )
+        .toFirestore();
+    return payload.keys.join(',');
   }
 }

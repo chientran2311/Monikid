@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
+import 'package:monikid/repositories/ai/gemma_model_repository.dart';
+import 'package:monikid/repositories/ai/gemma_model_repository_impl.dart';
 import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
@@ -15,6 +17,8 @@ import 'package:monikid/repositories/fqa/fqa_repository.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:monikid/repositories/request_money/request_money_repository.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
+import 'package:monikid/repositories/link_family/link_family_repository.dart';
+import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
 import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
@@ -43,6 +47,9 @@ Future<void> setupLocator() async {
   );
   getIt.registerLazySingleton<ReceiptOcrService>(
     () => ReceiptOcrServiceImpl(getIt<Logger>()),
+  );
+  getIt.registerLazySingleton<GemmaModelRepository>(
+    () => GemmaModelRepositoryImpl(getIt<Logger>()),
   );
 
   // Register Repositories
@@ -101,6 +108,15 @@ getIt.registerLazySingleton<PinCodeRepository>(
 
   getIt.registerLazySingleton<StatisticRepository>(
     () => StatisticRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<LinkFamilyRepository>(
+    () => LinkFamilyRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<ParentDashboardRepository>(
+    () => ParentDashboardRepositoryImpl(
+        getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 }
 

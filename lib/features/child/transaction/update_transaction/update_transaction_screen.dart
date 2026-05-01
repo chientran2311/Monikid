@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
@@ -17,6 +16,8 @@ import 'package:monikid/features/child/transaction/update_transaction/widgets/tr
 import 'package:monikid/features/child/transaction/update_transaction/widgets/transaction_type_selector.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_evidence_section.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 
 class UpdateTransactionScreen extends ConsumerStatefulWidget {
   const UpdateTransactionScreen({super.key, required this.transactionId});
@@ -30,7 +31,6 @@ class UpdateTransactionScreen extends ConsumerStatefulWidget {
 
 class _UpdateTransactionScreenState
     extends ConsumerState<UpdateTransactionScreen> {
-  final ImagePicker _imagePicker = ImagePicker();
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
   bool _isSyncingControllers = false;
@@ -126,40 +126,27 @@ class _UpdateTransactionScreenState
       return;
     }
 
-    final pickedFile = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1920,
-      maxHeight: 1080,
-      imageQuality: 85,
+    final imageSelection =
+        await showModalBottomSheet<TransactionImageSelection>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => UploadPicDialog(
+        imageIntake: ref.read(transactionImageIntakeProvider),
+      ),
     );
 
-    if (pickedFile == null) {
-      return;
-    }
-
-    final bytes = await pickedFile.readAsBytes();
-    if (!mounted || bytes.isEmpty) {
+    if (!mounted || imageSelection == null) {
       return;
     }
 
     ref
         .read(updateTransactionNotifierProvider.notifier)
         .setNewEvidenceImage(
-          bytes: bytes,
-          fileName: pickedFile.name,
-          mimeType: _resolveMimeType(pickedFile.name),
+          bytes: imageSelection.bytes,
+          fileName: imageSelection.fileName,
+          mimeType: imageSelection.mimeType,
         );
-  }
-
-  String _resolveMimeType(String fileName) {
-    final normalized = fileName.toLowerCase();
-    if (normalized.endsWith('.png')) {
-      return 'image/png';
-    }
-    if (normalized.endsWith('.webp')) {
-      return 'image/webp';
-    }
-    return 'image/jpeg';
   }
 
   @override
@@ -436,17 +423,6 @@ class _UpdateTransactionView extends StatelessWidget {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  ActionTile(
-                    iconData: Icons.account_balance_wallet,
-                    label: s.updateTransactionWalletLabel,
-                    value: s.updateTransactionCashWalletValue,
-                    iconBgColor: Colors.blue.shade100,
-                    iconColor: Colors.blue.shade700,
-                    isDark: isDark,
-                    surfaceColor: surfaceColor,
-                    enabled: false,
-                    trailingIcon: Icons.expand_more,
-                  ),
                   const SizedBox(height: 100),
                 ],
               ),

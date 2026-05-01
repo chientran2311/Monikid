@@ -1,184 +1,98 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-
-// Import Tabs
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/home/home_tab_par.dart';
-import 'package:monikid/features/parent/statistic/statistic_tab_par.dart';
 import 'package:monikid/features/parent/setting/setting_tab_par.dart';
+import 'package:monikid/features/parent/statistic/statistic_tab_par.dart';
 
-class ParentBottomNavBar extends StatefulWidget {
-  const ParentBottomNavBar({Key? key}) : super(key: key);
-
-  @override
-  State<ParentBottomNavBar> createState() => _ParentBottomNavBarState();
-}
-
-class _ParentBottomNavBarState extends State<ParentBottomNavBar> {
-  int _currentIndex = 0;
-
-  final List<Widget> _tabs = [
-    const HomeTabParent(),
-    const StatisticTabParent(),
-    const SettingTabParent(),
-  ];
+class ParentBottomNavBar extends HookConsumerWidget {
+  const ParentBottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
+    final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currentIndex = useState(0);
 
-    // Background based on HTML: `bg-surface-light dark:bg-surface-dark`
-    final bgColor = isDark ? const Color(0xFF1e2e1a) : Colors.white;
-    final parentPrimary = const Color(0xFF49ec13); // primary color from HTML
-    final unselectedColor = isDark
-        ? const Color(0xFF64748B)
-        : const Color(0xFF94A3B8); // slate-400
+    const tabs = [HomeTabParent(), StatisticTabParent(), SettingTabParent()];
+
+    final navItems = [
+      (Icons.home_rounded, s.navParentHome),
+      (Icons.bar_chart_rounded, s.navParentStatistic),
+      (Icons.settings_rounded, s.navParentSettings),
+    ];
+
+    final unselectedColor =
+        isDark ? const Color(0xFF64748B) : AppTheme.textGrey;
+
+    // Glass surface: semi-transparent so blur bleeds through
+    final glassColor = isDark
+        ? AppTheme.surfaceDark.withValues(alpha: 0.78)
+        : Colors.white.withValues(alpha: 0.80);
+
+    final glassBorder = isDark
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.white.withValues(alpha: 0.60);
 
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _tabs),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          border: Border(
-            top: BorderSide(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-            ),
-          ),
-        ),
-        child: SafeArea(
-          // Padding cho iPhone home indicator
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24.0,
-              vertical: 8.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNavItem(
-                  0,
-                  Icons.home_filled,
-                  "Trang chủ",
-                  parentPrimary,
-                  unselectedColor,
+      // Body extends behind floating pill so BackdropFilter has content to blur
+      extendBody: true,
+      body: IndexedStack(index: currentIndex.value, children: tabs),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30.r),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Container(
+                height: 62.h,
+                decoration: BoxDecoration(
+                  color: glassColor,
+                  borderRadius: BorderRadius.circular(30.r),
+                  border: Border.all(color: glassBorder, width: 0.8),
                 ),
-                _buildCenterNavItem(
-                  1,
-                  Icons.pie_chart,
-                  "Thống kê",
-                  parentPrimary,
-                  unselectedColor,
-                  isDark,
-                  bgColor,
-                ),
-                _buildNavItem(
-                  2,
-                  Icons.settings,
-                  "Cài đặt",
-                  parentPrimary,
-                  unselectedColor,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    int index,
-    IconData icon,
-    String label,
-    Color primaryColor,
-    Color unselectedColor,
-  ) {
-    final isSelected = _currentIndex == index;
-    final color = isSelected ? primaryColor : unselectedColor;
-
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64, // w-16 in tailwind
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Custom Center Item (The Thống kê tab has a special look in HTML)
-  Widget _buildCenterNavItem(
-    int index,
-    IconData icon,
-    String label,
-    Color primaryColor,
-    Color unselectedColor,
-    bool isDark,
-    Color bgColor,
-  ) {
-    final isSelected = _currentIndex == index;
-    final color = isSelected ? primaryColor : unselectedColor;
-
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Thống kê icon in HTML has relative -top-5 for floating effect when active (or just a special circle)
-            // Lấy cảm hứng từ HTML: <div class="bg-primary text-white h-14 w-14 rounded-full flex items-center justify-center...">
-            if (isSelected)
-              Transform.translate(
-                offset: const Offset(0, -16), // Nâng lên
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: bgColor, width: 4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(navItems.length, (i) {
+                    final isSelected = currentIndex.value == i;
+                    final color =
+                        isSelected ? AppTheme.primary : unselectedColor;
+                    return GestureDetector(
+                      onTap: () => currentIndex.value = i,
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(navItems[i].$1, color: color, size: 24.r),
+                            SizedBox(height: 3.h),
+                            Text(
+                              navItems[i].$2,
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: color,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.pie_chart, color: Colors.white, size: 28),
-                  ),
+                    );
+                  }),
                 ),
-              )
-            else
-              Icon(icon, color: color, size: 28),
-
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

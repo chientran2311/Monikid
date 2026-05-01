@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FamilyMemberModel {
 
- String get uid; String get familyId; String get role;// parent, child
- String get displayName; String? get avatarUrl; DateTime get joinedAt; String get status;
+ String get uid; String get familyId; String get role; String get displayName; String? get avatarUrl; DateTime get joinedAt; String get status;
 /// Create a copy of FamilyMemberModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -93,7 +92,6 @@ class _FamilyMemberModel implements FamilyMemberModel {
 @override final  String uid;
 @override final  String familyId;
 @override final  String role;
-// parent, child
 @override final  String displayName;
 @override final  String? avatarUrl;
 @override final  DateTime joinedAt;

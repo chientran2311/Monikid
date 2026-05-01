@@ -7,6 +7,7 @@ class AddTransactionNoteSection extends StatelessWidget {
     super.key,
     required this.controller,
     required this.enabled,
+    required this.showAiBadge,
     required this.isDark,
     required this.surfaceColor,
     required this.textColor,
@@ -14,6 +15,7 @@ class AddTransactionNoteSection extends StatelessWidget {
 
   final TextEditingController controller;
   final bool enabled;
+  final bool showAiBadge;
   final bool isDark;
   final Color surfaceColor;
   final Color textColor;
@@ -36,34 +38,35 @@ class AddTransactionNoteSection extends StatelessWidget {
                     : const Color(0xFF334155),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 2,
-              ),
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.auto_awesome,
-                    size: 14,
-                    color: AppTheme.primary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    s.transactionAiAutoLabel,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+            if (showAiBadge)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.auto_awesome,
+                      size: 14,
                       color: AppTheme.primary,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      s.transactionAiAutoLabel,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
         const SizedBox(height: 8),

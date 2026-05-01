@@ -18,6 +18,7 @@ abstract class AddTransactionState with _$AddTransactionState {
   const AddTransactionState._();
 
   bool get isLoading => status == TransactionStatus.loading;
+  bool get isBusy => isLoading;
   bool get hasEvidenceImageSelection =>
       evidenceImageBytes != null &&
       evidenceImageFileName != null &&

@@ -1,181 +1,153 @@
-import 'package:flutter/material.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
+import 'dart:ui';
 
-/// Loại SnackBar — khớp với design trong snackbars.html
+import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
+
 enum SnackBarType { success, error, warning, info }
 
-/// AppSnackBar — Hệ thống thông báo toast
-/// Design: icon + message + close button (circle), có animation slide-up
-/// Colors: success=#2E7D32, error=#D32F2F, warning=#FFA000, info=#1976D2
 class AppSnackBar {
   AppSnackBar._();
 
-  // Màu sắc theo design HTML
-  static const _colors = {
-    SnackBarType.success: Color(0xFF2E7D32),
-    SnackBarType.error: Color(0xFFD32F2F),
-    SnackBarType.warning: Color(0xFFFFA000),
-    SnackBarType.info: Color(0xFF1976D2),
-  };
-
-  // Icons theo design HTML
-  static const _icons = {
-    SnackBarType.success: Icons.check_circle,
-    SnackBarType.error: Icons.cancel,
-    SnackBarType.warning: Icons.report_problem,
-    SnackBarType.info: Icons.sync,
-  };
-
-  /// Hiện snackbar
   static void show(
     BuildContext context, {
     required String message,
     SnackBarType type = SnackBarType.info,
-    Duration duration = const Duration(seconds: 2),
-    VoidCallback? onAction,
-    String? actionLabel,
+    Duration duration = const Duration(seconds: 3),
   }) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    final bgColor = _colors[type]!;
-    final icon = _icons[type]!;
-    final textColor = type == SnackBarType.warning
-        ? const Color(0xFF1E293B)
-        : Colors.white;
-    final closeColor = type == SnackBarType.warning
-        ? const Color(0xFF1E293B).withOpacity(0.6)
-        : Colors.white.withOpacity(0.7);
-
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
-          children: [
-            // Icon — info type có animation xoay
-            if (type == SnackBarType.info)
-              _SpinningIcon(icon: icon, color: textColor)
-            else
-              Icon(icon, color: textColor, size: 22),
-            const SizedBox(width: 12),
-            // Message
-            Expanded(
-              child: Text(
-                message,
-                style: context.typo.label.large.copyWith(
-                  color: textColor,
-                ),
-              ),
-            ),
-            // Action button (nếu có)
-            if (actionLabel != null && onAction != null) ...[
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  onAction();
-                },
-                child: Text(
-                  actionLabel,
-                  style: context.typo.title.small.copyWith(
-                    color: textColor,
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(width: 8),
-            // Close button — circle, cùng row
-            SizedBox(
-              width: 28,
-              height: 28,
-              child: Material(
-                color: Colors.transparent,
-                shape: const CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                child: InkWell(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: closeColor.withOpacity(0.15),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(Icons.close, color: closeColor, size: 16),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: bgColor,
+        content: _SnackBarContent(message: message, type: type),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        elevation: 8,
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        padding: EdgeInsets.zero,
         duration: duration,
         dismissDirection: DismissDirection.horizontal,
       ),
     );
   }
 
-  // === Shortcut methods ===
+  static void success(BuildContext context, String message) =>
+      show(context, message: message, type: SnackBarType.success);
 
-  /// ✅ Thành công
-  static void success(BuildContext context, String message) {
-    show(context, message: message, type: SnackBarType.success);
-  }
+  static void error(BuildContext context, String message) =>
+      show(context, message: message, type: SnackBarType.error);
 
-  /// ❌ Lỗi
-  static void error(BuildContext context, String message) {
-    show(context, message: message, type: SnackBarType.error);
-  }
+  static void warning(BuildContext context, String message) =>
+      show(context, message: message, type: SnackBarType.warning);
 
-  /// ⚠️ Cảnh báo
-  static void warning(BuildContext context, String message) {
-    show(context, message: message, type: SnackBarType.warning);
-  }
-
-  /// ℹ️ Info / Loading
-  static void info(BuildContext context, String message) {
-    show(context, message: message, type: SnackBarType.info);
-  }
+  static void info(BuildContext context, String message) =>
+      show(context, message: message, type: SnackBarType.info);
 }
 
-/// Spinning icon widget cho Info/Loading type
-class _SpinningIcon extends StatefulWidget {
-  final IconData icon;
-  final Color color;
-  const _SpinningIcon({required this.icon, required this.color});
+class _SnackBarContent extends StatelessWidget {
+  const _SnackBarContent({required this.message, required this.type});
 
-  @override
-  State<_SpinningIcon> createState() => _SpinningIconState();
-}
-
-class _SpinningIconState extends State<_SpinningIcon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  final String message;
+  final SnackBarType type;
 
   @override
   Widget build(BuildContext context) {
-    return RotationTransition(
-      turns: _controller,
-      child: Icon(widget.icon, color: widget.color, size: 22),
+    ScreenUtils.init(context);
+
+    final cfg = _configFor(type);
+    const textColor = Color(0xFF1F2937);
+    const closeColor = Color(0xFF9CA3AF);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: EdgeInsets.all(16.r),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.88),
+            borderRadius: BorderRadius.circular(14.r),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.4),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: cfg.badgeBg,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(cfg.icon, color: cfg.iconColor, size: 20.r),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              if (type == SnackBarType.info)
+                SizedBox(
+                  width: 16.r,
+                  height: 16.r,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppTheme.chartBlue,
+                    backgroundColor:
+                        AppTheme.chartBlue.withValues(alpha: 0.25),
+                  ),
+                )
+              else
+                GestureDetector(
+                  onTap: () =>
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+                  child: Icon(Icons.close, color: closeColor, size: 18.r),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
+
+  static ({Color badgeBg, Color iconColor, IconData icon}) _configFor(
+    SnackBarType type,
+  ) =>
+      switch (type) {
+        SnackBarType.success => (
+          badgeBg: AppTheme.successSurface,
+          iconColor: AppTheme.primary,
+          icon: Icons.check_circle_rounded,
+        ),
+        SnackBarType.error => (
+          badgeBg: AppTheme.dangerSurface,
+          iconColor: AppTheme.redAlert,
+          icon: Icons.cancel_rounded,
+        ),
+        SnackBarType.warning => (
+          badgeBg: AppTheme.amberFill,
+          iconColor: AppTheme.amberText,
+          icon: Icons.warning_rounded,
+        ),
+        SnackBarType.info => (
+          badgeBg: AppTheme.infoSurface,
+          iconColor: AppTheme.chartBlue,
+          icon: Icons.info_rounded,
+        ),
+      };
 }

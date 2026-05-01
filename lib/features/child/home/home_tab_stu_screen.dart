@@ -8,6 +8,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/child/home/home_scan_bill_notifier.dart';
 import 'package:monikid/features/child/home/home_tab_provider.dart';
 import 'package:monikid/features/child/home/home_tab_skeleton.dart';
 import 'package:monikid/features/child/home/home_tab_state.dart';
@@ -19,6 +20,7 @@ import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
 class HomeTabStudent extends HookConsumerWidget {
@@ -75,7 +77,9 @@ class HomeTabStudent extends HookConsumerWidget {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            await ref.read(setMoneyLimitNotifierProvider.notifier).loadCurrentLimit();
+            await ref
+                .read(setMoneyLimitNotifierProvider.notifier)
+                .loadCurrentLimit();
             await ref.read(homeTabNotifierProvider.notifier).refresh();
           },
           child: _buildBody(
@@ -119,8 +123,8 @@ class HomeTabStudent extends HookConsumerWidget {
     final sectionMaxWidth = screenWidth >= 840
         ? 720.0
         : screenWidth >= 600
-            ? 640.0
-            : double.infinity;
+        ? 640.0
+        : double.infinity;
     final remainingBudget = hasMonthlyLimit
         ? (monthlyLimitMinor ?? 0) - state.monthlyExpense
         : null;
@@ -316,10 +320,8 @@ class _HomeHeader extends StatelessWidget {
                 ? Image.network(
                     avatarUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.person,
-                      color: AppTheme.primary,
-                    ),
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.person, color: AppTheme.primary),
                   )
                 : const Icon(Icons.person, color: AppTheme.primary),
           ),
@@ -329,31 +331,62 @@ class _HomeHeader extends StatelessWidget {
   }
 }
 
-class _HomeQuickActions extends StatelessWidget {
-  const _HomeQuickActions({
-    required this.isDark,
-    required this.onSetLimitTap,
-  });
+class _HomeQuickActions extends ConsumerWidget {
+  const _HomeQuickActions({required this.isDark, required this.onSetLimitTap});
 
   final bool isDark;
   final VoidCallback onSetLimitTap;
 
+  Future<void> _handleScanBill(BuildContext context, WidgetRef ref) async {
+    final imageSelection =
+        await showModalBottomSheet<TransactionImageSelection>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => UploadPicDialog(
+            imageIntake: ref.read(transactionImageIntakeProvider),
+          ),
+        );
+
+    if (!context.mounted || imageSelection == null) {
+      return;
+    }
+
+    ref
+        .read(homeScanBillNotifierProvider.notifier)
+        .scanAndAnalyze(imageSelection);
+    // Navigation and error handling are performed by ref.listen in build().
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
+    final scanState = ref.watch(homeScanBillNotifierProvider);
+    final isBusy = scanState.isBusy;
+
+    ref.listen(homeScanBillNotifierProvider, (_, next) {
+      if (next.status == HomeScanBillStatus.ready &&
+          next.transactionAiResult != null) {
+        context.push(
+          AppRoutes.addTransaction,
+          extra: (next.transactionAiResult, next.scannedImage),
+        );
+        ref.read(homeScanBillNotifierProvider.notifier).reset();
+      }
+      if (next.status == HomeScanBillStatus.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(s.scanBillAiError)),
+        );
+        ref.read(homeScanBillNotifierProvider.notifier).reset();
+      }
+    });
+
     final actions = [
       (
         icon: Icons.qr_code_scanner,
         label: s.scanbill,
         color: Colors.orange,
-        onTap: () {
-          showModalBottomSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const UploadPicDialog(),
-          );
-        },
+        onTap: isBusy ? null : () => _handleScanBill(context, ref),
       ),
       (
         icon: Icons.add_card,
@@ -380,31 +413,55 @@ class _HomeQuickActions extends StatelessWidget {
         final iconSize = (circleSize * 0.48).clamp(22.0, 30.0);
         final labelFontSize = screenHeight < 700 ? 11.5.r : 12.5.r;
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: actions.map((action) {
-            final index = actions.indexOf(action);
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: index == actions.length - 1 ? 0 : spacing,
-                ),
-                child: SizedBox(
-                  width: itemWidth,
-                  child: QuickAction(
-                    icon: action.icon,
-                    label: action.label,
-                    color: action.color,
-                    isDark: isDark,
-                    circleSize: circleSize,
-                    iconSize: iconSize,
-                    labelFontSize: labelFontSize,
-                    onTap: action.onTap,
+        return Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: actions
+                  .map((action) {
+                    final index = actions.indexOf(action);
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          right: index == actions.length - 1 ? 0 : spacing,
+                        ),
+                        child: Opacity(
+                          opacity: action.onTap == null ? 0.5 : 1.0,
+                          child: SizedBox(
+                            width: itemWidth,
+                            child: QuickAction(
+                              icon: action.icon,
+                              label: action.label,
+                              color: action.color,
+                              isDark: isDark,
+                              circleSize: circleSize,
+                              iconSize: iconSize,
+                              labelFontSize: labelFontSize,
+                              onTap: action.onTap,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  })
+                  .toList(growable: false),
+            ),
+            if (isBusy)
+              Positioned.fill(
+                child: Center(
+                  child: SizedBox(
+                    width: 20.r,
+                    height: 20.r,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.orange.shade600,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            );
-          }).toList(growable: false),
+          ],
         );
       },
     );
@@ -412,10 +469,7 @@ class _HomeQuickActions extends StatelessWidget {
 }
 
 class _SectionContainer extends StatelessWidget {
-  const _SectionContainer({
-    required this.maxWidth,
-    required this.child,
-  });
+  const _SectionContainer({required this.maxWidth, required this.child});
 
   final double maxWidth;
   final Widget child;

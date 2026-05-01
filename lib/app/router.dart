@@ -17,11 +17,14 @@ import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/child/bottom_nav_bar.dart';
 import 'package:monikid/features/child/request_money/add_new_request/add_request_money_screen.dart';
 import 'package:monikid/features/child/request_money/request_money_history/request_money_history_screen.dart';
+import 'package:monikid/features/child/chooseAImodel/choose_ai_model_screen.dart';
 import 'package:monikid/features/child/request_money/update_request/update_request_screen.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_screen.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_screen.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_screen.dart';
 import 'package:monikid/features/child/transaction/update_transaction/update_transaction_screen.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
+import 'package:monikid/models/ai/transaction_ai_result.dart';
 import 'package:monikid/models/entities/request_money/request_money_model.dart';
 
 class AppRoutes {
@@ -46,6 +49,7 @@ class AppRoutes {
 
   static const String parent = '/parent';
   static const String studentMain = '/student-main';
+  static const String chooseAiModel = '/choose-ai-model';
 
   static const String addTransaction = '/add-transaction';
   static const String transactionHistory = '/transaction-history';
@@ -145,8 +149,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const StudentBottomNavBar(),
       ),
       GoRoute(
+        path: AppRoutes.chooseAiModel,
+        builder: (context, state) => const ChooseAiModelScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.addTransaction,
-        builder: (context, state) => const AddTransactionScreen(),
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is (TransactionAiResult?, TransactionImageSelection?)) {
+            return AddTransactionScreen(
+              aiPrefill: extra.$1,
+              scannedImage: extra.$2,
+            );
+          }
+          return const AddTransactionScreen();
+        },
       ),
       GoRoute(
         path: AppRoutes.transactionHistory,

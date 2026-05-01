@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/di/di.dart';
@@ -37,10 +38,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       next.whenData((categories) {
         final originalTransaction = state.originalTransaction;
         if (originalTransaction == null) {
-          state = state.copyWith(
-            categories: categories,
-            errorMessage: null,
-          );
+          state = state.copyWith(categories: categories, errorMessage: null);
           return;
         }
 
@@ -200,7 +198,9 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       return;
     }
 
-    final amountText = state.amountText.replaceAll(RegExp(r'[^0-9]'), '').trim();
+    final amountText = state.amountText
+        .replaceAll(RegExp(r'[^0-9]'), '')
+        .trim();
     if (amountText.isEmpty) {
       state = state.copyWith(
         status: TransactionStatus.error,
@@ -244,6 +244,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
               bytes: state.newEvidenceImageBytes!,
               fileName: state.newEvidenceImageFileName!,
               mimeType: state.newEvidenceImageMimeType!,
+              categoryKey: updatedTransaction.categoryKey,
             )
           : null;
       final persistedTransaction = await _repository.updateTransaction(
@@ -274,6 +275,16 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
         status: TransactionStatus.error,
         errorMessage: s.transactionEvidenceUploadTimeout,
       );
+    } on FirebaseException catch (error, stackTrace) {
+      _logger.e(
+        'Update transaction firebase failure',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        errorMessage: _resolveFirebaseErrorMessage(error),
+      );
     } catch (error, stackTrace) {
       _logger.e(
         'Update transaction failed',
@@ -285,6 +296,22 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
         errorMessage: s.updateTransactionFailed,
       );
     }
+  }
+
+  String _resolveFirebaseErrorMessage(FirebaseException error) {
+    if (error.code == 'permission-denied') {
+      if (state.hasNewEvidenceImageSelection ||
+          state.removeExistingEvidenceImage) {
+        return 'Không thể cập nhật ảnh minh chứng. Kiểm tra Firestore rules cho evidence_image Cloudinary.';
+      }
+      return 'Rules hiện tại đang từ chối cập nhật transaction. Kiểm tra lại schema Firestore/rules.';
+    }
+
+    if (error.message != null && error.message!.trim().isNotEmpty) {
+      return error.message!;
+    }
+
+    return s.updateTransactionFailed;
   }
 
   void _applyTransaction(TransactionModel transaction) {
@@ -351,8 +378,9 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     );
 
     return fallback.copyWith(
-      icon:
-          selectedCategoryEmoji.isNotEmpty ? selectedCategoryEmoji : fallback.icon,
+      icon: selectedCategoryEmoji.isNotEmpty
+          ? selectedCategoryEmoji
+          : fallback.icon,
     );
   }
 

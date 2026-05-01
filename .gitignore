@@ -56,3 +56,7 @@ setting_fqa_page.dart
 setting_fqa_provider.dart
 setting_fqa_repository.dart
 setting_fqa_state.dart
+
+# Graphify generated JSON (cache, graph output, detect files)
+graphify-*/*.json
+graphify-*/**/*.json

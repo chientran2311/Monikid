@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
 class SwitchItem extends StatelessWidget {
+  const SwitchItem({
+    super.key,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+    required this.textColor,
+    required this.borderColor,
+    required this.activeColor,
+    required this.showBorder,
+    this.subtitle,
+  });
+
   final IconData icon;
   final Color iconColor;
   final Color iconBgColor;
@@ -10,45 +26,32 @@ class SwitchItem extends StatelessWidget {
   final ValueChanged<bool> onChanged;
   final Color textColor;
   final Color borderColor;
-  final Color parentPrimary;
+  final Color activeColor;
   final bool showBorder;
-
-  const SwitchItem({
-    Key? key,
-    required this.icon,
-    required this.iconColor,
-    required this.iconBgColor,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-    required this.textColor,
-    required this.borderColor,
-    required this.parentPrimary,
-    required this.showBorder,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border(bottom: BorderSide(color: borderColor))
-            : null,
-      ),
+      decoration: showBorder
+          ? BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: borderColor, width: 0.5),
+              ),
+            )
+          : null,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 32.r,
+            height: 32.r,
             decoration: BoxDecoration(
               color: iconBgColor,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(icon, color: iconColor, size: 20),
+            child: Icon(icon, color: iconColor, size: 18.r),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,16 +59,19 @@ class SwitchItem extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                     color: textColor,
                   ),
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     subtitle!,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: borderColor,
+                    ),
                   ),
                 ],
               ],
@@ -74,8 +80,8 @@ class SwitchItem extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.white,
-            activeTrackColor: parentPrimary,
+            activeThumbColor: Colors.white,
+            activeTrackColor: activeColor,
           ),
         ],
       ),

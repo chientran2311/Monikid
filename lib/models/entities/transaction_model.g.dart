@@ -40,7 +40,6 @@ _TransactionModel _$TransactionModelFromJson(Map<String, dynamic> json) =>
       note: json['note'] as String?,
       source: json['source'] as String?,
       merchantName: json['merchantName'] as String?,
-      paymentMethod: json['paymentMethod'] as String?,
       dateTs: DateTime.parse(json['dateTs'] as String),
       createdAt: const TimestampConverter().fromJson(
         json['createdAt'] as Timestamp?,
@@ -71,7 +70,6 @@ Map<String, dynamic> _$TransactionModelToJson(_TransactionModel instance) =>
       'note': instance.note,
       'source': instance.source,
       'merchantName': instance.merchantName,
-      'paymentMethod': instance.paymentMethod,
       'dateTs': instance.dateTs.toIso8601String(),
       'createdAt': const TimestampConverter().toJson(instance.createdAt),
       'updatedAt': const TimestampConverter().toJson(instance.updatedAt),

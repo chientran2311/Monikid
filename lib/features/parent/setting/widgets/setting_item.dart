@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
 class SettingItem extends StatelessWidget {
+  const SettingItem({
+    super.key,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
+    required this.title,
+    required this.textColor,
+    required this.borderColor,
+    required this.showBorder,
+    this.subtitle,
+    this.onTap,
+  });
+
   final IconData icon;
   final Color iconColor;
   final Color iconBgColor;
@@ -9,73 +23,67 @@ class SettingItem extends StatelessWidget {
   final Color textColor;
   final Color borderColor;
   final bool showBorder;
-
-  const SettingItem({
-    Key? key,
-    required this.icon,
-    required this.iconColor,
-    required this.iconBgColor,
-    required this.title,
-    required this.subtitle,
-    required this.textColor,
-    required this.borderColor,
-    required this.showBorder,
-  }) : super(key: key);
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border(bottom: BorderSide(color: borderColor))
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    shape: BoxShape.circle,
+    final mutedColor = borderColor;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap ?? () {},
+        child: Container(
+          decoration: showBorder
+              ? BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: borderColor, width: 0.5),
                   ),
-                  child: Icon(icon, color: iconColor, size: 20),
+                )
+              : null,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          child: Row(
+            children: [
+              Container(
+                width: 32.r,
+                height: 32.r,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                child: Icon(icon, color: iconColor, size: 18.r),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      SizedBox(height: 2.h),
                       Text(
-                        title,
+                        subtitle!,
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
+                          fontSize: 12.sp,
+                          color: mutedColor,
                         ),
                       ),
-                      if (subtitle != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle!,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
                     ],
-                  ),
+                  ],
                 ),
-                const Icon(Icons.chevron_right, color: Colors.grey),
-              ],
-            ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 20.r,
+                color: mutedColor,
+              ),
+            ],
           ),
         ),
       ),

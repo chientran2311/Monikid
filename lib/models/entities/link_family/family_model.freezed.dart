@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FamilyModel {
 
- String get familyId; String get parentId; String get parentName; String get inviteCode; DateTime get inviteCodeExpiresAt; int get childCount; String get status;// active, archived
- DateTime get createdAt; DateTime? get updatedAt;
+ String get familyId; String get parentId; String get parentName; String get inviteCode; DateTime get inviteCodeExpiresAt; int get childCount; String get status; DateTime get createdAt; DateTime? get updatedAt;
 /// Create a copy of FamilyModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -99,7 +98,6 @@ class _FamilyModel implements FamilyModel {
 @override final  DateTime inviteCodeExpiresAt;
 @override final  int childCount;
 @override final  String status;
-// active, archived
 @override final  DateTime createdAt;
 @override final  DateTime? updatedAt;
 

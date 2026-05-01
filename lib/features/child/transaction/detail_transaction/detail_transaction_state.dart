@@ -19,6 +19,5 @@ abstract class DetailTransactionState with _$DetailTransactionState {
   const DetailTransactionState._();
 
   bool get isLoading => status == TransactionStatus.loading;
-  bool get isDeleting => status == TransactionStatus.submitting;
   bool get hasEvidenceImage => transaction?.hasEvidenceImage == true;
 }

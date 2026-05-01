@@ -54,6 +54,20 @@ service cloud.firestore {
         && requesterDoc().data.member_status == 'active';
     }
 
+    function isFamilyParent(familyId) {
+      return isParent()
+        && requesterDoc().data.family_id == familyId;
+    }
+
+    function isChildWithoutFamily() {
+      return isSignedIn()
+        && requesterExists()
+        && requesterDoc().data.role == 'child'
+        && requesterDoc().data.member_status == 'active'
+        && (!requesterDoc().data.keys().hasAny(['family_id'])
+            || requesterDoc().data.family_id == null);
+    }
+
     function isSameFamilyWithUser(uid) {
       return requesterExists()
         && targetUserExists(uid)
@@ -137,6 +151,45 @@ service cloud.firestore {
         && data.updated_at is timestamp
         && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)))
         && (!data.keys().hasAny(['spending_alert']) || (data.spending_alert is map && isValidSpendingAlert(data.spending_alert)));
+    }
+
+    // Allows a parent to set their own family_id when createFamily transaction runs.
+    // Caller must not already belong to a family.
+    function isValidParentFamilyJoin(uid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let data = request.resource.data;
+      return isSelf(uid)
+        && requesterDoc().data.role == 'parent'
+        && diff.hasOnly(['family_id'])
+        && (!resource.data.keys().hasAny(['family_id'])
+            || resource.data.family_id == null)
+        && data.family_id is string
+        && data.family_id.size() > 0;
+    }
+
+    // Allows a child to set their family_id (and optional family_role) when joinFamily runs.
+    // Caller must not already belong to a family.
+    function isValidChildFamilyJoin(uid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let data = request.resource.data;
+      return isSelf(uid)
+        && requesterDoc().data.role == 'child'
+        && diff.hasOnly(['family_id', 'family_role'])
+        && (!resource.data.keys().hasAny(['family_id'])
+            || resource.data.family_id == null)
+        && data.family_id is string
+        && data.family_id.size() > 0
+        && (!data.keys().hasAny(['family_role']) || data.family_role == 'child');
+    }
+
+    // Allows a family parent to delete the family_id field from a child's user doc (removeChild).
+    function isValidParentRemoveChild(uid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      return isParent()
+        && diff.hasOnly(['family_id'])
+        && !request.resource.data.keys().hasAny(['family_id'])
+        && targetUserDoc(uid).data.role == 'child'
+        && resource.data.family_id == requesterDoc().data.family_id;
     }
 
     function isValidOcrMeta(data) {
@@ -372,10 +425,91 @@ service cloud.firestore {
         && data.updated_at is timestamp;
     }
 
+    // Validates the families document shape on create.
+    // invite_code must be exactly 6 digits. parent must have no existing family.
+    function isValidFamilyCreate() {
+      let data = request.resource.data;
+      return isParent()
+        && (!requesterDoc().data.keys().hasAny(['family_id'])
+            || requesterDoc().data.family_id == null)
+        && data.keys().hasOnly([
+            'parent_id', 'parent_name', 'invite_code',
+            'invite_code_expires_at', 'child_count', 'status',
+            'created_at', 'updated_at'
+          ])
+        && data.keys().hasAll([
+            'parent_id', 'parent_name', 'invite_code',
+            'invite_code_expires_at', 'child_count', 'status',
+            'created_at', 'updated_at'
+          ])
+        && data.parent_id == request.auth.uid
+        && data.parent_name is string
+        && data.parent_name.size() > 0
+        && data.invite_code is string
+        && data.invite_code.matches('^[0-9]{6}$')
+        && data.invite_code_expires_at is timestamp
+        && data.child_count == 0
+        && data.status == 'active'
+        && data.created_at is timestamp
+        && data.updated_at is timestamp;
+    }
+
+    // Allows updating invite_code/invite_code_expires_at (refresh) and child_count (join/remove).
+    // Immutable fields (parent_id, status) must not change.
+    function isValidFamilyUpdate() {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let data = request.resource.data;
+      return diff.hasOnly([
+          'invite_code', 'invite_code_expires_at',
+          'child_count', 'updated_at'
+        ])
+        && data.parent_id == resource.data.parent_id
+        && data.status == resource.data.status
+        && data.updated_at is timestamp
+        && (!diff.hasAny(['invite_code'])
+            || (data.invite_code is string
+                && data.invite_code.matches('^[0-9]{6}$')
+                && data.invite_code_expires_at is timestamp));
+    }
+
+    // Validates the member sub-document when a child joins a family.
+    function isValidMemberCreate(memberUid, familyId) {
+      let data = request.resource.data;
+      return isChildWithoutFamily()
+        && isSelf(memberUid)
+        && data.keys().hasOnly([
+            'uid', 'family_id', 'role', 'display_name',
+            'avatar_url', 'joined_at', 'status'
+          ])
+        && data.keys().hasAll([
+            'uid', 'family_id', 'role', 'display_name',
+            'joined_at', 'status'
+          ])
+        && data.uid == memberUid
+        && data.family_id == familyId
+        && data.role == 'child'
+        && data.display_name is string
+        && data.display_name.size() > 0
+        && data.status == 'active'
+        && data.joined_at is timestamp;
+    }
+
+    // Allows the family parent to mark a member as removed.
+    function isValidMemberRemove(familyId, memberUid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      return isFamilyParent(familyId)
+        && diff.hasOnly(['status'])
+        && request.resource.data.status == 'removed'
+        && resource.data.uid == memberUid;
+    }
+
     match /users/{uid} {
       allow read: if isSelf(uid) || isParentViewingChild(uid);
       allow create: if isSelf(uid) && isValidUserCreate(uid);
-      allow update: if isValidUserSelfUpdate(uid);
+      allow update: if isValidUserSelfUpdate(uid)
+        || isValidParentFamilyJoin(uid)
+        || isValidChildFamilyJoin(uid)
+        || isValidParentRemoveChild(uid);
       allow delete: if false;
 
       match /transactions/{transactionId} {
@@ -411,11 +545,16 @@ service cloud.firestore {
 
     match /families/{familyId} {
       allow read: if isFamilyMember(familyId);
-      allow create, update, delete: if false;
+      allow create: if isValidFamilyCreate();
+      allow update: if (isFamilyParent(familyId) || isChildWithoutFamily())
+        && isValidFamilyUpdate();
+      allow delete: if false;
 
       match /members/{memberUid} {
         allow read: if isFamilyMember(familyId);
-        allow create, update, delete: if false;
+        allow create: if isValidMemberCreate(memberUid, familyId);
+        allow update: if isValidMemberRemove(familyId, memberUid);
+        allow delete: if false;
       }
     }
 

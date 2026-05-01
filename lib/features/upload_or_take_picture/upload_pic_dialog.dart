@@ -1,17 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
+import 'package:monikid/shared/widgets/app_snackbar.dart';
 
-class UploadPicDialog extends ConsumerWidget {
-  const UploadPicDialog({super.key});
+class UploadPicDialog extends HookConsumerWidget {
+  const UploadPicDialog({super.key, required this.imageIntake});
+
+  final TransactionImageIntake imageIntake;
+
+  Future<void> _pickImage(
+    BuildContext context,
+    ValueNotifier<bool> isPicking,
+    String unsupportedFormatMessage,
+    String loadErrorMessage,
+    Future<TransactionImageSelection?> Function() pickImage,
+  ) async {
+    if (isPicking.value) {
+      return;
+    }
+
+    isPicking.value = true;
+    try {
+      final selection = await pickImage();
+      if (context.mounted) {
+        Navigator.of(context).pop(selection);
+      }
+    } on TransactionImageIntakeException catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+
+      final message = switch (error.error) {
+        TransactionImageIntakeError.unsupportedFormat =>
+          unsupportedFormatMessage,
+        TransactionImageIntakeError.readFailed => loadErrorMessage,
+      };
+      AppSnackBar.error(context, message);
+    } finally {
+      isPicking.value = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isPicking = useState(false);
     final s = context.l10n;
-    
+
     return SafeArea(
       bottom: false,
       child: Container(
@@ -36,13 +74,12 @@ class UploadPicDialog extends ConsumerWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
-                  color: isDark 
-                      ? const Color(0xFF334155) 
+                  color: isDark
+                      ? const Color(0xFF334155)
                       : const Color(0xFFE2E8F0),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              
               const SizedBox(height: 4),
               Text(
                 s.scanReceiptTitle,
@@ -64,40 +101,44 @@ class UploadPicDialog extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              
               ListTile(
                 leading: const Icon(Icons.photo_camera_outlined),
                 title: Text(s.takePicture),
-                onTap: () {
-                  ref.read(uploadPicProvider.notifier).takePic();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                enabled: !isPicking.value,
+                onTap: () => _pickImage(
+                  context,
+                  isPicking,
+                  s.transactionEvidenceUnsupportedFormat,
+                  s.transactionEvidenceLoadError,
+                  imageIntake.pickFromCamera,
+                ),
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
                 title: Text(s.chooseFromGallery),
-                onTap: () {
-                  ref.read(uploadPicProvider.notifier).choosePic();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                enabled: !isPicking.value,
+                onTap: () => _pickImage(
+                  context,
+                  isPicking,
+                  s.transactionEvidenceUnsupportedFormat,
+                  s.transactionEvidenceLoadError,
+                  imageIntake.pickFromGallery,
+                ),
               ),
-              
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: isPicking.value
+                      ? null
+                      : () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark 
-                        ? AppTheme.backgroundDark.withValues(alpha: 0.5) 
+                    backgroundColor: isDark
+                        ? AppTheme.backgroundDark.withValues(alpha: 0.5)
                         : AppTheme.backgroundLight.withValues(alpha: 0.5),
-                    foregroundColor: isDark 
-                        ? Colors.white 
+                    foregroundColor: isDark
+                        ? Colors.white
                         : const Color(0xFF0F172A),
                     elevation: 0,
                     shape: RoundedRectangleBorder(

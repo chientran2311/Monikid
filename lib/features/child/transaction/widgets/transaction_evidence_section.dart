@@ -40,7 +40,7 @@ class TransactionEvidenceSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          s.transactionEvidenceSectionTitle,
+          s.transactionEvidenceAddOptionalLabel,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -95,11 +95,7 @@ class TransactionEvidenceSection extends StatelessWidget {
                             ? Icons.sync_outlined
                             : Icons.add_photo_alternate_outlined,
                       ),
-                      label: Text(
-                        hasPreview || hasExistingImage
-                            ? s.transactionEvidenceReplaceAction
-                            : s.transactionEvidenceAddAction,
-                      ),
+                      label: Text(s.transactionEvidenceUploadAction),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
                         foregroundColor: Colors.white,

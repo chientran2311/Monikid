@@ -14,4 +14,11 @@ class StorageKeys {
   static const String hashedPinKey = 'hashed_pin';
   static const String pinFailedCountKey = 'pin_failed_count';
   static const String pinLockedUntilKey = 'pin_locked_until';
+  static const String userGeminiApiKey = 'user_gemini_api_key';
+
+  // Local Storage Keys for feature flags
+  static const String hasStoredGeminiApiKey = 'has_stored_gemini_api_key';
+
+  // AI model selection
+  static const String selectedAiModel = 'selected_ai_model';
 }

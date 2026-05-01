@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:monikid/core/config/app_config.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
 class TransactionEvidenceUploadPayload {
@@ -9,11 +11,13 @@ class TransactionEvidenceUploadPayload {
     required this.bytes,
     required this.fileName,
     required this.mimeType,
+    required this.categoryKey,
   });
 
   final Uint8List bytes;
   final String fileName;
   final String mimeType;
+  final String categoryKey;
 }
 
 abstract class TransactionEvidenceStorage {
@@ -29,10 +33,11 @@ abstract class TransactionEvidenceStorage {
 }
 
 class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
-  TransactionEvidenceStorageImpl(this._storage, this._logger);
+  TransactionEvidenceStorageImpl(this._logger, {http.Client? httpClient})
+    : _httpClient = httpClient ?? http.Client();
 
-  final FirebaseStorage _storage;
   final Logger _logger;
+  final http.Client _httpClient;
 
   @override
   Future<TransactionEvidenceImage> uploadEvidenceImage({
@@ -41,29 +46,63 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
     required TransactionEvidenceUploadPayload payload,
   }) async {
     final uploadedAt = DateTime.now();
-    final extension = _resolveExtension(payload.fileName, payload.mimeType);
-    final fileName = 'evidence_${uploadedAt.millisecondsSinceEpoch}.$extension';
-    final storagePath = 'transactions/$userId/$transactionId/$fileName';
+    final cloudName = AppConfig.cloudinaryCloudName;
+    final uploadPreset = AppConfig.cloudinaryUnsignedUploadPreset;
+    final fileName = _buildFileName(
+      categoryKey: payload.categoryKey,
+      uploadedAt: uploadedAt,
+      originalFileName: payload.fileName,
+      mimeType: payload.mimeType,
+    );
+    final folder = 'transactions/$userId/$transactionId';
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/upload'),
+    )
+      ..fields['upload_preset'] = uploadPreset
+      ..fields['folder'] = folder
+      ..fields['resource_type'] = 'image'
+      ..fields['tags'] = 'transaction_evidence,$transactionId,$userId'
+      ..fields['context'] = 'transaction_id=$transactionId|user_id=$userId'
+      ..files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          payload.bytes,
+          filename: fileName,
+        ),
+      );
 
     try {
       _logger.i(
-        'Uploading evidence image for transaction $transactionId to $storagePath.',
+        'Uploading evidence image for transaction $transactionId to Cloudinary folder $folder.',
       );
-      final ref = _storage.ref(storagePath);
-      await ref.putData(
-        payload.bytes,
-        SettableMetadata(contentType: payload.mimeType),
-      );
+      final streamedResponse = await _httpClient.send(request);
+      final responseBody = await streamedResponse.stream.bytesToString();
+      if (streamedResponse.statusCode < 200 || streamedResponse.statusCode >= 300) {
+        throw Exception(
+          'Cloudinary upload failed: ${streamedResponse.statusCode} $responseBody',
+        );
+      }
+
+      final responseJson = jsonDecode(responseBody);
+      if (responseJson is! Map<String, dynamic>) {
+        throw Exception('Cloudinary upload returned an invalid JSON payload.');
+      }
+
+      final secureUrl = responseJson['secure_url'] as String?;
+      if (secureUrl == null || secureUrl.trim().isEmpty) {
+        throw Exception('Cloudinary upload response is missing secure_url.');
+      }
 
       return TransactionEvidenceImage(
-        storagePath: storagePath,
-        fileName: payload.fileName,
+        storagePath: secureUrl,
+        fileName: responseJson['original_filename'] as String? ?? payload.fileName,
         mimeType: payload.mimeType,
         uploadedAt: uploadedAt,
       );
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to upload evidence image.',
+        'Failed to upload evidence image to Cloudinary.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -77,44 +116,67 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
       return;
     }
 
-    try {
-      _logger.i('Deleting evidence image at $storagePath.');
-      await _storage.ref(storagePath).delete();
-    } on FirebaseException catch (error, stackTrace) {
-      if (error.code == 'object-not-found') {
-        _logger.w('Evidence image already missing at $storagePath.');
-        return;
-      }
-
-      _logger.e(
-        'Failed to delete evidence image.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      rethrow;
-    } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to delete evidence image.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      rethrow;
-    }
+    _logger.w(
+      'Cloudinary unsigned upload flow cannot guarantee durable asset deletion from the client. Skipping delete for $storagePath.',
+    );
   }
 
   @override
   Future<String> getEvidenceDownloadUrl(String storagePath) async {
-    try {
-      _logger.i('Resolving evidence image url for $storagePath.');
-      return _storage.ref(storagePath).getDownloadURL();
-    } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to resolve evidence image url.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      rethrow;
+    final trimmedStoragePath = storagePath.trim();
+    if (trimmedStoragePath.isEmpty) {
+      throw Exception('Missing Cloudinary evidence URL.');
     }
+
+    final uri = Uri.tryParse(trimmedStoragePath);
+    final isHttpUrl =
+        uri != null &&
+        (uri.scheme == 'https' || uri.scheme == 'http') &&
+        uri.host.isNotEmpty;
+    if (!isHttpUrl) {
+      throw Exception(
+        'Unsupported legacy evidence path. Expected a Cloudinary delivery URL.',
+      );
+    }
+
+    return trimmedStoragePath;
+  }
+
+  String _buildFileName({
+    required String categoryKey,
+    required DateTime uploadedAt,
+    required String originalFileName,
+    required String mimeType,
+  }) {
+    final normalizedCategory = _normalizeCategoryKey(categoryKey);
+    final extension = _resolveExtension(originalFileName, mimeType);
+    final formattedTimestamp = _formatFileTimestamp(uploadedAt);
+    return 'bill_${normalizedCategory}_$formattedTimestamp.$extension';
+  }
+
+  String _normalizeCategoryKey(String categoryKey) {
+    final normalized = categoryKey
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+
+    if (normalized.isEmpty) {
+      return 'uncategorized';
+    }
+
+    return normalized;
+  }
+
+  String _formatFileTimestamp(DateTime uploadedAt) {
+    final twoDigitMonth = uploadedAt.month.toString().padLeft(2, '0');
+    final twoDigitDay = uploadedAt.day.toString().padLeft(2, '0');
+    final twoDigitHour = uploadedAt.hour.toString().padLeft(2, '0');
+    final twoDigitMinute = uploadedAt.minute.toString().padLeft(2, '0');
+    final twoDigitSecond = uploadedAt.second.toString().padLeft(2, '0');
+
+    return '${uploadedAt.year}${twoDigitMonth}${twoDigitDay}_${twoDigitHour}${twoDigitMinute}${twoDigitSecond}';
   }
 
   String _resolveExtension(String fileName, String mimeType) {

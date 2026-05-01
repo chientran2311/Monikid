@@ -26,9 +26,7 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
       if (next.selectedTransaction?.transactionId == currentTransactionId) {
         final selectedTransaction = next.selectedTransaction;
         state = state.copyWith(
-          status: state.isDeleting
-              ? TransactionStatus.submitting
-              : TransactionStatus.ready,
+          status: TransactionStatus.ready,
           transaction: selectedTransaction,
           errorMessage: null,
         );
@@ -39,8 +37,7 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
       }
 
       if (next.selectedTransactionId == currentTransactionId &&
-          next.selectionErrorMessage != null &&
-          !state.isDeleting) {
+          next.selectionErrorMessage != null) {
         state = state.copyWith(
           status: TransactionStatus.error,
           transaction: null,
@@ -79,47 +76,6 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
       errorMessage: null,
     );
     await _syncEvidenceImageUrl(transaction);
-  }
-
-  Future<void> deleteTransaction() async {
-    final transaction = state.transaction;
-    if (transaction == null) {
-      state = state.copyWith(
-        status: TransactionStatus.error,
-        errorMessage: 'Missing transaction to delete.',
-      );
-      return;
-    }
-
-    state = state.copyWith(
-      status: TransactionStatus.submitting,
-      errorMessage: null,
-    );
-
-    try {
-      final transactionId = transaction.transactionId;
-      _logger.i('Deleting transaction $transactionId');
-      await ref
-          .read(transactionRepositoryProvider)
-          .deleteTransaction(transaction.userId, transactionId);
-      ref
-          .read(transactionHistoryProvider.notifier)
-          .removeTransaction(transactionId);
-      state = state.copyWith(
-        status: TransactionStatus.success,
-        errorMessage: null,
-      );
-    } catch (error, stackTrace) {
-      _logger.e(
-        'Delete transaction failed',
-        error: error,
-        stackTrace: stackTrace,
-      );
-      state = state.copyWith(
-        status: TransactionStatus.error,
-        errorMessage: 'Khong the xoa giao dich. Vui long thu lai.',
-      );
-    }
   }
 
   Future<void> retryEvidenceImage() async {

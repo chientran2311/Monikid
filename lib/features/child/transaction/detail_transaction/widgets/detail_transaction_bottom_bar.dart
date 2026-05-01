@@ -7,16 +7,12 @@ class DetailTransactionBottomBar extends StatelessWidget {
     super.key,
     required this.isDark,
     required this.bgColor,
-    required this.isDeleting,
     required this.onEdit,
-    required this.onDelete,
   });
 
   final bool isDark;
   final Color bgColor;
-  final bool isDeleting;
   final VoidCallback onEdit;
-  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +30,7 @@ class DetailTransactionBottomBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ElevatedButton(
-            onPressed: isDeleting ? null : onEdit,
+            onPressed: onEdit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
@@ -58,37 +54,6 @@ class DetailTransactionBottomBar extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: isDeleting ? null : onDelete,
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF64748B),
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: isDeleting
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.delete, size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        s.transactionDeleteAction,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
           ),
         ],
       ),

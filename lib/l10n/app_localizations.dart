@@ -62,7 +62,8 @@ import 'app_localizations_vi.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('vi')
+    Locale('vi'),
   ];
 
   /// No description provided for @language.
@@ -130,6 +133,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Registration failed: {error}'**
   String registerFailed(String error);
+
+  /// No description provided for @navChildHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navChildHome;
+
+  /// No description provided for @navChildTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get navChildTransactions;
+
+  /// No description provided for @navChildStatistic.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get navChildStatistic;
+
+  /// No description provided for @navChildSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navChildSettings;
+
+  /// No description provided for @homeParFamilyMembersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Members'**
+  String get homeParFamilyMembersLabel;
+
+  /// No description provided for @homeParNoFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members yet'**
+  String get homeParNoFamilyTitle;
+
+  /// No description provided for @homeParNoFamilySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a family to start tracking your child\'s spending'**
+  String get homeParNoFamilySubtitle;
+
+  /// No description provided for @homeParCreateFamilyBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Family'**
+  String get homeParCreateFamilyBtn;
+
+  /// No description provided for @homeParInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Member'**
+  String get homeParInviteTitle;
+
+  /// No description provided for @homeParInviteCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Code'**
+  String get homeParInviteCodeLabel;
+
+  /// No description provided for @homeParCopyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Code'**
+  String get homeParCopyCode;
+
+  /// No description provided for @homeParCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied!'**
+  String get homeParCodeCopied;
+
+  /// No description provided for @homeParManageMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get homeParManageMembers;
+
+  /// No description provided for @homeParSpendingOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get homeParSpendingOverview;
+
+  /// No description provided for @homeParMonthlyExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get homeParMonthlyExpense;
+
+  /// No description provided for @homeParMonthlyIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get homeParMonthlyIncome;
+
+  /// No description provided for @homeParTransactionTagNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get homeParTransactionTagNew;
+
+  /// No description provided for @homeParTransactionTagEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get homeParTransactionTagEdited;
+
+  /// No description provided for @homeParLoadingMemberData.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get homeParLoadingMemberData;
+
+  /// No description provided for @homeParAddMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get homeParAddMember;
+
+  /// No description provided for @homeParRecentTransactionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Transactions'**
+  String get homeParRecentTransactionsLabel;
+
+  /// No description provided for @homeParSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See All'**
+  String get homeParSeeAll;
+
+  /// No description provided for @homeParAlertsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get homeParAlertsLabel;
+
+  /// No description provided for @homeParAlertWeeklyLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approaching Weekly Limit'**
+  String get homeParAlertWeeklyLimitTitle;
+
+  /// No description provided for @homeParAlertWeeklyLimitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check spending limits for your family members.'**
+  String get homeParAlertWeeklyLimitBody;
 
   /// No description provided for @noTransactionsYet.
   ///
@@ -196,12 +349,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transaction added successfully!'**
   String get msgAddTransactionSuccess;
-
-  /// No description provided for @msgTransactionDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Transaction deleted'**
-  String get msgTransactionDeleted;
 
   /// No description provided for @actionCancel.
   ///
@@ -335,18 +482,6 @@ abstract class AppLocalizations {
   /// **'Add a note...'**
   String get updateTransactionNoteHint;
 
-  /// No description provided for @updateTransactionWalletLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Source wallet'**
-  String get updateTransactionWalletLabel;
-
-  /// No description provided for @updateTransactionCashWalletValue.
-  ///
-  /// In en, this message translates to:
-  /// **'Cash'**
-  String get updateTransactionCashWalletValue;
-
   /// No description provided for @transactionDetailTitle.
   ///
   /// In en, this message translates to:
@@ -365,12 +500,6 @@ abstract class AppLocalizations {
   /// **'TIME'**
   String get transactionDetailTimeLabel;
 
-  /// No description provided for @transactionDetailSourceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'SOURCE'**
-  String get transactionDetailSourceLabel;
-
   /// No description provided for @transactionDetailNoteLabel.
   ///
   /// In en, this message translates to:
@@ -383,23 +512,29 @@ abstract class AppLocalizations {
   /// **'Edit transaction'**
   String get transactionEditAction;
 
-  /// No description provided for @transactionDeleteAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete transaction'**
-  String get transactionDeleteAction;
-
   /// No description provided for @transactionEvidenceSectionTitle.
   ///
   /// In en, this message translates to:
   /// **'Evidence image'**
   String get transactionEvidenceSectionTitle;
 
+  /// No description provided for @transactionEvidenceAddOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add evidence image (optional)'**
+  String get transactionEvidenceAddOptionalLabel;
+
   /// No description provided for @transactionEvidenceOptionalLabel.
   ///
   /// In en, this message translates to:
   /// **'Optional. Add one proof image for this transaction.'**
   String get transactionEvidenceOptionalLabel;
+
+  /// No description provided for @transactionEvidenceUploadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload image'**
+  String get transactionEvidenceUploadAction;
 
   /// No description provided for @transactionEvidenceAddAction.
   ///
@@ -443,11 +578,95 @@ abstract class AppLocalizations {
   /// **'Unable to load the evidence image.'**
   String get transactionEvidenceLoadError;
 
+  /// No description provided for @transactionEvidenceLegacyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This evidence image was stored with the old storage flow and is no longer available here.'**
+  String get transactionEvidenceLegacyUnavailable;
+
+  /// No description provided for @transactionEvidenceUnsupportedFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Only JPG and PNG images are supported.'**
+  String get transactionEvidenceUnsupportedFormat;
+
   /// No description provided for @transactionEvidenceUploadTimeout.
   ///
   /// In en, this message translates to:
   /// **'Image upload timed out. Please try again.'**
   String get transactionEvidenceUploadTimeout;
+
+  /// No description provided for @transactionEvidencePermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to save the evidence image. Check the Firestore rules for Cloudinary evidence_image.'**
+  String get transactionEvidencePermissionDenied;
+
+  /// No description provided for @transactionPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Current rules are blocking the transaction write. Check the Firestore schema and rules again.'**
+  String get transactionPermissionDenied;
+
+  /// No description provided for @transactionScanAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan receipt'**
+  String get transactionScanAction;
+
+  /// No description provided for @transactionRescanAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan again'**
+  String get transactionRescanAction;
+
+  /// No description provided for @transactionScanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Take or choose one receipt image to autofill amount, date, category, and note.'**
+  String get transactionScanHint;
+
+  /// No description provided for @transactionScanExtracting.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading text from the receipt image...'**
+  String get transactionScanExtracting;
+
+  /// No description provided for @transactionScanAnalyzing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing category and writing description...'**
+  String get transactionScanAnalyzing;
+
+  /// No description provided for @transactionScanSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill complete. Review every suggested field before saving.'**
+  String get transactionScanSuccess;
+
+  /// No description provided for @transactionScanPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic fields were filled from OCR. Review category and note manually if needed.'**
+  String get transactionScanPartial;
+
+  /// No description provided for @transactionScanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to analyze this receipt. You can try again or enter the transaction manually.'**
+  String get transactionScanFailed;
+
+  /// No description provided for @transactionScanNoTextFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No readable text was found in this receipt image.'**
+  String get transactionScanNoTextFound;
+
+  /// No description provided for @transactionScanNoSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'No usable autofill suggestion was found. Please review the form manually.'**
+  String get transactionScanNoSuggestion;
 
   /// No description provided for @profileEditTitle.
   ///
@@ -640,6 +859,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose how to add receipt image to process.'**
   String get scanReceiptDesc;
+
+  /// No description provided for @chooseAiModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose AI model'**
+  String get chooseAiModelTitle;
+
+  /// No description provided for @chooseAiModelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your Gemini API key to test a real AI request in this screen. The local gemma 2b download path is still being prepared separately.'**
+  String get chooseAiModelDescription;
+
+  /// No description provided for @aiModelGeminiName.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini'**
+  String get aiModelGeminiName;
+
+  /// No description provided for @aiModelGemmaName.
+  ///
+  /// In en, this message translates to:
+  /// **'gemma 2b'**
+  String get aiModelGemmaName;
+
+  /// No description provided for @aiModelApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter API key'**
+  String get aiModelApiKeyHint;
+
+  /// No description provided for @aiModelAddApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Add API Key'**
+  String get aiModelAddApiKey;
+
+  /// No description provided for @aiModelRemoveApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove API Key'**
+  String get aiModelRemoveApiKey;
+
+  /// No description provided for @aiModelApiKeySessionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'API key is securely stored on this device.'**
+  String get aiModelApiKeySessionNote;
+
+  /// No description provided for @aiModelPromptHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a prompt to test Gemini...'**
+  String get aiModelPromptHint;
+
+  /// No description provided for @aiModelSendPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Prompt'**
+  String get aiModelSendPrompt;
+
+  /// No description provided for @aiModelResponseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini response'**
+  String get aiModelResponseTitle;
+
+  /// No description provided for @aiModelApiKeyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an API key first.'**
+  String get aiModelApiKeyRequired;
+
+  /// No description provided for @aiModelPromptRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a prompt before sending.'**
+  String get aiModelPromptRequired;
+
+  /// No description provided for @aiModelInvalidApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'The Gemini API key is invalid or does not have access.'**
+  String get aiModelInvalidApiKey;
+
+  /// No description provided for @aiModelRequestTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The Gemini request timed out. Please try again.'**
+  String get aiModelRequestTimeout;
+
+  /// No description provided for @aiModelEmptyResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini returned an empty response.'**
+  String get aiModelEmptyResponse;
+
+  /// No description provided for @aiModelRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to get a Gemini response right now.'**
+  String get aiModelRequestFailed;
+
+  /// No description provided for @aiModelLocalSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Local model'**
+  String get aiModelLocalSectionTitle;
+
+  /// No description provided for @aiModelDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get aiModelDownload;
+
+  /// No description provided for @aiModelGemmaDownloadConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'File size: ~1.35 GB. Make sure you have enough storage and a stable connection before downloading.'**
+  String get aiModelGemmaDownloadConfirmMessage;
+
+  /// No description provided for @aiModelGemmaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Source provenance is pinned to the official Google Gemma docs and the google/gemma-2b-it distribution channel. The app download URL will be managed separately later.'**
+  String get aiModelGemmaDescription;
+
+  /// No description provided for @aiModelComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get aiModelComingSoon;
+
+  /// No description provided for @aiModelAnalyzeTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Transaction'**
+  String get aiModelAnalyzeTransaction;
+
+  /// No description provided for @aiModelAnalyzingTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing...'**
+  String get aiModelAnalyzingTransaction;
+
+  /// No description provided for @aiModelSelectModelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select model'**
+  String get aiModelSelectModelLabel;
+
+  /// No description provided for @aiModelSelectModelConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This model will be used for the next Gemini requests on this device.'**
+  String get aiModelSelectModelConfirmMessage;
+
+  /// No description provided for @aiModelUseThisModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this model'**
+  String get aiModelUseThisModel;
+
+  /// No description provided for @aiModelSavingModelSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving selected model...'**
+  String get aiModelSavingModelSelection;
+
+  /// No description provided for @appBarBrandTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SmartSpending'**
+  String get appBarBrandTitle;
+
+  /// No description provided for @appBarNotificationsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get appBarNotificationsTooltip;
+
+  /// No description provided for @navParentHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navParentHome;
+
+  /// No description provided for @navParentStatistic.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get navParentStatistic;
+
+  /// No description provided for @navParentSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navParentSettings;
+
+  /// No description provided for @parentStatisticTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get parentStatisticTitle;
+
+  /// No description provided for @parentStatisticWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get parentStatisticWeek;
+
+  /// No description provided for @parentStatisticMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get parentStatisticMonth;
+
+  /// No description provided for @parentStatisticBudgetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Budget'**
+  String get parentStatisticBudgetTitle;
+
+  /// No description provided for @parentStatisticSpentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get parentStatisticSpentLabel;
+
+  /// No description provided for @parentStatisticLeftLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Left'**
+  String get parentStatisticLeftLabel;
+
+  /// No description provided for @parentStatisticTrendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Trend'**
+  String get parentStatisticTrendTitle;
+
+  /// No description provided for @parentStatisticTopCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Categories'**
+  String get parentStatisticTopCategoriesTitle;
+
+  /// No description provided for @parentStatisticNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available yet'**
+  String get parentStatisticNoData;
+
+  /// No description provided for @settingParTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingParTitle;
+
+  /// No description provided for @settingParEditProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get settingParEditProfile;
+
+  /// No description provided for @settingParFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family management'**
+  String get settingParFamilyTitle;
+
+  /// No description provided for @settingParManageFamilyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Family Member'**
+  String get settingParManageFamilyLabel;
+
+  /// No description provided for @settingParChildAccountsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Child accounts'**
+  String get settingParChildAccountsLabel;
+
+  /// No description provided for @settingParChildAccountsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or remove accounts'**
+  String get settingParChildAccountsSubtitle;
+
+  /// No description provided for @settingParSpendingLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending limit'**
+  String get settingParSpendingLimitLabel;
+
+  /// No description provided for @settingParSpendingLimitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set weekly/monthly limits'**
+  String get settingParSpendingLimitSubtitle;
+
+  /// No description provided for @settingParNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingParNotificationsTitle;
+
+  /// No description provided for @settingParPushLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get settingParPushLabel;
+
+  /// No description provided for @settingParPushSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When child makes a transaction'**
+  String get settingParPushSubtitle;
+
+  /// No description provided for @settingParEmailReportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly email report'**
+  String get settingParEmailReportLabel;
+
+  /// No description provided for @settingParAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settingParAccountTitle;
+
+  /// No description provided for @settingParChangePasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get settingParChangePasswordLabel;
+
+  /// No description provided for @settingParHelpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Feedback'**
+  String get settingParHelpLabel;
+
+  /// No description provided for @settingParLogoutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get settingParLogoutLabel;
+
+  /// No description provided for @settingParVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version 1.0.2'**
+  String get settingParVersion;
+
+  /// No description provided for @settingStuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingStuTitle;
+
+  /// No description provided for @settingStuSectionGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settingStuSectionGeneral;
+
+  /// No description provided for @settingStuSectionAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settingStuSectionAccount;
+
+  /// No description provided for @settingStuBudgetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Setup'**
+  String get settingStuBudgetLabel;
+
+  /// No description provided for @settingStuFamilyCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Code'**
+  String get settingStuFamilyCodeLabel;
+
+  /// No description provided for @settingSignOutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get settingSignOutConfirm;
+
+  /// No description provided for @settingSignOutFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out failed'**
+  String get settingSignOutFailed;
+
+  /// No description provided for @aiModelApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get aiModelApiKeyLabel;
+
+  /// No description provided for @aiModelGeminiSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemini Google API'**
+  String get aiModelGeminiSectionTitle;
+
+  /// No description provided for @aiModelBetaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get aiModelBetaLabel;
+
+  /// No description provided for @aiModelDownloadingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not close the app'**
+  String get aiModelDownloadingNote;
 
   /// No description provided for @authPasswordLabel.
   ///
@@ -921,7 +1560,11 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'This {periodLabel}, you spent {percent}% more on {categoryLabel} than the previous {periodLabel}. This category increased the most.'**
-  String statisticSmartInsightMessage(String periodLabel, String percent, String categoryLabel);
+  String statisticSmartInsightMessage(
+    String periodLabel,
+    String percent,
+    String categoryLabel,
+  );
 
   /// No description provided for @statisticSpendingLimitLabel.
   ///
@@ -1102,9 +1745,82 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select period'**
   String get statisticSelectPeriodTitle;
+
+  /// No description provided for @scanBillAiError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to analyze the bill. Please try again or enter manually.'**
+  String get scanBillAiError;
+
+  /// No description provided for @customCategoryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add custom category'**
+  String get customCategoryAdd;
+
+  /// No description provided for @customCategoryLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get customCategoryLabelHint;
+
+  /// No description provided for @customCategoryTypeExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get customCategoryTypeExpense;
+
+  /// No description provided for @customCategoryTypeIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get customCategoryTypeIncome;
+
+  /// No description provided for @customCategoryLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You can have at most 5 custom categories'**
+  String get customCategoryLimitReached;
+
+  /// No description provided for @customCategoryCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Category created'**
+  String get customCategoryCreated;
+
+  /// No description provided for @customCategoryDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Category deleted'**
+  String get customCategoryDeleted;
+
+  /// No description provided for @customCategoryConfirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this category?'**
+  String get customCategoryConfirmDelete;
+
+  /// No description provided for @customCategoryConfirmDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions using this category will keep their existing label.'**
+  String get customCategoryConfirmDeleteBody;
+
+  /// No description provided for @customCategoryCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get customCategoryCancel;
+
+  /// No description provided for @customCategoryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get customCategoryConfirm;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -1113,25 +1829,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'vi'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'vi'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'vi': return AppLocalizationsVi();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'vi':
+      return AppLocalizationsVi();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

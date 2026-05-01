@@ -21,12 +21,90 @@ class AppLocalizationsVi extends AppLocalizations {
   String get close => 'Đóng';
 
   @override
-  String get validationEmptyFields => 'Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)';
+  String get validationEmptyFields =>
+      'Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)';
 
   @override
   String registerFailed(String error) {
     return 'Đăng ký thất bại: $error';
   }
+
+  @override
+  String get navChildHome => 'Trang chủ';
+
+  @override
+  String get navChildTransactions => 'Giao dịch';
+
+  @override
+  String get navChildStatistic => 'Thống kê';
+
+  @override
+  String get navChildSettings => 'Cài đặt';
+
+  @override
+  String get homeParFamilyMembersLabel => 'Thành viên gia đình';
+
+  @override
+  String get homeParNoFamilyTitle => 'Chưa có thành viên gia đình';
+
+  @override
+  String get homeParNoFamilySubtitle =>
+      'Tạo gia đình để bắt đầu theo dõi chi tiêu của con';
+
+  @override
+  String get homeParCreateFamilyBtn => 'Tạo gia đình';
+
+  @override
+  String get homeParInviteTitle => 'Thêm thành viên mới';
+
+  @override
+  String get homeParInviteCodeLabel => 'Mã liên kết';
+
+  @override
+  String get homeParCopyCode => 'Sao chép mã';
+
+  @override
+  String get homeParCodeCopied => 'Đã sao chép!';
+
+  @override
+  String get homeParManageMembers => 'Quản lý';
+
+  @override
+  String get homeParSpendingOverview => 'Chi tiêu tháng này';
+
+  @override
+  String get homeParMonthlyExpense => 'Chi tiêu';
+
+  @override
+  String get homeParMonthlyIncome => 'Thu nhập';
+
+  @override
+  String get homeParTransactionTagNew => 'Mới';
+
+  @override
+  String get homeParTransactionTagEdited => 'Đã sửa';
+
+  @override
+  String get homeParLoadingMemberData => 'Đang tải dữ liệu...';
+
+  @override
+  String get homeParAddMember => 'Thêm';
+
+  @override
+  String get homeParRecentTransactionsLabel => 'Giao dịch gần đây';
+
+  @override
+  String get homeParSeeAll => 'Xem tất cả';
+
+  @override
+  String get homeParAlertsLabel => 'Cảnh báo';
+
+  @override
+  String get homeParAlertWeeklyLimitTitle => 'Sắp chạm giới hạn tuần';
+
+  @override
+  String get homeParAlertWeeklyLimitBody =>
+      'Kiểm tra giới hạn chi tiêu cho các thành viên trong gia đình.';
 
   @override
   String get noTransactionsYet => 'Chưa có giao dịch nào.';
@@ -46,7 +124,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get helpStillNeedHelp => 'Vẫn cần trợ giúp?';
 
   @override
-  String get helpContactSupportDesc => 'Nếu bạn không tìm thấy câu trả lời, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi 24/7.';
+  String get helpContactSupportDesc =>
+      'Nếu bạn không tìm thấy câu trả lời, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi 24/7.';
 
   @override
   String get actionChatWithUs => 'Chat với chúng tôi';
@@ -64,9 +143,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get msgAddTransactionSuccess => 'Thêm giao dịch thành công!';
 
   @override
-  String get msgTransactionDeleted => 'Đã xóa giao dịch';
-
-  @override
   String get actionCancel => 'Hủy';
 
   @override
@@ -79,22 +155,27 @@ class AppLocalizationsVi extends AppLocalizations {
   String get msgUpdateSuccess => 'Cập nhật thành công';
 
   @override
-  String get addTransactionFailed => 'Không thể thêm giao dịch. Vui lòng thử lại.';
+  String get addTransactionFailed =>
+      'Không thể thêm giao dịch. Vui lòng thử lại.';
 
   @override
-  String get updateTransactionFailed => 'Không thể cập nhật giao dịch. Vui lòng thử lại.';
+  String get updateTransactionFailed =>
+      'Không thể cập nhật giao dịch. Vui lòng thử lại.';
 
   @override
-  String get updateTransactionMissingError => 'Không tìm thấy giao dịch để cập nhật.';
+  String get updateTransactionMissingError =>
+      'Không tìm thấy giao dịch để cập nhật.';
 
   @override
   String get transactionLoadError => 'Không thể tải giao dịch.';
 
   @override
-  String get transactionCategoryLoadError => 'Không thể tải danh mục. Vui lòng thử lại.';
+  String get transactionCategoryLoadError =>
+      'Không thể tải danh mục. Vui lòng thử lại.';
 
   @override
-  String get transactionUserNotAuthenticated => 'Người dùng chưa được xác thực.';
+  String get transactionUserNotAuthenticated =>
+      'Người dùng chưa được xác thực.';
 
   @override
   String get transactionAmountLabel => 'Số tiền';
@@ -121,7 +202,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactionAiAutoLabel => 'AI tự động';
 
   @override
-  String get addTransactionNoteHint => 'Nhập ghi chú, AI sẽ tự động phân loại...';
+  String get addTransactionNoteHint =>
+      'Nhập ghi chú, AI sẽ tự động phân loại...';
 
   @override
   String get updateTransactionTitle => 'Chỉnh sửa giao dịch';
@@ -133,12 +215,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get updateTransactionNoteHint => 'Thêm ghi chú...';
 
   @override
-  String get updateTransactionWalletLabel => 'Ví nguồn';
-
-  @override
-  String get updateTransactionCashWalletValue => 'Tiền mặt';
-
-  @override
   String get transactionDetailTitle => 'Chi tiết giao dịch';
 
   @override
@@ -148,22 +224,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactionDetailTimeLabel => 'THỜI GIAN';
 
   @override
-  String get transactionDetailSourceLabel => 'NGUỒN TIỀN';
-
-  @override
   String get transactionDetailNoteLabel => 'GHI CHÚ';
 
   @override
   String get transactionEditAction => 'Chỉnh sửa giao dịch';
 
   @override
-  String get transactionDeleteAction => 'Xóa giao dịch';
-
-  @override
   String get transactionEvidenceSectionTitle => 'Ảnh minh chứng';
 
   @override
-  String get transactionEvidenceOptionalLabel => 'Tùy chọn. Thêm 1 ảnh minh chứng cho giao dịch này.';
+  String get transactionEvidenceAddOptionalLabel =>
+      'Thêm ảnh minh chứng (optional)';
+
+  @override
+  String get transactionEvidenceOptionalLabel =>
+      'Tùy chọn. Thêm 1 ảnh minh chứng cho giao dịch này.';
+
+  @override
+  String get transactionEvidenceUploadAction => 'Tải ảnh';
 
   @override
   String get transactionEvidenceAddAction => 'Thêm ảnh';
@@ -187,7 +265,61 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactionEvidenceLoadError => 'Không thể tải ảnh minh chứng.';
 
   @override
-  String get transactionEvidenceUploadTimeout => 'Tải ảnh lên quá lâu. Vui lòng thử lại.';
+  String get transactionEvidenceLegacyUnavailable =>
+      'Ảnh minh chứng này được lưu theo luồng lưu trữ cũ và hiện không còn xem được tại đây.';
+
+  @override
+  String get transactionEvidenceUnsupportedFormat =>
+      'Chỉ hỗ trợ ảnh JPG và PNG.';
+
+  @override
+  String get transactionEvidenceUploadTimeout =>
+      'Tải ảnh lên quá lâu. Vui lòng thử lại.';
+
+  @override
+  String get transactionEvidencePermissionDenied =>
+      'Không thể lưu ảnh minh chứng. Hãy kiểm tra Firestore rules cho evidence_image Cloudinary.';
+
+  @override
+  String get transactionPermissionDenied =>
+      'Rules hiện tại đang từ chối ghi transaction. Hãy kiểm tra lại schema Firestore và rules.';
+
+  @override
+  String get transactionScanAction => 'Quét hóa đơn';
+
+  @override
+  String get transactionRescanAction => 'Quét lại';
+
+  @override
+  String get transactionScanHint =>
+      'Chụp hoặc chọn một ảnh hóa đơn để tự điền số tiền, ngày, danh mục và ghi chú.';
+
+  @override
+  String get transactionScanExtracting => 'Đang đọc chữ từ ảnh hóa đơn...';
+
+  @override
+  String get transactionScanAnalyzing =>
+      'Đang phân tích danh mục và tạo mô tả...';
+
+  @override
+  String get transactionScanSuccess =>
+      'Đã tự điền xong. Hãy kiểm tra lại các trường trước khi lưu.';
+
+  @override
+  String get transactionScanPartial =>
+      'Đã điền một phần từ OCR. Hãy kiểm tra lại danh mục và ghi chú nếu cần.';
+
+  @override
+  String get transactionScanFailed =>
+      'Không thể phân tích hóa đơn này. Bạn có thể thử lại hoặc nhập tay giao dịch.';
+
+  @override
+  String get transactionScanNoTextFound =>
+      'Không tìm thấy nội dung chữ có thể đọc được trên ảnh hóa đơn này.';
+
+  @override
+  String get transactionScanNoSuggestion =>
+      'Không tạo được gợi ý tự điền phù hợp. Vui lòng kiểm tra biểu mẫu thủ công.';
 
   @override
   String get profileEditTitle => 'Chỉnh sửa hồ sơ';
@@ -211,7 +343,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileEditEmail => 'Email';
 
   @override
-  String get profileEditEmailWarning => 'Email không thể thay đổi để bảo mật tài khoản.';
+  String get profileEditEmailWarning =>
+      'Email không thể thay đổi để bảo mật tài khoản.';
 
   @override
   String get profileEditDob => 'Ngày sinh';
@@ -286,6 +419,224 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scanReceiptDesc => 'Chọn cách thêm ảnh hoá đơn để xử lý.';
 
   @override
+  String get chooseAiModelTitle => 'Chọn AI model';
+
+  @override
+  String get chooseAiModelDescription =>
+      'Chuẩn bị khu vực AI cho các tích hợp sau này. Gemini hiện chỉ là mock setup, còn model Ollama local sẽ ở trạng thái sắp có.';
+
+  @override
+  String get aiModelGeminiName => 'Gemini';
+
+  @override
+  String get aiModelGemmaName => 'gemma:2b';
+
+  @override
+  String get aiModelApiKeyHint => 'Nhập API key';
+
+  @override
+  String get aiModelAddApiKey => 'Thêm API Key';
+
+  @override
+  String get aiModelRemoveApiKey => 'Gỡ API Key';
+
+  @override
+  String get aiModelApiKeySessionNote =>
+      'API key được lưu an toàn trong bộ nhớ thiết bị.';
+
+  @override
+  String get aiModelPromptHint => 'Enter a prompt to test Gemini...';
+
+  @override
+  String get aiModelSendPrompt => 'Send Prompt';
+
+  @override
+  String get aiModelResponseTitle => 'Gemini response';
+
+  @override
+  String get aiModelApiKeyRequired => 'Please enter an API key first.';
+
+  @override
+  String get aiModelPromptRequired => 'Please enter a prompt before sending.';
+
+  @override
+  String get aiModelInvalidApiKey =>
+      'The Gemini API key is invalid or does not have access.';
+
+  @override
+  String get aiModelRequestTimeout =>
+      'The Gemini request timed out. Please try again.';
+
+  @override
+  String get aiModelEmptyResponse => 'Gemini returned an empty response.';
+
+  @override
+  String get aiModelRequestFailed =>
+      'Unable to get a Gemini response right now.';
+
+  @override
+  String get aiModelLocalSectionTitle => 'Model local';
+
+  @override
+  String get aiModelDownload => 'Download';
+
+  @override
+  String get aiModelGemmaDownloadConfirmMessage =>
+      'Dung lượng file: ~1.35 GB. Hãy đảm bảo bạn có đủ bộ nhớ và kết nối ổn định trước khi tải xuống.';
+
+  @override
+  String get aiModelGemmaDescription =>
+      'Source provenance is pinned to the official Google Gemma docs and the google/gemma-2b-it distribution channel. The app download URL will be managed separately later.';
+
+  @override
+  String get aiModelComingSoon => 'Sắp có';
+
+  @override
+  String get aiModelAnalyzeTransaction => 'Phân tích giao dịch';
+
+  @override
+  String get aiModelAnalyzingTransaction => 'Đang phân tích...';
+
+  @override
+  String get aiModelSelectModelLabel => 'Chọn model';
+
+  @override
+  String get aiModelSelectModelConfirmMessage =>
+      'Model nay se duoc dung cho cac yeu cau Gemini tiep theo tren thiet bi nay.';
+
+  @override
+  String get aiModelUseThisModel => 'Dung model nay';
+
+  @override
+  String get aiModelSavingModelSelection => 'Dang luu model da chon...';
+
+  @override
+  String get appBarBrandTitle => 'SmartSpending';
+
+  @override
+  String get appBarNotificationsTooltip => 'Thông báo';
+
+  @override
+  String get navParentHome => 'Trang chủ';
+
+  @override
+  String get navParentStatistic => 'Thống kê';
+
+  @override
+  String get navParentSettings => 'Cài đặt';
+
+  @override
+  String get parentStatisticTitle => 'Thống kê';
+
+  @override
+  String get parentStatisticWeek => 'Tuần';
+
+  @override
+  String get parentStatisticMonth => 'Tháng';
+
+  @override
+  String get parentStatisticBudgetTitle => 'Ngân sách tuần';
+
+  @override
+  String get parentStatisticSpentLabel => 'Đã chi';
+
+  @override
+  String get parentStatisticLeftLabel => 'Còn lại';
+
+  @override
+  String get parentStatisticTrendTitle => 'Xu hướng chi tiêu';
+
+  @override
+  String get parentStatisticTopCategoriesTitle => 'Danh mục hàng đầu';
+
+  @override
+  String get parentStatisticNoData => 'Chưa có dữ liệu';
+
+  @override
+  String get settingParTitle => 'Cài đặt';
+
+  @override
+  String get settingParEditProfile => 'Chỉnh sửa hồ sơ';
+
+  @override
+  String get settingParFamilyTitle => 'Quản lý gia đình';
+
+  @override
+  String get settingParManageFamilyLabel => 'Quản lý thành viên gia đình';
+
+  @override
+  String get settingParChildAccountsLabel => 'Tài khoản con';
+
+  @override
+  String get settingParChildAccountsSubtitle => 'Thêm hoặc xóa tài khoản';
+
+  @override
+  String get settingParSpendingLimitLabel => 'Hạn mức chi tiêu';
+
+  @override
+  String get settingParSpendingLimitSubtitle => 'Thiết lập giới hạn tuần/tháng';
+
+  @override
+  String get settingParNotificationsTitle => 'Thông báo';
+
+  @override
+  String get settingParPushLabel => 'Thông báo tức thì';
+
+  @override
+  String get settingParPushSubtitle => 'Khi con thực hiện giao dịch';
+
+  @override
+  String get settingParEmailReportLabel => 'Báo cáo tuần qua Email';
+
+  @override
+  String get settingParAccountTitle => 'Tài khoản';
+
+  @override
+  String get settingParChangePasswordLabel => 'Đổi mật khẩu';
+
+  @override
+  String get settingParHelpLabel => 'Trợ giúp & Phản hồi';
+
+  @override
+  String get settingParLogoutLabel => 'Đăng xuất';
+
+  @override
+  String get settingParVersion => 'Phiên bản 1.0.2';
+
+  @override
+  String get settingStuTitle => 'Cài đặt';
+
+  @override
+  String get settingStuSectionGeneral => 'Tổng quát';
+
+  @override
+  String get settingStuSectionAccount => 'Tài khoản';
+
+  @override
+  String get settingStuBudgetLabel => 'Thiết lập ngân sách';
+
+  @override
+  String get settingStuFamilyCodeLabel => 'Mã liên kết gia đình';
+
+  @override
+  String get settingSignOutConfirm => 'Bạn có chắc chắn muốn đăng xuất không?';
+
+  @override
+  String get settingSignOutFailed => 'Đăng xuất thất bại';
+
+  @override
+  String get aiModelApiKeyLabel => 'API Key';
+
+  @override
+  String get aiModelGeminiSectionTitle => 'Gemini Google API';
+
+  @override
+  String get aiModelBetaLabel => 'Beta';
+
+  @override
+  String get aiModelDownloadingNote => 'Không đóng ứng dụng';
+
+  @override
   String get authPasswordLabel => 'Mật khẩu';
 
   @override
@@ -307,7 +658,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get pinCreateTitle => 'Tạo mã PIN mới';
 
   @override
-  String get pinCreateDescription => 'Tạo mã PIN 6 chữ số để bảo vệ tài khoản của bạn.';
+  String get pinCreateDescription =>
+      'Tạo mã PIN 6 chữ số để bảo vệ tài khoản của bạn.';
 
   @override
   String get pinReEnterTitle => 'Xác nhận lại mã PIN';
@@ -368,7 +720,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeStudentViewAll => 'Xem tất cả';
 
   @override
-  String get homeStudentLoadError => 'Không thể tải màn hình chính. Vui lòng thử lại.';
+  String get homeStudentLoadError =>
+      'Không thể tải màn hình chính. Vui lòng thử lại.';
 
   @override
   String get homeStudentAddTransaction => 'Thêm giao dịch';
@@ -383,16 +736,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get setMoneyLimitTitle => 'Thiết lập hạn mức tháng';
 
   @override
-  String get setMoneyLimitDescription => 'Hạn mức này giúp bạn kiểm soát chi tiêu tốt hơn mỗi tháng.';
+  String get setMoneyLimitDescription =>
+      'Hạn mức này giúp bạn kiểm soát chi tiêu tốt hơn mỗi tháng.';
 
   @override
   String get setMoneyLimitSkipAction => 'Bỏ qua';
 
   @override
-  String get setMoneyLimitUnauthenticated => 'Vui lòng đăng nhập lại để thiết lập hạn mức tháng.';
+  String get setMoneyLimitUnauthenticated =>
+      'Vui lòng đăng nhập lại để thiết lập hạn mức tháng.';
 
   @override
-  String get setMoneyLimitSaveFailed => 'Không thể lưu hạn mức tháng. Vui lòng thử lại.';
+  String get setMoneyLimitSaveFailed =>
+      'Không thể lưu hạn mức tháng. Vui lòng thử lại.';
 
   @override
   String setMoneyLimitQuickAmount(int millionCount) {
@@ -427,10 +783,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticLastMonth => 'Tháng trước';
 
   @override
-  String get statisticSmartInsightFallback => 'Chưa có biến động chi tiêu nổi bật trong kỳ này.';
+  String get statisticSmartInsightFallback =>
+      'Chưa có biến động chi tiêu nổi bật trong kỳ này.';
 
   @override
-  String statisticSmartInsightMessage(String periodLabel, String percent, String categoryLabel) {
+  String statisticSmartInsightMessage(
+    String periodLabel,
+    String percent,
+    String categoryLabel,
+  ) {
     return '$periodLabel này bạn chi cho $categoryLabel nhiều hơn $percent% so với $periodLabel trước. Đây là danh mục tăng mạnh nhất.';
   }
 
@@ -456,7 +817,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticBudgetNoLimitTitle => 'Thiết lập hạn mức tháng';
 
   @override
-  String get statisticBudgetNoLimitDescription => 'Thêm hạn mức tháng để so sánh ngân sách với chi tiêu trong kỳ hiện tại.';
+  String get statisticBudgetNoLimitDescription =>
+      'Thêm hạn mức tháng để so sánh ngân sách với chi tiêu trong kỳ hiện tại.';
 
   @override
   String statisticSavedComparedToPrevious(String percent, String periodLabel) {
@@ -531,8 +893,48 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticNoDataTitle => 'Chưa có dữ liệu chi tiêu';
 
   @override
-  String get statisticNoDataDescription => 'Hãy thêm giao dịch để xem xu hướng chi tiêu và phân tích danh mục.';
+  String get statisticNoDataDescription =>
+      'Hãy thêm giao dịch để xem xu hướng chi tiêu và phân tích danh mục.';
 
   @override
   String get statisticSelectPeriodTitle => 'Chọn mốc thời gian';
+
+  @override
+  String get scanBillAiError =>
+      'Không thể phân tích hóa đơn. Vui lòng thử lại hoặc nhập tay.';
+
+  @override
+  String get customCategoryAdd => 'Thêm danh mục';
+
+  @override
+  String get customCategoryLabelHint => 'Tên danh mục';
+
+  @override
+  String get customCategoryTypeExpense => 'Chi tiêu';
+
+  @override
+  String get customCategoryTypeIncome => 'Thu nhập';
+
+  @override
+  String get customCategoryLimitReached =>
+      'Bạn chỉ có thể tạo tối đa 5 danh mục tùy chỉnh';
+
+  @override
+  String get customCategoryCreated => 'Đã tạo danh mục';
+
+  @override
+  String get customCategoryDeleted => 'Đã xóa danh mục';
+
+  @override
+  String get customCategoryConfirmDelete => 'Xóa danh mục này?';
+
+  @override
+  String get customCategoryConfirmDeleteBody =>
+      'Các giao dịch dùng danh mục này vẫn giữ nhãn cũ.';
+
+  @override
+  String get customCategoryCancel => 'Hủy';
+
+  @override
+  String get customCategoryConfirm => 'Thêm';
 }

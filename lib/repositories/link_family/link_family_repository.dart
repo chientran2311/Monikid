@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/core/utils/family_code_util.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/models/entities/link_family/family_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -8,7 +9,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'link_family_repository.g.dart';
 
 abstract class LinkFamilyRepository {
-   Future<FamilyModel?> getFamilyByInviteCode(String inviteCode);
+  Future<FamilyModel?> createFamily({
+    required String parentId,
+    required String parentName,
+  });
+
+  Future<FamilyModel?> getFamilyByInviteCode(String inviteCode);
 
   Future<FamilyModel?> getFamilyById(String familyId);
 
@@ -163,6 +169,108 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<FamilyModel?> createFamily({
+    required String parentId,
+    required String parentName,
+  }) async {
+    try {
+      final familyRef = _firestore.collection('families').doc();
+      final userRef = _firestore.collection('users').doc(parentId);
+      final inviteCode = FamilyCodeUtil.generate();
+      final expiresAt = DateTime.now().add(const Duration(days: 365));
+
+      await _firestore.runTransaction((tx) async {
+        tx.set(familyRef, {
+          'parent_id': parentId,
+          'parent_name': parentName,
+          'invite_code': inviteCode,
+          'invite_code_expires_at': Timestamp.fromDate(expiresAt),
+          'child_count': 0,
+          'status': 'active',
+          'created_at': FieldValue.serverTimestamp(),
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+        tx.update(userRef, {'family_id': familyRef.id});
+      });
+
+      final doc = await familyRef.get();
+      return FamilyModel.fromFirestore(doc);
+    } catch (e, stackTrace) {
+      _logger.e('Error creating family', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<FamilyModel?> getFamilyById(String familyId) async {
+    try {
+      final doc =
+          await _firestore.collection('families').doc(familyId).get();
+      if (!doc.exists) return null;
+      return FamilyModel.fromFirestore(doc);
+    } catch (e, stackTrace) {
+      _logger.e('Error fetching family by ID', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Stream<List<FamilyMemberModel>> watchFamilyMembers(String familyId) {
+    return _firestore
+        .collection('families')
+        .doc(familyId)
+        .collection('members')
+        .where('status', isEqualTo: 'active')
+        .snapshots()
+        .map(
+          (snap) => snap.docs
+              .map((d) => FamilyMemberModel.fromFirestore(d))
+              .toList(growable: false),
+        );
+  }
+
+  @override
+  Future<void> refreshInviteCode(String familyId) async {
+    try {
+      final newCode = FamilyCodeUtil.generate();
+      final expiresAt = DateTime.now().add(const Duration(days: 365));
+      await _firestore.collection('families').doc(familyId).update({
+        'invite_code': newCode,
+        'invite_code_expires_at': Timestamp.fromDate(expiresAt),
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+    } catch (e, stackTrace) {
+      _logger.e('Error refreshing invite code', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeChild({
+    required String familyId,
+    required String childId,
+  }) async {
+    try {
+      final familyRef = _firestore.collection('families').doc(familyId);
+      final memberRef = familyRef.collection('members').doc(childId);
+      final userRef = _firestore.collection('users').doc(childId);
+
+      await _firestore.runTransaction((tx) async {
+        tx.update(memberRef, {'status': 'removed'});
+        tx.update(userRef, {'family_id': FieldValue.delete()});
+        tx.update(familyRef, {
+          'child_count': FieldValue.increment(-1),
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+      });
+    } catch (e, stackTrace) {
+      _logger.e('Error removing child from family', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
 }
 
 @riverpod

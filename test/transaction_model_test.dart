@@ -37,6 +37,35 @@ void main() {
       expect(firestoreData['amount_minor'], 25000);
       expect(firestoreData['category_label'], 'Reward');
       expect(firestoreData['date_ts'], isA<Timestamp>());
+      expect(firestoreData.containsKey('evidence_image'), isFalse);
+    });
+
+    test('toFirestore keeps bounded OCR metadata only', () {
+      final transaction = TransactionModel(
+        transactionId: 'tx-ocr-1',
+        userId: 'user-1',
+        amountMinor: 50000,
+        type: 'expense',
+        categoryKey: 'food',
+        categoryLabel: 'Food',
+        source: 'ocr',
+        merchantName: 'Circle K',
+        ocrUsed: true,
+        ocrConfidence: 0.91,
+        dateTs: DateTime(2026, 4, 23, 9, 15),
+      );
+
+      final firestoreData = transaction.toFirestore();
+      final ocrMeta = firestoreData['ocr_meta'] as Map<String, dynamic>?;
+
+      expect(firestoreData['source'], 'ocr');
+      expect(firestoreData['merchant_name'], 'Circle K');
+      expect(ocrMeta, isNotNull);
+      expect(ocrMeta?['used'], isTrue);
+      expect(ocrMeta?['confidence'], 0.91);
+      expect(firestoreData.containsKey('ocr_text'), isFalse);
+      expect(firestoreData.containsKey('llm_payload'), isFalse);
+      expect(firestoreData.containsKey('ai_response'), isFalse);
     });
 
     test('fromFirestore reads evidence image metadata', () {
@@ -120,12 +149,14 @@ void main() {
 
       final expenseMatches = merged
           .where(
-            (category) => category.label == 'Food' && category.type == 'expense',
+            (category) =>
+                category.label == 'Food' && category.type == 'expense',
           )
           .toList();
       final incomeMatches = merged
           .where(
-            (category) => category.label == 'Reward' && category.type == 'income',
+            (category) =>
+                category.label == 'Reward' && category.type == 'income',
           )
           .toList();
 

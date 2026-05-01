@@ -64,7 +64,9 @@ abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
       'storage_path': storagePath,
       'file_name': fileName,
       'mime_type': mimeType,
-      'uploaded_at': uploadedAt != null ? Timestamp.fromDate(uploadedAt!) : null,
+      'uploaded_at': uploadedAt != null
+          ? Timestamp.fromDate(uploadedAt!)
+          : null,
     };
   }
 }
@@ -84,7 +86,6 @@ abstract class TransactionModel with _$TransactionModel {
     String? note,
     String? source,
     String? merchantName,
-    String? paymentMethod,
     @TimestampConverter() required DateTime dateTs,
     @TimestampConverter() DateTime? createdAt,
     @TimestampConverter() DateTime? updatedAt,
@@ -124,7 +125,11 @@ abstract class TransactionModel with _$TransactionModel {
       ),
       amountMinor: amountMinor,
       currency:
-          _readNullableString(json, snakeKey: 'currency', camelKey: 'currency') ??
+          _readNullableString(
+            json,
+            snakeKey: 'currency',
+            camelKey: 'currency',
+          ) ??
           'VND',
       type: _readString(json, snakeKey: 'type', camelKey: 'type'),
       categoryKey: _readString(
@@ -152,11 +157,6 @@ abstract class TransactionModel with _$TransactionModel {
         snakeKey: 'merchant_name',
         camelKey: 'merchantName',
       ),
-      paymentMethod: _readNullableString(
-        json,
-        snakeKey: 'payment_method',
-        camelKey: 'paymentMethod',
-      ),
       dateTs:
           _parseDate(json['date_ts'] ?? json['dateTs'] ?? json['date']) ??
           DateTime.now(),
@@ -171,7 +171,7 @@ abstract class TransactionModel with _$TransactionModel {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
+    final data = <String, dynamic>{
       'transaction_id': transactionId,
       'user_id': userId,
       'family_id': familyId,
@@ -184,16 +184,17 @@ abstract class TransactionModel with _$TransactionModel {
       'note': note,
       'source': source,
       'merchant_name': merchantName ?? '',
-      'payment_method': paymentMethod,
       'date_ts': Timestamp.fromDate(dateTs),
       'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       'updated_at': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
-      'ocr_meta': {
-        'used': ocrUsed ?? false,
-        'confidence': ocrConfidence,
-      },
-      'evidence_image': evidenceImage?.toFirestore(),
+      'ocr_meta': {'used': ocrUsed ?? false, 'confidence': ocrConfidence},
     };
+
+    if (evidenceImage != null) {
+      data['evidence_image'] = evidenceImage!.toFirestore();
+    }
+
+    return data;
   }
 
   double get amount => amountMinor.toDouble();
@@ -216,10 +217,9 @@ abstract class TransactionModel with _$TransactionModel {
       amountMinor: amount != null ? amount.round() : amountMinor,
       type: type ?? this.type,
       categoryLabel: categoryLabel ?? this.categoryLabel,
-      categoryKey:
-          categoryLabel != null && categoryLabel != this.categoryLabel
-              ? _slugifyCategory(categoryLabel)
-              : categoryKey,
+      categoryKey: categoryLabel != null && categoryLabel != this.categoryLabel
+          ? _slugifyCategory(categoryLabel)
+          : categoryKey,
       categoryIcon: categoryIcon ?? this.categoryIcon,
       dateTs: date ?? dateTs,
       note: note,
@@ -234,7 +234,9 @@ String _readString(
   String? fallbackKey,
 }) {
   final value =
-      json[snakeKey] ?? json[camelKey] ?? (fallbackKey != null ? json[fallbackKey] : null);
+      json[snakeKey] ??
+      json[camelKey] ??
+      (fallbackKey != null ? json[fallbackKey] : null);
   if (value is String) {
     return value.trim();
   }
@@ -248,7 +250,9 @@ String? _readNullableString(
   String? fallbackKey,
 }) {
   final value =
-      json[snakeKey] ?? json[camelKey] ?? (fallbackKey != null ? json[fallbackKey] : null);
+      json[snakeKey] ??
+      json[camelKey] ??
+      (fallbackKey != null ? json[fallbackKey] : null);
   if (value is String) {
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;

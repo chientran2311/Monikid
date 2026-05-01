@@ -1,9 +1,9 @@
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/app/app.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_state.dart';
@@ -16,228 +16,258 @@ import 'package:monikid/features/child/transaction/transaction_history/widgets/c
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_evidence_section.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
+import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
+import 'package:monikid/models/ai/transaction_ai_result.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:uuid/uuid.dart';
 
-class AddTransactionScreen extends ConsumerStatefulWidget {
-  const AddTransactionScreen({super.key});
+class AddTransactionScreen extends HookConsumerWidget {
+  const AddTransactionScreen({super.key, this.aiPrefill, this.scannedImage});
+
+  final TransactionAiResult? aiPrefill;
+  final TransactionImageSelection? scannedImage;
 
   @override
-  ConsumerState<AddTransactionScreen> createState() =>
-      _AddTransactionScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actionState = ref.watch(addTransactionNotifierProvider);
+    final categories =
+        ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final s = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
+    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final isBusy = actionState.isBusy;
 
-class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
-  final ImagePicker _imagePicker = ImagePicker();
-  int _transactionType = 0;
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
-  String _selectedCategoryKey = transactionCategoryKeyForCategory(
-    getDefaultCategoryForType('expense'),
-  );
-  String _selectedCategory = getDefaultCategoryForType('expense').label;
-  String _selectedEmoji = getDefaultCategoryForType('expense').icon;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  String get _currentType => _transactionType == 0 ? 'expense' : 'income';
-
-  void _syncCategoryForType(List<CategoryModel> categories) {
-    final matchedCategory = findCategoryByLabel(
-      categories,
-      _selectedCategory,
-      type: _currentType,
+    final transactionType = useState(0);
+    final amountController = useTextEditingController();
+    final noteController = useTextEditingController();
+    final selectedDate = useState(DateTime.now());
+    final selectedCategoryKey = useState(
+      transactionCategoryKeyForCategory(getDefaultCategoryForType('expense')),
     );
-    final fallbackCategory = getDefaultCategoryForType(
-      _currentType,
-      categories: categories,
-    );
+    final selectedCategory = useState(getDefaultCategoryForType('expense').label);
+    final selectedEmoji = useState(getDefaultCategoryForType('expense').icon);
 
-    final nextCategory = matchedCategory ?? fallbackCategory;
-    if (_selectedCategory != nextCategory.label ||
-        _selectedEmoji != nextCategory.icon) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
-          return;
+    final currentType = transactionType.value == 0 ? 'expense' : 'income';
+
+    useEffect(
+      () {
+        final prefill = aiPrefill;
+        if (prefill == null) return null;
+
+        amountController.text = prefill.amountMinor.toString();
+        noteController.text = prefill.note;
+
+        final parsedDate = DateTime.tryParse(prefill.transactionDate);
+        if (parsedDate != null) {
+          selectedDate.value = parsedDate;
         }
-        setState(() {
-          _selectedCategoryKey = transactionCategoryKeyForCategory(
+
+        CategoryModel? matched;
+        for (final c in categories) {
+          if (transactionCategoryKeyForCategory(c) == prefill.categoryKey) {
+            matched = c;
+            break;
+          }
+        }
+        if (matched != null) {
+          selectedCategoryKey.value = transactionCategoryKeyForCategory(matched);
+          selectedCategory.value = matched.label;
+          selectedEmoji.value = matched.icon;
+        }
+
+        return null;
+      },
+      const [],
+    );
+
+    useEffect(
+      () {
+        final image = scannedImage;
+        if (image == null) return null;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(addTransactionNotifierProvider.notifier).setEvidenceImage(
+            bytes: image.bytes,
+            fileName: image.fileName,
+            mimeType: image.mimeType,
+          );
+        });
+        return null;
+      },
+      [scannedImage],
+    );
+
+    void syncCategoryForType() {
+      final matchedCategory = findCategoryByLabel(
+        categories,
+        selectedCategory.value,
+        type: currentType,
+      );
+      final fallbackCategory = getDefaultCategoryForType(
+        currentType,
+        categories: categories,
+      );
+      final nextCategory = matchedCategory ?? fallbackCategory;
+
+      if (selectedCategory.value != nextCategory.label ||
+          selectedEmoji.value != nextCategory.icon ||
+          selectedCategoryKey.value !=
+              transactionCategoryKeyForCategory(nextCategory)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) {
+            return;
+          }
+          selectedCategoryKey.value = transactionCategoryKeyForCategory(
             nextCategory,
           );
-          _selectedCategory = nextCategory.label;
-          _selectedEmoji = nextCategory.icon;
+          selectedCategory.value = nextCategory.label;
+          selectedEmoji.value = nextCategory.icon;
         });
-      });
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        _selectedDate = DateTime(
-          picked.year,
-          picked.month,
-          picked.day,
-          _selectedDate.hour,
-          _selectedDate.minute,
-          _selectedDate.second,
-        );
-      });
-    }
-  }
-
-  void _handleTransactionTypeChanged(
-    int index,
-    List<CategoryModel> categories,
-  ) {
-    final category = getDefaultCategoryForType(
-      index == 0 ? 'expense' : 'income',
-      categories: categories,
-    );
-
-    setState(() {
-      _transactionType = index;
-      _selectedCategoryKey = transactionCategoryKeyForCategory(category);
-      _selectedCategory = category.label;
-      _selectedEmoji = category.icon;
-    });
-  }
-
-  void _showCategoryDialog(bool isLoading) {
-    if (isLoading) {
-      return;
+      }
     }
 
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => CategoryDialog(
-        selectedCategory: _selectedCategory,
-        showAllOption: false,
-        categoryType: _currentType,
-        onCategorySelected: (category) {
-          if (category != null) {
-            setState(() {
-              _selectedCategoryKey = transactionCategoryKeyForCategory(
-                category,
-              );
-              _selectedCategory = category.label;
-              _selectedEmoji = category.icon;
-            });
-          }
-        },
-      ),
-    );
-  }
-
-  Future<void> _pickEvidenceImage() async {
-    final actionState = ref.read(addTransactionNotifierProvider);
-    if (actionState.isLoading) {
-      return;
-    }
-
-    final pickedFile = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1920,
-      maxHeight: 1080,
-      imageQuality: 85,
-    );
-
-    if (pickedFile == null) {
-      return;
-    }
-
-    final bytes = await pickedFile.readAsBytes();
-    if (!mounted || bytes.isEmpty) {
-      return;
-    }
-
-    ref
-        .read(addTransactionNotifierProvider.notifier)
-        .setEvidenceImage(
-          bytes: bytes,
-          fileName: pickedFile.name,
-          mimeType: _resolveMimeType(pickedFile.name),
-        );
-  }
-
-  String _resolveMimeType(String fileName) {
-    final normalized = fileName.toLowerCase();
-    if (normalized.endsWith('.png')) {
-      return 'image/png';
-    }
-    if (normalized.endsWith('.webp')) {
-      return 'image/webp';
-    }
-    return 'image/jpeg';
-  }
-
-  Future<void> _saveTransaction() async {
-    if (_amountController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(s.validationEnterAmount)));
-      return;
-    }
-
-    final amountStr = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
-    final amount = double.tryParse(amountStr) ?? 0.0;
-
-    if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(s.validationAmountGreaterThanZero)),
+    Future<void> selectDate() async {
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate.value,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2101),
       );
-      return;
-    }
 
-    final authState = ref.read(authSessionProvider);
-    final user = authState.user;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(s.transactionUserNotAuthenticated)),
+      if (picked == null || !context.mounted) {
+        return;
+      }
+
+      selectedDate.value = DateTime(
+        picked.year,
+        picked.month,
+        picked.day,
+        selectedDate.value.hour,
+        selectedDate.value.minute,
+        selectedDate.value.second,
       );
-      return;
     }
 
-    final now = DateTime.now();
-    final transaction = TransactionModel(
-      transactionId: const Uuid().v4(),
-      userId: user.uid,
-      familyId: authState.account?.familyId,
-      amountMinor: amount.round(),
-      type: _currentType,
-      categoryKey: _selectedCategoryKey,
-      categoryLabel: _selectedCategory,
-      categoryIcon: _selectedEmoji,
-      note: _noteController.text.trim(),
-      source: 'manual',
-      dateTs: _selectedDate,
-      createdAt: now,
-      updatedAt: now,
-    );
+    void handleTransactionTypeChanged(int index) {
+      final category = getDefaultCategoryForType(
+        index == 0 ? 'expense' : 'income',
+        categories: categories,
+      );
 
-    await ref
-        .read(addTransactionNotifierProvider.notifier)
-        .addTransaction(transaction);
-  }
+      transactionType.value = index;
+      selectedCategoryKey.value = transactionCategoryKeyForCategory(category);
+      selectedCategory.value = category.label;
+      selectedEmoji.value = category.icon;
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    void showCategoryPicker() {
+      if (isBusy) {
+        return;
+      }
+
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => CategoryDialog(
+          selectedCategory: selectedCategory.value,
+          showAllOption: false,
+          categoryType: currentType,
+          onCategorySelected: (category) {
+            if (category == null) {
+              return;
+            }
+
+            selectedCategoryKey.value = transactionCategoryKeyForCategory(
+              category,
+            );
+            selectedCategory.value = category.label;
+            selectedEmoji.value = category.icon;
+          },
+        ),
+      );
+    }
+
+    Future<void> pickEvidenceImage() async {
+      if (isBusy) {
+        return;
+      }
+
+      final imageSelection =
+          await showModalBottomSheet<TransactionImageSelection>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => UploadPicDialog(
+              imageIntake: ref.read(transactionImageIntakeProvider),
+            ),
+          );
+
+      if (!context.mounted || imageSelection == null) {
+        return;
+      }
+
+      ref.read(addTransactionNotifierProvider.notifier).setEvidenceImage(
+        bytes: imageSelection.bytes,
+        fileName: imageSelection.fileName,
+        mimeType: imageSelection.mimeType,
+      );
+    }
+
+    Future<void> saveTransaction() async {
+      if (amountController.text.isEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(s.validationEnterAmount)));
+        return;
+      }
+
+      final amountStr = amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final amount = double.tryParse(amountStr) ?? 0.0;
+
+      if (amount <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(s.validationAmountGreaterThanZero)),
+        );
+        return;
+      }
+
+      final authState = ref.read(authSessionProvider);
+      final user = authState.user;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(s.transactionUserNotAuthenticated)),
+        );
+        return;
+      }
+
+      final now = DateTime.now();
+      final transaction = TransactionModel(
+        transactionId: const Uuid().v4(),
+        userId: user.uid,
+        familyId: authState.account?.familyId,
+        amountMinor: amount.round(),
+        type: currentType,
+        categoryKey: selectedCategoryKey.value,
+        categoryLabel: selectedCategory.value,
+        categoryIcon: selectedEmoji.value,
+        note: noteController.text.trim(),
+        source: 'manual',
+        dateTs: selectedDate.value,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      await ref
+          .read(addTransactionNotifierProvider.notifier)
+          .addTransaction(transaction);
+    }
+
+    syncCategoryForType();
+
     ref.listen<AddTransactionState>(addTransactionNotifierProvider, (
       previous,
       next,
@@ -265,23 +295,12 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         case TransactionStatus.loading:
         case TransactionStatus.ready:
         case TransactionStatus.submitting:
-          break;
+          return;
       }
     });
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final actionState = ref.watch(addTransactionNotifierProvider);
-    final isLoading = actionState.isLoading;
-    final categories =
-        ref.watch(categoryStreamProvider).value ?? defaultCategories;
-
-    _syncCategoryForType(categories);
-
     return PopScope(
-      canPop: !isLoading,
+      canPop: !isBusy,
       child: Scaffold(
         backgroundColor: bgColor,
         appBar: AppBar(
@@ -289,7 +308,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
           elevation: 0,
           leadingWidth: 80,
           leading: TextButton(
-            onPressed: isLoading ? null : () => context.pop(),
+            onPressed: isBusy ? null : () => context.pop(),
             child: Text(
               s.actionCancel,
               style: TextStyle(
@@ -333,52 +352,46 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         TransactionTypeTab(
                           title: s.transactionExpenseType,
                           index: 0,
-                          selectedIndex: _transactionType,
-                          onTabSelected: isLoading
+                          selectedIndex: transactionType.value,
+                          onTabSelected: isBusy
                               ? (_) {}
-                              : (index) => _handleTransactionTypeChanged(
-                                  index,
-                                  categories,
-                                ),
+                              : handleTransactionTypeChanged,
                         ),
                         TransactionTypeTab(
                           title: s.transactionIncomeType,
                           index: 1,
-                          selectedIndex: _transactionType,
-                          onTabSelected: isLoading
+                          selectedIndex: transactionType.value,
+                          onTabSelected: isBusy
                               ? (_) {}
-                              : (index) => _handleTransactionTypeChanged(
-                                  index,
-                                  categories,
-                                ),
+                              : handleTransactionTypeChanged,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 32),
                   AddTransactionAmountSection(
-                    controller: _amountController,
-                    enabled: !isLoading,
+                    controller: amountController,
+                    enabled: !isBusy,
                     textColor: textColor,
                   ),
                   const SizedBox(height: 32),
                   GestureDetector(
-                    onTap: () => _showCategoryDialog(isLoading),
+                    onTap: showCategoryPicker,
                     child: TransactionFormField(
                       label: s.transactionCategoryLabel,
-                      value: _selectedCategory,
-                      iconOrEmoji: _selectedEmoji,
+                      value: selectedCategory.value,
+                      iconOrEmoji: selectedEmoji.value,
                       iconColor: Colors.orange,
                       showChevron: true,
                     ),
                   ),
                   const SizedBox(height: 16),
                   GestureDetector(
-                    onTap: isLoading ? null : () => _selectDate(context),
+                    onTap: isBusy ? null : selectDate,
                     child: TransactionFormField(
                       label: s.transactionDateLabel,
                       value:
-                          '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                          '${selectedDate.value.day}/${selectedDate.value.month}/${selectedDate.value.year}',
                       iconOrEmoji: '📅',
                       iconColor: AppTheme.primary,
                       showChevron: true,
@@ -386,8 +399,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   ),
                   const SizedBox(height: 16),
                   AddTransactionNoteSection(
-                    controller: _noteController,
-                    enabled: !isLoading,
+                    controller: noteController,
+                    enabled: !isBusy,
+                    showAiBadge: false,
                     isDark: isDark,
                     surfaceColor: surfaceColor,
                     textColor: textColor,
@@ -396,10 +410,10 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   TransactionEvidenceSection(
                     isDark: isDark,
                     surfaceColor: surfaceColor,
-                    enabled: !isLoading,
+                    enabled: !isBusy,
                     previewBytes: actionState.evidenceImageBytes,
                     selectedFileName: actionState.evidenceImageFileName,
-                    onPickImage: _pickEvidenceImage,
+                    onPickImage: pickEvidenceImage,
                     onRemoveImage: actionState.hasEvidenceImageSelection
                         ? () => ref
                               .read(addTransactionNotifierProvider.notifier)
@@ -423,7 +437,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   ),
                 ),
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _saveTransaction,
+                  onPressed: isBusy ? null : saveTransaction,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     foregroundColor: Colors.white,
@@ -434,7 +448,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     elevation: 8,
                     shadowColor: AppTheme.primary.withValues(alpha: 0.4),
                   ),
-                  child: isLoading
+                  child: actionState.isLoading
                       ? const SizedBox(
                           height: 24,
                           width: 24,
@@ -460,7 +474,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 ),
               ),
             ),
-            if (isLoading) TransactionEditorLoadingOverlay(isDark: isDark),
+            if (actionState.isBusy)
+              TransactionEditorLoadingOverlay(isDark: isDark),
           ],
         ),
       ),

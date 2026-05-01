@@ -8,12 +8,12 @@ class TransactionTypeTab extends StatelessWidget {
   final ValueChanged<int> onTabSelected;
 
   const TransactionTypeTab({
-    Key? key,
+    super.key,
     required this.title,
     required this.index,
     required this.selectedIndex,
     required this.onTabSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class TransactionTypeTab extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 2,
                       offset: const Offset(0, 1),
                     ),

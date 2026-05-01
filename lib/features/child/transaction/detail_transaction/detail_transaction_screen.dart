@@ -48,12 +48,6 @@ class _DetailTransactionScreenState
       }
 
       switch (next.status) {
-        case TransactionStatus.success:
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(s.msgTransactionDeleted)));
-          context.pop(true);
-          return;
         case TransactionStatus.error:
           if (next.errorMessage != null) {
             ScaffoldMessenger.of(
@@ -65,6 +59,7 @@ class _DetailTransactionScreenState
         case TransactionStatus.loading:
         case TransactionStatus.ready:
         case TransactionStatus.submitting:
+        case TransactionStatus.success:
           break;
       }
     });
@@ -81,7 +76,7 @@ class _DetailTransactionScreenState
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-          onPressed: state.isDeleting ? null : () => context.pop(),
+          onPressed: () => context.pop(),
         ),
         title: Text(
           s.transactionDetailTitle,
@@ -111,13 +106,7 @@ class _DetailTransactionScreenState
         if (transaction == null) {
           return Center(child: Text(s.transactionDetailNoData));
         }
-        return Stack(
-          children: [
-            _TransactionContent(state: state, isDark: isDark),
-            if (state.isDeleting)
-              TransactionDetailLoadingOverlay(isDark: isDark),
-          ],
-        );
+        return _TransactionContent(state: state, isDark: isDark);
       case TransactionStatus.success:
         return const SizedBox.shrink();
     }
@@ -139,7 +128,6 @@ class _DetailTransactionScreenState
     return DetailTransactionBottomBar(
       isDark: isDark,
       bgColor: bgColor,
-      isDeleting: state.isDeleting,
       onEdit: () async {
         ref
             .read(transactionHistoryProvider.notifier)
@@ -147,11 +135,6 @@ class _DetailTransactionScreenState
         await context.push(
           AppRoutes.updateTransactionPath(transaction.transactionId),
         );
-      },
-      onDelete: () {
-        ref
-            .read(detailTransactionNotifierProvider.notifier)
-            .deleteTransaction();
       },
     );
   }
@@ -239,15 +222,6 @@ class _TransactionContent extends ConsumerWidget {
                       ? const Color(0xFF1E293B)
                       : const Color(0xFFF1F5F9),
                   height: 32,
-                ),
-                TransactionDetailRow(
-                  iconData: Icons.account_balance_wallet,
-                  label: s.transactionDetailSourceLabel,
-                  value:
-                      transaction.paymentMethod ??
-                      transaction.merchantName ??
-                      s.updateTransactionCashWalletValue,
-                  isDark: isDark,
                 ),
                 if (transaction.note != null &&
                     transaction.note!.isNotEmpty) ...[
@@ -344,6 +318,9 @@ class _EvidenceSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transaction = state.transaction!;
+    final hasLegacyEvidencePath = _hasLegacyEvidencePath(
+      transaction.evidenceImage?.storagePath,
+    );
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final borderColor = isDark
         ? const Color(0xFF1E293B)
@@ -388,22 +365,33 @@ class _EvidenceSection extends ConsumerWidget {
             )
           else if (state.evidenceImageUrl == null)
             _EvidenceErrorState(
-              errorMessage: state.evidenceImageErrorMessage,
-              onRetry: () => ref
-                  .read(detailTransactionNotifierProvider.notifier)
-                  .retryEvidenceImage(),
+              errorMessage: hasLegacyEvidencePath
+                  ? s.transactionEvidenceLegacyUnavailable
+                  : state.evidenceImageErrorMessage,
+              onRetry: hasLegacyEvidencePath
+                  ? null
+                  : () => ref
+                        .read(detailTransactionNotifierProvider.notifier)
+                        .retryEvidenceImage(),
             )
           else ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                state.evidenceImageUrl!,
-                height: 220,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return const _BrokenImagePlaceholder();
-                },
+            GestureDetector(
+              onTap: () => _showEvidenceImageViewer(
+                context,
+                imageUrl: state.evidenceImageUrl!,
+                fileName: transaction.evidenceImage?.fileName,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  state.evidenceImageUrl!,
+                  height: 220,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const _BrokenImagePlaceholder();
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -419,6 +407,35 @@ class _EvidenceSection extends ConsumerWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  bool _hasLegacyEvidencePath(String? storagePath) {
+    final trimmedStoragePath = storagePath?.trim();
+    if (trimmedStoragePath == null || trimmedStoragePath.isEmpty) {
+      return false;
+    }
+
+    final uri = Uri.tryParse(trimmedStoragePath);
+    if (uri == null) {
+      return true;
+    }
+
+    return uri.scheme != 'https' && uri.scheme != 'http';
+  }
+
+  Future<void> _showEvidenceImageViewer(
+    BuildContext context, {
+    required String imageUrl,
+    String? fileName,
+  }) {
+    return showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      builder: (context) => _EvidenceImageViewerDialog(
+        imageUrl: imageUrl,
+        fileName: fileName,
       ),
     );
   }
@@ -454,11 +471,11 @@ class _EvidenceEmptyState extends StatelessWidget {
 class _EvidenceErrorState extends StatelessWidget {
   const _EvidenceErrorState({
     required this.errorMessage,
-    required this.onRetry,
+    this.onRetry,
   });
 
   final String? errorMessage;
-  final VoidCallback onRetry;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -476,12 +493,14 @@ class _EvidenceErrorState extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
           ),
-          const SizedBox(height: 12),
-          TextButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: Text(s.actionRetry),
-          ),
+          if (onRetry != null) ...[
+            const SizedBox(height: 12),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(s.actionRetry),
+            ),
+          ],
         ],
       ),
     );
@@ -503,6 +522,75 @@ class _BrokenImagePlaceholder extends StatelessWidget {
           style: const TextStyle(
             color: Color(0xFF64748B),
             fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EvidenceImageViewerDialog extends StatelessWidget {
+  const _EvidenceImageViewerDialog({
+    required this.imageUrl,
+    this.fileName,
+  });
+
+  final String imageUrl;
+  final String? fileName;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelColor = Colors.white.withValues(alpha: 0.8);
+
+    return Dialog.fullscreen(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        color: Colors.black,
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4,
+                  child: Center(
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const _BrokenImagePlaceholder();
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.12),
+                  ),
+                ),
+              ),
+              if (fileName != null && fileName!.trim().isNotEmpty)
+                Positioned(
+                  left: 20,
+                  right: 20,
+                  bottom: 20,
+                  child: Text(
+                    fileName!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: labelColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),

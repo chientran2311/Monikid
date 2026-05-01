@@ -1,7 +1,11 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
 // Import Tabs
@@ -11,14 +15,13 @@ import 'package:monikid/features/child/statistic/statistic_screen.dart';
 import 'package:monikid/features/child/setting/setting_tab_stu.dart';
 
 class StudentBottomNavBar extends StatefulWidget {
-  const StudentBottomNavBar({Key? key}) : super(key: key);
+  const StudentBottomNavBar({super.key});
 
   @override
   State<StudentBottomNavBar> createState() => _StudentBottomNavBarState();
 }
 
 class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
-  // Logic index để chuyển hướng giữa các màn hình
   int _currentIndex = 0;
 
   final List<Widget> _tabs = [
@@ -30,97 +33,71 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtils.init(context);
+    final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Background based on HTML: `bg-white dark:bg-[#1c2a1e]`
-    final bgColor = isDark ? const Color(0xFF1c2a1e) : Colors.white;
+    final glassColor = isDark
+        ? AppTheme.surfaceDark.withValues(alpha: 0.78)
+        : Colors.white.withValues(alpha: 0.80);
 
-    // Unselected colors based on HTML: `text-slate-400 dark:text-slate-500`
-    final unselectedColor = isDark
-        ? const Color(0xFF64748B)
-        : const Color(0xFF94A3B8);
+    final unselectedColor =
+        isDark ? const Color(0xFF64748B) : AppTheme.textGrey;
 
     return Scaffold(
-      // LazyLoadIndexedStack dùng để giữ state của các tab không bị reload khi chuyển qua lại, đồng thời ko render tất cả ngay từ đầu
+      extendBody: true,
       body: LazyLoadIndexedStack(index: _currentIndex, children: _tabs),
-
-      // Nút (+) thêm giao dịch ở giữa
       floatingActionButton: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primary.withOpacity(0.4),
+              color: AppTheme.primary.withValues(alpha: 0.35),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
           ],
         ),
         child: FloatingActionButton(
-          onPressed: () {
-            context.push(AppRoutes.addTransaction);
-          },
+          onPressed: () => context.push(AppRoutes.addTransaction),
           backgroundColor: AppTheme.primary,
           shape: const CircleBorder(),
           elevation: 0,
-          child: const Icon(Icons.add_rounded, size: 36, color: Colors.white),
+          child: Icon(Icons.add_rounded, size: 28.r, color: Colors.white),
         ),
       ),
-
-      // Ghim FAB ở giữa navigation bar
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomAppBar(
-        color: bgColor,
-        shape: const CircularNotchedRectangle(), // Khoét lỗ giữa cho FAB
-        notchMargin: 8.0,
-        height: 70,
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Nhóm bên trái
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: BottomAppBar(
+            color: glassColor,
+            shape: const CircularNotchedRectangle(),
+            notchMargin: 8.0,
+            height: 64.h,
+            elevation: 0,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildNavItem(
-                  0,
-                  Icons.home_rounded,
-                  "Trang chủ",
-                  unselectedColor,
+                Row(
+                  children: [
+                    _buildNavItem(0, Icons.home_rounded, s.navChildHome, unselectedColor),
+                    SizedBox(width: 28.w),
+                    _buildNavItem(1, Icons.receipt_long_rounded, s.navChildTransactions, unselectedColor),
+                  ],
                 ),
-                const SizedBox(width: 32),
-                _buildNavItem(
-                  1,
-                  Icons.receipt_long_rounded,
-                  "Giao dịch",
-                  unselectedColor,
+                Row(
+                  children: [
+                    _buildNavItem(2, Icons.bar_chart_rounded, s.navChildStatistic, unselectedColor),
+                    SizedBox(width: 28.w),
+                    _buildNavItem(3, Icons.settings_rounded, s.navChildSettings, unselectedColor),
+                  ],
                 ),
               ],
             ),
-            // Khoảng trống ở giữa cho FAB (tự bù trừ do spaceBetween của Row lớn)
-
-            // Nhóm bên phải
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildNavItem(
-                  2,
-                  Icons.bar_chart_rounded,
-                  "Thống kê",
-                  unselectedColor,
-                ),
-                const SizedBox(width: 32),
-                _buildNavItem(
-                  3,
-                  Icons.settings_rounded,
-                  "Cài đặt",
-                  unselectedColor,
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -142,14 +119,14 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 2),
+          Icon(icon, color: color, size: 24.r),
+          SizedBox(height: 2.h),
           Text(
             label,
             style: TextStyle(
               color: color,
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              fontSize: 10.sp,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             ),
           ),
         ],

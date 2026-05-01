@@ -20,6 +20,8 @@ import 'package:monikid/features/child/statistic/widgets/statistic_top_categorie
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 
+import 'package:monikid/shared/widgets/main_app_bar.dart';
+
 import 'statistic_models.dart';
 import 'statistic_provider.dart';
 
@@ -29,6 +31,7 @@ class StatisticScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ScreenUtils.init(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(statisticProvider);
     final notifier = ref.read(statisticProvider.notifier);
     final historyNotifier = ref.read(transactionHistoryProvider.notifier);
@@ -83,27 +86,9 @@ class StatisticScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? AppTheme.backgroundDark
-          : AppTheme.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? AppTheme.surfaceDark.withValues(alpha: 0.92)
-            : AppTheme.backgroundLight.withValues(alpha: 0.92),
-        elevation: 1,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: Text(
-          context.l10n.statisticTitle,
-          style: TextStyle(
-            fontSize: 18.r,
-            fontWeight: FontWeight.w800,
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : AppTheme.textBlack,
-          ),
-        ),
-      ),
+      backgroundColor:
+          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
+      appBar: const MainAppBar(),
       body: RefreshIndicator(
         onRefresh: notifier.refresh,
         child: CustomScrollView(

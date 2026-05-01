@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/di/di.dart';
@@ -63,6 +64,7 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
               bytes: state.evidenceImageBytes!,
               fileName: state.evidenceImageFileName!,
               mimeType: state.evidenceImageMimeType!,
+              categoryKey: transaction.categoryKey,
             )
           : null;
       await _repository.addTransaction(
@@ -75,7 +77,7 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
       );
     } on TimeoutException catch (error, stackTrace) {
       _logger.e(
-        'Add transaction evidence upload timed out',
+        'Add transaction evidence upload timed out.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -83,9 +85,19 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
         status: TransactionStatus.error,
         errorMessage: s.transactionEvidenceUploadTimeout,
       );
+    } on FirebaseException catch (error, stackTrace) {
+      _logger.e(
+        'Add transaction firebase failure.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      state = state.copyWith(
+        status: TransactionStatus.error,
+        errorMessage: _resolveFirebaseErrorMessage(error),
+      );
     } catch (error, stackTrace) {
       _logger.e(
-        'Add transaction failed',
+        'Add transaction failed.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -94,5 +106,20 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
         errorMessage: s.addTransactionFailed,
       );
     }
+  }
+
+  String _resolveFirebaseErrorMessage(FirebaseException error) {
+    if (error.code == 'permission-denied') {
+      if (state.hasEvidenceImageSelection) {
+        return s.transactionEvidencePermissionDenied;
+      }
+      return s.transactionPermissionDenied;
+    }
+
+    if (error.message != null && error.message!.trim().isNotEmpty) {
+      return error.message!;
+    }
+
+    return s.addTransactionFailed;
   }
 }

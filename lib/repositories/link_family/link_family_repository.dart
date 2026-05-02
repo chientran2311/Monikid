@@ -176,10 +176,44 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
     required String parentName,
   }) async {
     try {
+      // Pre-flight: verify user doc shape before attempting the transaction.
+      final userSnap =
+          await _firestore.collection('users').doc(parentId).get();
+      if (!userSnap.exists) {
+        throw Exception('createFamily: user doc not found for uid=$parentId');
+      }
+      final userData = userSnap.data()!;
+      _logger.d(
+        'createFamily pre-flight '
+        'role=${userData['role']} '
+        'member_status=${userData['member_status']} '
+        'family_id=${userData['family_id']}',
+      );
+      if (userData['role'] != 'parent') {
+        throw Exception(
+          'createFamily: user role is "${userData['role']}", expected "parent"',
+        );
+      }
+      if (userData['member_status'] != 'active') {
+        throw Exception(
+          'createFamily: member_status is "${userData['member_status']}", expected "active"',
+        );
+      }
+      final existingFamilyId = userData['family_id'];
+      if (existingFamilyId != null &&
+          existingFamilyId is String &&
+          existingFamilyId.isNotEmpty) {
+        throw Exception(
+          'createFamily: user already belongs to family $existingFamilyId',
+        );
+      }
+
       final familyRef = _firestore.collection('families').doc();
       final userRef = _firestore.collection('users').doc(parentId);
       final inviteCode = FamilyCodeUtil.generate();
       final expiresAt = DateTime.now().add(const Duration(days: 365));
+
+      _logger.d('createFamily writing family=${familyRef.id} invite=$inviteCode');
 
       await _firestore.runTransaction((tx) async {
         tx.set(familyRef, {
@@ -198,7 +232,7 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
       final doc = await familyRef.get();
       return FamilyModel.fromFirestore(doc);
     } catch (e, stackTrace) {
-      _logger.e('Error creating family', error: e, stackTrace: stackTrace);
+      _logger.e('createFamily failed', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }

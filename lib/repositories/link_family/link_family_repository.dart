@@ -22,8 +22,9 @@ abstract class LinkFamilyRepository {
 
   Future<void> joinFamily({
     required String familyId,
-    required String childId,
-    required String childName,
+    required String userId,
+    required String userName,
+    required String role,
     String? avatarUrl,
   });
 
@@ -113,14 +114,15 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   @override
   Future<void> joinFamily({
     required String familyId,
-    required String childId,
-    required String childName,
+    required String userId,
+    required String userName,
+    required String role,
     String? avatarUrl,
   }) async {
     try {
       final familyRef = _firestore.collection('families').doc(familyId);
-      final userRef = _firestore.collection('users').doc(childId);
-      final memberRef = familyRef.collection('members').doc(childId);
+      final userRef = _firestore.collection('users').doc(userId);
+      final memberRef = familyRef.collection('members').doc(userId);
 
       await _firestore.runTransaction((transaction) async {
         final familyDoc = await transaction.get(familyRef);
@@ -147,23 +149,29 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
 
         transaction.update(userRef, {
           'family_id': familyId,
-          'family_role': 'child',
+          'family_role': role,
         });
 
         transaction.set(memberRef, {
-          'uid': childId,
+          'uid': userId,
           'family_id': familyId,
-          'role': 'child',
-          'display_name': childName,
+          'role': role,
+          'display_name': userName,
           'avatar_url': avatarUrl,
           'joined_at': FieldValue.serverTimestamp(),
           'status': 'active',
         });
 
-        transaction.update(familyRef, {
-          'child_count': FieldValue.increment(1),
-          'updated_at': FieldValue.serverTimestamp(),
-        });
+        if (role == 'child') {
+          transaction.update(familyRef, {
+            'child_count': FieldValue.increment(1),
+            'updated_at': FieldValue.serverTimestamp(),
+          });
+        } else {
+          transaction.update(familyRef, {
+            'updated_at': FieldValue.serverTimestamp(),
+          });
+        }
       });
     } catch (e, stackTrace) {
       _logger.e(

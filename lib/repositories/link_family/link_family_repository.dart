@@ -35,6 +35,11 @@ abstract class LinkFamilyRepository {
     required String familyId,
     required String childId,
   });
+
+  Future<void> removeParentMember({
+    required String familyId,
+    required String memberUid,
+  });
 }
 
 
@@ -301,6 +306,29 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
       });
     } catch (e, stackTrace) {
       _logger.e('Error removing child from family', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeParentMember({
+    required String familyId,
+    required String memberUid,
+  }) async {
+    try {
+      final familyRef = _firestore.collection('families').doc(familyId);
+      final memberRef = familyRef.collection('members').doc(memberUid);
+      final userRef = _firestore.collection('users').doc(memberUid);
+
+      await _firestore.runTransaction((tx) async {
+        tx.update(memberRef, {'status': 'removed'});
+        tx.update(userRef, {'family_id': FieldValue.delete()});
+        tx.update(familyRef, {
+          'updated_at': FieldValue.serverTimestamp(),
+        });
+      });
+    } catch (e, stackTrace) {
+      _logger.e('Error removing parent member from family', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }

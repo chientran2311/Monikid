@@ -4,6 +4,15 @@
   "vietnamese": "Vietnamese",
   "english": "English",
   "close": "Close",
+  "actionSkip": "Skip",
+  "onboardingLanguageTitleLeading": "Choose",
+  "onboardingLanguageTitleHighlight": "language",
+  "onboardingLanguageDescription": "Please choose the language you want to use in the app.",
+  "onboardingContinueAction": "Continue",
+  "onboardingCurrencyTitle": "Choose currency",
+  "onboardingCurrencyDescription": "Please choose the currency you want to use to manage transactions in the app.",
+  "onboardingCurrencyVnd": "Vietnamese Dong (VND)",
+  "onboardingCurrencyUsd": "US Dollar (USD)",
   "validationEmptyFields": "Please fill in all fields (Name, Email, Password)",
   "registerFailed": "Registration failed: {error}",
   "@registerFailed": {
@@ -38,6 +47,21 @@
   "homeParAlertsLabel": "Alerts",
   "homeParAlertWeeklyLimitTitle": "Approaching Weekly Limit",
   "homeParAlertWeeklyLimitBody": "Check spending limits for your family members.",
+  "homeParTopCategoryAlertTitle": "Highest spending in {category}",
+  "@homeParTopCategoryAlertTitle": {
+    "placeholders": {
+      "category": { "type": "String" }
+    }
+  },
+  "homeParTopCategoryAlertBody": "Tap to view transaction details",
+  "homeParThisMonth": "This month",
+  "homeParViewDetail": "View details",
+  "homeParSpentPercent": "Spent {percent}% of income",
+  "@homeParSpentPercent": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
   "noTransactionsYet": "No transactions yet.",
   "errorGeneric": "Error: {error}",
   "@errorGeneric": {
@@ -58,6 +82,8 @@
   "msgAddTransactionSuccess": "Transaction added successfully!",
   "actionCancel": "Cancel",
   "actionConfirm": "Confirm",
+  "actionDone": "Done",
+  "actionSelect": "Select",
   "validationInvalidAmount": "Invalid amount",
   "msgUpdateSuccess": "Update successful",
   "addTransactionFailed": "Unable to add transaction. Please try again.",
@@ -69,6 +95,7 @@
   "transactionAmountLabel": "Amount",
   "transactionCategoryLabel": "Category",
   "transactionDateLabel": "Date",
+  "transactionHistorySelectDateTitle": "Select date",
   "transactionNoteLabel": "Note",
   "transactionExpenseType": "Expense",
   "transactionIncomeType": "Income",
@@ -81,7 +108,9 @@
   "transactionDetailTitle": "Transaction details",
   "transactionDetailNoData": "No transaction data available.",
   "transactionDetailTimeLabel": "TIME",
+  "transactionDetailCreatedAtLabel": "CREATED AT",
   "transactionDetailNoteLabel": "NOTE",
+  "transactionDetailEvidenceLabel": "EVIDENCE IMAGE",
   "transactionEditAction": "Edit transaction",
   "transactionEvidenceSectionTitle": "Evidence image",
   "transactionEvidenceAddOptionalLabel": "Add evidence image (optional)",
@@ -111,6 +140,7 @@
   "transactionScanNoSuggestion": "No usable autofill suggestion was found. Please review the form manually.",
   "profileEditTitle": "Edit Profile",
   "profileEditAvatarLabel": "Change Avatar",
+  "profileEditAvatarDesc": "Take a new photo or choose from gallery",
   "profileEditFullName": "Full Name",
   "profileEditFullNameHint": "Enter your full name",
   "profileEditPhone": "Phone Number",
@@ -120,6 +150,10 @@
   "profileEditDob": "Date of Birth",
   "profileEditDobHint": "DD/MM/YYYY",
   "actionSaveChanges": "Save Changes",
+  "profileEditSaveSuccess": "Profile updated successfully",
+  "profileEditErrorNameRequired": "Full name is required",
+  "profileEditErrorNameTooShort": "Name must be at least 2 characters",
+  "profileEditErrorInvalidPhone": "Invalid Vietnamese phone number (e.g. 0912345678)",
   "editRequestTitle": "Edit Request",
   "requestAmountLabel": "Requested Amount",
   "requestReasonLabel": "Reason",
@@ -177,12 +211,38 @@
   "parentStatisticTitle": "Statistics",
   "parentStatisticWeek": "Week",
   "parentStatisticMonth": "Month",
+  "parentStatisticYear": "Year",
   "parentStatisticBudgetTitle": "Weekly Budget",
   "parentStatisticSpentLabel": "Spent",
   "parentStatisticLeftLabel": "Left",
   "parentStatisticTrendTitle": "Spending Trend",
   "parentStatisticTopCategoriesTitle": "Top Categories",
   "parentStatisticNoData": "No data available yet",
+  "parentStatisticTotalSpentTitle": "Total spent",
+  "parentStatisticVsLastMonth": "vs last month",
+  "parentStatisticSpendingUp": "+{percent}%",
+  "@parentStatisticSpendingUp": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "parentStatisticSpendingDown": "-{percent}%",
+  "@parentStatisticSpendingDown": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "parentStatisticSpendingStable": "Stable",
+  "parentStatisticLoading": "Loading spending statistics...",
+  "parentStatisticLoadError": "Could not load spending statistics.",
+  "parentStatisticRetry": "Retry",
+  "parentStatisticSelectChild": "Select a child to view spending statistics.",
+  "parentStatisticTransactionCount": "{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}",
+  "@parentStatisticTransactionCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "settingParTitle": "Settings",
   "settingParEditProfile": "Edit profile",
   "settingParFamilyTitle": "Family management",
@@ -191,6 +251,8 @@
   "settingParChildAccountsSubtitle": "Add or remove accounts",
   "settingParSpendingLimitLabel": "Spending limit",
   "settingParSpendingLimitSubtitle": "Set weekly/monthly limits",
+  "settingParAppearanceTitle": "Appearance",
+  "settingParThemeLabel": "Light/Dark mode",
   "settingParNotificationsTitle": "Notifications",
   "settingParPushLabel": "Push notifications",
   "settingParPushSubtitle": "When child makes a transaction",
@@ -372,6 +434,24 @@
   "statisticNoDataDescription": "Add transactions to see your spending trends and category insights.",
   "statisticSelectPeriodTitle": "Select period",
   "scanBillAiError": "Unable to analyze the bill. Please try again or enter manually.",
+  "scanBillLoadingTitle": "Processing Receipt",
+  "scanBillScanningStatus": "Scanning receipt...",
+  "scanBillAnalyzingStatus": "AI is analyzing...",
+  "joinFamilyTitle": "Join Family",
+  "joinFamilySubtitle": "Enter the 6-digit invite code from your parent",
+  "joinFamilyInputHint": "Enter code",
+  "joinFamilyButton": "Join Family",
+  "joinFamilySuccess": "You have joined the family!",
+  "joinFamilyErrorInvalidCode": "Invalid or expired invite code",
+  "joinFamilyErrorAlreadyMember": "You are already part of a family",
+  "joinFamilyErrorUnknown": "Failed to join. Please try again.",
+  "unlinkFamilyTitle": "My Family",
+  "unlinkFamilySubtitle": "You are currently connected to a family",
+  "unlinkFamilyButton": "Leave Family",
+  "unlinkFamilyConfirmTitle": "Leave family?",
+  "unlinkFamilyConfirmBody": "You will leave this family. You can rejoin later with an invite code.",
+  "unlinkFamilySuccess": "You have left the family.",
+  "unlinkFamilyErrorFailed": "Failed to leave family. Please try again.",
   "customCategoryAdd": "Add custom category",
   "customCategoryLabelHint": "Category name",
   "customCategoryTypeExpense": "Expense",
@@ -382,5 +462,69 @@
   "customCategoryConfirmDelete": "Delete this category?",
   "customCategoryConfirmDeleteBody": "Transactions using this category will keep their existing label.",
   "customCategoryCancel": "Cancel",
-  "customCategoryConfirm": "Add"
+  "customCategoryConfirm": "Add",
+  "customCategorySelectTitleExpense": "Select expense category",
+  "customCategorySelectTitleIncome": "Select income category",
+  "customCategorySelectTitle": "Select category",
+  "customCategoryConfirmSelection": "Confirm",
+  "setMoneyLimitManagedByParent": "Spending limit is managed by parent",
+  "parentSetLimitTitle": "Set monthly spending limit",
+  "parentSetLimitDescription": "This limit helps your child stay in control of their spending each month",
+  "notifTitle": "Notifications",
+  "notifMarkAllRead": "Mark all as read",
+  "notifEmpty": "No notifications yet",
+  "notifOverspend80Title": "Approaching limit",
+  "notifOverspend80Body": "You've spent {amount} — 80% of your {month} limit.",
+  "@notifOverspend80Body": {
+    "placeholders": { "amount": {}, "month": {} }
+  },
+  "notifOverspend100Title": "Limit exceeded",
+  "notifOverspend100Body": "You've spent {amount} — exceeded your {month} limit.",
+  "@notifOverspend100Body": {
+    "placeholders": { "amount": {}, "month": {} }
+  },
+  "notifWeeklyOverspendTitle": "Spending spike",
+  "notifWeeklyOverspendBody": "You spent {percent}% more this week than last week.",
+  "@notifWeeklyOverspendBody": {
+    "placeholders": { "percent": {} }
+  },
+  "notifParentOverspend80Body": "{childName} has spent 80% of the {month} limit.",
+  "@notifParentOverspend80Body": {
+    "placeholders": { "childName": {}, "month": {} }
+  },
+  "notifParentOverspend100Body": "{childName} has exceeded the {month} limit.",
+  "@notifParentOverspend100Body": {
+    "placeholders": { "childName": {}, "month": {} }
+  },
+  "notifParentWeeklyOverspendBody": "{childName} spent {percent}% more this week than last week.",
+  "@notifParentWeeklyOverspendBody": {
+    "placeholders": { "childName": {}, "percent": {} }
+  },
+
+  "familyManagementTitle": "Manage Family",
+  "familyManagementEmptyMessage": "No family found",
+  "familyManagementErrorMessage": "Error loading family data",
+  "familyManagementChildrenSection": "Children",
+  "familyManagementParentsSection": "Parents",
+  "familyManagementHostParentLabel": "(Host Parent)",
+  "familyManagementNonHostParentLabel": "(Non-host Parent)",
+  "familyManagementUnlinkButton": "Unlink",
+  "familyManagementSetLimitButton": "Set Limit",
+  "familyManagementRemoveLimitButton": "Remove Limit",
+  "familyManagementConfirmUnlinkChildTitle": "Confirm Unlink",
+  "familyManagementConfirmUnlinkChildMessage": "Are you sure you want to unlink {childName}?",
+  "@familyManagementConfirmUnlinkChildMessage": {
+    "placeholders": { "childName": {} }
+  },
+  "familyManagementConfirmUnlinkParentTitle": "Confirm Unlink",
+  "familyManagementConfirmUnlinkParentMessage": "Are you sure you want to unlink {parentName}?",
+  "@familyManagementConfirmUnlinkParentMessage": {
+    "placeholders": { "parentName": {} }
+  },
+  "familyManagementUnlinkSuccess": "Unlinked successfully",
+  "familyManagementUnlinkError": "Error unlinking",
+  "familyManagementSetLimitSuccess": "Limit set successfully",
+  "familyManagementSetLimitError": "Error setting limit",
+  "familyManagementRemoveLimitSuccess": "Limit removed successfully",
+  "familyManagementRemoveLimitError": "Error removing limit"
 }

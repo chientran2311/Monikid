@@ -1,5 +1,14 @@
 {
   "@@locale": "vi",
+  "actionSkip": "Bỏ qua",
+  "onboardingLanguageTitleLeading": "Chọn",
+  "onboardingLanguageTitleHighlight": "ngôn ngữ",
+  "onboardingLanguageDescription": "Vui lòng chọn ngôn ngữ bạn muốn sử dụng trong ứng dụng.",
+  "onboardingContinueAction": "Tiếp tục",
+  "onboardingCurrencyTitle": "Chọn loại tiền tệ",
+  "onboardingCurrencyDescription": "Vui lòng chọn loại tiền tệ bạn muốn sử dụng để quản lý các giao dịch trong ứng dụng.",
+  "onboardingCurrencyVnd": "Việt Nam Đồng (VND)",
+  "onboardingCurrencyUsd": "Đô la Mỹ (USD)",
   "aiModelSelectModelConfirmMessage": "Model nay se duoc dung cho cac yeu cau Gemini tiep theo tren thiet bi nay.",
   "aiModelUseThisModel": "Dung model nay",
   "aiModelSavingModelSelection": "Dang luu model da chon...",
@@ -24,6 +33,21 @@
   "homeParAlertsLabel": "Cảnh báo",
   "homeParAlertWeeklyLimitTitle": "Sắp chạm giới hạn tuần",
   "homeParAlertWeeklyLimitBody": "Kiểm tra giới hạn chi tiêu cho các thành viên trong gia đình.",
+  "homeParTopCategoryAlertTitle": "Chi nhiều nhất ở {category}",
+  "@homeParTopCategoryAlertTitle": {
+    "placeholders": {
+      "category": { "type": "String" }
+    }
+  },
+  "homeParTopCategoryAlertBody": "Nhấn để xem chi tiết giao dịch",
+  "homeParThisMonth": "Tháng này",
+  "homeParViewDetail": "Xem chi tiết",
+  "homeParSpentPercent": "Đã chi {percent}% thu nhập",
+  "@homeParSpentPercent": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
   "appBarBrandTitle": "SmartSpending",
   "appBarNotificationsTooltip": "Thông báo",
   "navParentHome": "Trang chủ",
@@ -36,12 +60,38 @@
   "parentStatisticTitle": "Thống kê",
   "parentStatisticWeek": "Tuần",
   "parentStatisticMonth": "Tháng",
+  "parentStatisticYear": "Năm",
   "parentStatisticBudgetTitle": "Ngân sách tuần",
   "parentStatisticSpentLabel": "Đã chi",
   "parentStatisticLeftLabel": "Còn lại",
   "parentStatisticTrendTitle": "Xu hướng chi tiêu",
   "parentStatisticTopCategoriesTitle": "Danh mục hàng đầu",
   "parentStatisticNoData": "Chưa có dữ liệu",
+  "parentStatisticTotalSpentTitle": "Tổng đã chi",
+  "parentStatisticVsLastMonth": "so với tháng trước",
+  "parentStatisticSpendingUp": "+{percent}%",
+  "@parentStatisticSpendingUp": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "parentStatisticSpendingDown": "-{percent}%",
+  "@parentStatisticSpendingDown": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "parentStatisticSpendingStable": "Ổn định",
+  "parentStatisticLoading": "Đang tải thống kê chi tiêu...",
+  "parentStatisticLoadError": "Không thể tải thống kê chi tiêu.",
+  "parentStatisticRetry": "Thử lại",
+  "parentStatisticSelectChild": "Chọn một trẻ để xem thống kê chi tiêu.",
+  "parentStatisticTransactionCount": "{count, plural, =0{Chưa có giao dịch} other{{count} giao dịch}}",
+  "@parentStatisticTransactionCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "settingParTitle": "Cài đặt",
   "settingParEditProfile": "Chỉnh sửa hồ sơ",
   "settingParFamilyTitle": "Quản lý gia đình",
@@ -50,6 +100,8 @@
   "settingParChildAccountsSubtitle": "Thêm hoặc xóa tài khoản",
   "settingParSpendingLimitLabel": "Hạn mức chi tiêu",
   "settingParSpendingLimitSubtitle": "Thiết lập giới hạn tuần/tháng",
+  "settingParAppearanceTitle": "Giao diện",
+  "settingParThemeLabel": "Giao diện sáng/tối",
   "settingParNotificationsTitle": "Thông báo",
   "settingParPushLabel": "Thông báo tức thì",
   "settingParPushSubtitle": "Khi con thực hiện giao dịch",
@@ -118,6 +170,8 @@
   "msgAddTransactionSuccess": "Thêm giao dịch thành công!",
   "actionCancel": "Hủy",
   "actionConfirm": "Xác nhận",
+  "actionDone": "Xong",
+  "actionSelect": "Chọn",
   "validationInvalidAmount": "Số tiền không hợp lệ",
   "msgUpdateSuccess": "Cập nhật thành công",
   "addTransactionFailed": "Không thể thêm giao dịch. Vui lòng thử lại.",
@@ -129,6 +183,7 @@
   "transactionAmountLabel": "Số tiền",
   "transactionCategoryLabel": "Danh mục",
   "transactionDateLabel": "Ngày",
+  "transactionHistorySelectDateTitle": "Chọn ngày",
   "transactionNoteLabel": "Ghi chú",
   "transactionExpenseType": "Tiền chi",
   "transactionIncomeType": "Tiền thu",
@@ -141,7 +196,9 @@
   "transactionDetailTitle": "Chi tiết giao dịch",
   "transactionDetailNoData": "Không có dữ liệu giao dịch.",
   "transactionDetailTimeLabel": "THỜI GIAN",
+  "transactionDetailCreatedAtLabel": "TẠO LÚC",
   "transactionDetailNoteLabel": "GHI CHÚ",
+  "transactionDetailEvidenceLabel": "ẢNH MINH CHỨNG",
   "transactionEditAction": "Chỉnh sửa giao dịch",
   "transactionEvidenceSectionTitle": "Ảnh minh chứng",
   "transactionEvidenceAddOptionalLabel": "Thêm ảnh minh chứng (optional)",
@@ -171,6 +228,7 @@
   "transactionScanNoSuggestion": "Không tạo được gợi ý tự điền phù hợp. Vui lòng kiểm tra biểu mẫu thủ công.",
   "profileEditTitle": "Chỉnh sửa hồ sơ",
   "profileEditAvatarLabel": "Thay đổi ảnh đại diện",
+  "profileEditAvatarDesc": "Chụp ảnh mới hoặc chọn từ thư viện",
   "profileEditFullName": "Họ và tên",
   "profileEditFullNameHint": "Nhập họ và tên của bạn",
   "profileEditPhone": "Số điện thoại",
@@ -180,6 +238,10 @@
   "profileEditDob": "Ngày sinh",
   "profileEditDobHint": "DD/MM/YYYY",
   "actionSaveChanges": "Lưu thay đổi",
+  "profileEditSaveSuccess": "Cập nhật hồ sơ thành công",
+  "profileEditErrorNameRequired": "Họ tên là bắt buộc",
+  "profileEditErrorNameTooShort": "Họ tên phải có ít nhất 2 ký tự",
+  "profileEditErrorInvalidPhone": "Số điện thoại không hợp lệ (VD: 0912345678)",
   "editRequestTitle": "Chỉnh sửa yêu cầu",
   "requestAmountLabel": "Số tiền yêu cầu",
   "requestReasonLabel": "Lý do của con",
@@ -362,6 +424,24 @@
   "statisticNoDataDescription": "Hãy thêm giao dịch để xem xu hướng chi tiêu và phân tích danh mục.",
   "statisticSelectPeriodTitle": "Chọn mốc thời gian",
   "scanBillAiError": "Không thể phân tích hóa đơn. Vui lòng thử lại hoặc nhập tay.",
+  "scanBillLoadingTitle": "Đang xử lý hóa đơn",
+  "scanBillScanningStatus": "Đang quét hóa đơn...",
+  "scanBillAnalyzingStatus": "AI đang phân tích...",
+  "joinFamilyTitle": "Tham gia gia đình",
+  "joinFamilySubtitle": "Nhập mã mời 6 chữ số từ phụ huynh của bạn",
+  "joinFamilyInputHint": "Nhập mã",
+  "joinFamilyButton": "Tham gia",
+  "joinFamilySuccess": "Bạn đã tham gia gia đình thành công!",
+  "joinFamilyErrorInvalidCode": "Mã mời không hợp lệ hoặc đã hết hạn",
+  "joinFamilyErrorAlreadyMember": "Bạn đã thuộc về một gia đình",
+  "joinFamilyErrorUnknown": "Không thể tham gia. Vui lòng thử lại.",
+  "unlinkFamilyTitle": "Gia đình của tôi",
+  "unlinkFamilySubtitle": "Bạn đang kết nối với một gia đình",
+  "unlinkFamilyButton": "Hủy liên kết",
+  "unlinkFamilyConfirmTitle": "Rời gia đình?",
+  "unlinkFamilyConfirmBody": "Bạn sẽ rời khỏi gia đình này. Bạn có thể tham gia lại bằng mã mời.",
+  "unlinkFamilySuccess": "Bạn đã rời gia đình.",
+  "unlinkFamilyErrorFailed": "Không thể rời gia đình. Vui lòng thử lại.",
   "customCategoryAdd": "Thêm danh mục",
   "customCategoryLabelHint": "Tên danh mục",
   "customCategoryTypeExpense": "Chi tiêu",
@@ -372,5 +452,69 @@
   "customCategoryConfirmDelete": "Xóa danh mục này?",
   "customCategoryConfirmDeleteBody": "Các giao dịch dùng danh mục này vẫn giữ nhãn cũ.",
   "customCategoryCancel": "Hủy",
-  "customCategoryConfirm": "Thêm"
+  "customCategoryConfirm": "Thêm",
+  "customCategorySelectTitleExpense": "Chọn danh mục chi tiêu",
+  "customCategorySelectTitleIncome": "Chọn danh mục thu nhập",
+  "customCategorySelectTitle": "Chọn danh mục",
+  "customCategoryConfirmSelection": "Xác nhận",
+  "setMoneyLimitManagedByParent": "Hạn mức do phụ huynh quản lý",
+  "parentSetLimitTitle": "Thiết lập hạn mức tháng",
+  "parentSetLimitDescription": "Hạn mức này giúp con kiểm soát chi tiêu tốt hơn mỗi tháng",
+  "notifTitle": "Thông báo",
+  "notifMarkAllRead": "Đánh dấu tất cả đã đọc",
+  "notifEmpty": "Chưa có thông báo nào",
+  "notifOverspend80Title": "Sắp đạt hạn mức",
+  "notifOverspend80Body": "Bạn đã chi {amount} — 80% hạn mức tháng {month}.",
+  "@notifOverspend80Body": {
+    "placeholders": { "amount": {}, "month": {} }
+  },
+  "notifOverspend100Title": "Đã vượt hạn mức",
+  "notifOverspend100Body": "Bạn đã chi {amount} — vượt hạn mức tháng {month}.",
+  "@notifOverspend100Body": {
+    "placeholders": { "amount": {}, "month": {} }
+  },
+  "notifWeeklyOverspendTitle": "Chi tiêu tăng cao",
+  "notifWeeklyOverspendBody": "Tuần này bạn chi nhiều hơn {percent}% so với tuần trước.",
+  "@notifWeeklyOverspendBody": {
+    "placeholders": { "percent": {} }
+  },
+  "notifParentOverspend80Body": "Con {childName} đã chi 80% hạn mức tháng {month}.",
+  "@notifParentOverspend80Body": {
+    "placeholders": { "childName": {}, "month": {} }
+  },
+  "notifParentOverspend100Body": "Con {childName} đã vượt hạn mức tháng {month}.",
+  "@notifParentOverspend100Body": {
+    "placeholders": { "childName": {}, "month": {} }
+  },
+  "notifParentWeeklyOverspendBody": "Con {childName} tuần này chi nhiều hơn {percent}% so với tuần trước.",
+  "@notifParentWeeklyOverspendBody": {
+    "placeholders": { "childName": {}, "percent": {} }
+  },
+
+  "familyManagementTitle": "Quản lý gia đình",
+  "familyManagementEmptyMessage": "Không tìm thấy gia đình",
+  "familyManagementErrorMessage": "Có lỗi xảy ra khi tải dữ liệu gia đình",
+  "familyManagementChildrenSection": "Trẻ em",
+  "familyManagementParentsSection": "Phụ huynh",
+  "familyManagementHostParentLabel": "(Người tạo gia đình)",
+  "familyManagementNonHostParentLabel": "(Phụ huynh phụ)",
+  "familyManagementUnlinkButton": "Gỡ liên kết",
+  "familyManagementSetLimitButton": "Đặt hạn mức",
+  "familyManagementRemoveLimitButton": "Xóa hạn mức",
+  "familyManagementConfirmUnlinkChildTitle": "Xác nhận gỡ liên kết",
+  "familyManagementConfirmUnlinkChildMessage": "Bạn có chắc muốn gỡ liên kết {childName}?",
+  "@familyManagementConfirmUnlinkChildMessage": {
+    "placeholders": { "childName": {} }
+  },
+  "familyManagementConfirmUnlinkParentTitle": "Xác nhận gỡ liên kết",
+  "familyManagementConfirmUnlinkParentMessage": "Bạn có chắc muốn gỡ liên kết {parentName}?",
+  "@familyManagementConfirmUnlinkParentMessage": {
+    "placeholders": { "parentName": {} }
+  },
+  "familyManagementUnlinkSuccess": "Đã gỡ liên kết thành công",
+  "familyManagementUnlinkError": "Lỗi khi gỡ liên kết",
+  "familyManagementSetLimitSuccess": "Đã đặt hạn mức thành công",
+  "familyManagementSetLimitError": "Lỗi khi đặt hạn mức",
+  "familyManagementRemoveLimitSuccess": "Đã xóa hạn mức thành công",
+  "familyManagementRemoveLimitError": "Lỗi khi xóa hạn mức"
 }

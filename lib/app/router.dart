@@ -13,15 +13,22 @@ import 'package:monikid/features/auth/register/register_screen.dart';
 import 'package:monikid/features/change_profile/profile_edit_screen.dart';
 import 'package:monikid/features/fqa/fqa_screen.dart';
 import 'package:monikid/features/parent/bottom_nav_bar_par.dart';
+import 'package:monikid/features/parent/family_management/family_management_screen.dart';
+import 'package:monikid/features/child/notification/notification_screen.dart';
+import 'package:monikid/features/parent/notification/parent_notification_screen.dart';
+import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
+import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_screen.dart';
+import 'package:monikid/features/parent/transaction_par/transaction_history_par_screen.dart';
 import 'package:monikid/features/splash/splash_screen.dart';
 import 'package:monikid/features/child/bottom_nav_bar.dart';
 import 'package:monikid/features/child/request_money/add_new_request/add_request_money_screen.dart';
 import 'package:monikid/features/child/request_money/request_money_history/request_money_history_screen.dart';
-import 'package:monikid/features/child/chooseAImodel/choose_ai_model_screen.dart';
+import 'package:monikid/features/child/choose_ai_model/choose_ai_model_screen.dart';
 import 'package:monikid/features/child/request_money/update_request/update_request_screen.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_screen.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_screen.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_screen.dart';
+import 'package:monikid/features/child/join_family/join_family_screen.dart';
 import 'package:monikid/features/child/transaction/update_transaction/update_transaction_screen.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/models/ai/transaction_ai_result.dart';
@@ -47,7 +54,14 @@ class AppRoutes {
   static const String reEnterPin = '/re-enter-pin';
   static const String enterPinCode = '/enter-pin-code';
 
+  static const String childNotifications = '/child/notifications';
+  static const String parentNotifications = '/parent/notifications';
   static const String parent = '/parent';
+  static const String manageFamily = '/manage-family';
+  static const String parentCategoryTransactions = '/parent/category-transactions';
+  static const String parentTransactionHistory = '/parent/transaction-history';
+  static const String parentTransactionDetail =
+      '/parent/children/:childUid/transactions/:transactionId';
   static const String studentMain = '/student-main';
   static const String chooseAiModel = '/choose-ai-model';
 
@@ -66,6 +80,13 @@ class AppRoutes {
 
   static String detailTransactionPath(String transactionId) {
     return '/detail-transaction/$transactionId';
+  }
+
+  static String parentTransactionDetailPath(
+    String childUid,
+    String transactionId,
+  ) {
+    return '/parent/children/$childUid/transactions/$transactionId';
   }
 }
 
@@ -97,8 +118,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
-        path: '/notifications',
-        builder: (context, state) => const Placeholder(),
+        path: AppRoutes.childNotifications,
+        builder: (context, state) => const ChildNotificationScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentNotifications,
+        builder: (context, state) => const ParentNotificationScreen(),
       ),
       GoRoute(
         path: AppRoutes.fqa,
@@ -107,6 +132,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.profileEdit,
         builder: (context, state) => const ProfileEditScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.joinFamily,
+        builder: (context, state) => const JoinFamilyScreen(),
       ),
       GoRoute(
         path: AppRoutes.onboard1,
@@ -143,6 +172,35 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.parent,
         builder: (context, state) => const ParentBottomNavBar(),
+      ),
+      GoRoute(
+        path: AppRoutes.manageFamily,
+        builder: (context, state) => const FamilyManagementScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentCategoryTransactions,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is ParentCategoryTransactionsArgs) {
+            return ParentCategoryTransactionsScreen(args: extra);
+          }
+          return const ParentBottomNavBar();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.parentTransactionHistory,
+        builder: (context, state) => const TransactionHistoryParScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentTransactionDetail,
+        builder: (context, state) {
+          final childUid = state.pathParameters['childUid'] ?? '';
+          final transactionId = state.pathParameters['transactionId'] ?? '';
+          return ParentTransactionDetailScreen(
+            childUid: childUid,
+            transactionId: transactionId,
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.studentMain,

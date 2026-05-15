@@ -17,6 +17,13 @@ abstract class ParentDashboardRepository {
     required String childUid,
     required String monthKey,
   });
+
+  Future<void> setChildMonthlyLimit({
+    required String childUid,
+    required int amountMinor,
+  });
+
+  Future<void> removeChildMonthlyLimit({required String childUid});
 }
 
 class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
@@ -55,7 +62,7 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
         error: error,
         stackTrace: stackTrace,
       );
-      return [];
+      rethrow;
     }
   }
 
@@ -84,7 +91,46 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
         error: error,
         stackTrace: stackTrace,
       );
-      return (expenseMinor: 0, incomeMinor: 0);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> setChildMonthlyLimit({
+    required String childUid,
+    required int amountMinor,
+  }) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(childUid)
+          .update({'monthly_limit_minor': amountMinor});
+      _logger.i('Set monthly_limit_minor=$amountMinor for child=$childUid.');
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to set child monthly limit for child=$childUid.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> removeChildMonthlyLimit({required String childUid}) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(childUid)
+          .update({'monthly_limit_minor': FieldValue.delete()});
+      _logger.i('Removed monthly_limit_minor for child=$childUid.');
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to remove child monthly limit for child=$childUid.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
     }
   }
 }

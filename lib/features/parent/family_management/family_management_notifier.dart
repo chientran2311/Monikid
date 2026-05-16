@@ -99,9 +99,11 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   }
 
   Future<void> unlinkChild(String childUid) async {
+    final familyId = state.family?.familyId;
+    if (familyId == null) return;
     state = state.copyWith(isProcessing: true);
     try {
-      await _linkFamilyRepo.removeChild(childUid);
+      await _linkFamilyRepo.removeChild(familyId: familyId, childId: childUid);
       state = state.copyWith(isProcessing: false);
     } catch (e, stackTrace) {
       _logger.e('Error unlinking child', error: e, stackTrace: stackTrace);
@@ -114,9 +116,14 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   }
 
   Future<void> unlinkParentMember(String parentUid) async {
+    final familyId = state.family?.familyId;
+    if (familyId == null) return;
     state = state.copyWith(isProcessing: true);
     try {
-      await _linkFamilyRepo.removeParentMember(parentUid);
+      await _linkFamilyRepo.removeParentMember(
+        familyId: familyId,
+        memberUid: parentUid,
+      );
       state = state.copyWith(isProcessing: false);
     } catch (e, stackTrace) {
       _logger.e('Error unlinking parent', error: e, stackTrace: stackTrace);

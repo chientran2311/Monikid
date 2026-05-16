@@ -13,9 +13,7 @@ enum FamilyManagementStatus {
 }
 
 @freezed
-class FamilyManagementState with _$FamilyManagementState {
-  const FamilyManagementState._();
-
+abstract class FamilyManagementState with _$FamilyManagementState {
   const factory FamilyManagementState({
     @Default(FamilyManagementStatus.initial) FamilyManagementStatus status,
     FamilyModel? family,
@@ -24,6 +22,8 @@ class FamilyManagementState with _$FamilyManagementState {
     String? errorMessage,
     @Default(false) bool isProcessing,
   }) = _FamilyManagementState;
+
+  const FamilyManagementState._();
 
   bool get isLoading => status == FamilyManagementStatus.loading;
 
@@ -37,11 +37,8 @@ class FamilyManagementState with _$FamilyManagementState {
       activeMembers.where((m) => m.role == 'parent').toList();
 
   FamilyMemberModel? get nonHostParent {
-    final parents = parentMembers;
-    if (parents.isEmpty || family == null) return null;
-    return parents.firstWhere(
-      (p) => p.uid != family!.parentId,
-      orElse: () => parents.first,
-    );
+    if (family == null) return null;
+    final hostId = family!.parentId;
+    return parentMembers.where((p) => p.uid != hostId).firstOrNull;
   }
 }

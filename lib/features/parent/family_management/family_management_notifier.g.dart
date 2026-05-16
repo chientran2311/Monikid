@@ -7,7 +7,7 @@ part of 'family_management_notifier.dart';
 // **************************************************************************
 
 String _$familyManagementNotifierHash() =>
-    r'd2f211ba2a7ff4a65b8ccaf6f1b9e02e9c1a0b63';
+    r'0eafe8fd1d615af693a66557fc22cf1431b18aed';
 
 /// See also [FamilyManagementNotifier].
 @ProviderFor(FamilyManagementNotifier)

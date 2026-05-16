@@ -43,7 +43,7 @@ class PinScreenBody extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.1),
+                  color: AppTheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -58,8 +58,8 @@ class PinScreenBody extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: context.typo.title.medium.copyWith(
                   color: isDark
-                      ? const Color(0xFFF1F5F9)
-                      : const Color(0xFF0F172A),
+                      ? AppTheme.surfaceLightGrey
+                      : AppTheme.surfaceVeryDark,
                   height: 1.25,
                 ),
               ),
@@ -69,7 +69,7 @@ class PinScreenBody extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: context.typo.text.medium.copyWith(
                   color:
-                      isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      isDark ? AppTheme.textMuted : AppTheme.textGrey,
                 ),
               ),
             ],
@@ -85,8 +85,8 @@ class PinScreenBody extends StatelessWidget {
                 color: hasError
                     ? AppTheme.redAlert
                     : (isDark
-                          ? const Color(0xFFCBD5E1)
-                          : const Color(0xFF334155)),
+                          ? AppTheme.iconLight
+                          : AppTheme.borderDark),
               ),
             ),
           ),
@@ -102,7 +102,7 @@ class PinScreenBody extends StatelessWidget {
         ),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-          color: AppTheme.primary.withOpacity(isDark ? 0.1 : 0.05),
+          color: AppTheme.primary.withValues(alpha: isDark ? 0.1 : 0.05),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -116,7 +116,7 @@ class PinScreenBody extends StatelessWidget {
                 'KẾT NỐI BẢO MẬT BỞI MONIKID',
                 style: context.typo.caption.small.copyWith(
                   letterSpacing: 1.2,
-                  color: AppTheme.primary.withOpacity(0.8),
+                  color: AppTheme.primary.withValues(alpha: 0.8),
                 ),
               ),
             ],

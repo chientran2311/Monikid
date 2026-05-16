@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_provider.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/custom_input.dart';
@@ -12,57 +14,50 @@ import 'package:monikid/shared/widgets/success_dialog.dart';
 
 import 'widgets/illustration_section.dart';
 
-class ForgotPasswordScreen extends ConsumerStatefulWidget {
+class ForgotPasswordScreen extends HookConsumerWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() =>
-      _ForgotPasswordScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
 
-class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleResetPassword() async {
-    await ref.read(forgotPasswordProvider.notifier).submit(
-          _emailController.text.trim(),
-        );
-
-    if (!mounted) return;
-
-    final forgotPasswordState = ref.read(forgotPasswordProvider);
-    if (forgotPasswordState.isSuccess) {
-      final email = _emailController.text.trim();
-      SuccessDialog.show(
-        context,
-        title: 'Email đã được gửi!',
-        message:
-            'Chúng tôi đã gửi link đặt lại mật khẩu đến\n$email\n\nVui lòng kiểm tra hộp thư rồi nhấn vào link để đổi mật khẩu.',
-        buttonText: 'Quay về Đăng nhập',
-        icon: Icons.mark_email_read_rounded,
-        onPressed: () {
-          Navigator.of(context).pop();
-          context.go(AppRoutes.login);
-        },
-      );
-      return;
-    }
-
-    if (forgotPasswordState.errorMessage != null) {
-      AppSnackBar.error(context, forgotPasswordState.errorMessage!);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+    final emailController = useTextEditingController();
     final forgotPasswordState = ref.watch(forgotPasswordProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final subtitleColor = isDark ? AppTheme.iconLight : AppTheme.textGrey;
+
+    Future<void> handleResetPassword() async {
+      await ref.read(forgotPasswordProvider.notifier).submit(
+            emailController.text.trim(),
+          );
+
+      if (!context.mounted) {
+        return;
+      }
+
+      final nextState = ref.read(forgotPasswordProvider);
+      if (nextState.isSuccess) {
+        final email = emailController.text.trim();
+        SuccessDialog.show(
+          context,
+          title: 'Email đã được gửi!',
+          message:
+              'Chúng tôi đã gửi link đặt lại mật khẩu đến\n$email\n\nVui lòng kiểm tra hộp thư rồi nhấn vào link để đổi mật khẩu.',
+          buttonText: 'Quay về Đăng nhập',
+          icon: Icons.mark_email_read_rounded,
+          onPressed: () {
+            context.pop();
+            context.go(AppRoutes.login);
+          },
+        );
+        return;
+      }
+
+      if (nextState.errorMessage != null) {
+        AppSnackBar.error(context, nextState.errorMessage!);
+      }
+    }
 
     return Scaffold(
       backgroundColor:
@@ -87,7 +82,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       alignment: Alignment.centerLeft,
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: titleColor,
                         size: 24,
                       ),
                     ),
@@ -99,9 +94,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         'Quên mật khẩu?',
                         textAlign: TextAlign.center,
                         style: context.typo.title.small.copyWith(
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
+                          color: titleColor,
                         ),
                       ),
                     ),
@@ -121,7 +114,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     Text(
                       'Quên mật khẩu?',
                       style: context.typo.bigTitle.small.copyWith(
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: titleColor,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -130,9 +123,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       'Đừng lo lắng! Hãy nhập email đã đăng ký, chúng tôi sẽ gửi mã xác thực để bạn đặt lại mật khẩu.',
                       style: context.typo.text.large.copyWith(
                         height: 1.5,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF475569),
+                        color: subtitleColor,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -140,14 +131,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       label: 'Email',
                       placeholder: 'Nhập email của bạn',
                       prefixIcon: Icons.mail_outline,
-                      controller: _emailController,
+                      controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 24),
                     PrimaryButton(
                       text: 'Gửi mã xác thực',
                       icon: Icons.send_rounded,
-                      onPressed: _handleResetPassword,
+                      onPressed: handleResetPassword,
                       isLoading: forgotPasswordState.isLoading,
                     ),
                   ],

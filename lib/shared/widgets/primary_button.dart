@@ -30,7 +30,7 @@ class PrimaryButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 4,
-          shadowColor: AppTheme.primary.withOpacity(0.25),
+          shadowColor: AppTheme.primary.withValues(alpha: 0.25),
         ),
         child: isLoading
             ? const SizedBox(

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/child/transaction/transaction_history/widgets/calendar_dialog_content.dart';
 
 class CalendarDialog extends StatefulWidget {
-  final DateTime initialMonth;
-
-  /// Callback khi người dùng nhấn "Xác nhận" với ngày đã chọn.
-  final Function(DateTime) onDateConfirmed;
-
   const CalendarDialog({
-    Key? key,
+    super.key,
     required this.initialMonth,
     required this.onDateConfirmed,
-  }) : super(key: key);
+  });
+
+  final DateTime initialMonth;
+  final ValueChanged<DateTime> onDateConfirmed;
 
   @override
   State<CalendarDialog> createState() => _CalendarDialogState();
@@ -19,152 +22,110 @@ class CalendarDialog extends StatefulWidget {
 
 class _CalendarDialogState extends State<CalendarDialog> {
   late DateTime _selectedDate;
+  late DateTime _visibleMonth;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.initialMonth;
+    _selectedDate = DateUtils.dateOnly(widget.initialMonth);
+    _visibleMonth = DateTime(widget.initialMonth.year, widget.initialMonth.month);
   }
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtils.init(context);
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-      ),
+    return SizedBox(
+      height: ScreenUtils.screenHeight,
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // iOS Style Handle
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                height: 6,
-                width: 48,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 360.w),
+              child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-
-            // Header → Chọn ngày
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Text(
-                'Chọn ngày',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-            ),
-
-            // Calendar Picker
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  colorScheme: isDark
-                      ? const ColorScheme.dark(
-                          primary: AppTheme.primary,
-                          onPrimary: Colors.white,
-                          surface: Color(0xFF1E293B),
-                          onSurface: Colors.white,
-                        )
-                      : const ColorScheme.light(
-                          primary: AppTheme.primary,
-                          onPrimary: Colors.white,
-                          surface: Colors.white,
-                          onSurface: Color(0xFF0F172A),
-                        ),
-                ),
-                child: CalendarDatePicker(
-                  initialDate: _selectedDate,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                  // Chỉ cập nhật state nội bộ, KHÔNG đóng dialog
-                  onDateChanged: (date) {
-                    setState(() => _selectedDate = date);
-                  },
-                ),
-              ),
-            ),
-
-            // Footer: Hủy + Xác nhận
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-              child: Row(
-                children: [
-                  // Nút Hủy
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFF1F5F9),
-                        foregroundColor: textColor,
-                        elevation: 0,
-                        minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        'Hủy',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  color: surfaceColor,
+                  borderRadius: BorderRadius.circular(24.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.textBlack.withValues(alpha: 0.18),
+                      blurRadius: 30.r,
+                      offset: Offset(0, 18.h),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Nút Xác nhận → gọi onDateConfirmed với ngày đã chọn
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        widget.onDateConfirmed(_selectedDate);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        minimumSize: const Size(double.infinity, 52),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24.r),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CalendarDialogHeader(
+                        borderColor: borderColor,
+                        onCancel: () => context.pop(),
+                        onDone: _confirmSelection,
+                      ),
+                      CalendarMonthNavigator(
+                        visibleMonth: _visibleMonth,
+                        onPrevious: () => _shiftMonth(-1),
+                        onNext: () => _shiftMonth(1),
+                      ),
+                      CalendarGrid(
+                        visibleMonth: _visibleMonth,
+                        selectedDate: _selectedDate,
+                        onDateSelected: (date) {
+                          setState(() => _selectedDate = date);
+                        },
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(24.w, 8.h, 24.w, 24.h),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 50.h,
+                          child: ElevatedButton(
+                            onPressed: _confirmSelection,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: AppTheme.textWhite,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            child: Text(
+                              context.l10n.actionSelect,
+                              style: AppTextStyleFactory.style(
+                                size: AppFontSizes.buttonMedium,
+                                weight: FontWeight.w700,
+                                color: AppTheme.textWhite,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Xác nhận',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  void _confirmSelection() {
+    context.pop();
+    widget.onDateConfirmed(_selectedDate);
+  }
+
+  void _shiftMonth(int offset) {
+    setState(() {
+      _visibleMonth = DateTime(_visibleMonth.year, _visibleMonth.month + offset);
+    });
   }
 }

@@ -8,6 +8,7 @@ import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
+import 'package:monikid/features/child/transaction/update_transaction/update_transaction_helpers.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
@@ -42,11 +43,12 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
           return;
         }
 
-        final nextCategory = _resolveCurrentCategory(
+        final nextCategory = UpdateTransactionHelpers.resolveCurrentCategory(
           categories: categories,
           currentType: state.currentType,
           selectedCategoryEmoji: state.selectedCategoryEmoji,
           originalTransaction: originalTransaction,
+          defaultCategoryGetter: (type) => getDefaultCategoryForType(type.value, categories: defaultCategories),
         );
 
         state = state.copyWith(
@@ -135,9 +137,10 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
   }
 
   void updateTransactionType(TransactionType type) {
-    final fallbackCategory = _resolveCategoryForType(
+    final fallbackCategory = UpdateTransactionHelpers.resolveCategoryForType(
       type: type,
       categories: state.categories,
+      defaultCategoryGetter: (t) => getDefaultCategoryForType(t.value, categories: defaultCategories),
       preferredLabel: state.selectedCategory,
     );
 
@@ -155,11 +158,13 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     required Uint8List bytes,
     required String fileName,
     required String mimeType,
+    String? filePath,
   }) {
     state = state.copyWith(
       newEvidenceImageBytes: bytes,
       newEvidenceImageFileName: fileName,
       newEvidenceImageMimeType: mimeType,
+      newEvidenceImageFilePath: filePath,
       removeExistingEvidenceImage: false,
       status: TransactionStatus.ready,
       errorMessage: null,
@@ -198,26 +203,21 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       return;
     }
 
-    final amountText = state.amountText
-        .replaceAll(RegExp(r'[^0-9]'), '')
-        .trim();
-    if (amountText.isEmpty) {
+    final validationResult = UpdateTransactionHelpers.validateAmount(
+      amountText: state.amountText,
+      emptyError: s.validationEnterAmount,
+      invalidError: s.validationInvalidAmount,
+    );
+
+    if (!validationResult.isValid) {
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: s.validationEnterAmount,
+        errorMessage: validationResult.error,
       );
       return;
     }
 
-    final amount = double.tryParse(amountText);
-    if (amount == null || amount <= 0) {
-      state = state.copyWith(
-        status: TransactionStatus.error,
-        errorMessage: s.validationInvalidAmount,
-      );
-      return;
-    }
-
+    final amount = validationResult.value!;
     state = state.copyWith(
       status: TransactionStatus.submitting,
       errorMessage: null,
@@ -245,6 +245,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
               fileName: state.newEvidenceImageFileName!,
               mimeType: state.newEvidenceImageMimeType!,
               categoryKey: updatedTransaction.categoryKey,
+              filePath: state.newEvidenceImageFilePath,
             )
           : null;
       final persistedTransaction = await _repository.updateTransaction(
@@ -283,7 +284,12 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       );
       state = state.copyWith(
         status: TransactionStatus.error,
-        errorMessage: _resolveFirebaseErrorMessage(error),
+        errorMessage: UpdateTransactionHelpers.resolveFirebaseErrorMessage(
+          error: error,
+          hasNewEvidenceImage: state.hasNewEvidenceImageSelection,
+          removeExistingEvidence: state.removeExistingEvidenceImage,
+          defaultErrorMessage: s.updateTransactionFailed,
+        ),
       );
     } catch (error, stackTrace) {
       _logger.e(
@@ -298,29 +304,16 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     }
   }
 
-  String _resolveFirebaseErrorMessage(FirebaseException error) {
-    if (error.code == 'permission-denied') {
-      if (state.hasNewEvidenceImageSelection ||
-          state.removeExistingEvidenceImage) {
-        return 'Không thể cập nhật ảnh minh chứng. Kiểm tra Firestore rules cho evidence_image Cloudinary.';
-      }
-      return 'Rules hiện tại đang từ chối cập nhật transaction. Kiểm tra lại schema Firestore/rules.';
-    }
 
-    if (error.message != null && error.message!.trim().isNotEmpty) {
-      return error.message!;
-    }
-
-    return s.updateTransactionFailed;
-  }
 
   void _applyTransaction(TransactionModel transaction) {
     final transactionType = transactionTypeFromValue(transaction.type);
-    final resolvedCategory = _resolveCurrentCategory(
+    final resolvedCategory = UpdateTransactionHelpers.resolveCurrentCategory(
       categories: state.categories,
       currentType: transaction.type,
       selectedCategoryEmoji: transaction.categoryEmoji ?? '',
       originalTransaction: transaction,
+      defaultCategoryGetter: (type) => getDefaultCategoryForType(type.value, categories: defaultCategories),
     );
 
     state = state.copyWith(
@@ -330,7 +323,7 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
       selectedCategoryKey: transactionCategoryKeyForCategory(resolvedCategory),
       selectedCategory: resolvedCategory.label,
       selectedCategoryEmoji: resolvedCategory.icon,
-      amountText: _formatAmount(transaction.amount),
+      amountText: UpdateTransactionHelpers.formatAmount(transaction.amount),
       note: transaction.note ?? '',
       selectedDate: transaction.date,
       transactionType: transactionType,
@@ -338,82 +331,4 @@ class UpdateTransactionNotifier extends _$UpdateTransactionNotifier {
     );
   }
 
-  CategoryModel _resolveCurrentCategory({
-    required List<CategoryModel> categories,
-    required String currentType,
-    required String selectedCategoryEmoji,
-    required TransactionModel originalTransaction,
-  }) {
-    final exactMatches = categories.where((category) {
-      return category.type == currentType &&
-          transactionCategoryKeyForCategory(category) ==
-              originalTransaction.categoryKey;
-    }).toList();
-
-    if (exactMatches.isNotEmpty) {
-      return exactMatches.first;
-    }
-
-    final keyMatch = findCategoryByTransactionKey(
-      categories,
-      originalTransaction.categoryKey,
-      type: currentType,
-    );
-    if (keyMatch != null) {
-      return keyMatch;
-    }
-
-    final originalMatches = categories.where((category) {
-      return category.type == currentType &&
-          category.label == originalTransaction.category;
-    }).toList();
-
-    if (originalMatches.isNotEmpty) {
-      return originalMatches.first;
-    }
-
-    final fallback = _resolveCategoryForType(
-      type: transactionTypeFromValue(currentType),
-      categories: categories,
-    );
-
-    return fallback.copyWith(
-      icon: selectedCategoryEmoji.isNotEmpty
-          ? selectedCategoryEmoji
-          : fallback.icon,
-    );
-  }
-
-  CategoryModel _resolveCategoryForType({
-    required TransactionType type,
-    required List<CategoryModel> categories,
-    String? preferredLabel,
-  }) {
-    if (preferredLabel != null && preferredLabel.isNotEmpty) {
-      final preferredMatches = categories.where((category) {
-        return category.type == type.value && category.label == preferredLabel;
-      }).toList();
-
-      if (preferredMatches.isNotEmpty) {
-        return preferredMatches.first;
-      }
-    }
-
-    final sameTypeCategories = categories.where((category) {
-      return category.type == type.value;
-    }).toList();
-
-    if (sameTypeCategories.isNotEmpty) {
-      return sameTypeCategories.first;
-    }
-
-    return getDefaultCategoryForType(type.value, categories: defaultCategories);
-  }
-
-  String _formatAmount(double amount) {
-    if (amount == amount.truncateToDouble()) {
-      return amount.toInt().toString();
-    }
-    return amount.toString();
-  }
 }

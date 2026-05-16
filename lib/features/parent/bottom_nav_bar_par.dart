@@ -29,7 +29,7 @@ class ParentBottomNavBar extends HookConsumerWidget {
     ];
 
     final unselectedColor =
-        isDark ? const Color(0xFF64748B) : AppTheme.textGrey;
+        isDark ? AppTheme.textGrey : AppTheme.textGrey;
 
     // Glass surface: semi-transparent so blur bleeds through
     final glassColor = isDark

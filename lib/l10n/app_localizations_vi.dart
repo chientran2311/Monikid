@@ -21,6 +21,35 @@ class AppLocalizationsVi extends AppLocalizations {
   String get close => 'Đóng';
 
   @override
+  String get actionSkip => 'Bỏ qua';
+
+  @override
+  String get onboardingLanguageTitleLeading => 'Chọn';
+
+  @override
+  String get onboardingLanguageTitleHighlight => 'ngôn ngữ';
+
+  @override
+  String get onboardingLanguageDescription =>
+      'Vui lòng chọn ngôn ngữ bạn muốn sử dụng trong ứng dụng.';
+
+  @override
+  String get onboardingContinueAction => 'Tiếp tục';
+
+  @override
+  String get onboardingCurrencyTitle => 'Chọn loại tiền tệ';
+
+  @override
+  String get onboardingCurrencyDescription =>
+      'Vui lòng chọn loại tiền tệ bạn muốn sử dụng để quản lý các giao dịch trong ứng dụng.';
+
+  @override
+  String get onboardingCurrencyVnd => 'Việt Nam Đồng (VND)';
+
+  @override
+  String get onboardingCurrencyUsd => 'Đô la Mỹ (USD)';
+
+  @override
   String get validationEmptyFields =>
       'Vui lòng điền đủ thông tin (Tên, Email, Mật khẩu)';
 
@@ -107,6 +136,25 @@ class AppLocalizationsVi extends AppLocalizations {
       'Kiểm tra giới hạn chi tiêu cho các thành viên trong gia đình.';
 
   @override
+  String homeParTopCategoryAlertTitle(String category) {
+    return 'Chi nhiều nhất ở $category';
+  }
+
+  @override
+  String get homeParTopCategoryAlertBody => 'Nhấn để xem chi tiết giao dịch';
+
+  @override
+  String get homeParThisMonth => 'Tháng này';
+
+  @override
+  String get homeParViewDetail => 'Xem chi tiết';
+
+  @override
+  String homeParSpentPercent(String percent) {
+    return 'Đã chi $percent% thu nhập';
+  }
+
+  @override
   String get noTransactionsYet => 'Chưa có giao dịch nào.';
 
   @override
@@ -149,6 +197,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get actionConfirm => 'Xác nhận';
 
   @override
+  String get actionDone => 'Xong';
+
+  @override
+  String get actionSelect => 'Chọn';
+
+  @override
   String get validationInvalidAmount => 'Số tiền không hợp lệ';
 
   @override
@@ -185,6 +239,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get transactionDateLabel => 'Ngày';
+
+  @override
+  String get transactionHistorySelectDateTitle => 'Chọn ngày';
 
   @override
   String get transactionNoteLabel => 'Ghi chú';
@@ -224,7 +281,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactionDetailTimeLabel => 'THỜI GIAN';
 
   @override
+  String get transactionDetailCreatedAtLabel => 'TẠO LÚC';
+
+  @override
   String get transactionDetailNoteLabel => 'GHI CHÚ';
+
+  @override
+  String get transactionDetailEvidenceLabel => 'ẢNH MINH CHỨNG';
 
   @override
   String get transactionEditAction => 'Chỉnh sửa giao dịch';
@@ -328,6 +391,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get profileEditAvatarLabel => 'Thay đổi ảnh đại diện';
 
   @override
+  String get profileEditAvatarDesc => 'Chụp ảnh mới hoặc chọn từ thư viện';
+
+  @override
   String get profileEditFullName => 'Họ và tên';
 
   @override
@@ -354,6 +420,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get actionSaveChanges => 'Lưu thay đổi';
+
+  @override
+  String get profileEditSaveSuccess => 'Cập nhật hồ sơ thành công';
+
+  @override
+  String get profileEditErrorNameRequired => 'Họ tên là bắt buộc';
+
+  @override
+  String get profileEditErrorNameTooShort => 'Họ tên phải có ít nhất 2 ký tự';
+
+  @override
+  String get profileEditErrorInvalidPhone =>
+      'Số điện thoại không hợp lệ (VD: 0912345678)';
 
   @override
   String get editRequestTitle => 'Chỉnh sửa yêu cầu';
@@ -535,6 +614,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get parentStatisticMonth => 'Tháng';
 
   @override
+  String get parentStatisticYear => 'Năm';
+
+  @override
   String get parentStatisticBudgetTitle => 'Ngân sách tuần';
 
   @override
@@ -551,6 +633,49 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get parentStatisticNoData => 'Chưa có dữ liệu';
+
+  @override
+  String get parentStatisticTotalSpentTitle => 'Tổng đã chi';
+
+  @override
+  String get parentStatisticVsLastMonth => 'so với tháng trước';
+
+  @override
+  String parentStatisticSpendingUp(String percent) {
+    return '+$percent%';
+  }
+
+  @override
+  String parentStatisticSpendingDown(String percent) {
+    return '-$percent%';
+  }
+
+  @override
+  String get parentStatisticSpendingStable => 'Ổn định';
+
+  @override
+  String get parentStatisticLoading => 'Đang tải thống kê chi tiêu...';
+
+  @override
+  String get parentStatisticLoadError => 'Không thể tải thống kê chi tiêu.';
+
+  @override
+  String get parentStatisticRetry => 'Thử lại';
+
+  @override
+  String get parentStatisticSelectChild =>
+      'Chọn một trẻ để xem thống kê chi tiêu.';
+
+  @override
+  String parentStatisticTransactionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giao dịch',
+      zero: 'Chưa có giao dịch',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get settingParTitle => 'Cài đặt';
@@ -575,6 +700,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingParSpendingLimitSubtitle => 'Thiết lập giới hạn tuần/tháng';
+
+  @override
+  String get settingParAppearanceTitle => 'Giao diện';
+
+  @override
+  String get settingParThemeLabel => 'Giao diện sáng/tối';
 
   @override
   String get settingParNotificationsTitle => 'Thông báo';
@@ -904,6 +1035,63 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể phân tích hóa đơn. Vui lòng thử lại hoặc nhập tay.';
 
   @override
+  String get scanBillLoadingTitle => 'Đang xử lý hóa đơn';
+
+  @override
+  String get scanBillScanningStatus => 'Đang quét hóa đơn...';
+
+  @override
+  String get scanBillAnalyzingStatus => 'AI đang phân tích...';
+
+  @override
+  String get joinFamilyTitle => 'Tham gia gia đình';
+
+  @override
+  String get joinFamilySubtitle => 'Nhập mã mời 6 chữ số từ phụ huynh của bạn';
+
+  @override
+  String get joinFamilyInputHint => 'Nhập mã';
+
+  @override
+  String get joinFamilyButton => 'Tham gia';
+
+  @override
+  String get joinFamilySuccess => 'Bạn đã tham gia gia đình thành công!';
+
+  @override
+  String get joinFamilyErrorInvalidCode =>
+      'Mã mời không hợp lệ hoặc đã hết hạn';
+
+  @override
+  String get joinFamilyErrorAlreadyMember => 'Bạn đã thuộc về một gia đình';
+
+  @override
+  String get joinFamilyErrorUnknown => 'Không thể tham gia. Vui lòng thử lại.';
+
+  @override
+  String get unlinkFamilyTitle => 'Gia đình của tôi';
+
+  @override
+  String get unlinkFamilySubtitle => 'Bạn đang kết nối với một gia đình';
+
+  @override
+  String get unlinkFamilyButton => 'Hủy liên kết';
+
+  @override
+  String get unlinkFamilyConfirmTitle => 'Rời gia đình?';
+
+  @override
+  String get unlinkFamilyConfirmBody =>
+      'Bạn sẽ rời khỏi gia đình này. Bạn có thể tham gia lại bằng mã mời.';
+
+  @override
+  String get unlinkFamilySuccess => 'Bạn đã rời gia đình.';
+
+  @override
+  String get unlinkFamilyErrorFailed =>
+      'Không thể rời gia đình. Vui lòng thử lại.';
+
+  @override
   String get customCategoryAdd => 'Thêm danh mục';
 
   @override
@@ -937,4 +1125,207 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get customCategoryConfirm => 'Thêm';
+
+  @override
+  String get customCategorySelectTitleExpense => 'Chọn danh mục chi tiêu';
+
+  @override
+  String get customCategorySelectTitleIncome => 'Chọn danh mục thu nhập';
+
+  @override
+  String get customCategorySelectTitle => 'Chọn danh mục';
+
+  @override
+  String get customCategoryConfirmSelection => 'Xác nhận';
+
+  @override
+  String get setMoneyLimitManagedByParent => 'Hạn mức do phụ huynh quản lý';
+
+  @override
+  String get parentSetLimitTitle => 'Thiết lập hạn mức tháng';
+
+  @override
+  String get parentSetLimitDescription =>
+      'Hạn mức này giúp con kiểm soát chi tiêu tốt hơn mỗi tháng';
+
+  @override
+  String get notifTitle => 'Thông báo';
+
+  @override
+  String get notifMarkAllRead => 'Đánh dấu tất cả đã đọc';
+
+  @override
+  String get notifEmpty => 'Chưa có thông báo nào';
+
+  @override
+  String get notifOverspend80Title => 'Sắp đạt hạn mức';
+
+  @override
+  String notifOverspend80Body(Object amount, Object month) {
+    return 'Bạn đã chi $amount — 80% hạn mức tháng $month.';
+  }
+
+  @override
+  String get notifOverspend100Title => 'Đã vượt hạn mức';
+
+  @override
+  String notifOverspend100Body(Object amount, Object month) {
+    return 'Bạn đã chi $amount — vượt hạn mức tháng $month.';
+  }
+
+  @override
+  String get notifWeeklyOverspendTitle => 'Chi tiêu tăng cao';
+
+  @override
+  String notifWeeklyOverspendBody(Object percent) {
+    return 'Tuần này bạn chi nhiều hơn $percent% so với tuần trước.';
+  }
+
+  @override
+  String notifParentOverspend80Body(Object childName, Object month) {
+    return 'Con $childName đã chi 80% hạn mức tháng $month.';
+  }
+
+  @override
+  String notifParentOverspend100Body(Object childName, Object month) {
+    return 'Con $childName đã vượt hạn mức tháng $month.';
+  }
+
+  @override
+  String notifParentWeeklyOverspendBody(Object childName, Object percent) {
+    return 'Con $childName tuần này chi nhiều hơn $percent% so với tuần trước.';
+  }
+
+  @override
+  String get familyManagementTitle => 'Quản lý gia đình';
+
+  @override
+  String get familyManagementEmptyMessage => 'Không tìm thấy gia đình';
+
+  @override
+  String get familyManagementErrorMessage =>
+      'Có lỗi xảy ra khi tải dữ liệu gia đình';
+
+  @override
+  String get familyManagementHostBadge => 'Chủ';
+
+  @override
+  String get familyManagementHostSubtitle => 'Chủ gia đình';
+
+  @override
+  String get familyManagementParentSubtitle => 'Phụ huynh';
+
+  @override
+  String get familyManagementInviteCodeLabel => 'Mã mời gia đình';
+
+  @override
+  String get familyManagementCopyTooltip => 'Sao chép';
+
+  @override
+  String get familyManagementCopySuccess => 'Đã sao chép mã mời';
+
+  @override
+  String get familyManagementSectionMembers => 'THÀNH VIÊN';
+
+  @override
+  String get familyManagementChildrenSection => 'Trẻ em';
+
+  @override
+  String get familyManagementParentsSection => 'Phụ huynh';
+
+  @override
+  String get familyManagementHostParentLabel => '(Người tạo gia đình)';
+
+  @override
+  String get familyManagementNonHostParentLabel => '(Phụ huynh phụ)';
+
+  @override
+  String get familyManagementSetLimit => 'Đặt hạn mức';
+
+  @override
+  String get familyManagementUnlinkChild => 'Hủy';
+
+  @override
+  String get familyManagementUnlinkParent => 'Hủy liên kết';
+
+  @override
+  String get familyManagementNoLimit => 'Chưa đặt';
+
+  @override
+  String get familyManagementEmptyChildren => 'Chưa có thành viên nào';
+
+  @override
+  String get familyManagementUnlinkButton => 'Gỡ liên kết';
+
+  @override
+  String get familyManagementSetLimitButton => 'Đặt hạn mức';
+
+  @override
+  String get familyManagementRemoveLimitButton => 'Xóa hạn mức';
+
+  @override
+  String get familyManagementLimitDialogTitle => 'Đặt hạn mức';
+
+  @override
+  String get familyManagementLimitInputHint => '0';
+
+  @override
+  String get familyManagementRemoveLimit => 'Xóa hạn mức';
+
+  @override
+  String get familyManagementSave => 'Lưu';
+
+  @override
+  String get familyManagementCancel => 'Không';
+
+  @override
+  String get familyManagementUnlinkConfirmTitle => 'Hủy liên kết?';
+
+  @override
+  String familyManagementUnlinkConfirmBody(Object name) {
+    return 'Bạn có chắc muốn hủy liên kết $name?';
+  }
+
+  @override
+  String get familyManagementUnlinkConfirmButton => 'Hủy liên kết';
+
+  @override
+  String get familyManagementConfirmUnlinkChildTitle => 'Xác nhận gỡ liên kết';
+
+  @override
+  String familyManagementConfirmUnlinkChildMessage(Object childName) {
+    return 'Bạn có chắc muốn gỡ liên kết $childName?';
+  }
+
+  @override
+  String get familyManagementConfirmUnlinkParentTitle => 'Xác nhận gỡ liên kết';
+
+  @override
+  String familyManagementConfirmUnlinkParentMessage(Object parentName) {
+    return 'Bạn có chắc muốn gỡ liên kết $parentName?';
+  }
+
+  @override
+  String get familyManagementLimitSetSuccess => 'Đã cập nhật hạn mức';
+
+  @override
+  String get familyManagementLimitRemovedSuccess => 'Đã xóa hạn mức';
+
+  @override
+  String get familyManagementUnlinkSuccess => 'Đã gỡ liên kết thành công';
+
+  @override
+  String get familyManagementUnlinkError => 'Lỗi khi gỡ liên kết';
+
+  @override
+  String get familyManagementSetLimitSuccess => 'Đã đặt hạn mức thành công';
+
+  @override
+  String get familyManagementSetLimitError => 'Lỗi khi đặt hạn mức';
+
+  @override
+  String get familyManagementRemoveLimitSuccess => 'Đã xóa hạn mức thành công';
+
+  @override
+  String get familyManagementRemoveLimitError => 'Lỗi khi xóa hạn mức';
 }

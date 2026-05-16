@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'family_model.freezed.dart';
 part 'family_model.g.dart';
-@freezed
+
 @freezed
 abstract class FamilyModel with _$FamilyModel {
   const factory FamilyModel({

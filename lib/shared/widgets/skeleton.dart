@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
 
 class Skeleton extends StatefulWidget {
   final double height;
@@ -42,7 +43,7 @@ class _SkeletonState extends State<Skeleton>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = isDark ? Colors.grey[800]! : Colors.grey[300]!;
+    final color = widget.color ?? (isDark ? AppTheme.borderDark : AppTheme.surfaceLightGrey);
 
     return FadeTransition(
       opacity: _animation,

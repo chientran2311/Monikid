@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UpdateTransactionState {
 
- String? get currentTransactionId; TransactionModel? get originalTransaction; TransactionStatus get status; List<CategoryModel> get categories; String get selectedCategoryKey; String get selectedCategory; String get selectedCategoryEmoji; String get amountText; String get note; DateTime? get selectedDate; TransactionType get transactionType; Uint8List? get newEvidenceImageBytes; String? get newEvidenceImageFileName; String? get newEvidenceImageMimeType; bool get removeExistingEvidenceImage; String? get errorMessage;
+ String? get currentTransactionId; TransactionModel? get originalTransaction; TransactionStatus get status; List<CategoryModel> get categories; String get selectedCategoryKey; String get selectedCategory; String get selectedCategoryEmoji; String get amountText; String get note; DateTime? get selectedDate; TransactionType get transactionType; Uint8List? get newEvidenceImageBytes; String? get newEvidenceImageFileName; String? get newEvidenceImageMimeType; String? get newEvidenceImageFilePath; bool get removeExistingEvidenceImage; String? get errorMessage;
 /// Create a copy of UpdateTransactionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $UpdateTransactionStateCopyWith<UpdateTransactionState> get copyWith => _$Update
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTransactionState&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.originalTransaction, originalTransaction) || other.originalTransaction == originalTransaction)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryEmoji, selectedCategoryEmoji) || other.selectedCategoryEmoji == selectedCategoryEmoji)&&(identical(other.amountText, amountText) || other.amountText == amountText)&&(identical(other.note, note) || other.note == note)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&const DeepCollectionEquality().equals(other.newEvidenceImageBytes, newEvidenceImageBytes)&&(identical(other.newEvidenceImageFileName, newEvidenceImageFileName) || other.newEvidenceImageFileName == newEvidenceImageFileName)&&(identical(other.newEvidenceImageMimeType, newEvidenceImageMimeType) || other.newEvidenceImageMimeType == newEvidenceImageMimeType)&&(identical(other.removeExistingEvidenceImage, removeExistingEvidenceImage) || other.removeExistingEvidenceImage == removeExistingEvidenceImage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateTransactionState&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.originalTransaction, originalTransaction) || other.originalTransaction == originalTransaction)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryEmoji, selectedCategoryEmoji) || other.selectedCategoryEmoji == selectedCategoryEmoji)&&(identical(other.amountText, amountText) || other.amountText == amountText)&&(identical(other.note, note) || other.note == note)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&const DeepCollectionEquality().equals(other.newEvidenceImageBytes, newEvidenceImageBytes)&&(identical(other.newEvidenceImageFileName, newEvidenceImageFileName) || other.newEvidenceImageFileName == newEvidenceImageFileName)&&(identical(other.newEvidenceImageMimeType, newEvidenceImageMimeType) || other.newEvidenceImageMimeType == newEvidenceImageMimeType)&&(identical(other.newEvidenceImageFilePath, newEvidenceImageFilePath) || other.newEvidenceImageFilePath == newEvidenceImageFilePath)&&(identical(other.removeExistingEvidenceImage, removeExistingEvidenceImage) || other.removeExistingEvidenceImage == removeExistingEvidenceImage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentTransactionId,originalTransaction,status,const DeepCollectionEquality().hash(categories),selectedCategoryKey,selectedCategory,selectedCategoryEmoji,amountText,note,selectedDate,transactionType,const DeepCollectionEquality().hash(newEvidenceImageBytes),newEvidenceImageFileName,newEvidenceImageMimeType,removeExistingEvidenceImage,errorMessage);
+int get hashCode => Object.hash(runtimeType,currentTransactionId,originalTransaction,status,const DeepCollectionEquality().hash(categories),selectedCategoryKey,selectedCategory,selectedCategoryEmoji,amountText,note,selectedDate,transactionType,const DeepCollectionEquality().hash(newEvidenceImageBytes),newEvidenceImageFileName,newEvidenceImageMimeType,newEvidenceImageFilePath,removeExistingEvidenceImage,errorMessage);
 
 @override
 String toString() {
-  return 'UpdateTransactionState(currentTransactionId: $currentTransactionId, originalTransaction: $originalTransaction, status: $status, categories: $categories, selectedCategoryKey: $selectedCategoryKey, selectedCategory: $selectedCategory, selectedCategoryEmoji: $selectedCategoryEmoji, amountText: $amountText, note: $note, selectedDate: $selectedDate, transactionType: $transactionType, newEvidenceImageBytes: $newEvidenceImageBytes, newEvidenceImageFileName: $newEvidenceImageFileName, newEvidenceImageMimeType: $newEvidenceImageMimeType, removeExistingEvidenceImage: $removeExistingEvidenceImage, errorMessage: $errorMessage)';
+  return 'UpdateTransactionState(currentTransactionId: $currentTransactionId, originalTransaction: $originalTransaction, status: $status, categories: $categories, selectedCategoryKey: $selectedCategoryKey, selectedCategory: $selectedCategory, selectedCategoryEmoji: $selectedCategoryEmoji, amountText: $amountText, note: $note, selectedDate: $selectedDate, transactionType: $transactionType, newEvidenceImageBytes: $newEvidenceImageBytes, newEvidenceImageFileName: $newEvidenceImageFileName, newEvidenceImageMimeType: $newEvidenceImageMimeType, newEvidenceImageFilePath: $newEvidenceImageFilePath, removeExistingEvidenceImage: $removeExistingEvidenceImage, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $UpdateTransactionStateCopyWith<$Res>  {
   factory $UpdateTransactionStateCopyWith(UpdateTransactionState value, $Res Function(UpdateTransactionState) _then) = _$UpdateTransactionStateCopyWithImpl;
 @useResult
 $Res call({
- String? currentTransactionId, TransactionModel? originalTransaction, TransactionStatus status, List<CategoryModel> categories, String selectedCategoryKey, String selectedCategory, String selectedCategoryEmoji, String amountText, String note, DateTime? selectedDate, TransactionType transactionType, Uint8List? newEvidenceImageBytes, String? newEvidenceImageFileName, String? newEvidenceImageMimeType, bool removeExistingEvidenceImage, String? errorMessage
+ String? currentTransactionId, TransactionModel? originalTransaction, TransactionStatus status, List<CategoryModel> categories, String selectedCategoryKey, String selectedCategory, String selectedCategoryEmoji, String amountText, String note, DateTime? selectedDate, TransactionType transactionType, Uint8List? newEvidenceImageBytes, String? newEvidenceImageFileName, String? newEvidenceImageMimeType, String? newEvidenceImageFilePath, bool removeExistingEvidenceImage, String? errorMessage
 });
 
 
@@ -63,7 +63,7 @@ class _$UpdateTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentTransactionId = freezed,Object? originalTransaction = freezed,Object? status = null,Object? categories = null,Object? selectedCategoryKey = null,Object? selectedCategory = null,Object? selectedCategoryEmoji = null,Object? amountText = null,Object? note = null,Object? selectedDate = freezed,Object? transactionType = null,Object? newEvidenceImageBytes = freezed,Object? newEvidenceImageFileName = freezed,Object? newEvidenceImageMimeType = freezed,Object? removeExistingEvidenceImage = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentTransactionId = freezed,Object? originalTransaction = freezed,Object? status = null,Object? categories = null,Object? selectedCategoryKey = null,Object? selectedCategory = null,Object? selectedCategoryEmoji = null,Object? amountText = null,Object? note = null,Object? selectedDate = freezed,Object? transactionType = null,Object? newEvidenceImageBytes = freezed,Object? newEvidenceImageFileName = freezed,Object? newEvidenceImageMimeType = freezed,Object? newEvidenceImageFilePath = freezed,Object? removeExistingEvidenceImage = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 currentTransactionId: freezed == currentTransactionId ? _self.currentTransactionId : currentTransactionId // ignore: cast_nullable_to_non_nullable
 as String?,originalTransaction: freezed == originalTransaction ? _self.originalTransaction : originalTransaction // ignore: cast_nullable_to_non_nullable
@@ -79,6 +79,7 @@ as DateTime?,transactionType: null == transactionType ? _self.transactionType : 
 as TransactionType,newEvidenceImageBytes: freezed == newEvidenceImageBytes ? _self.newEvidenceImageBytes : newEvidenceImageBytes // ignore: cast_nullable_to_non_nullable
 as Uint8List?,newEvidenceImageFileName: freezed == newEvidenceImageFileName ? _self.newEvidenceImageFileName : newEvidenceImageFileName // ignore: cast_nullable_to_non_nullable
 as String?,newEvidenceImageMimeType: freezed == newEvidenceImageMimeType ? _self.newEvidenceImageMimeType : newEvidenceImageMimeType // ignore: cast_nullable_to_non_nullable
+as String?,newEvidenceImageFilePath: freezed == newEvidenceImageFilePath ? _self.newEvidenceImageFilePath : newEvidenceImageFilePath // ignore: cast_nullable_to_non_nullable
 as String?,removeExistingEvidenceImage: null == removeExistingEvidenceImage ? _self.removeExistingEvidenceImage : removeExistingEvidenceImage // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -104,7 +105,7 @@ $TransactionModelCopyWith<$Res>? get originalTransaction {
 
 
 class _UpdateTransactionState extends UpdateTransactionState {
-  const _UpdateTransactionState({this.currentTransactionId, this.originalTransaction, this.status = TransactionStatus.initial, final  List<CategoryModel> categories = const [], this.selectedCategoryKey = '', this.selectedCategory = '', this.selectedCategoryEmoji = '', this.amountText = '', this.note = '', this.selectedDate, this.transactionType = TransactionType.expense, this.newEvidenceImageBytes, this.newEvidenceImageFileName, this.newEvidenceImageMimeType, this.removeExistingEvidenceImage = false, this.errorMessage}): _categories = categories,super._();
+  const _UpdateTransactionState({this.currentTransactionId, this.originalTransaction, this.status = TransactionStatus.initial, final  List<CategoryModel> categories = const [], this.selectedCategoryKey = '', this.selectedCategory = '', this.selectedCategoryEmoji = '', this.amountText = '', this.note = '', this.selectedDate, this.transactionType = TransactionType.expense, this.newEvidenceImageBytes, this.newEvidenceImageFileName, this.newEvidenceImageMimeType, this.newEvidenceImageFilePath, this.removeExistingEvidenceImage = false, this.errorMessage}): _categories = categories,super._();
   
 
 @override final  String? currentTransactionId;
@@ -127,6 +128,7 @@ class _UpdateTransactionState extends UpdateTransactionState {
 @override final  Uint8List? newEvidenceImageBytes;
 @override final  String? newEvidenceImageFileName;
 @override final  String? newEvidenceImageMimeType;
+@override final  String? newEvidenceImageFilePath;
 @override@JsonKey() final  bool removeExistingEvidenceImage;
 @override final  String? errorMessage;
 
@@ -140,16 +142,16 @@ _$UpdateTransactionStateCopyWith<_UpdateTransactionState> get copyWith => __$Upd
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTransactionState&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.originalTransaction, originalTransaction) || other.originalTransaction == originalTransaction)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryEmoji, selectedCategoryEmoji) || other.selectedCategoryEmoji == selectedCategoryEmoji)&&(identical(other.amountText, amountText) || other.amountText == amountText)&&(identical(other.note, note) || other.note == note)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&const DeepCollectionEquality().equals(other.newEvidenceImageBytes, newEvidenceImageBytes)&&(identical(other.newEvidenceImageFileName, newEvidenceImageFileName) || other.newEvidenceImageFileName == newEvidenceImageFileName)&&(identical(other.newEvidenceImageMimeType, newEvidenceImageMimeType) || other.newEvidenceImageMimeType == newEvidenceImageMimeType)&&(identical(other.removeExistingEvidenceImage, removeExistingEvidenceImage) || other.removeExistingEvidenceImage == removeExistingEvidenceImage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateTransactionState&&(identical(other.currentTransactionId, currentTransactionId) || other.currentTransactionId == currentTransactionId)&&(identical(other.originalTransaction, originalTransaction) || other.originalTransaction == originalTransaction)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedCategory, selectedCategory) || other.selectedCategory == selectedCategory)&&(identical(other.selectedCategoryEmoji, selectedCategoryEmoji) || other.selectedCategoryEmoji == selectedCategoryEmoji)&&(identical(other.amountText, amountText) || other.amountText == amountText)&&(identical(other.note, note) || other.note == note)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&const DeepCollectionEquality().equals(other.newEvidenceImageBytes, newEvidenceImageBytes)&&(identical(other.newEvidenceImageFileName, newEvidenceImageFileName) || other.newEvidenceImageFileName == newEvidenceImageFileName)&&(identical(other.newEvidenceImageMimeType, newEvidenceImageMimeType) || other.newEvidenceImageMimeType == newEvidenceImageMimeType)&&(identical(other.newEvidenceImageFilePath, newEvidenceImageFilePath) || other.newEvidenceImageFilePath == newEvidenceImageFilePath)&&(identical(other.removeExistingEvidenceImage, removeExistingEvidenceImage) || other.removeExistingEvidenceImage == removeExistingEvidenceImage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentTransactionId,originalTransaction,status,const DeepCollectionEquality().hash(_categories),selectedCategoryKey,selectedCategory,selectedCategoryEmoji,amountText,note,selectedDate,transactionType,const DeepCollectionEquality().hash(newEvidenceImageBytes),newEvidenceImageFileName,newEvidenceImageMimeType,removeExistingEvidenceImage,errorMessage);
+int get hashCode => Object.hash(runtimeType,currentTransactionId,originalTransaction,status,const DeepCollectionEquality().hash(_categories),selectedCategoryKey,selectedCategory,selectedCategoryEmoji,amountText,note,selectedDate,transactionType,const DeepCollectionEquality().hash(newEvidenceImageBytes),newEvidenceImageFileName,newEvidenceImageMimeType,newEvidenceImageFilePath,removeExistingEvidenceImage,errorMessage);
 
 @override
 String toString() {
-  return 'UpdateTransactionState(currentTransactionId: $currentTransactionId, originalTransaction: $originalTransaction, status: $status, categories: $categories, selectedCategoryKey: $selectedCategoryKey, selectedCategory: $selectedCategory, selectedCategoryEmoji: $selectedCategoryEmoji, amountText: $amountText, note: $note, selectedDate: $selectedDate, transactionType: $transactionType, newEvidenceImageBytes: $newEvidenceImageBytes, newEvidenceImageFileName: $newEvidenceImageFileName, newEvidenceImageMimeType: $newEvidenceImageMimeType, removeExistingEvidenceImage: $removeExistingEvidenceImage, errorMessage: $errorMessage)';
+  return 'UpdateTransactionState(currentTransactionId: $currentTransactionId, originalTransaction: $originalTransaction, status: $status, categories: $categories, selectedCategoryKey: $selectedCategoryKey, selectedCategory: $selectedCategory, selectedCategoryEmoji: $selectedCategoryEmoji, amountText: $amountText, note: $note, selectedDate: $selectedDate, transactionType: $transactionType, newEvidenceImageBytes: $newEvidenceImageBytes, newEvidenceImageFileName: $newEvidenceImageFileName, newEvidenceImageMimeType: $newEvidenceImageMimeType, newEvidenceImageFilePath: $newEvidenceImageFilePath, removeExistingEvidenceImage: $removeExistingEvidenceImage, errorMessage: $errorMessage)';
 }
 
 
@@ -160,7 +162,7 @@ abstract mixin class _$UpdateTransactionStateCopyWith<$Res> implements $UpdateTr
   factory _$UpdateTransactionStateCopyWith(_UpdateTransactionState value, $Res Function(_UpdateTransactionState) _then) = __$UpdateTransactionStateCopyWithImpl;
 @override @useResult
 $Res call({
- String? currentTransactionId, TransactionModel? originalTransaction, TransactionStatus status, List<CategoryModel> categories, String selectedCategoryKey, String selectedCategory, String selectedCategoryEmoji, String amountText, String note, DateTime? selectedDate, TransactionType transactionType, Uint8List? newEvidenceImageBytes, String? newEvidenceImageFileName, String? newEvidenceImageMimeType, bool removeExistingEvidenceImage, String? errorMessage
+ String? currentTransactionId, TransactionModel? originalTransaction, TransactionStatus status, List<CategoryModel> categories, String selectedCategoryKey, String selectedCategory, String selectedCategoryEmoji, String amountText, String note, DateTime? selectedDate, TransactionType transactionType, Uint8List? newEvidenceImageBytes, String? newEvidenceImageFileName, String? newEvidenceImageMimeType, String? newEvidenceImageFilePath, bool removeExistingEvidenceImage, String? errorMessage
 });
 
 
@@ -177,7 +179,7 @@ class __$UpdateTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of UpdateTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentTransactionId = freezed,Object? originalTransaction = freezed,Object? status = null,Object? categories = null,Object? selectedCategoryKey = null,Object? selectedCategory = null,Object? selectedCategoryEmoji = null,Object? amountText = null,Object? note = null,Object? selectedDate = freezed,Object? transactionType = null,Object? newEvidenceImageBytes = freezed,Object? newEvidenceImageFileName = freezed,Object? newEvidenceImageMimeType = freezed,Object? removeExistingEvidenceImage = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentTransactionId = freezed,Object? originalTransaction = freezed,Object? status = null,Object? categories = null,Object? selectedCategoryKey = null,Object? selectedCategory = null,Object? selectedCategoryEmoji = null,Object? amountText = null,Object? note = null,Object? selectedDate = freezed,Object? transactionType = null,Object? newEvidenceImageBytes = freezed,Object? newEvidenceImageFileName = freezed,Object? newEvidenceImageMimeType = freezed,Object? newEvidenceImageFilePath = freezed,Object? removeExistingEvidenceImage = null,Object? errorMessage = freezed,}) {
   return _then(_UpdateTransactionState(
 currentTransactionId: freezed == currentTransactionId ? _self.currentTransactionId : currentTransactionId // ignore: cast_nullable_to_non_nullable
 as String?,originalTransaction: freezed == originalTransaction ? _self.originalTransaction : originalTransaction // ignore: cast_nullable_to_non_nullable
@@ -193,6 +195,7 @@ as DateTime?,transactionType: null == transactionType ? _self.transactionType : 
 as TransactionType,newEvidenceImageBytes: freezed == newEvidenceImageBytes ? _self.newEvidenceImageBytes : newEvidenceImageBytes // ignore: cast_nullable_to_non_nullable
 as Uint8List?,newEvidenceImageFileName: freezed == newEvidenceImageFileName ? _self.newEvidenceImageFileName : newEvidenceImageFileName // ignore: cast_nullable_to_non_nullable
 as String?,newEvidenceImageMimeType: freezed == newEvidenceImageMimeType ? _self.newEvidenceImageMimeType : newEvidenceImageMimeType // ignore: cast_nullable_to_non_nullable
+as String?,newEvidenceImageFilePath: freezed == newEvidenceImageFilePath ? _self.newEvidenceImageFilePath : newEvidenceImageFilePath // ignore: cast_nullable_to_non_nullable
 as String?,removeExistingEvidenceImage: null == removeExistingEvidenceImage ? _self.removeExistingEvidenceImage : removeExistingEvidenceImage // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,

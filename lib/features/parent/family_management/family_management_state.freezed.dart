@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FamilyManagementState {
 
- FamilyManagementStatus get status; FamilyModel? get family; List<FamilyMemberModel> get members; String? get errorMessage; bool get isProcessing;
+ FamilyManagementStatus get status; FamilyModel? get family; List<FamilyMemberModel> get members; Map<String, int?> get monthlyLimits; String? get errorMessage; bool get isProcessing;
 /// Create a copy of FamilyManagementState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $FamilyManagementStateCopyWith<FamilyManagementState> get copyWith => _$FamilyMa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyManagementState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isProcessing, isProcessing) || other.isProcessing == isProcessing));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyManagementState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other.members, members)&&const DeepCollectionEquality().equals(other.monthlyLimits, monthlyLimits)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isProcessing, isProcessing) || other.isProcessing == isProcessing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(members),errorMessage,isProcessing);
+int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(members),const DeepCollectionEquality().hash(monthlyLimits),errorMessage,isProcessing);
 
 @override
 String toString() {
-  return 'FamilyManagementState(status: $status, family: $family, members: $members, errorMessage: $errorMessage, isProcessing: $isProcessing)';
+  return 'FamilyManagementState(status: $status, family: $family, members: $members, monthlyLimits: $monthlyLimits, errorMessage: $errorMessage, isProcessing: $isProcessing)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $FamilyManagementStateCopyWith<$Res>  {
   factory $FamilyManagementStateCopyWith(FamilyManagementState value, $Res Function(FamilyManagementState) _then) = _$FamilyManagementStateCopyWithImpl;
 @useResult
 $Res call({
- FamilyManagementStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? errorMessage, bool isProcessing
+ FamilyManagementStatus status, FamilyModel? family, List<FamilyMemberModel> members, Map<String, int?> monthlyLimits, String? errorMessage, bool isProcessing
 });
 
 
@@ -63,12 +63,13 @@ class _$FamilyManagementStateCopyWithImpl<$Res>
 
 /// Create a copy of FamilyManagementState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? errorMessage = freezed,Object? isProcessing = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? monthlyLimits = null,Object? errorMessage = freezed,Object? isProcessing = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as FamilyManagementStatus,family: freezed == family ? _self.family : family // ignore: cast_nullable_to_non_nullable
 as FamilyModel?,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
-as List<FamilyMemberModel>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as List<FamilyMemberModel>,monthlyLimits: null == monthlyLimits ? _self.monthlyLimits : monthlyLimits // ignore: cast_nullable_to_non_nullable
+as Map<String, int?>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,isProcessing: null == isProcessing ? _self.isProcessing : isProcessing // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -93,7 +94,7 @@ $FamilyModelCopyWith<$Res>? get family {
 
 
 class _FamilyManagementState extends FamilyManagementState {
-  const _FamilyManagementState({this.status = FamilyManagementStatus.initial, this.family, final  List<FamilyMemberModel> members = const [], this.errorMessage, this.isProcessing = false}): _members = members,super._();
+  const _FamilyManagementState({this.status = FamilyManagementStatus.initial, this.family, final  List<FamilyMemberModel> members = const [], final  Map<String, int?> monthlyLimits = const {}, this.errorMessage, this.isProcessing = false}): _members = members,_monthlyLimits = monthlyLimits,super._();
   
 
 @override@JsonKey() final  FamilyManagementStatus status;
@@ -103,6 +104,13 @@ class _FamilyManagementState extends FamilyManagementState {
   if (_members is EqualUnmodifiableListView) return _members;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_members);
+}
+
+ final  Map<String, int?> _monthlyLimits;
+@override@JsonKey() Map<String, int?> get monthlyLimits {
+  if (_monthlyLimits is EqualUnmodifiableMapView) return _monthlyLimits;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_monthlyLimits);
 }
 
 @override final  String? errorMessage;
@@ -118,16 +126,16 @@ _$FamilyManagementStateCopyWith<_FamilyManagementState> get copyWith => __$Famil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyManagementState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isProcessing, isProcessing) || other.isProcessing == isProcessing));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyManagementState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other._members, _members)&&const DeepCollectionEquality().equals(other._monthlyLimits, _monthlyLimits)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.isProcessing, isProcessing) || other.isProcessing == isProcessing));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(_members),errorMessage,isProcessing);
+int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_monthlyLimits),errorMessage,isProcessing);
 
 @override
 String toString() {
-  return 'FamilyManagementState(status: $status, family: $family, members: $members, errorMessage: $errorMessage, isProcessing: $isProcessing)';
+  return 'FamilyManagementState(status: $status, family: $family, members: $members, monthlyLimits: $monthlyLimits, errorMessage: $errorMessage, isProcessing: $isProcessing)';
 }
 
 
@@ -138,7 +146,7 @@ abstract mixin class _$FamilyManagementStateCopyWith<$Res> implements $FamilyMan
   factory _$FamilyManagementStateCopyWith(_FamilyManagementState value, $Res Function(_FamilyManagementState) _then) = __$FamilyManagementStateCopyWithImpl;
 @override @useResult
 $Res call({
- FamilyManagementStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? errorMessage, bool isProcessing
+ FamilyManagementStatus status, FamilyModel? family, List<FamilyMemberModel> members, Map<String, int?> monthlyLimits, String? errorMessage, bool isProcessing
 });
 
 
@@ -155,12 +163,13 @@ class __$FamilyManagementStateCopyWithImpl<$Res>
 
 /// Create a copy of FamilyManagementState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? errorMessage = freezed,Object? isProcessing = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? monthlyLimits = null,Object? errorMessage = freezed,Object? isProcessing = null,}) {
   return _then(_FamilyManagementState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as FamilyManagementStatus,family: freezed == family ? _self.family : family // ignore: cast_nullable_to_non_nullable
 as FamilyModel?,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
-as List<FamilyMemberModel>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as List<FamilyMemberModel>,monthlyLimits: null == monthlyLimits ? _self._monthlyLimits : monthlyLimits // ignore: cast_nullable_to_non_nullable
+as Map<String, int?>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,isProcessing: null == isProcessing ? _self.isProcessing : isProcessing // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

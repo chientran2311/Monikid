@@ -18,15 +18,20 @@ class AppTheme {
   // Background and Surface (Dark Mode)
   static const Color backgroundDark = Color(0xFF141E15);
   static const Color surfaceDark = Color(0xFF1C2B1E);
+  static const Color surfaceVeryDark = Color(0xFF0F172A); // slate-900
 
   // Background and Surface (Light Mode)
   static const Color backgroundLight = Color(0xFFF6F8F6);
   static const Color surfaceLight = Colors.white;
+  static const Color surfaceVeryLight = Color(0xFFF8FAFC); // slate-50
+  static const Color surfaceLightGrey = Color(0xFFF1F5F9); // slate-100
 
   // Semantic & Text colors
   static const Color textWhite = Colors.white;
   static const Color textBlack = Color(0xFF111811);
-  static const Color textGrey = Color(0xFF64748B); // neutral-gray
+  static const Color textGrey = Color(0xFF64748B); // neutral-gray / slate-500
+  static const Color textMuted = Color(0xFF94A3B8); // slate-400
+  static const Color textDark = Color(0xFF475569); // slate-600
   static const Color redAlert = Color(0xFFFF5252);
   static const Color orangeWarning = Color(0xFFFFAB40);
 
@@ -36,7 +41,11 @@ class AppTheme {
   static const Color inputBackground = surfaceDark;
   static const Color primaryGreen = primary;
 
+  // Avatar colors for family member display
+  static const Color avatarParent = Color(0xFF5C6BC0); // indigo-400: non-host parent avatar
+
   // Additional colors used in UI
+  static const Color iconLight = Color(0xFFCBD5E1); // slate-300 for icons
   static const Color surfaceVariant = Color(0xFF1E293B); // Dark surface variant
   static const Color borderDark = Color(0xFF334155); // Dark border
   static const Color borderLight = Color(0xFFE2E8F0); // Light border
@@ -54,6 +63,31 @@ class AppTheme {
   static const Color dangerBorder = Color(0xFFFECACA);
   static const Color infoSurface = Color(0xFFEFF6FF);
   static const Color infoBorder = Color(0xFFBFDBFE);
+
+  // ==========================================================================
+  // NOTIFICATION SCREEN (Light theme — used regardless of system dark mode)
+  // ==========================================================================
+
+  // Card surface & unread tint
+  static const Color notifCardSurface = Colors.white;
+  static const Color notifUnreadTint = Color(0xFFF0FDF4); // green-50: unread card bg
+
+  // Icon container backgrounds (40×40, borderRadius 12)
+  static const Color notifIconBlueBg = Color(0xFFEFF6FF);   // blue-50: weeklyOverspend
+  static const Color notifIconAmberBg = Color(0xFFFEF3C7);  // amber-100: overspend80
+  static const Color notifIconRedBg = Color(0xFFFEF2F2);    // red-50: overspend100
+
+  // Icon foreground colors
+  static const Color notifIconBlue = Color(0xFF3B82F6);   // blue-500
+  static const Color notifIconAmber = Color(0xFFFFAB40);  // amber: 80% warning
+  static const Color notifIconRed = Color(0xFFFF5252);    // red: 100% exceeded
+
+  // Badge on notification icon (home AppBar)
+  static const Color notifBadgeBg = Color(0xFFFF5252);    // red alert
+  static const Color notifBadgeFg = Colors.white;
+
+  // Card shadow color (iOS-style soft shadow)
+  static const Color notifCardShadow = Color(0x0D000000); // rgba(0,0,0,0.05)
 
   // ==========================================================================
   // DARK THEME

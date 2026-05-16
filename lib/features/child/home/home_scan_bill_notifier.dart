@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
-import 'package:monikid/features/child/chooseAImodel/choose_ai_model_provider.dart';
+import 'package:monikid/features/child/choose_ai_model/choose_ai_model_provider.dart';
 import 'package:monikid/features/child/home/ocr_service.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
@@ -51,6 +51,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
   late final Logger _logger;
   late final GeminiAiService _geminiService;
   late final HomeReceiptOcrService _ocrService;
+  bool _cancelled = false;
 
   @override
   HomeScanBillState build() {
@@ -60,6 +61,13 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
     return const HomeScanBillState();
   }
 
+  /// Cancels any in-progress scan. The underlying request is not aborted but
+  /// its result is discarded. State resets to idle immediately.
+  void cancel() {
+    _cancelled = true;
+    state = const HomeScanBillState();
+  }
+
   /// Runs the full OCR → AI pipeline for the given [selection].
   ///
   /// State transitions:
@@ -67,6 +75,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
   ///   idle → scanning → error               (OCR returned null)
   ///   idle → scanning → analyzing → error   (AI failed)
   Future<void> scanAndAnalyze(TransactionImageSelection selection) async {
+    _cancelled = false;
     state = state.copyWith(
       status: HomeScanBillStatus.scanning,
       errorMessage: null,
@@ -76,6 +85,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
 
     // ── Step 1: OCR ──────────────────────────────────────────────────────────
     final ocrResult = await _ocrService.scan(selection);
+    if (_cancelled) return;
     if (ocrResult == null) {
       _logger.w(
         'scanAndAnalyze: OCR returned null for file=${selection.fileName}.',
@@ -126,6 +136,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
         model: selectedModel,
       );
 
+      if (_cancelled) return;
       if (resultMap == null) {
         _logger.w('scanAndAnalyze: Gemini returned null/empty map.');
         state = state.copyWith(

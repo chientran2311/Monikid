@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/shared/widgets/skeleton.dart';
 
 class TransactionEditorLoadingSkeleton extends StatelessWidget {
@@ -101,8 +102,8 @@ class TransactionDetailLoadingSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? Colors.black : Colors.white;
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9);
+    final surfaceColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight;
+    final borderColor = isDark ? AppTheme.borderDark : AppTheme.surfaceLightGrey;
 
     return Container(
       color: bgColor,
@@ -143,7 +144,7 @@ class TransactionDetailLoadingSkeleton extends StatelessWidget {
               height: 128,
               width: double.infinity,
               borderRadius: 16,
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
             ),
           ],
         ),
@@ -164,8 +165,8 @@ class _DetailRowSkeleton extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E293B)
-                : const Color(0xFFF8FAFC),
+                ? AppTheme.surfaceVariant
+                : AppTheme.surfaceVeryLight,
             shape: BoxShape.circle,
           ),
           child: const Skeleton(height: 40, width: 40, borderRadius: 20),

@@ -122,6 +122,60 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @actionSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get actionSkip;
+
+  /// No description provided for @onboardingLanguageTitleLeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get onboardingLanguageTitleLeading;
+
+  /// No description provided for @onboardingLanguageTitleHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'language'**
+  String get onboardingLanguageTitleHighlight;
+
+  /// No description provided for @onboardingLanguageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose the language you want to use in the app.'**
+  String get onboardingLanguageDescription;
+
+  /// No description provided for @onboardingContinueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get onboardingContinueAction;
+
+  /// No description provided for @onboardingCurrencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose currency'**
+  String get onboardingCurrencyTitle;
+
+  /// No description provided for @onboardingCurrencyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose the currency you want to use to manage transactions in the app.'**
+  String get onboardingCurrencyDescription;
+
+  /// No description provided for @onboardingCurrencyVnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Vietnamese Dong (VND)'**
+  String get onboardingCurrencyVnd;
+
+  /// No description provided for @onboardingCurrencyUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'US Dollar (USD)'**
+  String get onboardingCurrencyUsd;
+
   /// No description provided for @validationEmptyFields.
   ///
   /// In en, this message translates to:
@@ -284,6 +338,36 @@ abstract class AppLocalizations {
   /// **'Check spending limits for your family members.'**
   String get homeParAlertWeeklyLimitBody;
 
+  /// No description provided for @homeParTopCategoryAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest spending in {category}'**
+  String homeParTopCategoryAlertTitle(String category);
+
+  /// No description provided for @homeParTopCategoryAlertBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view transaction details'**
+  String get homeParTopCategoryAlertBody;
+
+  /// No description provided for @homeParThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get homeParThisMonth;
+
+  /// No description provided for @homeParViewDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get homeParViewDetail;
+
+  /// No description provided for @homeParSpentPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent {percent}% of income'**
+  String homeParSpentPercent(String percent);
+
   /// No description provided for @noTransactionsYet.
   ///
   /// In en, this message translates to:
@@ -362,6 +446,18 @@ abstract class AppLocalizations {
   /// **'Confirm'**
   String get actionConfirm;
 
+  /// No description provided for @actionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get actionDone;
+
+  /// No description provided for @actionSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get actionSelect;
+
   /// No description provided for @validationInvalidAmount.
   ///
   /// In en, this message translates to:
@@ -427,6 +523,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date'**
   String get transactionDateLabel;
+
+  /// No description provided for @transactionHistorySelectDateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get transactionHistorySelectDateTitle;
 
   /// No description provided for @transactionNoteLabel.
   ///
@@ -500,11 +602,23 @@ abstract class AppLocalizations {
   /// **'TIME'**
   String get transactionDetailTimeLabel;
 
+  /// No description provided for @transactionDetailCreatedAtLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATED AT'**
+  String get transactionDetailCreatedAtLabel;
+
   /// No description provided for @transactionDetailNoteLabel.
   ///
   /// In en, this message translates to:
   /// **'NOTE'**
   String get transactionDetailNoteLabel;
+
+  /// No description provided for @transactionDetailEvidenceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EVIDENCE IMAGE'**
+  String get transactionDetailEvidenceLabel;
 
   /// No description provided for @transactionEditAction.
   ///
@@ -680,6 +794,12 @@ abstract class AppLocalizations {
   /// **'Change Avatar'**
   String get profileEditAvatarLabel;
 
+  /// No description provided for @profileEditAvatarDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a new photo or choose from gallery'**
+  String get profileEditAvatarDesc;
+
   /// No description provided for @profileEditFullName.
   ///
   /// In en, this message translates to:
@@ -733,6 +853,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Changes'**
   String get actionSaveChanges;
+
+  /// No description provided for @profileEditSaveSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileEditSaveSuccess;
+
+  /// No description provided for @profileEditErrorNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is required'**
+  String get profileEditErrorNameRequired;
+
+  /// No description provided for @profileEditErrorNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be at least 2 characters'**
+  String get profileEditErrorNameTooShort;
+
+  /// No description provided for @profileEditErrorInvalidPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Vietnamese phone number (e.g. 0912345678)'**
+  String get profileEditErrorInvalidPhone;
 
   /// No description provided for @editRequestTitle.
   ///
@@ -1076,6 +1220,12 @@ abstract class AppLocalizations {
   /// **'Month'**
   String get parentStatisticMonth;
 
+  /// No description provided for @parentStatisticYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get parentStatisticYear;
+
   /// No description provided for @parentStatisticBudgetTitle.
   ///
   /// In en, this message translates to:
@@ -1111,6 +1261,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data available yet'**
   String get parentStatisticNoData;
+
+  /// No description provided for @parentStatisticTotalSpentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Total spent'**
+  String get parentStatisticTotalSpentTitle;
+
+  /// No description provided for @parentStatisticVsLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'vs last month'**
+  String get parentStatisticVsLastMonth;
+
+  /// No description provided for @parentStatisticSpendingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'+{percent}%'**
+  String parentStatisticSpendingUp(String percent);
+
+  /// No description provided for @parentStatisticSpendingDown.
+  ///
+  /// In en, this message translates to:
+  /// **'-{percent}%'**
+  String parentStatisticSpendingDown(String percent);
+
+  /// No description provided for @parentStatisticSpendingStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stable'**
+  String get parentStatisticSpendingStable;
+
+  /// No description provided for @parentStatisticLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading spending statistics...'**
+  String get parentStatisticLoading;
+
+  /// No description provided for @parentStatisticLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load spending statistics.'**
+  String get parentStatisticLoadError;
+
+  /// No description provided for @parentStatisticRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get parentStatisticRetry;
+
+  /// No description provided for @parentStatisticSelectChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a child to view spending statistics.'**
+  String get parentStatisticSelectChild;
+
+  /// No description provided for @parentStatisticTransactionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}'**
+  String parentStatisticTransactionCount(int count);
 
   /// No description provided for @settingParTitle.
   ///
@@ -1159,6 +1369,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set weekly/monthly limits'**
   String get settingParSpendingLimitSubtitle;
+
+  /// No description provided for @settingParAppearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingParAppearanceTitle;
+
+  /// No description provided for @settingParThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Light/Dark mode'**
+  String get settingParThemeLabel;
 
   /// No description provided for @settingParNotificationsTitle.
   ///
@@ -1752,6 +1974,114 @@ abstract class AppLocalizations {
   /// **'Unable to analyze the bill. Please try again or enter manually.'**
   String get scanBillAiError;
 
+  /// No description provided for @scanBillLoadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Receipt'**
+  String get scanBillLoadingTitle;
+
+  /// No description provided for @scanBillScanningStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning receipt...'**
+  String get scanBillScanningStatus;
+
+  /// No description provided for @scanBillAnalyzingStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is analyzing...'**
+  String get scanBillAnalyzingStatus;
+
+  /// No description provided for @joinFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Family'**
+  String get joinFamilyTitle;
+
+  /// No description provided for @joinFamilySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit invite code from your parent'**
+  String get joinFamilySubtitle;
+
+  /// No description provided for @joinFamilyInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter code'**
+  String get joinFamilyInputHint;
+
+  /// No description provided for @joinFamilyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Family'**
+  String get joinFamilyButton;
+
+  /// No description provided for @joinFamilySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You have joined the family!'**
+  String get joinFamilySuccess;
+
+  /// No description provided for @joinFamilyErrorInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired invite code'**
+  String get joinFamilyErrorInvalidCode;
+
+  /// No description provided for @joinFamilyErrorAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already part of a family'**
+  String get joinFamilyErrorAlreadyMember;
+
+  /// No description provided for @joinFamilyErrorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to join. Please try again.'**
+  String get joinFamilyErrorUnknown;
+
+  /// No description provided for @unlinkFamilyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Family'**
+  String get unlinkFamilyTitle;
+
+  /// No description provided for @unlinkFamilySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are currently connected to a family'**
+  String get unlinkFamilySubtitle;
+
+  /// No description provided for @unlinkFamilyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Family'**
+  String get unlinkFamilyButton;
+
+  /// No description provided for @unlinkFamilyConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave family?'**
+  String get unlinkFamilyConfirmTitle;
+
+  /// No description provided for @unlinkFamilyConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You will leave this family. You can rejoin later with an invite code.'**
+  String get unlinkFamilyConfirmBody;
+
+  /// No description provided for @unlinkFamilySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You have left the family.'**
+  String get unlinkFamilySuccess;
+
+  /// No description provided for @unlinkFamilyErrorFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to leave family. Please try again.'**
+  String get unlinkFamilyErrorFailed;
+
   /// No description provided for @customCategoryAdd.
   ///
   /// In en, this message translates to:
@@ -1817,6 +2147,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add'**
   String get customCategoryConfirm;
+
+  /// No description provided for @customCategorySelectTitleExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Select expense category'**
+  String get customCategorySelectTitleExpense;
+
+  /// No description provided for @customCategorySelectTitleIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Select income category'**
+  String get customCategorySelectTitleIncome;
+
+  /// No description provided for @customCategorySelectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select category'**
+  String get customCategorySelectTitle;
+
+  /// No description provided for @customCategoryConfirmSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get customCategoryConfirmSelection;
+
+  /// No description provided for @setMoneyLimitManagedByParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending limit is managed by parent'**
+  String get setMoneyLimitManagedByParent;
+
+  /// No description provided for @parentSetLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set monthly spending limit'**
+  String get parentSetLimitTitle;
+
+  /// No description provided for @parentSetLimitDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This limit helps your child stay in control of their spending each month'**
+  String get parentSetLimitDescription;
+
+  /// No description provided for @notifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifTitle;
+
+  /// No description provided for @notifMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get notifMarkAllRead;
+
+  /// No description provided for @notifEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get notifEmpty;
+
+  /// No description provided for @notifOverspend80Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Approaching limit'**
+  String get notifOverspend80Title;
+
+  /// No description provided for @notifOverspend80Body.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve spent {amount} — 80% of your {month} limit.'**
+  String notifOverspend80Body(Object amount, Object month);
+
+  /// No description provided for @notifOverspend100Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit exceeded'**
+  String get notifOverspend100Title;
+
+  /// No description provided for @notifOverspend100Body.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve spent {amount} — exceeded your {month} limit.'**
+  String notifOverspend100Body(Object amount, Object month);
+
+  /// No description provided for @notifWeeklyOverspendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending spike'**
+  String get notifWeeklyOverspendTitle;
+
+  /// No description provided for @notifWeeklyOverspendBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You spent {percent}% more this week than last week.'**
+  String notifWeeklyOverspendBody(Object percent);
+
+  /// No description provided for @notifParentOverspend80Body.
+  ///
+  /// In en, this message translates to:
+  /// **'{childName} has spent 80% of the {month} limit.'**
+  String notifParentOverspend80Body(Object childName, Object month);
+
+  /// No description provided for @notifParentOverspend100Body.
+  ///
+  /// In en, this message translates to:
+  /// **'{childName} has exceeded the {month} limit.'**
+  String notifParentOverspend100Body(Object childName, Object month);
+
+  /// No description provided for @notifParentWeeklyOverspendBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{childName} spent {percent}% more this week than last week.'**
+  String notifParentWeeklyOverspendBody(Object childName, Object percent);
+
+  /// No description provided for @familyManagementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Family'**
+  String get familyManagementTitle;
+
+  /// No description provided for @familyManagementEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No family found'**
+  String get familyManagementEmptyMessage;
+
+  /// No description provided for @familyManagementErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading family data'**
+  String get familyManagementErrorMessage;
+
+  /// No description provided for @familyManagementHostBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Host'**
+  String get familyManagementHostBadge;
+
+  /// No description provided for @familyManagementHostSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family host'**
+  String get familyManagementHostSubtitle;
+
+  /// No description provided for @familyManagementParentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get familyManagementParentSubtitle;
+
+  /// No description provided for @familyManagementInviteCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Family invite code'**
+  String get familyManagementInviteCodeLabel;
+
+  /// No description provided for @familyManagementCopyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get familyManagementCopyTooltip;
+
+  /// No description provided for @familyManagementCopySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite code copied'**
+  String get familyManagementCopySuccess;
+
+  /// No description provided for @familyManagementSectionMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'MEMBERS'**
+  String get familyManagementSectionMembers;
+
+  /// No description provided for @familyManagementChildrenSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Children'**
+  String get familyManagementChildrenSection;
+
+  /// No description provided for @familyManagementParentsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents'**
+  String get familyManagementParentsSection;
+
+  /// No description provided for @familyManagementHostParentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'(Host Parent)'**
+  String get familyManagementHostParentLabel;
+
+  /// No description provided for @familyManagementNonHostParentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'(Non-host Parent)'**
+  String get familyManagementNonHostParentLabel;
+
+  /// No description provided for @familyManagementSetLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Set limit'**
+  String get familyManagementSetLimit;
+
+  /// No description provided for @familyManagementUnlinkChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get familyManagementUnlinkChild;
+
+  /// No description provided for @familyManagementUnlinkParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get familyManagementUnlinkParent;
+
+  /// No description provided for @familyManagementNoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get familyManagementNoLimit;
+
+  /// No description provided for @familyManagementEmptyChildren.
+  ///
+  /// In en, this message translates to:
+  /// **'No members yet'**
+  String get familyManagementEmptyChildren;
+
+  /// No description provided for @familyManagementUnlinkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get familyManagementUnlinkButton;
+
+  /// No description provided for @familyManagementSetLimitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Limit'**
+  String get familyManagementSetLimitButton;
+
+  /// No description provided for @familyManagementRemoveLimitButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Limit'**
+  String get familyManagementRemoveLimitButton;
+
+  /// No description provided for @familyManagementLimitDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set spending limit'**
+  String get familyManagementLimitDialogTitle;
+
+  /// No description provided for @familyManagementLimitInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0'**
+  String get familyManagementLimitInputHint;
+
+  /// No description provided for @familyManagementRemoveLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove limit'**
+  String get familyManagementRemoveLimit;
+
+  /// No description provided for @familyManagementSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get familyManagementSave;
+
+  /// No description provided for @familyManagementCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get familyManagementCancel;
+
+  /// No description provided for @familyManagementUnlinkConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink member?'**
+  String get familyManagementUnlinkConfirmTitle;
+
+  /// No description provided for @familyManagementUnlinkConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unlink {name}?'**
+  String familyManagementUnlinkConfirmBody(Object name);
+
+  /// No description provided for @familyManagementUnlinkConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get familyManagementUnlinkConfirmButton;
+
+  /// No description provided for @familyManagementConfirmUnlinkChildTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Unlink'**
+  String get familyManagementConfirmUnlinkChildTitle;
+
+  /// No description provided for @familyManagementConfirmUnlinkChildMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unlink {childName}?'**
+  String familyManagementConfirmUnlinkChildMessage(Object childName);
+
+  /// No description provided for @familyManagementConfirmUnlinkParentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Unlink'**
+  String get familyManagementConfirmUnlinkParentTitle;
+
+  /// No description provided for @familyManagementConfirmUnlinkParentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unlink {parentName}?'**
+  String familyManagementConfirmUnlinkParentMessage(Object parentName);
+
+  /// No description provided for @familyManagementLimitSetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending limit updated'**
+  String get familyManagementLimitSetSuccess;
+
+  /// No description provided for @familyManagementLimitRemovedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending limit removed'**
+  String get familyManagementLimitRemovedSuccess;
+
+  /// No description provided for @familyManagementUnlinkSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked successfully'**
+  String get familyManagementUnlinkSuccess;
+
+  /// No description provided for @familyManagementUnlinkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error unlinking'**
+  String get familyManagementUnlinkError;
+
+  /// No description provided for @familyManagementSetLimitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit set successfully'**
+  String get familyManagementSetLimitSuccess;
+
+  /// No description provided for @familyManagementSetLimitError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error setting limit'**
+  String get familyManagementSetLimitError;
+
+  /// No description provided for @familyManagementRemoveLimitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit removed successfully'**
+  String get familyManagementRemoveLimitSuccess;
+
+  /// No description provided for @familyManagementRemoveLimitError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error removing limit'**
+  String get familyManagementRemoveLimitError;
 }
 
 class _AppLocalizationsDelegate

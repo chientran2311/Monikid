@@ -18,21 +18,20 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
     @Default([]) List<TransactionModel> transactions,
     @Default(TransactionHistorySharedStatus.initial)
     TransactionHistorySharedStatus sharedStatus,
-    String? selectedTransactionId,
-    TransactionModel? selectedTransaction,
     @Default(true) bool isLoading,
     @Default(false) bool isListLoading,
     @Default(false) bool isLoadingMore,
-    @Default(false) bool isResolvingSelection,
     @Default(true) bool hasMore,
-    DateTime? selectedDate,
-    String? selectedCategoryKey,
-    // 'all' | 'income' | 'expense'
-    @Default('all') String transactionTypeFilter,
     @Default(8) int monthLimit,
-    String? selectionErrorMessage,
     String? sharedErrorMessage,
     String? errorMessage,
+    // Legacy state properties kept for backward compatibility
+    DateTime? selectedDate,
+    String? transactionTypeFilter,
+    String? selectedCategoryKey,
+    TransactionModel? selectedTransaction,
+    String? selectedTransactionId,
+    String? selectionErrorMessage,
   }) = _TransactionHistoryState;
 
   const TransactionHistoryState._();
@@ -41,6 +40,4 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
   bool get hasSharedData =>
       sharedStatus == TransactionHistorySharedStatus.success ||
       sharedStatus == TransactionHistorySharedStatus.empty;
-  bool get hasSelectedTransaction =>
-      selectedTransactionId != null && selectedTransaction != null;
 }

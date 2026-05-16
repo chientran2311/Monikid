@@ -13,6 +13,7 @@ class FamilyMembersSection extends StatelessWidget {
     required this.selectedMemberId,
     required this.inviteCode,
     required this.onMemberTap,
+    required this.onSetLimitTap,
   });
 
   final bool isDark;
@@ -20,6 +21,7 @@ class FamilyMembersSection extends StatelessWidget {
   final String? selectedMemberId;
   final String inviteCode;
   final ValueChanged<String> onMemberTap;
+  final ValueChanged<String> onSetLimitTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +53,10 @@ class FamilyMembersSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 96.h,
+          height: 104.h,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 8.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
             physics: const BouncingScrollPhysics(),
             children: [
               ...members.map((member) {
@@ -67,6 +69,7 @@ class FamilyMembersSection extends StatelessWidget {
                     textColor: textColor,
                     mutedColor: mutedColor,
                     onTap: () => onMemberTap(member.uid),
+                    onSetLimitTap: () => onSetLimitTap(member.uid),
                   ),
                 );
               }),
@@ -89,6 +92,7 @@ class _MemberAvatar extends StatelessWidget {
     required this.textColor,
     required this.mutedColor,
     required this.onTap,
+    required this.onSetLimitTap,
   });
 
   final FamilyMemberModel member;
@@ -96,47 +100,77 @@ class _MemberAvatar extends StatelessWidget {
   final Color textColor;
   final Color mutedColor;
   final VoidCallback onTap;
+  final VoidCallback onSetLimitTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 64.r,
-            height: 64.r,
-            padding: EdgeInsets.all(isSelected ? 2.r : 0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: isSelected
-                  ? Border.all(color: AppTheme.primary, width: 2)
-                  : null,
+      child: SizedBox(
+        width: 72.w,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 64.r,
+                  height: 64.r,
+                  padding: EdgeInsets.all(isSelected ? 2.r : 0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: isSelected
+                        ? Border.all(color: AppTheme.primary, width: 2)
+                        : null,
+                  ),
+                  child: ClipOval(
+                    child: member.avatarUrl != null
+                        ? Image.network(
+                            member.avatarUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                _InitialAvatar(name: member.displayName),
+                          )
+                        : _InitialAvatar(name: member.displayName),
+                  ),
+                ),
+                Positioned(
+                  top: -4,
+                  right: -4,
+                  child: GestureDetector(
+                    onTap: onSetLimitTap,
+                    child: Container(
+                      width: 22.r,
+                      height: 22.r,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: Icon(
+                        Icons.tune_rounded,
+                        size: 12.sp,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            child: ClipOval(
-              child: member.avatarUrl != null
-                  ? Image.network(
-                      member.avatarUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _InitialAvatar(name: member.displayName),
-                    )
-                  : _InitialAvatar(name: member.displayName),
+            SizedBox(height: 6.h),
+            Text(
+              member.displayName,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? textColor : mutedColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            member.displayName,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? textColor : mutedColor,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

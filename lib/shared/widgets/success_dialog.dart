@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 
@@ -29,12 +30,12 @@ class SuccessDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.2),
+      barrierColor: Colors.black.withValues(alpha: 0.2),
       builder: (context) => SuccessDialog(
         title: title,
         message: message,
         buttonText: buttonText,
-        onPressed: onPressed ?? () => Navigator.of(context).pop(),
+        onPressed: onPressed ?? () => context.pop(),
         icon: icon,
       ),
     );
@@ -50,11 +51,11 @@ class SuccessDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 40,
               offset: const Offset(0, 16),
             ),
@@ -67,7 +68,7 @@ class SuccessDialog extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppTheme.primary, size: 40),
@@ -76,7 +77,7 @@ class SuccessDialog extends StatelessWidget {
             Text(
               title,
               style: context.typo.title.medium.copyWith(
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark,
               ),
             ),
             const SizedBox(height: 8),
@@ -85,9 +86,7 @@ class SuccessDialog extends StatelessWidget {
               textAlign: TextAlign.center,
               style: context.typo.text.medium.copyWith(
                 height: 1.5,
-                color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
+                color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
               ),
             ),
             const SizedBox(height: 24),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/app/app.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
 
 class ChangeLanguageDialog extends ConsumerWidget {
@@ -9,8 +11,8 @@ class ChangeLanguageDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final surfaceColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark;
 
     // Defaultly hardcoding 2 supported locales for now.
     // In a real app, this might be tied to a Riverpod Provider that manages Locale state
@@ -41,8 +43,8 @@ class ChangeLanguageDialog extends ConsumerWidget {
                 width: 48,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
+                      ? AppTheme.borderDark
+                      : AppTheme.borderLight,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -63,12 +65,12 @@ class ChangeLanguageDialog extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => context.pop(),
                     icon: Icon(
                       Icons.close,
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? AppTheme.textMuted
+                          : AppTheme.textGrey,
                     ),
                     splashRadius: 24,
                     padding: EdgeInsets.zero,
@@ -91,7 +93,7 @@ class ChangeLanguageDialog extends ConsumerWidget {
                       onTap: () async {
                         await ref.read(changeLanguageProvider.notifier).setLanguage(lang['code']!);
                         if (context.mounted) {
-                          Navigator.pop(context, lang['code']);
+                          context.pop(lang['code']);
                         }
                       },
                       child: Container(
@@ -99,15 +101,15 @@ class ChangeLanguageDialog extends ConsumerWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Theme.of(context).primaryColor.withOpacity(0.1)
+                              ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: isSelected
                                 ? Theme.of(context).primaryColor
                                 : isDark
-                                  ? const Color(0xFF334155)
-                                  : const Color(0xFFE2E8F0),
+                                  ? AppTheme.borderDark
+                                  : AppTheme.borderLight,
                             width: 1.5,
                           ),
                         ),
@@ -136,8 +138,8 @@ class ChangeLanguageDialog extends ConsumerWidget {
                               Icon(
                                 Icons.circle_outlined,
                                 color: isDark
-                                  ? const Color(0xFF64748B)
-                                  : const Color(0xFF94A3B8),
+                                  ? AppTheme.textGrey
+                                  : AppTheme.textMuted,
                                 size: 24,
                               ),
                           ],
@@ -153,11 +155,11 @@ class ChangeLanguageDialog extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
               child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFF0F172A),
+                      ? AppTheme.borderDark
+                      : AppTheme.surfaceVeryDark,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   minimumSize: const Size(double.infinity, 56),

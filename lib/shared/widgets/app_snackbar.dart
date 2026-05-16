@@ -54,8 +54,8 @@ class _SnackBarContent extends StatelessWidget {
     ScreenUtils.init(context);
 
     final cfg = _configFor(type);
-    const textColor = Color(0xFF1F2937);
-    const closeColor = Color(0xFF9CA3AF);
+    final textColor = AppTheme.textBlack;
+    final closeColor = AppTheme.textGrey;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14.r),

@@ -36,7 +36,7 @@ class TransactionItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -50,8 +50,8 @@ class TransactionItem extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: isExpense
-                    ? Colors.redAccent.withOpacity(0.1)
-                    : Colors.green.withOpacity(0.1),
+                    ? Colors.redAccent.withValues(alpha: 0.1)
+                    : Colors.green.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -73,7 +73,7 @@ class TransactionItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? AppTheme.textWhite : AppTheme.surfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -85,8 +85,8 @@ class TransactionItem extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? AppTheme.textMuted
+                            : AppTheme.textGrey,
                       ),
                     ),
                   const SizedBox(height: 4),
@@ -95,8 +95,8 @@ class TransactionItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF94A3B8),
+                          ? AppTheme.textMuted
+                          : AppTheme.textMuted,
                     ),
                   ),
                 ],

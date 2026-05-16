@@ -1,8 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:monikid/core/config/storage_keys.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/core/storage/local_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'set_money_limit_repository.g.dart';
@@ -23,24 +22,30 @@ abstract class SetMoneyLimitRepository {
   Future<void> clearMonthlyLimitMinor(String userId);
 }
 
-class SetMoneyLimitRepositoryImpl implements SetMoneyLimitRepository {
-  SetMoneyLimitRepositoryImpl(this._localStorage, this._logger);
+class FirestoreSpendingLimitRepositoryImpl implements SetMoneyLimitRepository {
+  FirestoreSpendingLimitRepositoryImpl({
+    required FirebaseFirestore firestore,
+    required Logger logger,
+  })  : _firestore = firestore,
+        _logger = logger;
 
-  final AppLocalStorage _localStorage;
+  final FirebaseFirestore _firestore;
   final Logger _logger;
+
+  DocumentReference<Map<String, dynamic>> _userDoc(String userId) =>
+      _firestore.collection('users').doc(userId);
 
   @override
   Future<int?> readMonthlyLimitMinor(String userId) async {
     try {
-      final rawValue = _localStorage.readSync(_storageKey(userId));
-      if (rawValue == null || rawValue.isEmpty) {
-        return null;
-      }
-
-      return int.tryParse(rawValue);
+      final snap = await _userDoc(userId).get();
+      final data = snap.data();
+      if (data == null) return null;
+      final raw = data['monthly_limit_minor'];
+      return raw is int ? raw : null;
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to read the monthly spending limit from local storage.',
+        'Failed to read monthly_limit_minor from Firestore.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -54,14 +59,14 @@ class SetMoneyLimitRepositoryImpl implements SetMoneyLimitRepository {
     required int amountMinor,
   }) async {
     try {
-      await _localStorage.write(
-        key: _storageKey(userId),
-        value: amountMinor.toString(),
+      await _userDoc(userId).set(
+        {'monthly_limit_minor': amountMinor},
+        SetOptions(merge: true),
       );
-      _logger.i('Saved the monthly spending limit for userId=$userId.');
+      _logger.i('Saved monthly_limit_minor=$amountMinor for userId=$userId.');
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to save the monthly spending limit to local storage.',
+        'Failed to save monthly_limit_minor to Firestore.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -72,19 +77,17 @@ class SetMoneyLimitRepositoryImpl implements SetMoneyLimitRepository {
   @override
   Future<void> clearMonthlyLimitMinor(String userId) async {
     try {
-      await _localStorage.delete(key: _storageKey(userId));
-      _logger.i('Cleared the monthly spending limit for userId=$userId.');
+      await _userDoc(userId).update({
+        'monthly_limit_minor': FieldValue.delete(),
+      });
+      _logger.i('Cleared monthly_limit_minor for userId=$userId.');
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to clear the monthly spending limit from local storage.',
+        'Failed to clear monthly_limit_minor from Firestore.',
         error: error,
         stackTrace: stackTrace,
       );
       rethrow;
     }
-  }
-
-  String _storageKey(String userId) {
-    return '${StorageKeys.monthlyLimitMinorPrefix}_$userId';
   }
 }

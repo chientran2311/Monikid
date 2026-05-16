@@ -16,12 +16,14 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtils.init(context);
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final resolvedBackgroundColor =
         backgroundColor ??
         (isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight)
             .withValues(alpha: 0.92);
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
     return Material(
       color: resolvedBackgroundColor,

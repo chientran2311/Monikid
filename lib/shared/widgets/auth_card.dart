@@ -16,13 +16,13 @@ class AuthCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16), // rounded-2xl
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15, // shadow-lg equivalent
             spreadRadius: -3,
             offset: const Offset(0, 10),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             spreadRadius: -2,
             offset: const Offset(0, 4),

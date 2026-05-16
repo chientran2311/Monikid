@@ -24,6 +24,7 @@ abstract class UpdateTransactionState with _$UpdateTransactionState {
     Uint8List? newEvidenceImageBytes,
     String? newEvidenceImageFileName,
     String? newEvidenceImageMimeType,
+    String? newEvidenceImageFilePath,
     @Default(false) bool removeExistingEvidenceImage,
     String? errorMessage,
   }) = _UpdateTransactionState;
@@ -43,4 +44,8 @@ abstract class UpdateTransactionState with _$UpdateTransactionState {
       newEvidenceImageMimeType != null;
   bool get hasExistingEvidenceImage =>
       originalTransaction?.hasEvidenceImage == true && !removeExistingEvidenceImage;
+  String? get effectiveEvidenceImageFileName =>
+      newEvidenceImageFileName ?? (hasExistingEvidenceImage ? 'evidence.jpg' : null);
+  bool get hasEvidenceUrl => hasExistingEvidenceImage;
+  bool get canSubmit => !isLoading && !isSubmitting && hasTransaction;
 }

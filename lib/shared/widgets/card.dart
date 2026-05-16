@@ -17,14 +17,14 @@ class Card extends StatelessWidget {
           colors: [
             AppTheme.primaryGreen,
             AppTheme.surface,
-            AppTheme.surface.withOpacity(0.8),
+            AppTheme.surface.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white10),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -49,7 +49,7 @@ class Card extends StatelessWidget {
               ),
               Icon(
                 Icons.visibility_outlined,
-                color: AppTheme.textGrey.withOpacity(0.5),
+                color: AppTheme.textGrey.withValues(alpha: 0.5),
               ),
             ],
           ),

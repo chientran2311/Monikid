@@ -57,7 +57,6 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         members: members,
       );
 
-      // Auto-select first child
       if (members.isNotEmpty) {
         await selectMember(members.first.uid);
       }
@@ -100,7 +99,10 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         error: error,
         stackTrace: stackTrace,
       );
-      state = state.copyWith(isLoadingMemberData: false);
+      state = state.copyWith(
+        isLoadingMemberData: false,
+        errorMessage: error.toString(),
+      );
     }
   }
 
@@ -125,6 +127,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
           selectedMemberId: null,
           selectedMemberTransactions: const [],
         );
+        await ref.read(authSessionProvider.notifier).refreshSession();
       }
     } catch (error, stackTrace) {
       _logger.e('Failed to create family', error: error, stackTrace: stackTrace);
@@ -143,8 +146,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
     }
 
     try {
-      final members =
-          await _familyRepo.watchFamilyMembers(familyId).first;
+      final members = await _familyRepo.watchFamilyMembers(familyId).first;
       state = state.copyWith(members: members);
       final selectedId = state.selectedMemberId;
       if (selectedId != null) {
@@ -154,6 +156,22 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
       }
     } catch (error, stackTrace) {
       _logger.e('Failed to refresh parent home', error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> setChildLimit({
+    required String childUid,
+    required int amountMinor,
+  }) async {
+    try {
+      await _dashRepo.setChildMonthlyLimit(
+        childUid: childUid,
+        amountMinor: amountMinor,
+      );
+      _logger.i('Set limit amountMinor=$amountMinor for child=$childUid.');
+    } catch (error, stackTrace) {
+      _logger.e('Failed to set child limit.', error: error, stackTrace: stackTrace);
+      rethrow;
     }
   }
 

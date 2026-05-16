@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -28,7 +29,7 @@ class InviteCodeSheet extends StatelessWidget {
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor =
-        isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+        isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Container(
       margin: EdgeInsets.all(12.r),
@@ -105,6 +106,7 @@ class InviteCodeSheet extends StatelessWidget {
                       ClipboardData(text: inviteCode));
                   if (!context.mounted) return;
                   context.showSuccessSnackBar(s.homeParCodeCopied);
+                  context.pop();
                 },
                 icon: Icon(Icons.copy_rounded, size: 18.r),
                 label: Text(
@@ -126,34 +128,7 @@ class InviteCodeSheet extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12.h),
-
-          // Done button
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: mutedColor,
-                  side: BorderSide(color: borderColor),
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Text(
-                  s.actionCancel,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 24.h),
         ],
       ),
     );

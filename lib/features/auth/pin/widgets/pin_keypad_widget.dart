@@ -94,14 +94,14 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
                           color: isFilled
                               ? activeColor
                               : (isDark
-                                    ? const Color(0xFF1E293B)
-                                    : const Color(0xFFE2E8F0)),
+                                    ? AppTheme.surfaceVariant
+                                    : AppTheme.borderLight),
                           border: Border.all(
                             color: isFilled
                                 ? activeColor
                                 : (isDark
-                                      ? const Color(0xFF334155)
-                                      : const Color(0xFFE2E8F0)),
+                                      ? AppTheme.borderDark
+                                      : AppTheme.borderLight),
                             width: 2,
                           ),
                         ),
@@ -159,7 +159,7 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
 
   Widget _buildKey(BuildContext context, String value, bool isDark, {IconData? icon}) {
     final bgColor = isDark
-        ? const Color(0xFF1E293B).withOpacity(0.5)
+        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
         : const Color(0xFFF8FAFC);
     final textColor =
         isDark ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B);

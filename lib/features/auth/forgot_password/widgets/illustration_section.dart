@@ -19,8 +19,8 @@ class IllustrationSection extends StatelessWidget {
         height: illustrationSize,
         decoration: BoxDecoration(
           color: isDark
-              ? AppTheme.primary.withOpacity(0.1)
-              : AppTheme.primary.withOpacity(0.05),
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : AppTheme.primary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Stack(
@@ -34,7 +34,7 @@ class IllustrationSection extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppTheme.primary.withOpacity(0.2),
+                      AppTheme.primary.withValues(alpha: 0.2),
                       Colors.transparent,
                     ],
                   ),
@@ -55,7 +55,7 @@ class IllustrationSection extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primary.withOpacity(0.3),
+                          color: AppTheme.primary.withValues(alpha: 0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -93,7 +93,7 @@ class IllustrationSection extends StatelessWidget {
       width: 8,
       height: 8,
       decoration: BoxDecoration(
-        color: AppTheme.primary.withOpacity(opacity),
+        color: AppTheme.primary.withValues(alpha: opacity),
         shape: BoxShape.circle,
       ),
     );

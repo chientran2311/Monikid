@@ -21,9 +21,9 @@ class SettingTabStudent extends ConsumerWidget {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
     final mutedColor =
-        isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+        isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     final langCode =
         ref.watch(changeLanguageProvider).localeCode;
@@ -127,7 +127,7 @@ class SettingTabStudent extends ConsumerWidget {
                     size: 18.r,
                     color: mutedColor,
                   ),
-                  onTap: () {},
+                  onTap: () => context.push(AppRoutes.joinFamily),
                 ),
                 SettingItem(
                   icon: Icons.lock_reset_rounded,

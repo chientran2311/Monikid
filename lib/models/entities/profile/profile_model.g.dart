@@ -12,9 +12,9 @@ _ProfileModel _$ProfileModelFromJson(Map<String, dynamic> json) =>
       avatarUrl: json['avatarUrl'] as String?,
       fullName: json['fullName'] as String,
       email: json['email'] as String,
-      phone: json['phone'] as String?,
-      dob: json['dob'] as String?,
-      gender: json['gender'] as String?,
+      phone: json['phone'] as String? ?? '',
+      dob: json['dob'] as String? ?? '',
+      gender: json['gender'] as String? ?? '',
       role: json['role'] as String,
     );
 

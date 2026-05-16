@@ -25,7 +25,7 @@ class RegisterHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: context.typo.text.medium.copyWith(
             color:
-                isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                isDark ? AppTheme.textMuted : AppTheme.textGrey,
           ),
         ),
       ],

@@ -20,9 +20,12 @@ class FamilyManagementState with _$FamilyManagementState {
     @Default(FamilyManagementStatus.initial) FamilyManagementStatus status,
     FamilyModel? family,
     @Default([]) List<FamilyMemberModel> members,
+    @Default({}) Map<String, int?> monthlyLimits,
     String? errorMessage,
     @Default(false) bool isProcessing,
   }) = _FamilyManagementState;
+
+  bool get isLoading => status == FamilyManagementStatus.loading;
 
   List<FamilyMemberModel> get activeMembers =>
       members.where((m) => m.status == 'active').toList();

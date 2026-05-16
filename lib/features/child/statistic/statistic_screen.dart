@@ -20,8 +20,6 @@ import 'package:monikid/features/child/statistic/widgets/statistic_top_categorie
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 
-import 'package:monikid/shared/widgets/main_app_bar.dart';
-
 import 'statistic_models.dart';
 import 'statistic_provider.dart';
 
@@ -85,16 +83,31 @@ class StatisticScreen extends HookConsumerWidget {
       await notifier.refresh();
     }
 
+    final textColor = isDark ? Colors.white : AppTheme.textBlack;
+
     return Scaffold(
       backgroundColor:
           isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      appBar: const MainAppBar(),
-      body: RefreshIndicator(
-        onRefresh: notifier.refresh,
-        child: CustomScrollView(
-          controller: scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: notifier.refresh,
+          child: CustomScrollView(
+            controller: scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 0),
+                  child: Text(
+                    context.l10n.statisticTitle,
+                    style: TextStyle(
+                      fontSize: 30.sp,
+                      fontWeight: FontWeight.w700,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 32.h),
@@ -180,6 +193,7 @@ class StatisticScreen extends HookConsumerWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

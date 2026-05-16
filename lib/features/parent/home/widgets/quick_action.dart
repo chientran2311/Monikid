@@ -22,8 +22,8 @@ class QuickAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = isPrimary
         ? (isDark
-              ? parentPrimary.withOpacity(0.2)
-              : parentPrimary.withOpacity(0.1))
+              ? parentPrimary.withValues(alpha: 0.2)
+              : parentPrimary.withValues(alpha: 0.1))
         : (isDark ? const Color(0xFF1E2E1A) : Colors.white);
 
     final iconColor = isPrimary
@@ -53,7 +53,7 @@ class QuickAction extends StatelessWidget {
                 boxShadow: [
                   if (!isDark && !isPrimary)
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),

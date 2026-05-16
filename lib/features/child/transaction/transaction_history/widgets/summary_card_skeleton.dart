@@ -24,7 +24,7 @@ class SummaryCardSkeleton extends StatelessWidget {
             width: 120,
             height: 10,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -33,7 +33,7 @@ class SummaryCardSkeleton extends StatelessWidget {
             width: 180,
             height: 26,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(6),
             ),
           ),
@@ -44,7 +44,7 @@ class SummaryCardSkeleton extends StatelessWidget {
                 child: Container(
                   height: 20,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -54,7 +54,7 @@ class SummaryCardSkeleton extends StatelessWidget {
                 child: Container(
                   height: 20,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),

@@ -39,7 +39,7 @@ class ActionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             if (!isDark)
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4),
           ],
         ),
         child: Row(

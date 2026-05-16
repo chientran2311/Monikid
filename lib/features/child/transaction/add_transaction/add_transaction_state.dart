@@ -13,6 +13,7 @@ abstract class AddTransactionState with _$AddTransactionState {
     Uint8List? evidenceImageBytes,
     String? evidenceImageFileName,
     String? evidenceImageMimeType,
+    String? evidenceImageFilePath,
   }) = _AddTransactionState;
 
   const AddTransactionState._();

@@ -31,11 +31,13 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
     required Uint8List bytes,
     required String fileName,
     required String mimeType,
+    String? filePath,
   }) {
     state = state.copyWith(
       evidenceImageBytes: bytes,
       evidenceImageFileName: fileName,
       evidenceImageMimeType: mimeType,
+      evidenceImageFilePath: filePath,
       status: TransactionStatus.ready,
       errorMessage: null,
     );
@@ -65,6 +67,7 @@ class AddTransactionNotifier extends _$AddTransactionNotifier {
               fileName: state.evidenceImageFileName!,
               mimeType: state.evidenceImageMimeType!,
               categoryKey: transaction.categoryKey,
+              filePath: state.evidenceImageFilePath,
             )
           : null;
       await _repository.addTransaction(

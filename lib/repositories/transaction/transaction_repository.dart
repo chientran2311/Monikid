@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -47,7 +48,7 @@ abstract class TransactionRepository {
     String transactionId,
   );
 
-  Stream<TransactionMonthRecord> getTransactionsByMonth(
+  Future<TransactionMonthRecord> getTransactionsByMonth(
     String userId,
     DateTime month, {
     int? limit,
@@ -92,12 +93,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
     this._evidenceStorage,
     this._logger,
     this._summaryRepo,
+    this._ocrService,
   );
 
   final FirebaseFirestore _firestore;
   final TransactionEvidenceStorage _evidenceStorage;
   final Logger _logger;
   final MonthlySummaryRepository _summaryRepo;
+  final ReceiptOcrService _ocrService;
 
   String _monthKey(DateTime date) => DateFormat('yyyy-MM').format(date);
 
@@ -118,11 +121,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     try {
       if (evidenceUpload != null) {
+        final (recipientName, transactionDate) = await _resolveOcrMetadata(evidenceUpload);
         uploadedEvidenceImage = await _evidenceStorage
             .uploadEvidenceImage(
               userId: transaction.userId,
               transactionId: transaction.transactionId,
               payload: evidenceUpload,
+              recipientName: recipientName,
+              transactionDate: transactionDate,
             )
             .timeout(uploadTimeout);
       }
@@ -178,11 +184,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     try {
       if (newEvidenceUpload != null) {
+        final (recipientName, transactionDate) = await _resolveOcrMetadata(newEvidenceUpload);
         uploadedEvidenceImage = await _evidenceStorage
             .uploadEvidenceImage(
               userId: transaction.userId,
               transactionId: transaction.transactionId,
               payload: newEvidenceUpload,
+              recipientName: recipientName,
+              transactionDate: transactionDate,
             )
             .timeout(uploadTimeout);
       }
@@ -282,12 +291,12 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Stream<TransactionMonthRecord> getTransactionsByMonth(
+  Future<TransactionMonthRecord> getTransactionsByMonth(
     String userId,
     DateTime month, {
     int? limit,
     String? type,
-  }) {
+  }) async {
     final range = _monthRange(month);
 
     Query<Map<String, dynamic>> query = _transactionsOfUser(userId)
@@ -306,20 +315,18 @@ class TransactionRepositoryImpl implements TransactionRepository {
       query = query.limit(limit);
     }
 
-    return query
-        .snapshots()
-        .map((snapshot) {
-          final transactions = snapshot.docs.map(_mapTransaction).toList();
-          return (transactions: transactions, month: month);
-        })
-        .handleError((error, stackTrace) {
-          _logger.e(
-            'Failed to listen transactions by month.',
-            error: error,
-            stackTrace: stackTrace,
-          );
-          throw error;
-        });
+    try {
+      final snapshot = await query.get();
+      final transactions = snapshot.docs.map(_mapTransaction).toList();
+      return (transactions: transactions, month: month);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to fetch transactions by month.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -523,10 +530,32 @@ class TransactionRepositoryImpl implements TransactionRepository {
       await _evidenceStorage.deleteEvidenceImage(storagePath);
     } catch (error, stackTrace) {
       _logger.e(
-        'Evidence cleanup failed for $storagePath.',
+        'Failed to clean up uploaded evidence after error.',
         error: error,
         stackTrace: stackTrace,
       );
+    }
+  }
+
+  Future<(String recipientName, DateTime transactionDate)> _resolveOcrMetadata(
+    TransactionEvidenceUploadPayload payload,
+  ) async {
+    if (payload.filePath == null) {
+      return ('unknown', DateTime.now());
+    }
+    try {
+      final result = await _ocrService.extractFromImage(filePath: payload.filePath!);
+      return (
+        result?.merchantName ?? 'unknown',
+        result?.transactionDate ?? DateTime.now(),
+      );
+    } catch (error, stackTrace) {
+      _logger.w(
+        'OCR failed for evidence image; using fallback metadata.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      return ('unknown', DateTime.now());
     }
   }
 

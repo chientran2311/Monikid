@@ -20,7 +20,7 @@ class NoFamilyEmptyState extends StatelessWidget {
     final s = context.l10n;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor =
-        isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+        isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Center(
       child: Padding(

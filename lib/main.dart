@@ -1,9 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/firebase_options.dart';
+import 'package:monikid/core/utils/logger.dart';
 
 import 'app/app.dart';
 import 'package:monikid/core/di/di.dart';
@@ -15,8 +16,12 @@ void main() async {
   // Load environment variables (non-fatal if .env is empty/missing)
   try {
     await dotenv.load(fileName: '.env');
-  } catch (e) {
-    debugPrint('⚠️ Could not load .env file: $e');
+  } catch (error, stackTrace) {
+    logger.w(
+      'Could not load the .env file. Continuing with defaults.',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   // Set preferred orientations (portrait only for mobile)

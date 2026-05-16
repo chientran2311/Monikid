@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AddTransactionState {
 
- TransactionStatus get status; String? get errorMessage; Uint8List? get evidenceImageBytes; String? get evidenceImageFileName; String? get evidenceImageMimeType;
+ TransactionStatus get status; String? get errorMessage; Uint8List? get evidenceImageBytes; String? get evidenceImageFileName; String? get evidenceImageMimeType; String? get evidenceImageFilePath;
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $AddTransactionStateCopyWith<AddTransactionState> get copyWith => _$AddTransacti
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&const DeepCollectionEquality().equals(other.evidenceImageBytes, evidenceImageBytes)&&(identical(other.evidenceImageFileName, evidenceImageFileName) || other.evidenceImageFileName == evidenceImageFileName)&&(identical(other.evidenceImageMimeType, evidenceImageMimeType) || other.evidenceImageMimeType == evidenceImageMimeType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&const DeepCollectionEquality().equals(other.evidenceImageBytes, evidenceImageBytes)&&(identical(other.evidenceImageFileName, evidenceImageFileName) || other.evidenceImageFileName == evidenceImageFileName)&&(identical(other.evidenceImageMimeType, evidenceImageMimeType) || other.evidenceImageMimeType == evidenceImageMimeType)&&(identical(other.evidenceImageFilePath, evidenceImageFilePath) || other.evidenceImageFilePath == evidenceImageFilePath));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage,const DeepCollectionEquality().hash(evidenceImageBytes),evidenceImageFileName,evidenceImageMimeType);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,const DeepCollectionEquality().hash(evidenceImageBytes),evidenceImageFileName,evidenceImageMimeType,evidenceImageFilePath);
 
 @override
 String toString() {
-  return 'AddTransactionState(status: $status, errorMessage: $errorMessage, evidenceImageBytes: $evidenceImageBytes, evidenceImageFileName: $evidenceImageFileName, evidenceImageMimeType: $evidenceImageMimeType)';
+  return 'AddTransactionState(status: $status, errorMessage: $errorMessage, evidenceImageBytes: $evidenceImageBytes, evidenceImageFileName: $evidenceImageFileName, evidenceImageMimeType: $evidenceImageMimeType, evidenceImageFilePath: $evidenceImageFilePath)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $AddTransactionStateCopyWith<$Res>  {
   factory $AddTransactionStateCopyWith(AddTransactionState value, $Res Function(AddTransactionState) _then) = _$AddTransactionStateCopyWithImpl;
 @useResult
 $Res call({
- TransactionStatus status, String? errorMessage, Uint8List? evidenceImageBytes, String? evidenceImageFileName, String? evidenceImageMimeType
+ TransactionStatus status, String? errorMessage, Uint8List? evidenceImageBytes, String? evidenceImageFileName, String? evidenceImageMimeType, String? evidenceImageFilePath
 });
 
 
@@ -63,13 +63,14 @@ class _$AddTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,Object? evidenceImageBytes = freezed,Object? evidenceImageFileName = freezed,Object? evidenceImageMimeType = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,Object? evidenceImageBytes = freezed,Object? evidenceImageFileName = freezed,Object? evidenceImageMimeType = freezed,Object? evidenceImageFilePath = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TransactionStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,evidenceImageBytes: freezed == evidenceImageBytes ? _self.evidenceImageBytes : evidenceImageBytes // ignore: cast_nullable_to_non_nullable
 as Uint8List?,evidenceImageFileName: freezed == evidenceImageFileName ? _self.evidenceImageFileName : evidenceImageFileName // ignore: cast_nullable_to_non_nullable
 as String?,evidenceImageMimeType: freezed == evidenceImageMimeType ? _self.evidenceImageMimeType : evidenceImageMimeType // ignore: cast_nullable_to_non_nullable
+as String?,evidenceImageFilePath: freezed == evidenceImageFilePath ? _self.evidenceImageFilePath : evidenceImageFilePath // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -81,7 +82,7 @@ as String?,
 
 
 class _AddTransactionState extends AddTransactionState {
-  const _AddTransactionState({this.status = TransactionStatus.initial, this.errorMessage, this.evidenceImageBytes, this.evidenceImageFileName, this.evidenceImageMimeType}): super._();
+  const _AddTransactionState({this.status = TransactionStatus.initial, this.errorMessage, this.evidenceImageBytes, this.evidenceImageFileName, this.evidenceImageMimeType, this.evidenceImageFilePath}): super._();
   
 
 @override@JsonKey() final  TransactionStatus status;
@@ -89,6 +90,7 @@ class _AddTransactionState extends AddTransactionState {
 @override final  Uint8List? evidenceImageBytes;
 @override final  String? evidenceImageFileName;
 @override final  String? evidenceImageMimeType;
+@override final  String? evidenceImageFilePath;
 
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
@@ -100,16 +102,16 @@ _$AddTransactionStateCopyWith<_AddTransactionState> get copyWith => __$AddTransa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&const DeepCollectionEquality().equals(other.evidenceImageBytes, evidenceImageBytes)&&(identical(other.evidenceImageFileName, evidenceImageFileName) || other.evidenceImageFileName == evidenceImageFileName)&&(identical(other.evidenceImageMimeType, evidenceImageMimeType) || other.evidenceImageMimeType == evidenceImageMimeType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AddTransactionState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&const DeepCollectionEquality().equals(other.evidenceImageBytes, evidenceImageBytes)&&(identical(other.evidenceImageFileName, evidenceImageFileName) || other.evidenceImageFileName == evidenceImageFileName)&&(identical(other.evidenceImageMimeType, evidenceImageMimeType) || other.evidenceImageMimeType == evidenceImageMimeType)&&(identical(other.evidenceImageFilePath, evidenceImageFilePath) || other.evidenceImageFilePath == evidenceImageFilePath));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage,const DeepCollectionEquality().hash(evidenceImageBytes),evidenceImageFileName,evidenceImageMimeType);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,const DeepCollectionEquality().hash(evidenceImageBytes),evidenceImageFileName,evidenceImageMimeType,evidenceImageFilePath);
 
 @override
 String toString() {
-  return 'AddTransactionState(status: $status, errorMessage: $errorMessage, evidenceImageBytes: $evidenceImageBytes, evidenceImageFileName: $evidenceImageFileName, evidenceImageMimeType: $evidenceImageMimeType)';
+  return 'AddTransactionState(status: $status, errorMessage: $errorMessage, evidenceImageBytes: $evidenceImageBytes, evidenceImageFileName: $evidenceImageFileName, evidenceImageMimeType: $evidenceImageMimeType, evidenceImageFilePath: $evidenceImageFilePath)';
 }
 
 
@@ -120,7 +122,7 @@ abstract mixin class _$AddTransactionStateCopyWith<$Res> implements $AddTransact
   factory _$AddTransactionStateCopyWith(_AddTransactionState value, $Res Function(_AddTransactionState) _then) = __$AddTransactionStateCopyWithImpl;
 @override @useResult
 $Res call({
- TransactionStatus status, String? errorMessage, Uint8List? evidenceImageBytes, String? evidenceImageFileName, String? evidenceImageMimeType
+ TransactionStatus status, String? errorMessage, Uint8List? evidenceImageBytes, String? evidenceImageFileName, String? evidenceImageMimeType, String? evidenceImageFilePath
 });
 
 
@@ -137,13 +139,14 @@ class __$AddTransactionStateCopyWithImpl<$Res>
 
 /// Create a copy of AddTransactionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,Object? evidenceImageBytes = freezed,Object? evidenceImageFileName = freezed,Object? evidenceImageMimeType = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,Object? evidenceImageBytes = freezed,Object? evidenceImageFileName = freezed,Object? evidenceImageMimeType = freezed,Object? evidenceImageFilePath = freezed,}) {
   return _then(_AddTransactionState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TransactionStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,evidenceImageBytes: freezed == evidenceImageBytes ? _self.evidenceImageBytes : evidenceImageBytes // ignore: cast_nullable_to_non_nullable
 as Uint8List?,evidenceImageFileName: freezed == evidenceImageFileName ? _self.evidenceImageFileName : evidenceImageFileName // ignore: cast_nullable_to_non_nullable
 as String?,evidenceImageMimeType: freezed == evidenceImageMimeType ? _self.evidenceImageMimeType : evidenceImageMimeType // ignore: cast_nullable_to_non_nullable
+as String?,evidenceImageFilePath: freezed == evidenceImageFilePath ? _self.evidenceImageFilePath : evidenceImageFilePath // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

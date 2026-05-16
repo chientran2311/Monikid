@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:monikid/core/theme/theme.dart';
 
 class FQASkeletonList extends StatelessWidget {
   const FQASkeletonList({super.key});
@@ -15,8 +16,8 @@ class FQASkeletonList extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, __) {
         return Shimmer.fromColors(
-          baseColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-          highlightColor: isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC),
+          baseColor: isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey,
+          highlightColor: isDark ? AppTheme.borderDark : AppTheme.surfaceVeryLight,
           child: Container(
             height: 60,
             width: double.infinity,

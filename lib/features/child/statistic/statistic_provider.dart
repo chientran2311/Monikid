@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:logger/logger.dart';
+import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/auth/providers/auth_session_state.dart';
+import 'package:monikid/features/child/statistic/statistic_helpers.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
@@ -24,7 +26,7 @@ class Statistic extends _$Statistic {
   StatisticState build() {
     _repository = ref.read(statisticRepositoryProvider);
     _setMoneyLimitRepository = ref.read(setMoneyLimitRepositoryProvider);
-    _logger = Logger();
+    _logger = getIt<Logger>();
 
     ref.listen<AuthSessionState>(authSessionProvider, (previous, next) {
       final previousUid = previous?.user?.uid;
@@ -122,7 +124,7 @@ class Statistic extends _$Statistic {
         return;
       }
 
-      final budgetOverview = _buildBudgetOverview(
+      final budgetOverview = StatisticHelpers.buildBudgetOverview(
         limitMinor: limitMinor,
         currentTotalExpenseMinor: overview.currentPeriod.totalExpenseMinor,
         previousTotalExpenseMinor: overview.previousPeriod.totalExpenseMinor,
@@ -137,8 +139,8 @@ class Statistic extends _$Statistic {
         visibleTransactions: page.transactions,
         status: nextStatus,
         hasMore: page.hasMore,
-        totalExpense: _minorToDouble(overview.currentPeriod.totalExpenseMinor),
-        previousPeriodTotalExpense: _minorToDouble(
+        totalExpense: StatisticHelpers.minorToDouble(overview.currentPeriod.totalExpenseMinor),
+        previousPeriodTotalExpense: StatisticHelpers.minorToDouble(
           overview.previousPeriod.totalExpenseMinor,
         ),
         currentOverview: overview.currentPeriod,
@@ -244,89 +246,4 @@ class Statistic extends _$Statistic {
     await loadFirstPage();
   }
 
-  StatisticBudgetOverview _buildBudgetOverview({
-    required int? limitMinor,
-    required int currentTotalExpenseMinor,
-    required int previousTotalExpenseMinor,
-  }) {
-    if (limitMinor == null || limitMinor <= 0) {
-      return StatisticBudgetOverview(
-        spentMinor: currentTotalExpenseMinor,
-        comparisonDirection: _comparisonDirection(
-          currentTotalExpenseMinor,
-          previousTotalExpenseMinor,
-        ),
-        comparisonPercent: _comparisonPercent(
-          currentTotalExpenseMinor,
-          previousTotalExpenseMinor,
-        ),
-      );
-    }
-
-    final remainingMinor = limitMinor - currentTotalExpenseMinor;
-    final usageRatio = currentTotalExpenseMinor <= 0
-        ? 0.0
-        : currentTotalExpenseMinor / limitMinor;
-
-    return StatisticBudgetOverview(
-      limitMinor: limitMinor,
-      spentMinor: currentTotalExpenseMinor,
-      remainingMinor: remainingMinor,
-      usageRatio: usageRatio.clamp(0.0, 1.0),
-      status: _budgetStatus(usageRatio, remainingMinor),
-      comparisonDirection: _comparisonDirection(
-        currentTotalExpenseMinor,
-        previousTotalExpenseMinor,
-      ),
-      comparisonPercent: _comparisonPercent(
-        currentTotalExpenseMinor,
-        previousTotalExpenseMinor,
-      ),
-    );
-  }
-
-  StatisticBudgetStatus _budgetStatus(double usageRatio, int remainingMinor) {
-    if (remainingMinor < 0) {
-      return StatisticBudgetStatus.exceeded;
-    }
-    if (usageRatio >= 0.8) {
-      return StatisticBudgetStatus.warning;
-    }
-    return StatisticBudgetStatus.onTrack;
-  }
-
-  StatisticTrendDirection _comparisonDirection(
-    int currentTotalExpenseMinor,
-    int previousTotalExpenseMinor,
-  ) {
-    if (currentTotalExpenseMinor > previousTotalExpenseMinor) {
-      return StatisticTrendDirection.up;
-    }
-    if (currentTotalExpenseMinor < previousTotalExpenseMinor) {
-      return StatisticTrendDirection.down;
-    }
-    if (currentTotalExpenseMinor == 0 && previousTotalExpenseMinor == 0) {
-      return StatisticTrendDirection.none;
-    }
-    return StatisticTrendDirection.stable;
-  }
-
-  double? _comparisonPercent(
-    int currentTotalExpenseMinor,
-    int previousTotalExpenseMinor,
-  ) {
-    if (previousTotalExpenseMinor <= 0) {
-      if (currentTotalExpenseMinor <= 0) {
-        return null;
-      }
-      return 100.0;
-    }
-
-    final difference = (currentTotalExpenseMinor - previousTotalExpenseMinor).abs();
-    return (difference / previousTotalExpenseMinor) * 100;
-  }
-
-  double _minorToDouble(int amountMinor) {
-    return amountMinor.toDouble();
-  }
 }

@@ -59,6 +59,14 @@ class AppConfig {
     return preset;
   }
 
+  static String get cloudinaryProfileAvatarUploadPreset {
+    final preset = dotenv.env['CLOUDINARY_PROFILE_AVATAR_UPLOAD_PRESET'];
+    if (preset == null || preset.isEmpty) {
+      throw Exception('Missing CLOUDINARY_PROFILE_AVATAR_UPLOAD_PRESET in .env');
+    }
+    return preset;
+  }
+
   static String get mockBankApiKey =>
       dotenv.env['MOCK_BANK_API_KEY'] ?? 'monikid-mockbank-secret-2024';
 }

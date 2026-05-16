@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_provider.dart';
 import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_provider.dart';
 import 'package:monikid/features/auth/pin/widgets/pin_screen_body.dart';
@@ -13,6 +14,8 @@ class ReEnterPinScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
+
     final state = ref.watch(reEnterPINProvider);
     final notifier = ref.read(reEnterPINProvider.notifier);
     final draftPinCode = ref.watch(

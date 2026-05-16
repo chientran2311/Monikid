@@ -44,7 +44,7 @@ class SplashLoadingSection extends StatelessWidget {
                     Text(
                       '${value.toInt()}%',
                       style: context.typo.caption.large.copyWith(
-                        color: const Color(0xFF94A3B8),
+                        color: AppTheme.textMuted,
                       ),
                     ),
                   ],
@@ -58,7 +58,7 @@ class SplashLoadingSection extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               color:
-                  isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  isDark ? AppTheme.borderDark : AppTheme.borderLight,
               borderRadius: BorderRadius.circular(9999),
             ),
             child: Align(

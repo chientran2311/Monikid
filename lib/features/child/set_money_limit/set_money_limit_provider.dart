@@ -118,12 +118,18 @@ class SetMoneyLimitNotifier extends _$SetMoneyLimitNotifier {
   }
 
   Future<bool> save() async {
-    final currentUserId = ref.read(authSessionProvider).user?.uid;
+    final authState = ref.read(authSessionProvider);
+    final currentUserId = authState.user?.uid;
     if (currentUserId == null) {
       state = state.copyWith(
         status: SetMoneyLimitStatus.error,
         validationError: SetMoneyLimitValidationError.unauthenticated,
       );
+      return false;
+    }
+
+    if (authState.account?.familyId != null) {
+      _logger.w('Child attempted to self-set limit while in family — blocked.');
       return false;
     }
 

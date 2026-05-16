@@ -21,6 +21,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
+  String get actionSkip => 'Skip';
+
+  @override
+  String get onboardingLanguageTitleLeading => 'Choose';
+
+  @override
+  String get onboardingLanguageTitleHighlight => 'language';
+
+  @override
+  String get onboardingLanguageDescription =>
+      'Please choose the language you want to use in the app.';
+
+  @override
+  String get onboardingContinueAction => 'Continue';
+
+  @override
+  String get onboardingCurrencyTitle => 'Choose currency';
+
+  @override
+  String get onboardingCurrencyDescription =>
+      'Please choose the currency you want to use to manage transactions in the app.';
+
+  @override
+  String get onboardingCurrencyVnd => 'Vietnamese Dong (VND)';
+
+  @override
+  String get onboardingCurrencyUsd => 'US Dollar (USD)';
+
+  @override
   String get validationEmptyFields =>
       'Please fill in all fields (Name, Email, Password)';
 
@@ -107,6 +136,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check spending limits for your family members.';
 
   @override
+  String homeParTopCategoryAlertTitle(String category) {
+    return 'Highest spending in $category';
+  }
+
+  @override
+  String get homeParTopCategoryAlertBody => 'Tap to view transaction details';
+
+  @override
+  String get homeParThisMonth => 'This month';
+
+  @override
+  String get homeParViewDetail => 'View details';
+
+  @override
+  String homeParSpentPercent(String percent) {
+    return 'Spent $percent% of income';
+  }
+
+  @override
   String get noTransactionsYet => 'No transactions yet.';
 
   @override
@@ -149,6 +197,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionConfirm => 'Confirm';
 
   @override
+  String get actionDone => 'Done';
+
+  @override
+  String get actionSelect => 'Select';
+
+  @override
   String get validationInvalidAmount => 'Invalid amount';
 
   @override
@@ -183,6 +237,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transactionDateLabel => 'Date';
+
+  @override
+  String get transactionHistorySelectDateTitle => 'Select date';
 
   @override
   String get transactionNoteLabel => 'Note';
@@ -222,7 +279,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionDetailTimeLabel => 'TIME';
 
   @override
+  String get transactionDetailCreatedAtLabel => 'CREATED AT';
+
+  @override
   String get transactionDetailNoteLabel => 'NOTE';
+
+  @override
+  String get transactionDetailEvidenceLabel => 'EVIDENCE IMAGE';
 
   @override
   String get transactionEditAction => 'Edit transaction';
@@ -328,6 +391,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileEditAvatarLabel => 'Change Avatar';
 
   @override
+  String get profileEditAvatarDesc => 'Take a new photo or choose from gallery';
+
+  @override
   String get profileEditFullName => 'Full Name';
 
   @override
@@ -354,6 +420,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionSaveChanges => 'Save Changes';
+
+  @override
+  String get profileEditSaveSuccess => 'Profile updated successfully';
+
+  @override
+  String get profileEditErrorNameRequired => 'Full name is required';
+
+  @override
+  String get profileEditErrorNameTooShort =>
+      'Name must be at least 2 characters';
+
+  @override
+  String get profileEditErrorInvalidPhone =>
+      'Invalid Vietnamese phone number (e.g. 0912345678)';
 
   @override
   String get editRequestTitle => 'Edit Request';
@@ -535,6 +615,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentStatisticMonth => 'Month';
 
   @override
+  String get parentStatisticYear => 'Year';
+
+  @override
   String get parentStatisticBudgetTitle => 'Weekly Budget';
 
   @override
@@ -551,6 +634,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentStatisticNoData => 'No data available yet';
+
+  @override
+  String get parentStatisticTotalSpentTitle => 'Total spent';
+
+  @override
+  String get parentStatisticVsLastMonth => 'vs last month';
+
+  @override
+  String parentStatisticSpendingUp(String percent) {
+    return '+$percent%';
+  }
+
+  @override
+  String parentStatisticSpendingDown(String percent) {
+    return '-$percent%';
+  }
+
+  @override
+  String get parentStatisticSpendingStable => 'Stable';
+
+  @override
+  String get parentStatisticLoading => 'Loading spending statistics...';
+
+  @override
+  String get parentStatisticLoadError => 'Could not load spending statistics.';
+
+  @override
+  String get parentStatisticRetry => 'Retry';
+
+  @override
+  String get parentStatisticSelectChild =>
+      'Select a child to view spending statistics.';
+
+  @override
+  String parentStatisticTransactionCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count transactions',
+      one: '1 transaction',
+      zero: 'No transactions',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get settingParTitle => 'Settings';
@@ -575,6 +702,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingParSpendingLimitSubtitle => 'Set weekly/monthly limits';
+
+  @override
+  String get settingParAppearanceTitle => 'Appearance';
+
+  @override
+  String get settingParThemeLabel => 'Light/Dark mode';
 
   @override
   String get settingParNotificationsTitle => 'Notifications';
@@ -904,6 +1037,63 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unable to analyze the bill. Please try again or enter manually.';
 
   @override
+  String get scanBillLoadingTitle => 'Processing Receipt';
+
+  @override
+  String get scanBillScanningStatus => 'Scanning receipt...';
+
+  @override
+  String get scanBillAnalyzingStatus => 'AI is analyzing...';
+
+  @override
+  String get joinFamilyTitle => 'Join Family';
+
+  @override
+  String get joinFamilySubtitle =>
+      'Enter the 6-digit invite code from your parent';
+
+  @override
+  String get joinFamilyInputHint => 'Enter code';
+
+  @override
+  String get joinFamilyButton => 'Join Family';
+
+  @override
+  String get joinFamilySuccess => 'You have joined the family!';
+
+  @override
+  String get joinFamilyErrorInvalidCode => 'Invalid or expired invite code';
+
+  @override
+  String get joinFamilyErrorAlreadyMember => 'You are already part of a family';
+
+  @override
+  String get joinFamilyErrorUnknown => 'Failed to join. Please try again.';
+
+  @override
+  String get unlinkFamilyTitle => 'My Family';
+
+  @override
+  String get unlinkFamilySubtitle => 'You are currently connected to a family';
+
+  @override
+  String get unlinkFamilyButton => 'Leave Family';
+
+  @override
+  String get unlinkFamilyConfirmTitle => 'Leave family?';
+
+  @override
+  String get unlinkFamilyConfirmBody =>
+      'You will leave this family. You can rejoin later with an invite code.';
+
+  @override
+  String get unlinkFamilySuccess => 'You have left the family.';
+
+  @override
+  String get unlinkFamilyErrorFailed =>
+      'Failed to leave family. Please try again.';
+
+  @override
   String get customCategoryAdd => 'Add custom category';
 
   @override
@@ -937,4 +1127,207 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customCategoryConfirm => 'Add';
+
+  @override
+  String get customCategorySelectTitleExpense => 'Select expense category';
+
+  @override
+  String get customCategorySelectTitleIncome => 'Select income category';
+
+  @override
+  String get customCategorySelectTitle => 'Select category';
+
+  @override
+  String get customCategoryConfirmSelection => 'Confirm';
+
+  @override
+  String get setMoneyLimitManagedByParent =>
+      'Spending limit is managed by parent';
+
+  @override
+  String get parentSetLimitTitle => 'Set monthly spending limit';
+
+  @override
+  String get parentSetLimitDescription =>
+      'This limit helps your child stay in control of their spending each month';
+
+  @override
+  String get notifTitle => 'Notifications';
+
+  @override
+  String get notifMarkAllRead => 'Mark all as read';
+
+  @override
+  String get notifEmpty => 'No notifications yet';
+
+  @override
+  String get notifOverspend80Title => 'Approaching limit';
+
+  @override
+  String notifOverspend80Body(Object amount, Object month) {
+    return 'You\'ve spent $amount — 80% of your $month limit.';
+  }
+
+  @override
+  String get notifOverspend100Title => 'Limit exceeded';
+
+  @override
+  String notifOverspend100Body(Object amount, Object month) {
+    return 'You\'ve spent $amount — exceeded your $month limit.';
+  }
+
+  @override
+  String get notifWeeklyOverspendTitle => 'Spending spike';
+
+  @override
+  String notifWeeklyOverspendBody(Object percent) {
+    return 'You spent $percent% more this week than last week.';
+  }
+
+  @override
+  String notifParentOverspend80Body(Object childName, Object month) {
+    return '$childName has spent 80% of the $month limit.';
+  }
+
+  @override
+  String notifParentOverspend100Body(Object childName, Object month) {
+    return '$childName has exceeded the $month limit.';
+  }
+
+  @override
+  String notifParentWeeklyOverspendBody(Object childName, Object percent) {
+    return '$childName spent $percent% more this week than last week.';
+  }
+
+  @override
+  String get familyManagementTitle => 'Manage Family';
+
+  @override
+  String get familyManagementEmptyMessage => 'No family found';
+
+  @override
+  String get familyManagementErrorMessage => 'Error loading family data';
+
+  @override
+  String get familyManagementHostBadge => 'Host';
+
+  @override
+  String get familyManagementHostSubtitle => 'Family host';
+
+  @override
+  String get familyManagementParentSubtitle => 'Parent';
+
+  @override
+  String get familyManagementInviteCodeLabel => 'Family invite code';
+
+  @override
+  String get familyManagementCopyTooltip => 'Copy';
+
+  @override
+  String get familyManagementCopySuccess => 'Invite code copied';
+
+  @override
+  String get familyManagementSectionMembers => 'MEMBERS';
+
+  @override
+  String get familyManagementChildrenSection => 'Children';
+
+  @override
+  String get familyManagementParentsSection => 'Parents';
+
+  @override
+  String get familyManagementHostParentLabel => '(Host Parent)';
+
+  @override
+  String get familyManagementNonHostParentLabel => '(Non-host Parent)';
+
+  @override
+  String get familyManagementSetLimit => 'Set limit';
+
+  @override
+  String get familyManagementUnlinkChild => 'Unlink';
+
+  @override
+  String get familyManagementUnlinkParent => 'Unlink';
+
+  @override
+  String get familyManagementNoLimit => 'No limit';
+
+  @override
+  String get familyManagementEmptyChildren => 'No members yet';
+
+  @override
+  String get familyManagementUnlinkButton => 'Unlink';
+
+  @override
+  String get familyManagementSetLimitButton => 'Set Limit';
+
+  @override
+  String get familyManagementRemoveLimitButton => 'Remove Limit';
+
+  @override
+  String get familyManagementLimitDialogTitle => 'Set spending limit';
+
+  @override
+  String get familyManagementLimitInputHint => '0';
+
+  @override
+  String get familyManagementRemoveLimit => 'Remove limit';
+
+  @override
+  String get familyManagementSave => 'Save';
+
+  @override
+  String get familyManagementCancel => 'Cancel';
+
+  @override
+  String get familyManagementUnlinkConfirmTitle => 'Unlink member?';
+
+  @override
+  String familyManagementUnlinkConfirmBody(Object name) {
+    return 'Are you sure you want to unlink $name?';
+  }
+
+  @override
+  String get familyManagementUnlinkConfirmButton => 'Unlink';
+
+  @override
+  String get familyManagementConfirmUnlinkChildTitle => 'Confirm Unlink';
+
+  @override
+  String familyManagementConfirmUnlinkChildMessage(Object childName) {
+    return 'Are you sure you want to unlink $childName?';
+  }
+
+  @override
+  String get familyManagementConfirmUnlinkParentTitle => 'Confirm Unlink';
+
+  @override
+  String familyManagementConfirmUnlinkParentMessage(Object parentName) {
+    return 'Are you sure you want to unlink $parentName?';
+  }
+
+  @override
+  String get familyManagementLimitSetSuccess => 'Spending limit updated';
+
+  @override
+  String get familyManagementLimitRemovedSuccess => 'Spending limit removed';
+
+  @override
+  String get familyManagementUnlinkSuccess => 'Unlinked successfully';
+
+  @override
+  String get familyManagementUnlinkError => 'Error unlinking';
+
+  @override
+  String get familyManagementSetLimitSuccess => 'Limit set successfully';
+
+  @override
+  String get familyManagementSetLimitError => 'Error setting limit';
+
+  @override
+  String get familyManagementRemoveLimitSuccess => 'Limit removed successfully';
+
+  @override
+  String get familyManagementRemoveLimitError => 'Error removing limit';
 }

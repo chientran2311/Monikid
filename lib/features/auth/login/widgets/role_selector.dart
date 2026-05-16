@@ -31,13 +31,13 @@ class RoleSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: selectedRole == 'parent'
-                      ? (isDark ? const Color(0xFF334155) : Colors.white)
+                      ? (isDark ? AppTheme.borderDark : AppTheme.surfaceLight)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: selectedRole == 'parent'
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                           ),
                         ]
@@ -52,18 +52,18 @@ class RoleSelector extends StatelessWidget {
                       color: selectedRole == 'parent'
                           ? AppTheme.primary
                           : (isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B)),
+                                ? AppTheme.textMuted
+                                : AppTheme.textGrey),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Phá»¥ huynh',
                       style: context.typo.subtitle.small.copyWith(
                         color: selectedRole == 'parent'
-                            ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                            ? (isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark)
                             : (isDark
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B)),
+                                  ? AppTheme.textMuted
+                                  : AppTheme.textGrey),
                       ),
                     ),
                   ],
@@ -78,13 +78,13 @@ class RoleSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: selectedRole == 'child'
-                      ? (isDark ? const Color(0xFF334155) : Colors.white)
+                      ? (isDark ? AppTheme.borderDark : AppTheme.surfaceLight)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: selectedRole == 'child'
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                           ),
                         ]
@@ -99,18 +99,18 @@ class RoleSelector extends StatelessWidget {
                       color: selectedRole == 'child'
                           ? AppTheme.primary
                           : (isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B)),
+                                ? AppTheme.textMuted
+                                : AppTheme.textGrey),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Há»c sinh',
                       style: context.typo.subtitle.small.copyWith(
                         color: selectedRole == 'child'
-                            ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                            ? (isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark)
                             : (isDark
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B)),
+                                  ? AppTheme.textMuted
+                                  : AppTheme.textGrey),
                       ),
                     ),
                   ],

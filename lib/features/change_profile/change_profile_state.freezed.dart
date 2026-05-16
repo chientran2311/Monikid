@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChangeProfileState {
 
- ProfileModel? get profile; bool get isLoading; bool get isSaving; String? get errorMessage; bool get saveSuccess;
+ ProfileModel? get profile; ChangeProfileStatus get status; String get fullName; String get phone; String get dob; String get gender; ChangeProfileFieldError? get fullNameError; ChangeProfileFieldError? get phoneError; bool get isFormValid; bool get isSaving; String? get errorMessage; bool get saveSuccess;
 /// Create a copy of ChangeProfileState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ChangeProfileStateCopyWith<ChangeProfileState> get copyWith => _$ChangeProfileS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChangeProfileState&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.saveSuccess, saveSuccess) || other.saveSuccess == saveSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChangeProfileState&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.status, status) || other.status == status)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dob, dob) || other.dob == dob)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.fullNameError, fullNameError) || other.fullNameError == fullNameError)&&(identical(other.phoneError, phoneError) || other.phoneError == phoneError)&&(identical(other.isFormValid, isFormValid) || other.isFormValid == isFormValid)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.saveSuccess, saveSuccess) || other.saveSuccess == saveSuccess));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,profile,isLoading,isSaving,errorMessage,saveSuccess);
+int get hashCode => Object.hash(runtimeType,profile,status,fullName,phone,dob,gender,fullNameError,phoneError,isFormValid,isSaving,errorMessage,saveSuccess);
 
 @override
 String toString() {
-  return 'ChangeProfileState(profile: $profile, isLoading: $isLoading, isSaving: $isSaving, errorMessage: $errorMessage, saveSuccess: $saveSuccess)';
+  return 'ChangeProfileState(profile: $profile, status: $status, fullName: $fullName, phone: $phone, dob: $dob, gender: $gender, fullNameError: $fullNameError, phoneError: $phoneError, isFormValid: $isFormValid, isSaving: $isSaving, errorMessage: $errorMessage, saveSuccess: $saveSuccess)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ChangeProfileStateCopyWith<$Res>  {
   factory $ChangeProfileStateCopyWith(ChangeProfileState value, $Res Function(ChangeProfileState) _then) = _$ChangeProfileStateCopyWithImpl;
 @useResult
 $Res call({
- ProfileModel? profile, bool isLoading, bool isSaving, String? errorMessage, bool saveSuccess
+ ProfileModel? profile, ChangeProfileStatus status, String fullName, String phone, String dob, String gender, ChangeProfileFieldError? fullNameError, ChangeProfileFieldError? phoneError, bool isFormValid, bool isSaving, String? errorMessage, bool saveSuccess
 });
 
 
@@ -63,10 +63,17 @@ class _$ChangeProfileStateCopyWithImpl<$Res>
 
 /// Create a copy of ChangeProfileState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? profile = freezed,Object? isLoading = null,Object? isSaving = null,Object? errorMessage = freezed,Object? saveSuccess = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? profile = freezed,Object? status = null,Object? fullName = null,Object? phone = null,Object? dob = null,Object? gender = null,Object? fullNameError = freezed,Object? phoneError = freezed,Object? isFormValid = null,Object? isSaving = null,Object? errorMessage = freezed,Object? saveSuccess = null,}) {
   return _then(_self.copyWith(
 profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as ProfileModel?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as ProfileModel?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ChangeProfileStatus,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,dob: null == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
+as String,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,fullNameError: freezed == fullNameError ? _self.fullNameError : fullNameError // ignore: cast_nullable_to_non_nullable
+as ChangeProfileFieldError?,phoneError: freezed == phoneError ? _self.phoneError : phoneError // ignore: cast_nullable_to_non_nullable
+as ChangeProfileFieldError?,isFormValid: null == isFormValid ? _self.isFormValid : isFormValid // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,saveSuccess: null == saveSuccess ? _self.saveSuccess : saveSuccess // ignore: cast_nullable_to_non_nullable
@@ -93,11 +100,18 @@ $ProfileModelCopyWith<$Res>? get profile {
 
 
 class _ChangeProfileState extends ChangeProfileState {
-  const _ChangeProfileState({this.profile, this.isLoading = false, this.isSaving = false, this.errorMessage, this.saveSuccess = false}): super._();
+  const _ChangeProfileState({this.profile, this.status = ChangeProfileStatus.initial, this.fullName = '', this.phone = '', this.dob = '', this.gender = '', this.fullNameError, this.phoneError, this.isFormValid = false, this.isSaving = false, this.errorMessage, this.saveSuccess = false}): super._();
   
 
 @override final  ProfileModel? profile;
-@override@JsonKey() final  bool isLoading;
+@override@JsonKey() final  ChangeProfileStatus status;
+@override@JsonKey() final  String fullName;
+@override@JsonKey() final  String phone;
+@override@JsonKey() final  String dob;
+@override@JsonKey() final  String gender;
+@override final  ChangeProfileFieldError? fullNameError;
+@override final  ChangeProfileFieldError? phoneError;
+@override@JsonKey() final  bool isFormValid;
 @override@JsonKey() final  bool isSaving;
 @override final  String? errorMessage;
 @override@JsonKey() final  bool saveSuccess;
@@ -112,16 +126,16 @@ _$ChangeProfileStateCopyWith<_ChangeProfileState> get copyWith => __$ChangeProfi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChangeProfileState&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.saveSuccess, saveSuccess) || other.saveSuccess == saveSuccess));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChangeProfileState&&(identical(other.profile, profile) || other.profile == profile)&&(identical(other.status, status) || other.status == status)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dob, dob) || other.dob == dob)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.fullNameError, fullNameError) || other.fullNameError == fullNameError)&&(identical(other.phoneError, phoneError) || other.phoneError == phoneError)&&(identical(other.isFormValid, isFormValid) || other.isFormValid == isFormValid)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.saveSuccess, saveSuccess) || other.saveSuccess == saveSuccess));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,profile,isLoading,isSaving,errorMessage,saveSuccess);
+int get hashCode => Object.hash(runtimeType,profile,status,fullName,phone,dob,gender,fullNameError,phoneError,isFormValid,isSaving,errorMessage,saveSuccess);
 
 @override
 String toString() {
-  return 'ChangeProfileState(profile: $profile, isLoading: $isLoading, isSaving: $isSaving, errorMessage: $errorMessage, saveSuccess: $saveSuccess)';
+  return 'ChangeProfileState(profile: $profile, status: $status, fullName: $fullName, phone: $phone, dob: $dob, gender: $gender, fullNameError: $fullNameError, phoneError: $phoneError, isFormValid: $isFormValid, isSaving: $isSaving, errorMessage: $errorMessage, saveSuccess: $saveSuccess)';
 }
 
 
@@ -132,7 +146,7 @@ abstract mixin class _$ChangeProfileStateCopyWith<$Res> implements $ChangeProfil
   factory _$ChangeProfileStateCopyWith(_ChangeProfileState value, $Res Function(_ChangeProfileState) _then) = __$ChangeProfileStateCopyWithImpl;
 @override @useResult
 $Res call({
- ProfileModel? profile, bool isLoading, bool isSaving, String? errorMessage, bool saveSuccess
+ ProfileModel? profile, ChangeProfileStatus status, String fullName, String phone, String dob, String gender, ChangeProfileFieldError? fullNameError, ChangeProfileFieldError? phoneError, bool isFormValid, bool isSaving, String? errorMessage, bool saveSuccess
 });
 
 
@@ -149,10 +163,17 @@ class __$ChangeProfileStateCopyWithImpl<$Res>
 
 /// Create a copy of ChangeProfileState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? profile = freezed,Object? isLoading = null,Object? isSaving = null,Object? errorMessage = freezed,Object? saveSuccess = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? profile = freezed,Object? status = null,Object? fullName = null,Object? phone = null,Object? dob = null,Object? gender = null,Object? fullNameError = freezed,Object? phoneError = freezed,Object? isFormValid = null,Object? isSaving = null,Object? errorMessage = freezed,Object? saveSuccess = null,}) {
   return _then(_ChangeProfileState(
 profile: freezed == profile ? _self.profile : profile // ignore: cast_nullable_to_non_nullable
-as ProfileModel?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as ProfileModel?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as ChangeProfileStatus,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,dob: null == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
+as String,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,fullNameError: freezed == fullNameError ? _self.fullNameError : fullNameError // ignore: cast_nullable_to_non_nullable
+as ChangeProfileFieldError?,phoneError: freezed == phoneError ? _self.phoneError : phoneError // ignore: cast_nullable_to_non_nullable
+as ChangeProfileFieldError?,isFormValid: null == isFormValid ? _self.isFormValid : isFormValid // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,saveSuccess: null == saveSuccess ? _self.saveSuccess : saveSuccess // ignore: cast_nullable_to_non_nullable

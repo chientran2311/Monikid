@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_state.dart';
 
@@ -31,6 +33,8 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
     final s = context.l10n;
     final state = ref.watch(setMoneyLimitNotifierProvider);
     final notifier = ref.read(setMoneyLimitNotifierProvider.notifier);
+    final isManagedByParent =
+        ref.watch(authSessionProvider).account?.familyId != null;
     final amountController = useTextEditingController(text: state.amountInput);
     final errorText = _buildErrorText(context, state.validationError);
     final screenSize = MediaQuery.sizeOf(context);
@@ -104,9 +108,40 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                           ),
                         ),
                         SizedBox(height: 24.h),
+                        if (isManagedByParent) ...[
+                          Container(
+                            padding: EdgeInsets.all(12.r),
+                            decoration: BoxDecoration(
+                              color: AppTheme.amberFill,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(color: AppTheme.amberBorder),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: AppTheme.amberText,
+                                  size: 16.sp,
+                                ),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: Text(
+                                    s.setMoneyLimitManagedByParent,
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      color: AppTheme.amberText,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                        ],
                         TextField(
                           controller: amountController,
-                          autofocus: true,
+                          autofocus: !isManagedByParent,
+                          enabled: !isManagedByParent,
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.number,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -187,14 +222,14 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: state.isSaving
+                    onPressed: state.isSaving || isManagedByParent
                         ? null
                         : () async {
                             final isSaved = await notifier.save();
                             if (!context.mounted || !isSaved) {
                               return;
                             }
-                            Navigator.of(context).pop();
+                            context.pop();
                           },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppTheme.primary,
@@ -230,7 +265,7 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                   child: OutlinedButton(
                     onPressed: state.isSaving
                         ? null
-                        : () => Navigator.of(context).pop(),
+                        : () => context.pop(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF475569),
                       side: const BorderSide(color: Color(0xFFE2E8F0)),

@@ -12,12 +12,14 @@ class TransactionEvidenceUploadPayload {
     required this.fileName,
     required this.mimeType,
     required this.categoryKey,
+    this.filePath,
   });
 
   final Uint8List bytes;
   final String fileName;
   final String mimeType;
   final String categoryKey;
+  final String? filePath;
 }
 
 abstract class TransactionEvidenceStorage {
@@ -25,6 +27,8 @@ abstract class TransactionEvidenceStorage {
     required String userId,
     required String transactionId,
     required TransactionEvidenceUploadPayload payload,
+    required String recipientName,
+    required DateTime transactionDate,
   });
 
   Future<void> deleteEvidenceImage(String storagePath);
@@ -44,17 +48,20 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
     required String userId,
     required String transactionId,
     required TransactionEvidenceUploadPayload payload,
+    required String recipientName,
+    required DateTime transactionDate,
   }) async {
     final uploadedAt = DateTime.now();
     final cloudName = AppConfig.cloudinaryCloudName;
     final uploadPreset = AppConfig.cloudinaryUnsignedUploadPreset;
     final fileName = _buildFileName(
+      recipientName: recipientName,
       categoryKey: payload.categoryKey,
       uploadedAt: uploadedAt,
       originalFileName: payload.fileName,
       mimeType: payload.mimeType,
     );
-    final folder = 'transactions/$userId/$transactionId';
+    final folder = _buildFolder(userId, transactionDate);
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/upload'),
@@ -143,15 +150,34 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
   }
 
   String _buildFileName({
+    required String recipientName,
     required String categoryKey,
     required DateTime uploadedAt,
     required String originalFileName,
     required String mimeType,
   }) {
+    final normalizedRecipient = _normalizeText(recipientName);
     final normalizedCategory = _normalizeCategoryKey(categoryKey);
     final extension = _resolveExtension(originalFileName, mimeType);
     final formattedTimestamp = _formatFileTimestamp(uploadedAt);
-    return 'bill_${normalizedCategory}_$formattedTimestamp.$extension';
+    return '${normalizedRecipient}_${normalizedCategory}_$formattedTimestamp.$extension';
+  }
+
+  String _buildFolder(String userId, DateTime transactionDate) {
+    final mm = transactionDate.month.toString().padLeft(2, '0');
+    final dd = transactionDate.day.toString().padLeft(2, '0');
+    final year = transactionDate.year;
+    return 'transactions/$userId/${year}_$mm/$dd';
+  }
+
+  String _normalizeText(String text) {
+    final normalized = text
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp(r'_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+    return normalized.isEmpty ? 'unknown' : normalized;
   }
 
   String _normalizeCategoryKey(String categoryKey) {

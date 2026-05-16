@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/currency_formatter.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_state.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/detail_transaction_bottom_bar.dart';
-import 'package:monikid/features/child/transaction/detail_transaction/widgets/transaction_detail_row.dart';
+import 'package:monikid/features/child/transaction/detail_transaction/widgets/error_state.dart';
+import 'package:monikid/features/child/transaction/detail_transaction/widgets/transaction_content.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
 
-class DetailTransactionScreen extends ConsumerStatefulWidget {
+class DetailTransactionScreen extends HookConsumerWidget {
   const DetailTransactionScreen({super.key, required this.transactionId});
 
   final String transactionId;
 
   @override
-  ConsumerState<DetailTransactionScreen> createState() =>
-      _DetailTransactionScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
 
-class _DetailTransactionScreenState
-    extends ConsumerState<DetailTransactionScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(detailTransactionNotifierProvider.notifier)
-          .initialize(widget.transactionId);
-    });
-  }
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(detailTransactionNotifierProvider.notifier)
+            .initialize(transactionId);
+      });
+      return null;
+    }, [ref, transactionId]);
 
-  @override
-  Widget build(BuildContext context) {
     ref.listen<DetailTransactionState>(detailTransactionNotifierProvider, (
       previous,
       next,
@@ -67,7 +61,7 @@ class _DetailTransactionScreenState
     final state = ref.watch(detailTransactionNotifierProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -89,7 +83,7 @@ class _DetailTransactionScreenState
         centerTitle: true,
       ),
       body: _buildBody(state, isDark),
-      bottomNavigationBar: _buildBottomBar(state, isDark, bgColor),
+      bottomNavigationBar: _buildBottomBar(context, ref, state, isDark, bgColor),
     );
   }
 
@@ -99,20 +93,22 @@ class _DetailTransactionScreenState
       case TransactionStatus.loading:
         return TransactionDetailLoadingSkeleton(isDark: isDark);
       case TransactionStatus.error:
-        return _ErrorState(errorMessage: state.errorMessage);
+        return ErrorState(errorMessage: state.errorMessage);
       case TransactionStatus.ready:
       case TransactionStatus.submitting:
         final transaction = state.transaction;
         if (transaction == null) {
           return Center(child: Text(s.transactionDetailNoData));
         }
-        return _TransactionContent(state: state, isDark: isDark);
+        return TransactionContent(state: state, isDark: isDark);
       case TransactionStatus.success:
         return const SizedBox.shrink();
     }
   }
 
   Widget _buildBottomBar(
+    BuildContext context,
+    WidgetRef ref,
     DetailTransactionState state,
     bool isDark,
     Color bgColor,
@@ -136,464 +132,6 @@ class _DetailTransactionScreenState
           AppRoutes.updateTransactionPath(transaction.transactionId),
         );
       },
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.errorMessage});
-
-  final String? errorMessage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppTheme.redAlert.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              errorMessage ?? s.transactionLoadError,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: Color(0xFF64748B)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TransactionContent extends ConsumerWidget {
-  const _TransactionContent({required this.state, required this.isDark});
-
-  final DetailTransactionState state;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final transaction = state.transaction!;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Column(
-        children: [
-          _SummaryHeader(transaction: transaction),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9),
-              ),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-              ],
-            ),
-            child: Column(
-              children: [
-                TransactionDetailRow(
-                  iconData: Icons.calendar_today,
-                  label: s.transactionDetailTimeLabel,
-                  value: DateFormat(
-                    'dd/MM/yyyy - HH:mm',
-                  ).format(transaction.date),
-                  isDark: isDark,
-                ),
-                Divider(
-                  color: isDark
-                      ? const Color(0xFF1E293B)
-                      : const Color(0xFFF1F5F9),
-                  height: 32,
-                ),
-                if (transaction.note != null &&
-                    transaction.note!.isNotEmpty) ...[
-                  Divider(
-                    color: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF1F5F9),
-                    height: 32,
-                  ),
-                  TransactionDetailRow(
-                    iconData: Icons.description_outlined,
-                    label: s.transactionDetailNoteLabel,
-                    value: transaction.note!,
-                    isDark: isDark,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _EvidenceSection(state: state, isDark: isDark),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryHeader extends StatelessWidget {
-  const _SummaryHeader({required this.transaction});
-
-  final TransactionModel transaction;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: transaction.type == 'income'
-                ? Colors.green.withValues(alpha: 0.1)
-                : AppTheme.primary.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: transaction.type == 'income'
-                  ? Colors.green.withValues(alpha: 0.2)
-                  : AppTheme.primary.withValues(alpha: 0.1),
-              width: 4,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              transaction.categoryEmoji ??
-                  (transaction.type == 'income' ? '💰' : '💸'),
-              style: const TextStyle(fontSize: 36),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          transaction.category,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF64748B),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          CurrencyFormatter.formatWithSign(
-            transaction.amount,
-            transaction.type,
-          ),
-          style: TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.w900,
-            color: transaction.type == 'income'
-                ? Colors.green
-                : AppTheme.redAlert,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _EvidenceSection extends ConsumerWidget {
-  const _EvidenceSection({required this.state, required this.isDark});
-
-  final DetailTransactionState state;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final transaction = state.transaction!;
-    final hasLegacyEvidencePath = _hasLegacyEvidencePath(
-      transaction.evidenceImage?.storagePath,
-    );
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            s.transactionEvidenceSectionTitle,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (!state.hasEvidenceImage)
-            _EvidenceEmptyState(isDark: isDark)
-          else if (state.isResolvingEvidenceImage)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: CircularProgressIndicator(),
-              ),
-            )
-          else if (state.evidenceImageUrl == null)
-            _EvidenceErrorState(
-              errorMessage: hasLegacyEvidencePath
-                  ? s.transactionEvidenceLegacyUnavailable
-                  : state.evidenceImageErrorMessage,
-              onRetry: hasLegacyEvidencePath
-                  ? null
-                  : () => ref
-                        .read(detailTransactionNotifierProvider.notifier)
-                        .retryEvidenceImage(),
-            )
-          else ...[
-            GestureDetector(
-              onTap: () => _showEvidenceImageViewer(
-                context,
-                imageUrl: state.evidenceImageUrl!,
-                fileName: transaction.evidenceImage?.fileName,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  state.evidenceImageUrl!,
-                  height: 220,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const _BrokenImagePlaceholder();
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              transaction.evidenceImage?.fileName ??
-                  s.transactionEvidenceAttachedLabel,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF475569),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  bool _hasLegacyEvidencePath(String? storagePath) {
-    final trimmedStoragePath = storagePath?.trim();
-    if (trimmedStoragePath == null || trimmedStoragePath.isEmpty) {
-      return false;
-    }
-
-    final uri = Uri.tryParse(trimmedStoragePath);
-    if (uri == null) {
-      return true;
-    }
-
-    return uri.scheme != 'https' && uri.scheme != 'http';
-  }
-
-  Future<void> _showEvidenceImageViewer(
-    BuildContext context, {
-    required String imageUrl,
-    String? fileName,
-  }) {
-    return showDialog<void>(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.9),
-      builder: (context) => _EvidenceImageViewerDialog(
-        imageUrl: imageUrl,
-        fileName: fileName,
-      ),
-    );
-  }
-}
-
-class _EvidenceEmptyState extends StatelessWidget {
-  const _EvidenceEmptyState({required this.isDark});
-
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 140,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(
-        child: Text(
-          s.transactionEvidenceEmpty,
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EvidenceErrorState extends StatelessWidget {
-  const _EvidenceErrorState({
-    required this.errorMessage,
-    this.onRetry,
-  });
-
-  final String? errorMessage;
-  final VoidCallback? onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Text(
-            errorMessage ?? s.transactionEvidenceLoadError,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
-          ),
-          if (onRetry != null) ...[
-            const SizedBox(height: 12),
-            TextButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: Text(s.actionRetry),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _BrokenImagePlaceholder extends StatelessWidget {
-  const _BrokenImagePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 220,
-      width: double.infinity,
-      color: const Color(0xFFF8FAFC),
-      child: Center(
-        child: Text(
-          s.transactionEvidenceLoadError,
-          style: const TextStyle(
-            color: Color(0xFF64748B),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EvidenceImageViewerDialog extends StatelessWidget {
-  const _EvidenceImageViewerDialog({
-    required this.imageUrl,
-    this.fileName,
-  });
-
-  final String imageUrl;
-  final String? fileName;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelColor = Colors.white.withValues(alpha: 0.8);
-
-    return Dialog.fullscreen(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        color: Colors.black,
-        child: SafeArea(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: InteractiveViewer(
-                  minScale: 0.8,
-                  maxScale: 4,
-                  child: Center(
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const _BrokenImagePlaceholder();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withValues(alpha: 0.12),
-                  ),
-                ),
-              ),
-              if (fileName != null && fileName!.trim().isNotEmpty)
-                Positioned(
-                  left: 20,
-                  right: 20,
-                  bottom: 20,
-                  child: Text(
-                    fileName!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: labelColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/pin/enter_pin_code/enter_pin_code_provider.dart';
 import 'package:monikid/features/auth/pin/enter_pin_code/enter_pin_code_state.dart';
 import 'package:monikid/features/auth/pin/widgets/pin_screen_body.dart';
@@ -12,6 +13,8 @@ class EnterPinCodeScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
+
     final state = ref.watch(enterPINCodeProvider);
     final notifier = ref.read(enterPINCodeProvider.notifier);
     final s = context.l10n;

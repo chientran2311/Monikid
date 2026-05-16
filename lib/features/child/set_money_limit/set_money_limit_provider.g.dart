@@ -7,7 +7,7 @@ part of 'set_money_limit_provider.dart';
 // **************************************************************************
 
 String _$setMoneyLimitNotifierHash() =>
-    r'67ca73ea098c0f8aa45df2016ce1b9c1ce01d6c6';
+    r'b509ba93d2913a2734378afb0c8c19f6508ff6ee';
 
 /// See also [SetMoneyLimitNotifier].
 @ProviderFor(SetMoneyLimitNotifier)

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/notification_badge.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
@@ -9,11 +11,13 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.avatarUrl,
     this.onAvatarTap,
     this.onNotificationTap,
+    this.notifCount = 0,
   });
 
   final String? avatarUrl;
   final VoidCallback? onAvatarTap;
   final VoidCallback? onNotificationTap;
+  final int notifCount;
 
   @override
   Size get preferredSize => const Size.fromHeight(56);
@@ -24,9 +28,9 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark
         ? AppTheme.surfaceDark.withValues(alpha: 0.92)
-        : Colors.white.withValues(alpha: 0.92);
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final iconColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+        : AppTheme.surfaceLight.withValues(alpha: 0.92);
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final iconColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
     return Container(
@@ -59,16 +63,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: onNotificationTap,
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: iconColor,
-                  size: 24.r,
+              NotificationBadge(
+                count: notifCount,
+                child: IconButton(
+                  onPressed: onNotificationTap,
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: iconColor,
+                    size: 24.r,
+                  ),
+                  tooltip: s.appBarNotificationsTooltip,
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(minWidth: 32.r, minHeight: 32.r),
                 ),
-                tooltip: s.appBarNotificationsTooltip,
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints(minWidth: 32.r, minHeight: 32.r),
               ),
             ],
           ),

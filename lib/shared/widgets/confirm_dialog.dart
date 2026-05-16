@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
@@ -21,9 +22,9 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
 
     return Dialog(
       backgroundColor: surfaceColor,
@@ -58,7 +59,7 @@ class ConfirmDialog extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(false),
+                    onPressed: () => context.pop(false),
                     style: OutlinedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 13.h),
                       shape: RoundedRectangleBorder(
@@ -77,7 +78,7 @@ class ConfirmDialog extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(true),
+                    onPressed: () => context.pop(true),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: confirmColor ?? AppTheme.primary,
                       foregroundColor: Colors.white,

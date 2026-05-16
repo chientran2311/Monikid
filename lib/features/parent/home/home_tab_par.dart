@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/features/parent/home/widgets/family_members_section.dart';
+import 'package:monikid/features/parent/home/widgets/member_spending_card.dart';
+import 'package:monikid/features/parent/home/widgets/no_family_empty_state.dart';
+import 'package:monikid/features/parent/home/widgets/parent_home_section_header.dart';
+import 'package:monikid/features/parent/home/widgets/parent_transaction_list_card.dart';
+import 'package:monikid/features/parent/home/widgets/top_category_alert_card.dart';
+import 'package:monikid/features/parent/home/widgets/set_child_limit_sheet.dart';
+import 'package:monikid/features/parent/notification/parent_notification_provider.dart';
+import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
+import 'package:monikid/features/parent/statistic/parent_statistic_provider.dart';
+import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:monikid/shared/widgets/main_app_bar.dart';
-import 'widgets/family_members_section.dart';
-import 'widgets/home_alert_card.dart';
-import 'widgets/home_transaction_row.dart';
-import 'widgets/member_spending_card.dart';
-import 'widgets/no_family_empty_state.dart';
 
 class HomeTabParent extends HookConsumerWidget {
   const HomeTabParent({super.key});
@@ -23,21 +31,34 @@ class HomeTabParent extends HookConsumerWidget {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
     final notifier = ref.read(parentHomeNotifierProvider.notifier);
     final state = ref.watch(parentHomeNotifierProvider);
+    final statisticState = ref.watch(parentStatisticNotifierProvider);
+
+    final authState = ref.watch(authSessionProvider);
+    final uid = authState.account?.uid ?? authState.user?.uid;
+    final fallbackAvatarUrl =
+        authState.account?.photoUrl ?? authState.user?.photoURL;
+    final profileImageUrl = uid == null
+        ? null
+        : ref
+              .watch(profileImageProvider(uid))
+              .maybeWhen(data: (avatarUrl) => avatarUrl, orElse: () => null);
+    final resolvedAvatarUrl = profileImageUrl ?? fallbackAvatarUrl;
 
     useEffect(() {
       Future.microtask(() => notifier.onInit());
       return null;
     }, const []);
 
-    ref.listen(parentHomeNotifierProvider, (_, next) {
-      if (next.status == ParentHomeStatus.error && next.errorMessage != null) {
+    ref.listen(parentHomeNotifierProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         context.showErrorSnackBar(next.errorMessage!);
       }
     });
@@ -54,7 +75,12 @@ class HomeTabParent extends HookConsumerWidget {
       );
     } else {
       body = RefreshIndicator(
-        onRefresh: () async => notifier.refresh(),
+        onRefresh: () async {
+          if (uid != null) {
+            ref.invalidate(profileImageProvider(uid));
+          }
+          await notifier.refresh();
+        },
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
@@ -65,6 +91,21 @@ class HomeTabParent extends HookConsumerWidget {
               selectedMemberId: state.selectedMemberId,
               inviteCode: state.family?.inviteCode ?? '',
               onMemberTap: notifier.selectMember,
+              onSetLimitTap: (childUid) {
+                final member = state.members
+                    .where((m) => m.uid == childUid)
+                    .firstOrNull;
+                if (member == null) return;
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => SetChildLimitSheet(
+                    childUid: childUid,
+                    childName: member.displayName,
+                  ),
+                );
+              },
             ),
             SizedBox(height: 20.h),
             Padding(
@@ -82,13 +123,17 @@ class HomeTabParent extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionHeader(
+                  ParentHomeSectionHeader(
                     title: s.homeParRecentTransactionsLabel,
+                    trailingLabel: s.homeParSeeAll,
                     textColor: textColor,
                     mutedColor: mutedColor,
+                    onTrailingTap: () {
+                      context.push(AppRoutes.parentTransactionHistory);
+                    },
                   ),
                   SizedBox(height: 8.h),
-                  _TransactionListCard(
+                  ParentTransactionListCard(
                     isDark: isDark,
                     surfaceColor: surfaceColor,
                     borderColor: borderColor,
@@ -99,13 +144,63 @@ class HomeTabParent extends HookConsumerWidget {
                     emptyLabel: s.noTransactionsYet,
                   ),
                   SizedBox(height: 24.h),
-                  _SectionHeader(
+                  ParentHomeSectionHeader(
                     title: s.homeParAlertsLabel,
                     textColor: textColor,
                     mutedColor: mutedColor,
                   ),
                   SizedBox(height: 8.h),
-                  HomeAlertCard(isDark: isDark),
+                  if (statisticState.topCategories.isNotEmpty &&
+                      state.selectedMember != null)
+                    TopCategoryAlertCard(
+                      isDark: isDark,
+                      topCategory: statisticState.topCategories.first,
+                      onTap: () {
+                        final selectedChild = state.selectedMember;
+                        if (selectedChild != null) {
+                          final topCategory =
+                              statisticState.topCategories.first;
+                          context.push(
+                            AppRoutes.parentCategoryTransactions,
+                            extra: ParentCategoryTransactionsArgs(
+                              childUid: selectedChild.uid,
+                              categoryKey: topCategory.categoryKey,
+                              categoryLabel: topCategory.categoryLabel,
+                              period: statisticState.period,
+                            ),
+                          );
+                        }
+                      },
+                    )
+                  else
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? AppTheme.surfaceDark : Colors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        border: isDark
+                            ? Border.all(color: borderColor, width: 0.5)
+                            : null,
+                        boxShadow: isDark
+                            ? null
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                      ),
+                      padding: EdgeInsets.all(16.r),
+                      child: Center(
+                        child: Text(
+                          s.msgNoData,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: mutedColor,
+                          ),
+                        ),
+                      ),
+                    ),
                   SizedBox(height: 32.h),
                 ],
               ),
@@ -116,128 +211,14 @@ class HomeTabParent extends HookConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      appBar: const MainAppBar(),
-      body: body,
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.textColor,
-    required this.mutedColor,
-    this.trailingLabel,
-    this.onTrailingTap,
-  });
-
-  final String title;
-  final String? trailingLabel;
-  final Color textColor;
-  final Color mutedColor;
-  final VoidCallback? onTrailingTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Text(
-            title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: mutedColor,
-              letterSpacing: 0.6,
-            ),
-          ),
-        ),
-        if (trailingLabel != null)
-          GestureDetector(
-            onTap: onTrailingTap,
-            child: Text(
-              trailingLabel!,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primary,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _TransactionListCard extends StatelessWidget {
-  const _TransactionListCard({
-    required this.isDark,
-    required this.surfaceColor,
-    required this.borderColor,
-    required this.textColor,
-    required this.mutedColor,
-    required this.transactions,
-    required this.isLoading,
-    required this.emptyLabel,
-  });
-
-  final bool isDark;
-  final Color surfaceColor;
-  final Color borderColor;
-  final Color textColor;
-  final Color mutedColor;
-  final List<TransactionModel> transactions;
-  final bool isLoading;
-  final String emptyLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.circular(12.r),
-          border: isDark ? Border.all(color: borderColor, width: 0.5) : null,
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-        ),
-        child: isLoading
-            ? Padding(
-                padding: EdgeInsets.symmetric(vertical: 32.h),
-                child: const Center(child: CircularProgressIndicator()),
-              )
-            : transactions.isEmpty
-                ? Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32.h),
-                    child: Center(
-                      child: Text(
-                        emptyLabel,
-                        style: TextStyle(color: mutedColor, fontSize: 14.sp),
-                      ),
-                    ),
-                  )
-                : Column(
-                    children: List.generate(transactions.length, (i) {
-                      return HomeTransactionRow(
-                        tx: transactions[i],
-                        textColor: textColor,
-                        mutedColor: mutedColor,
-                        borderColor: borderColor,
-                        showDivider: i < transactions.length - 1,
-                      );
-                    }),
-                  ),
+      backgroundColor:
+          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
+      appBar: MainAppBar(
+        avatarUrl: resolvedAvatarUrl,
+        notifCount: ref.watch(parentUnreadNotificationCountProvider),
+        onNotificationTap: () => context.push(AppRoutes.parentNotifications),
       ),
+      body: body,
     );
   }
 }

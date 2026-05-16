@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 
 class SocialButton extends StatelessWidget {
@@ -23,9 +24,9 @@ class SocialButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight,
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -37,9 +38,7 @@ class SocialButton extends StatelessWidget {
             Text(
               text,
               style: context.typo.label.large.copyWith(
-                color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF334155),
+                color: isDark ? AppTheme.iconLight : AppTheme.borderDark,
               ),
             ),
           ],

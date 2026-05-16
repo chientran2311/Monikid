@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -154,7 +155,7 @@ class StatisticPeriodFilterSection extends StatelessWidget {
                             ),
                           ),
                           onTap: () {
-                            Navigator.of(sheetContext).pop();
+                            sheetContext.pop();
                             onDateSelected(option);
                           },
                         );

@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:monikid/features/auth/providers/auth_session_state.dart';
 import 'package:monikid/features/auth/register/register_provider.dart';
@@ -18,6 +19,8 @@ class RegisterScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ScreenUtils.init(context);
+
     final fullNameController = useTextEditingController();
     final emailController = useTextEditingController();
     final phoneController = useTextEditingController();

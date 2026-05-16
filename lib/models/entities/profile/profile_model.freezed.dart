@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileModel {
 
- String get id; String? get avatarUrl; String get fullName; String get email; String? get phone; String? get dob; String? get gender; String get role;
+ String get id; String? get avatarUrl; String get fullName; String get email; String get phone; String get dob; String get gender; String get role;
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $ProfileModelCopyWith<$Res>  {
   factory $ProfileModelCopyWith(ProfileModel value, $Res Function(ProfileModel) _then) = _$ProfileModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String? avatarUrl, String fullName, String email, String? phone, String? dob, String? gender, String role
+ String id, String? avatarUrl, String fullName, String email, String phone, String dob, String gender, String role
 });
 
 
@@ -66,16 +66,16 @@ class _$ProfileModelCopyWithImpl<$Res>
 
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? avatarUrl = freezed,Object? fullName = null,Object? email = null,Object? phone = freezed,Object? dob = freezed,Object? gender = freezed,Object? role = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? avatarUrl = freezed,Object? fullName = null,Object? email = null,Object? phone = null,Object? dob = null,Object? gender = null,Object? role = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,dob: freezed == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
-as String?,gender: freezed == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
-as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,dob: null == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
+as String,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -87,16 +87,16 @@ as String,
 @JsonSerializable()
 
 class _ProfileModel implements ProfileModel {
-  const _ProfileModel({required this.id, this.avatarUrl, required this.fullName, required this.email, this.phone, this.dob, this.gender, required this.role});
+  const _ProfileModel({required this.id, this.avatarUrl, required this.fullName, required this.email, this.phone = '', this.dob = '', this.gender = '', required this.role});
   factory _ProfileModel.fromJson(Map<String, dynamic> json) => _$ProfileModelFromJson(json);
 
 @override final  String id;
 @override final  String? avatarUrl;
 @override final  String fullName;
 @override final  String email;
-@override final  String? phone;
-@override final  String? dob;
-@override final  String? gender;
+@override@JsonKey() final  String phone;
+@override@JsonKey() final  String dob;
+@override@JsonKey() final  String gender;
 @override final  String role;
 
 /// Create a copy of ProfileModel
@@ -132,7 +132,7 @@ abstract mixin class _$ProfileModelCopyWith<$Res> implements $ProfileModelCopyWi
   factory _$ProfileModelCopyWith(_ProfileModel value, $Res Function(_ProfileModel) _then) = __$ProfileModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? avatarUrl, String fullName, String email, String? phone, String? dob, String? gender, String role
+ String id, String? avatarUrl, String fullName, String email, String phone, String dob, String gender, String role
 });
 
 
@@ -149,16 +149,16 @@ class __$ProfileModelCopyWithImpl<$Res>
 
 /// Create a copy of ProfileModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? avatarUrl = freezed,Object? fullName = null,Object? email = null,Object? phone = freezed,Object? dob = freezed,Object? gender = freezed,Object? role = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? avatarUrl = freezed,Object? fullName = null,Object? email = null,Object? phone = null,Object? dob = null,Object? gender = null,Object? role = null,}) {
   return _then(_ProfileModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
-as String?,dob: freezed == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
-as String?,gender: freezed == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
-as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,dob: null == dob ? _self.dob : dob // ignore: cast_nullable_to_non_nullable
+as String,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

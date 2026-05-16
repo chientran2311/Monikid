@@ -52,7 +52,7 @@ class SummaryCard extends StatelessWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: parentPrimary.withOpacity(0.15),
+                color: parentPrimary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
             ),
@@ -64,7 +64,7 @@ class SummaryCard extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: parentPrimary.withOpacity(0.1),
+                color: parentPrimary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
             ),
@@ -123,7 +123,7 @@ class SummaryCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(

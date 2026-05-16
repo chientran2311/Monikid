@@ -33,8 +33,8 @@ class TransactionEvidenceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = isDark
-        ? const Color(0xFF334155)
-        : const Color(0xFFE2E8F0);
+        ? AppTheme.borderDark
+        : AppTheme.borderLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +44,7 @@ class TransactionEvidenceSection extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+            color: isDark ? AppTheme.iconLight : AppTheme.borderDark,
           ),
         ),
         const SizedBox(height: 8),
@@ -80,8 +80,8 @@ class TransactionEvidenceSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   color: isDark
-                      ? const Color(0xFFCBD5E1)
-                      : const Color(0xFF475569),
+                      ? AppTheme.iconLight
+                      : AppTheme.textDark,
                 ),
               ),
               const SizedBox(height: 16),
@@ -211,7 +211,7 @@ class _EmptyPreview extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+              color: isDark ? AppTheme.iconLight : AppTheme.textDark,
             ),
           ),
         ],

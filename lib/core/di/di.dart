@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
+import 'package:monikid/core/service/notification_service.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository_impl.dart';
 import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
@@ -19,6 +21,7 @@ import 'package:monikid/repositories/request_money/request_money_repository.dart
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';
 import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
+import 'package:monikid/repositories/parent_statistic/parent_statistic_repository.dart';
 import 'package:monikid/repositories/statistic/statistic_repository.dart';
 import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
@@ -79,6 +82,7 @@ getIt.registerLazySingleton<PinCodeRepository>(
       getIt<TransactionEvidenceStorage>(),
       getIt<Logger>(),
       getIt<MonthlySummaryRepository>(),
+      getIt<ReceiptOcrService>(),
     ),
   );
 
@@ -103,7 +107,10 @@ getIt.registerLazySingleton<PinCodeRepository>(
   );
 
   getIt.registerLazySingleton<SetMoneyLimitRepository>(
-    () => SetMoneyLimitRepositoryImpl(getIt<AppLocalStorage>(), getIt<Logger>()),
+    () => FirestoreSpendingLimitRepositoryImpl(
+      firestore: getIt<FirebaseFirestore>(),
+      logger: getIt<Logger>(),
+    ),
   );
 
   getIt.registerLazySingleton<StatisticRepository>(
@@ -117,6 +124,28 @@ getIt.registerLazySingleton<PinCodeRepository>(
   getIt.registerLazySingleton<ParentDashboardRepository>(
     () => ParentDashboardRepositoryImpl(
         getIt<FirebaseFirestore>(), getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<ParentStatisticRepository>(
+    () => ParentStatisticRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<NotificationService>(
+    () => NotificationService(
+      getIt<NotificationRepository>(),
+      getIt<FirebaseFirestore>(),
+      getIt<Logger>(),
+    ),
   );
 }
 

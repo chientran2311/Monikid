@@ -39,10 +39,9 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
 
     final glassColor = isDark
         ? AppTheme.surfaceDark.withValues(alpha: 0.78)
-        : Colors.white.withValues(alpha: 0.80);
+        : AppTheme.surfaceLight.withValues(alpha: 0.80);
 
-    final unselectedColor =
-        isDark ? const Color(0xFF64748B) : AppTheme.textGrey;
+    final unselectedColor = AppTheme.textGrey;
 
     return Scaffold(
       extendBody: true,
@@ -63,12 +62,17 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar> {
           backgroundColor: AppTheme.primary,
           shape: const CircleBorder(),
           elevation: 0,
-          child: Icon(Icons.add_rounded, size: 28.r, color: Colors.white),
+          child: Icon(
+            Icons.add_rounded,
+            size: 42.r,
+            color: AppTheme.textWhite,
+            weight: 700,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: ClipRRect(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: BottomAppBar(

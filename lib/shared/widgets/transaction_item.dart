@@ -26,10 +26,8 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
+    final cardColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final borderColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey;
     final amountColor = isIncome ? AppTheme.primary : AppTheme.redAlert;
 
     return InkWell(
@@ -76,16 +74,14 @@ class TransactionItem extends StatelessWidget {
                     Text(
                       title,
                       style: context.typo.subtitle.small.copyWith(
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: context.typo.caption.large.copyWith(
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                        color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
                       ),
                     ),
                   ],

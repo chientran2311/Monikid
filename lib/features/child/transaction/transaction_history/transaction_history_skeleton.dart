@@ -125,7 +125,7 @@ class TransactionHistorySkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final shimmerCardColor = isDark
         ? const Color(0xFF1E3A2F)
-        : AppTheme.primary.withOpacity(0.12);
+        : AppTheme.primary.withValues(alpha: 0.12);
 
     return CustomScrollView(
       physics: const NeverScrollableScrollPhysics(),

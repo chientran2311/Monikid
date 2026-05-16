@@ -15,11 +15,14 @@ class AppIosSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoSwitch(
-      value: value,
-      onChanged: onChanged,
-      activeTrackColor: activeColor,
-      inactiveTrackColor: const Color(0xFFE5E5EA),
+    return Transform.scale(
+      scale: 0.85,
+      child: CupertinoSwitch(
+        value: value,
+        onChanged: onChanged,
+        activeTrackColor: activeColor,
+        inactiveTrackColor: const Color(0xFFE5E5EA),
+      ),
     );
   }
 }

@@ -65,8 +65,7 @@ class _RoleOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inactiveColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final inactiveColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return GestureDetector(
       onTap: onTap,
@@ -74,13 +73,13 @@ class _RoleOption extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? const Color(0xFF334155) : Colors.white)
+              ? (isDark ? AppTheme.borderDark : AppTheme.surfaceLight)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                   ),
                 ]
@@ -99,7 +98,7 @@ class _RoleOption extends StatelessWidget {
               label,
               style: context.typo.subtitle.small.copyWith(
                 color: isSelected
-                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                    ? (isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark)
                     : inactiveColor,
               ),
             ),

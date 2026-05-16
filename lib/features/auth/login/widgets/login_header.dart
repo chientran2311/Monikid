@@ -21,12 +21,12 @@ class LoginHeader extends StatelessWidget {
             color: AppTheme.primaryLight,
             borderRadius: BorderRadius.circular(40), // rounded-[40px]
             border: Border.all(
-              color: Colors.white,
+              color: AppTheme.surfaceLight,
               width: 4,
             ), // border-white border-4
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05), // shadow-md
+                color: Colors.black.withValues(alpha: 0.05), // shadow-md
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),

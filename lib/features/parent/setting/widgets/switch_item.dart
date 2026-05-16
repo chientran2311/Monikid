@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/app_ios_switch.dart';
 
 class SwitchItem extends StatelessWidget {
   const SwitchItem({
@@ -12,22 +13,20 @@ class SwitchItem extends StatelessWidget {
     required this.onChanged,
     required this.textColor,
     required this.borderColor,
-    required this.activeColor,
     required this.showBorder,
-    this.subtitle,
+    required this.activeColor,
   });
 
   final IconData icon;
   final Color iconColor;
   final Color iconBgColor;
   final String title;
-  final String? subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
   final Color textColor;
   final Color borderColor;
-  final Color activeColor;
   final bool showBorder;
+  final Color activeColor;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +38,7 @@ class SwitchItem extends StatelessWidget {
               ),
             )
           : null,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       child: Row(
         children: [
           Container(
@@ -53,35 +52,19 @@ class SwitchItem extends StatelessWidget {
           ),
           SizedBox(width: 12.w),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  SizedBox(height: 2.h),
-                  Text(
-                    subtitle!,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: borderColor,
-                    ),
-                  ),
-                ],
-              ],
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.w500,
+                color: textColor,
+              ),
             ),
           ),
-          Switch(
+          AppIosSwitch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: activeColor,
+            activeColor: activeColor,
           ),
         ],
       ),

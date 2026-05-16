@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/shared/widgets/social_button.dart';
 
@@ -70,7 +71,7 @@ class AuthSocialSection extends StatelessWidget {
                 icon: Icon(
                   Icons.apple,
                   size: 24,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
                 ),
                 onPressed: onApplePressed,
               ),

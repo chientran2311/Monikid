@@ -45,7 +45,7 @@ class SplashBrandSection extends StatelessWidget {
                 style: context.typo.label.large.copyWith(
                   letterSpacing: 0.25,
                   color:
-                      isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      isDark ? AppTheme.textMuted : AppTheme.textGrey,
                 ),
               ),
             ],
@@ -103,7 +103,7 @@ class _SplashLogo extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: isDark ? AppTheme.backgroundDark : Colors.white,
+                      color: isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(

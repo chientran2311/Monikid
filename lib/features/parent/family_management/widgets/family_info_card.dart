@@ -110,7 +110,7 @@ class FamilyInfoCard extends StatelessWidget {
                       );
                     }
                   },
-                  icon: Icon(Icons.copy_outlined, size: 16.w),
+                  icon: Icon(Icons.copy_outlined, size: 14.w),
                   label: Text(s.familyManagementCopyTooltip),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
@@ -120,11 +120,11 @@ class FamilyInfoCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     padding: EdgeInsets.symmetric(
-                      horizontal: 14.w,
-                      vertical: 10.h,
+                      horizontal: 10.w,
+                      vertical: 7.h,
                     ),
                     textStyle: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

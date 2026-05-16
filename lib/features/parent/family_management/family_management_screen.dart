@@ -270,6 +270,7 @@ class _FamilyBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       height: 130.h,
       decoration: BoxDecoration(

@@ -15,7 +15,6 @@ import 'package:monikid/features/parent/home/widgets/no_family_empty_state.dart'
 import 'package:monikid/features/parent/home/widgets/parent_home_section_header.dart';
 import 'package:monikid/features/parent/home/widgets/parent_transaction_list_card.dart';
 import 'package:monikid/features/parent/home/widgets/top_category_alert_card.dart';
-import 'package:monikid/features/parent/home/widgets/set_child_limit_sheet.dart';
 import 'package:monikid/features/parent/notification/parent_notification_provider.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_provider.dart';
@@ -91,21 +90,6 @@ class HomeTabParent extends HookConsumerWidget {
               selectedMemberId: state.selectedMemberId,
               inviteCode: state.family?.inviteCode ?? '',
               onMemberTap: notifier.selectMember,
-              onSetLimitTap: (childUid) {
-                final member = state.members
-                    .where((m) => m.uid == childUid)
-                    .firstOrNull;
-                if (member == null) return;
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (_) => SetChildLimitSheet(
-                    childUid: childUid,
-                    childName: member.displayName,
-                  ),
-                );
-              },
             ),
             SizedBox(height: 20.h),
             Padding(

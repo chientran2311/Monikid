@@ -100,7 +100,7 @@ class SettingTabParent extends ConsumerWidget {
                   textColor: textColor,
                   borderColor: borderColor,
                   showBorder: false,
-                  onTap: () => context.go(AppRoutes.manageFamily),
+                  onTap: () => context.push(AppRoutes.manageFamily),
                 ),
               ],
             ),

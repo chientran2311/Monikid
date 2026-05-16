@@ -137,7 +137,13 @@ class FamilyManagementScreen extends HookConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           color: AppTheme.textBlack,
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.parent);
+            }
+          },
         ),
         title: Text(
           s.familyManagementTitle,
@@ -147,13 +153,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
             color: AppTheme.textBlack,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            color: AppTheme.textBlack,
-            onPressed: () => context.push(AppRoutes.parentNotifications),
-          ),
-        ],
+        actions: const [],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppTheme.borderLight, height: 1, thickness: 1),

@@ -505,8 +505,8 @@
   "familyManagementEmptyMessage": "No family found",
   "familyManagementErrorMessage": "Error loading family data",
   "familyManagementHostBadge": "Host",
-  "familyManagementHostSubtitle": "Family host",
-  "familyManagementParentSubtitle": "Parent",
+  "familyManagementHostSubtitle": "Host",
+  "familyManagementParentSubtitle": "Family member",
   "familyManagementInviteCodeLabel": "Family invite code",
   "familyManagementCopyTooltip": "Copy",
   "familyManagementCopySuccess": "Invite code copied",
@@ -551,5 +551,7 @@
   "familyManagementSetLimitSuccess": "Limit set successfully",
   "familyManagementSetLimitError": "Error setting limit",
   "familyManagementRemoveLimitSuccess": "Limit removed successfully",
-  "familyManagementRemoveLimitError": "Error removing limit"
+  "familyManagementRemoveLimitError": "Error removing limit",
+  "familyManagementBannerTitle": "Building a future together",
+  "familyManagementBannerSubtitle": "Teach your children to manage money wisely from today."
 }

@@ -51,7 +51,6 @@ class FamilyInfoCard extends StatelessWidget {
               displayName: family.parentName,
               avatarColor: AppTheme.primary,
               subtitle: s.familyManagementHostSubtitle,
-              trailing: _HostBadge(label: s.familyManagementHostBadge),
             ),
             if (nonHostParent != null) ...[
               SizedBox(height: 12.h),
@@ -78,32 +77,28 @@ class FamilyInfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      s.familyManagementInviteCodeLabel,
+                      s.familyManagementInviteCodeLabel.toUpperCase(),
                       style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w500,
                         color: AppTheme.textGrey,
+                        letterSpacing: 0.8,
                       ),
                     ),
                     SizedBox(height: 4.h),
                     Text(
                       displayCode,
                       style: TextStyle(
-                        fontSize: 22.sp,
+                        fontSize: 26.sp,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.primary,
+                        letterSpacing: 2,
                       ),
                     ),
                   ],
                 ),
                 const Spacer(),
-                IconButton(
-                  icon: Icon(
-                    Icons.copy_outlined,
-                    size: 20.w,
-                    color: AppTheme.textGrey,
-                  ),
-                  tooltip: s.familyManagementCopyTooltip,
+                ElevatedButton.icon(
                   onPressed: () async {
                     await Clipboard.setData(ClipboardData(text: rawCode));
                     if (context.mounted) {
@@ -115,6 +110,24 @@ class FamilyInfoCard extends StatelessWidget {
                       );
                     }
                   },
+                  icon: Icon(Icons.copy_outlined, size: 16.w),
+                  label: Text(s.familyManagementCopyTooltip),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.w,
+                      vertical: 10.h,
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -180,30 +193,6 @@ class _ParentRow extends StatelessWidget {
         ),
         if (trailing != null) trailing!,
       ],
-    );
-  }
-}
-
-class _HostBadge extends StatelessWidget {
-  const _HostBadge({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryLight,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.primary,
-        ),
-      ),
     );
   }
 }

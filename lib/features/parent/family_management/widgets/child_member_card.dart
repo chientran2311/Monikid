@@ -87,7 +87,7 @@ class ChildMemberCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.w),
-            _ActionColumn(
+            _ActionRow(
               isHostParent: isHostParent,
               isProcessing: isProcessing,
               setLimitLabel: s.familyManagementSetLimit,
@@ -175,8 +175,8 @@ class _LimitChip extends StatelessWidget {
   }
 }
 
-class _ActionColumn extends StatelessWidget {
-  const _ActionColumn({
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
     required this.isHostParent,
     required this.isProcessing,
     required this.setLimitLabel,
@@ -194,8 +194,7 @@ class _ActionColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         OutlinedButton(
@@ -214,7 +213,7 @@ class _ActionColumn extends StatelessWidget {
           child: Text(setLimitLabel),
         ),
         if (isHostParent) ...[
-          SizedBox(height: 4.h),
+          SizedBox(width: 6.w),
           TextButton(
             onPressed: isProcessing ? null : onUnlink,
             style: TextButton.styleFrom(

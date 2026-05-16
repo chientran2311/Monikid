@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -117,6 +118,11 @@ class FamilyManagementScreen extends HookConsumerWidget {
                   ),
                 );
               }),
+            SizedBox(height: 16.h),
+            _FamilyBanner(
+              title: s.familyManagementBannerTitle,
+              subtitle: s.familyManagementBannerSubtitle,
+            ),
           ],
         ),
       );
@@ -141,6 +147,13 @@ class FamilyManagementScreen extends HookConsumerWidget {
             color: AppTheme.textBlack,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            color: AppTheme.textBlack,
+            onPressed: () => context.push(AppRoutes.parentNotifications),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppTheme.borderLight, height: 1, thickness: 1),
@@ -152,10 +165,10 @@ class FamilyManagementScreen extends HookConsumerWidget {
 
   Color _childAvatarColor(int index) {
     const colors = [
-      Color(0xFF039BE5), // sky blue
-      Color(0xFFFB8C00), // orange
-      Color(0xFF00897B), // teal
-      Color(0xFF8E24AA), // purple
+      Color(0xFF039BE5),
+      Color(0xFFFB8C00),
+      Color(0xFF00897B),
+      Color(0xFF8E24AA),
     ];
     return colors[index % colors.length];
   }
@@ -244,6 +257,70 @@ class _EmptyChildrenState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _FamilyBanner extends StatelessWidget {
+  const _FamilyBanner({required this.title, required this.subtitle});
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16.w),
+      height: 130.h,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1B5E20), Color(0xFF2F7F33), Color(0xFF43A047)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -10.w,
+            top: -10.h,
+            child: Opacity(
+              opacity: 0.12,
+              child: Icon(
+                Icons.eco_rounded,
+                size: 120.w,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

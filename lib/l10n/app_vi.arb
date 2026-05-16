@@ -495,8 +495,8 @@
   "familyManagementEmptyMessage": "Không tìm thấy gia đình",
   "familyManagementErrorMessage": "Có lỗi xảy ra khi tải dữ liệu gia đình",
   "familyManagementHostBadge": "Chủ",
-  "familyManagementHostSubtitle": "Chủ gia đình",
-  "familyManagementParentSubtitle": "Phụ huynh",
+  "familyManagementHostSubtitle": "Chủ",
+  "familyManagementParentSubtitle": "Thành viên gia đình",
   "familyManagementInviteCodeLabel": "Mã mời gia đình",
   "familyManagementCopyTooltip": "Sao chép",
   "familyManagementCopySuccess": "Đã sao chép mã mời",
@@ -541,5 +541,7 @@
   "familyManagementSetLimitSuccess": "Đã đặt hạn mức thành công",
   "familyManagementSetLimitError": "Lỗi khi đặt hạn mức",
   "familyManagementRemoveLimitSuccess": "Đã xóa hạn mức thành công",
-  "familyManagementRemoveLimitError": "Lỗi khi xóa hạn mức"
+  "familyManagementRemoveLimitError": "Lỗi khi xóa hạn mức",
+  "familyManagementBannerTitle": "Xây dựng tương lai cùng con",
+  "familyManagementBannerSubtitle": "Dạy trẻ cách quản lý chi tiêu thông minh từ hôm nay."
 }

@@ -1022,6 +1022,36 @@ abstract class AppLocalizations {
   /// **'Gemini'**
   String get aiModelGeminiName;
 
+  /// No description provided for @aiModelUseApiKeyModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use API key model'**
+  String get aiModelUseApiKeyModel;
+
+  /// No description provided for @aiModelUseLocalModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use local model'**
+  String get aiModelUseLocalModel;
+
+  /// No description provided for @aiModelApiKeyAddSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'API key verified and saved'**
+  String get aiModelApiKeyAddSuccess;
+
+  /// No description provided for @aiModelApiKeyInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid API key. Please check and try again.'**
+  String get aiModelApiKeyInvalid;
+
+  /// No description provided for @aiModelApiKeyTestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not verify API key. Check your internet connection.'**
+  String get aiModelApiKeyTestFailed;
+
   /// No description provided for @aiModelGemmaName.
   ///
   /// In en, this message translates to:
@@ -1123,6 +1153,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'File size: ~1.35 GB. Make sure you have enough storage and a stable connection before downloading.'**
   String get aiModelGemmaDownloadConfirmMessage;
+
+  /// No description provided for @aiModelDeleteModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete model'**
+  String get aiModelDeleteModel;
+
+  /// No description provided for @aiModelGemmaDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete AI model from device? You will need to re-download it to use it again.'**
+  String get aiModelGemmaDeleteConfirmMessage;
 
   /// No description provided for @aiModelGemmaDescription.
   ///
@@ -1968,6 +2010,12 @@ abstract class AppLocalizations {
   /// **'Select period'**
   String get statisticSelectPeriodTitle;
 
+  /// No description provided for @scanBillNoAiAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No AI available. Set up an API key or download the local AI model.'**
+  String get scanBillNoAiAvailable;
+
   /// No description provided for @scanBillAiError.
   ///
   /// In en, this message translates to:
@@ -2289,13 +2337,13 @@ abstract class AppLocalizations {
   /// No description provided for @familyManagementHostSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Family host'**
+  /// **'Host'**
   String get familyManagementHostSubtitle;
 
   /// No description provided for @familyManagementParentSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Parent'**
+  /// **'Family member'**
   String get familyManagementParentSubtitle;
 
   /// No description provided for @familyManagementInviteCodeLabel.
@@ -2513,6 +2561,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error removing limit'**
   String get familyManagementRemoveLimitError;
+
+  /// No description provided for @familyManagementBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Building a future together'**
+  String get familyManagementBannerTitle;
+
+  /// No description provided for @familyManagementBannerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Teach your children to manage money wisely from today.'**
+  String get familyManagementBannerSubtitle;
 }
 
 class _AppLocalizationsDelegate

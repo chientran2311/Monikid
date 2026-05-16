@@ -14,6 +14,20 @@ class GeminiAiService {
   final Logger _logger;
   late final AppSecureStorage _secureStorage;
 
+  /// Sends a minimal test request with [apiKey] (not yet stored) to verify it
+  /// is valid and has API access. Throws [InvalidApiKey] or
+  /// [UnsupportedUserLocation] on auth failures, or a network exception on
+  /// connectivity issues.
+  Future<void> validateApiKey(String apiKey) async {
+    _logger.i('GeminiAiService.validateApiKey: testing key...');
+    final model = GenerativeModel(
+      model: 'gemini-2.5-flash',
+      apiKey: apiKey,
+    );
+    await model.generateContent([Content.text('hi')]);
+    _logger.i('GeminiAiService.validateApiKey: key is valid.');
+  }
+
   Future<String?> getStoredApiKey() async {
     final apiKey = await _secureStorage.read(StorageKeys.userGeminiApiKey);
     if (apiKey != null && apiKey.isNotEmpty) {

@@ -4,7 +4,9 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/config/storage_keys.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/core/service/ai_analysis_service.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
+import 'package:monikid/core/service/local_gemma_ai_analysis_service.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
@@ -27,6 +29,7 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
   late final AppLocalStorage _localStorage;
   late final GeminiAiService _geminiService;
   late final GemmaModelRepository _modelRepository;
+  late final LocalGemmaAiAnalysisService _localGemmaService;
   CancelToken? _gemmaCancelToken;
 
   @override
@@ -36,6 +39,8 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     _localStorage = getIt<AppLocalStorage>();
     _geminiService = getIt<GeminiAiService>();
     _modelRepository = getIt<GemmaModelRepository>();
+    _localGemmaService =
+        getIt<AiAnalysisService>(instanceName: 'local') as LocalGemmaAiAnalysisService;
 
     final storedApiKey =
         await _secureStorage.read(StorageKeys.userGeminiApiKey);
@@ -46,24 +51,71 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
         await _localStorage.read(StorageKeys.selectedAiModel) ??
             kGeminiModelOptions.first.modelId;
 
+    bool useLocalModel =
+        await _localStorage.readBool(StorageKeys.useLocalModel) ?? false;
+
     // Clean up any stale .part file from a previous killed download
     await _modelRepository.reconcileStalePartFile();
 
-    // Check if model is already cached
+    final modelPath = await _modelRepository.getCachedModelPath();
+    _logger.d('ChooseAiModelNotifier.build: modelPath=$modelPath');
+
     final isCached = await _modelRepository.isModelCached();
+    _logger.d('ChooseAiModelNotifier.build: isCached=$isCached | useLocalModel=$useLocalModel');
+
+    final hasKeyInStorage = storedApiKey != null && storedApiKey.isNotEmpty;
+
+    // EC-3: model file gone externally — reset useLocalModel preference
+    if (!isCached && useLocalModel) {
+      _logger.w('ChooseAiModelNotifier.build: model not cached but useLocalModel=true — resetting.');
+      await _localStorage.writeBool(key: StorageKeys.useLocalModel, value: false);
+      useLocalModel = false;
+    }
+    // EC-4: both flags dirty (old data) — prefer Gemini, reset local
+    else if (isCached && useLocalModel && hasStoredApiKey && hasKeyInStorage) {
+      _logger.w('ChooseAiModelNotifier.build: both useLocalModel=true and hasSavedApiKey=true — resetting useLocalModel.');
+      await _localStorage.writeBool(key: StorageKeys.useLocalModel, value: false);
+      useLocalModel = false;
+    }
 
     return ChooseAiModelState(
       status: ChooseAiModelStatus.initial,
       apiKeyInput: storedApiKey ?? '',
       promptInput: '',
-      hasSavedApiKey: hasStoredApiKey && storedApiKey != null,
+      hasSavedApiKey: hasStoredApiKey && hasKeyInStorage,
+      hasKeyInStorage: hasKeyInStorage,
       responseText: null,
       error: null,
       selectedModel: storedModel,
       gemmaStatus: isCached
           ? GemmaDownloadStatus.downloaded
           : GemmaDownloadStatus.readyToDownload,
+      useLocalModel: useLocalModel,
     );
+  }
+
+  Future<void> toggleLocalModel(bool value) async {
+    final currentState = state.valueOrNull;
+    if (currentState == null) return;
+
+    try {
+      await _localStorage.writeBool(key: StorageKeys.useLocalModel, value: value);
+
+      if (value) {
+        // Turning local ON — disable Gemini (Group 2 mutual exclusivity)
+        await _localStorage.writeBool(
+            key: StorageKeys.hasStoredGeminiApiKey, value: false);
+        state = AsyncValue.data(
+            currentState.copyWith(useLocalModel: true, hasSavedApiKey: false));
+        _logger.i('useLocalModel=true: Gemini deactivated.');
+      } else {
+        state = AsyncValue.data(currentState.copyWith(useLocalModel: false));
+        _logger.i('useLocalModel=false.');
+      }
+    } catch (error, stackTrace) {
+      _logger.e('Failed to toggle useLocalModel preference.',
+          error: error, stackTrace: stackTrace);
+    }
   }
 
   void updateApiKeyInput(String value) {
@@ -214,15 +266,22 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
   Future<void> deleteLocalModel() async {
     final s = state.valueOrNull;
     if (s == null) return;
-    state = AsyncValue.data(s.copyWith(
-      gemmaStatus: GemmaDownloadStatus.deleting,
-    ));
+    state = AsyncValue.data(s.copyWith(gemmaStatus: GemmaDownloadStatus.deleting));
     await _modelRepository.deleteCachedModel();
+
+    // EC-2: model deleted — clear useLocalModel so switch doesn't show ON with no model
+    await _localStorage.writeBool(key: StorageKeys.useLocalModel, value: false);
+
+    // Reset in-memory flutter_gemma state to avoid phantom "loaded" session
+    _localGemmaService.reset();
+
     state = AsyncValue.data(state.valueOrNull!.copyWith(
       gemmaStatus: GemmaDownloadStatus.readyToDownload,
       gemmaDownloadProgress: 0.0,
       gemmaDownloadError: null,
+      useLocalModel: false,
     ));
+    _logger.i('deleteLocalModel: model deleted, useLocalModel reset, gemma service reset.');
   }
 
   String _mapDioError(DioException e) {
@@ -263,34 +322,36 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     ));
 
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 900));
+      // Group 3: validate key with a real test request before saving
+      await _geminiService.validateApiKey(normalizedApiKey);
 
       await _secureStorage.write(
         key: StorageKeys.userGeminiApiKey,
         value: normalizedApiKey,
       );
       await _localStorage.writeBool(
-        key: StorageKeys.hasStoredGeminiApiKey,
-        value: true,
-      );
+          key: StorageKeys.hasStoredGeminiApiKey, value: true);
+
+      // EC-1: saving key activates Gemini — deactivate local model
+      await _localStorage.writeBool(
+          key: StorageKeys.useLocalModel, value: false);
 
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.apiKeyReady,
         apiKeyInput: normalizedApiKey,
         hasSavedApiKey: true,
+        hasKeyInStorage: true,
+        useLocalModel: false,
         error: null,
       ));
 
-      _logger.i('Gemini API key saved securely.');
+      _logger.i('Gemini API key validated and saved.');
     } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to save Gemini API key.',
-        error: error,
-        stackTrace: stackTrace,
-      );
+      _logger.e('Failed to save Gemini API key.',
+          error: error, stackTrace: stackTrace);
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.error,
-        error: ChooseAiModelError.requestFailed,
+        error: _mapError(error),
         hasSavedApiKey: false,
       ));
     }
@@ -316,6 +377,7 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
         apiKeyInput: '',
         promptInput: currentState.promptInput,
         hasSavedApiKey: false,
+        hasKeyInStorage: false,
         responseText: null,
         error: null,
       ));
@@ -383,23 +445,22 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
         ));
         return;
       }
+      // Group 2: turning Gemini ON — disable local model
       await _localStorage.writeBool(
-        key: StorageKeys.hasStoredGeminiApiKey,
-        value: true,
-      );
+          key: StorageKeys.hasStoredGeminiApiKey, value: true);
+      await _localStorage.writeBool(
+          key: StorageKeys.useLocalModel, value: false);
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.apiKeyReady,
         apiKeyInput: storedKey,
         hasSavedApiKey: true,
+        useLocalModel: false,
         error: null,
       ));
-      _logger.i('Gemini API key re-enabled.');
+      _logger.i('Gemini API key re-enabled: local model deactivated.');
     } catch (error, stackTrace) {
-      _logger.e(
-        'Failed to enable Gemini API key.',
-        error: error,
-        stackTrace: stackTrace,
-      );
+      _logger.e('Failed to enable Gemini API key.',
+          error: error, stackTrace: stackTrace);
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.error,
         error: ChooseAiModelError.requestFailed,

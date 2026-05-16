@@ -51,6 +51,8 @@ enum GemmaDownloadStatus {
   error,
 }
 
+enum AiSource { gemini, local, none }
+
 @freezed
 abstract class ChooseAiModelState with _$ChooseAiModelState {
   const factory ChooseAiModelState({
@@ -58,6 +60,7 @@ abstract class ChooseAiModelState with _$ChooseAiModelState {
     @Default('') String apiKeyInput,
     @Default('') String promptInput,
     @Default(false) bool hasSavedApiKey,
+    @Default(false) bool hasKeyInStorage,
     @Default('gemini-2.5-flash') String selectedModel,
     String? responseText,
     TransactionAiResult? transactionAiResult,
@@ -65,6 +68,7 @@ abstract class ChooseAiModelState with _$ChooseAiModelState {
     @Default(GemmaDownloadStatus.idle) GemmaDownloadStatus gemmaStatus,
     @Default(0.0) double gemmaDownloadProgress,
     String? gemmaDownloadError,
+    @Default(false) bool useLocalModel,
   }) = _ChooseAiModelState;
 
   const ChooseAiModelState._();
@@ -88,4 +92,12 @@ abstract class ChooseAiModelState with _$ChooseAiModelState {
   bool get isGemmaDownloaded => gemmaStatus == GemmaDownloadStatus.downloaded;
   bool get isGemmaDeleting => gemmaStatus == GemmaDownloadStatus.deleting;
   bool get isGemmaError => gemmaStatus == GemmaDownloadStatus.error;
+
+  AiSource get activeAiSource {
+    final modelCached = gemmaStatus == GemmaDownloadStatus.downloaded;
+    if (useLocalModel && modelCached) return AiSource.local;
+    if (!useLocalModel && hasSavedApiKey) return AiSource.gemini;
+    if (!hasSavedApiKey && modelCached) return AiSource.local;
+    return AiSource.none;
+  }
 }

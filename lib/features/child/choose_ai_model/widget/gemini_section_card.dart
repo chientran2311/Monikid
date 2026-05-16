@@ -77,14 +77,26 @@ class GeminiSectionCard extends HookConsumerWidget {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
-          child: Text(
-            s.aiModelGeminiSectionTitle.toUpperCase(),
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.5,
-              color: mutedColor,
-            ),
+          child: Row(
+            children: [
+              Text(
+                s.aiModelGeminiSectionTitle.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                  color: mutedColor,
+                ),
+              ),
+              if (state.activeAiSource == AiSource.gemini) ...[
+                SizedBox(width: 6.w),
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: AppTheme.primary,
+                  size: 16.r,
+                ),
+              ],
+            ],
           ),
         ),
         SizedBox(height: 8.h),
@@ -112,7 +124,7 @@ class GeminiSectionCard extends HookConsumerWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        s.aiModelGeminiName,
+                        s.aiModelUseApiKeyModel,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
@@ -132,11 +144,13 @@ class GeminiSectionCard extends HookConsumerWidget {
                     else
                       AppIosSwitch(
                         value: state.hasSavedApiKey,
-                        onChanged: state.isBusy
+                        // disabled when no key in storage — add key first via button
+                        onChanged: (state.isBusy || !state.hasKeyInStorage)
                             ? null
                             : (v) => v
                                 ? notifier.enableApiKey()
                                 : notifier.disableApiKey(),
+                        scale: 0.6,
                       ),
                   ],
                 ),

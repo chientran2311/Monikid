@@ -59,3 +59,18 @@ String _languageLabel(String languageCode) {
       return languageCode.trim();
   }
 }
+
+/// Builds a prompt in Gemma 2B instruction-following format.
+///
+/// flutter_gemma has no systemInstruction param, so it is embedded inline.
+String buildLocalGemmaPrompt({
+  required String ocrText,
+  required String languageCode,
+  required List<ReceiptCategoryOption> categories,
+}) {
+  return '<start_of_turn>user\n'
+      '$kReceiptAnalysisSystemInstruction\n\n'
+      '${buildReceiptAnalysisPrompt(ocrText: ocrText, languageCode: languageCode, categories: categories)}'
+      '<end_of_turn>\n'
+      '<start_of_turn>model\n';
+}

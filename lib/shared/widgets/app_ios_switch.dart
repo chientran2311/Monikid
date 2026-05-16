@@ -7,16 +7,18 @@ class AppIosSwitch extends StatelessWidget {
     required this.value,
     this.onChanged,
     this.activeColor = AppTheme.primary,
+    this.scale = 0.85,
   });
 
   final bool value;
   final ValueChanged<bool>? onChanged;
   final Color activeColor;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {
     return Transform.scale(
-      scale: 0.85,
+      scale: scale,
       child: CupertinoSwitch(
         value: value,
         onChanged: onChanged,

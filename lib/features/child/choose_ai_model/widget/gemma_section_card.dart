@@ -13,18 +13,24 @@ class GemmaSectionCard extends StatelessWidget {
     required this.gemmaProgress,
     required this.gemmaError,
     required this.isDark,
+    required this.activeAiSource,
+    required this.useLocalModel,
     required this.onDownloadConfirmed,
     required this.onCancel,
     required this.onDelete,
+    required this.onToggleLocalModel,
   });
 
   final GemmaDownloadStatus gemmaStatus;
   final double gemmaProgress;
   final String? gemmaError;
   final bool isDark;
+  final AiSource activeAiSource;
+  final bool useLocalModel;
   final VoidCallback onDownloadConfirmed;
   final VoidCallback onCancel;
   final VoidCallback onDelete;
+  final ValueChanged<bool> onToggleLocalModel;
 
   Future<void> _handleDownloadTap(BuildContext context) async {
     final s = context.l10n;
@@ -39,6 +45,21 @@ class GemmaSectionCard extends StatelessWidget {
     );
     if (confirmed != true || !context.mounted) return;
     onDownloadConfirmed();
+  }
+
+  Future<void> _handleDeleteTap(BuildContext context) async {
+    final s = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => ConfirmDialog(
+        title: s.aiModelGemmaName,
+        message: s.aiModelGemmaDeleteConfirmMessage,
+        confirmLabel: s.aiModelDeleteModel,
+        cancelLabel: s.actionCancel,
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    onDelete();
   }
 
   @override
@@ -89,6 +110,14 @@ class GemmaSectionCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (activeAiSource == AiSource.local) ...[
+                SizedBox(width: 8.w),
+                Icon(
+                  Icons.check_circle_rounded,
+                  color: AppTheme.primary,
+                  size: 16.r,
+                ),
+              ],
             ],
           ),
         ),
@@ -133,18 +162,60 @@ class GemmaSectionCard extends StatelessWidget {
                           color: AppTheme.primary,
                         ),
                       )
-                    else
-                      AppIosSwitch(
-                        value: isDownloaded,
-                        onChanged: isBusy
-                            ? null
-                            : (v) =>
-                                v ? _handleDownloadTap(context) : onDelete(),
+                    else if (isDownloaded)
+                      ElevatedButton(
+                        onPressed: isBusy ? null : () => _handleDeleteTap(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: errorColor,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 4.h),
+                          minimumSize: Size.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          elevation: 0,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          s.aiModelDeleteModel,
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                   ],
                 ),
               ),
               Divider(height: 1, thickness: 0.5, color: borderColor),
+              // Use local model toggle (only visible when model is downloaded)
+              if (isDownloaded) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 16.w, vertical: 12.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          s.aiModelUseLocalModel,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      AppIosSwitch(
+                        value: useLocalModel,
+                        onChanged: isBusy ? null : onToggleLocalModel,
+                        scale: 0.6,
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(height: 1, thickness: 0.5, color: borderColor),
+              ],
               Padding(
                 padding: EdgeInsets.all(16.r),
                 child: Column(

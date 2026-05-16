@@ -22,6 +22,24 @@ class ChooseAiModelScreen extends ConsumerWidget {
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
 
+    // Group 3: snackbars for API key save result
+    ref.listen(chooseAiModelNotifierProvider, (previous, next) {
+      final prev = previous?.valueOrNull;
+      final curr = next.valueOrNull;
+      if (curr == null || !context.mounted) return;
+
+      final wasValidating = prev?.status == ChooseAiModelStatus.savingApiKey;
+
+      if (wasValidating && curr.status == ChooseAiModelStatus.apiKeyReady) {
+        context.showSuccessSnackBar(s.aiModelApiKeyAddSuccess);
+      } else if (wasValidating && curr.status == ChooseAiModelStatus.error) {
+        final msg = curr.error == ChooseAiModelError.invalidApiKey
+            ? s.aiModelApiKeyInvalid
+            : s.aiModelApiKeyTestFailed;
+        context.showErrorSnackBar(msg);
+      }
+    });
+
     final asyncState = ref.watch(chooseAiModelNotifierProvider);
     final state = asyncState.valueOrNull;
     final notifier = ref.read(chooseAiModelNotifierProvider.notifier);
@@ -54,7 +72,6 @@ class ChooseAiModelScreen extends ConsumerWidget {
           body: ListView(
             padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 40.h),
             children: [
-             
               SizedBox(height: 24.h),
               GeminiSectionCard(isDark: isDark),
               SizedBox(height: 24.h),
@@ -64,9 +81,12 @@ class ChooseAiModelScreen extends ConsumerWidget {
                 gemmaProgress: state?.gemmaDownloadProgress ?? 0.0,
                 gemmaError: state?.gemmaDownloadError,
                 isDark: isDark,
+                activeAiSource: state?.activeAiSource ?? AiSource.none,
+                useLocalModel: state?.useLocalModel ?? false,
                 onDownloadConfirmed: notifier.downloadLocalModel,
                 onCancel: notifier.cancelModelDownload,
                 onDelete: notifier.deleteLocalModel,
+                onToggleLocalModel: notifier.toggleLocalModel,
               ),
             ],
           ),

@@ -2,7 +2,11 @@ import 'package:get_it/get_it.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
+import 'package:monikid/core/service/ai_analysis_service.dart';
+import 'package:monikid/core/service/ai_provider_resolver.dart';
+import 'package:monikid/core/service/gemini_ai_analysis_service.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
+import 'package:monikid/core/service/local_gemma_ai_analysis_service.dart';
 import 'package:monikid/core/service/notification_service.dart';
 import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository.dart';
@@ -53,6 +57,27 @@ Future<void> setupLocator() async {
   );
   getIt.registerLazySingleton<GemmaModelRepository>(
     () => GemmaModelRepositoryImpl(getIt<Logger>()),
+  );
+  getIt.registerLazySingleton<AiAnalysisService>(
+    () => GeminiAiAnalysisService(
+      geminiService: getIt<GeminiAiService>(),
+      localStorage: getIt<AppLocalStorage>(),
+    ),
+    instanceName: 'gemini',
+  );
+  getIt.registerLazySingleton<AiAnalysisService>(
+    () => LocalGemmaAiAnalysisService(
+      gemmaRepository: getIt<GemmaModelRepository>(),
+    ),
+    instanceName: 'local',
+  );
+  getIt.registerLazySingleton<AiProviderResolver>(
+    () => AiProviderResolver(
+      geminiService: getIt<AiAnalysisService>(instanceName: 'gemini'),
+      localService: getIt<AiAnalysisService>(instanceName: 'local'),
+      storage: getIt<AppLocalStorage>(),
+      gemmaRepo: getIt<GemmaModelRepository>(),
+    ),
   );
 
   // Register Repositories

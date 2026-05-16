@@ -297,7 +297,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get transactionEvidenceAddOptionalLabel =>
-      'Thêm ảnh minh chứng (optional)';
+      'Thêm ảnh minh chứng (tùy chọn)';
 
   @override
   String get transactionEvidenceOptionalLabel =>
@@ -508,6 +508,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get aiModelGeminiName => 'Gemini';
 
   @override
+  String get aiModelUseApiKeyModel => 'Dùng API key model';
+
+  @override
+  String get aiModelUseLocalModel => 'Dùng model cục bộ';
+
+  @override
+  String get aiModelApiKeyAddSuccess => 'API key hợp lệ và đã được lưu';
+
+  @override
+  String get aiModelApiKeyInvalid =>
+      'API key không hợp lệ. Vui lòng kiểm tra lại.';
+
+  @override
+  String get aiModelApiKeyTestFailed =>
+      'Không thể xác minh API key. Kiểm tra kết nối internet.';
+
+  @override
   String get aiModelGemmaName => 'gemma:2b';
 
   @override
@@ -524,48 +541,55 @@ class AppLocalizationsVi extends AppLocalizations {
       'API key được lưu an toàn trong bộ nhớ thiết bị.';
 
   @override
-  String get aiModelPromptHint => 'Enter a prompt to test Gemini...';
+  String get aiModelPromptHint => 'Nhập câu hỏi để kiểm tra Gemini...';
 
   @override
-  String get aiModelSendPrompt => 'Send Prompt';
+  String get aiModelSendPrompt => 'Gửi câu hỏi';
 
   @override
-  String get aiModelResponseTitle => 'Gemini response';
+  String get aiModelResponseTitle => 'Phản hồi từ Gemini';
 
   @override
-  String get aiModelApiKeyRequired => 'Please enter an API key first.';
+  String get aiModelApiKeyRequired => 'Vui lòng nhập API key trước.';
 
   @override
-  String get aiModelPromptRequired => 'Please enter a prompt before sending.';
+  String get aiModelPromptRequired => 'Vui lòng nhập câu hỏi trước khi gửi.';
 
   @override
   String get aiModelInvalidApiKey =>
-      'The Gemini API key is invalid or does not have access.';
+      'API key Gemini không hợp lệ hoặc không có quyền truy cập.';
 
   @override
   String get aiModelRequestTimeout =>
-      'The Gemini request timed out. Please try again.';
+      'Yêu cầu Gemini đã quá thời gian. Vui lòng thử lại.';
 
   @override
-  String get aiModelEmptyResponse => 'Gemini returned an empty response.';
+  String get aiModelEmptyResponse => 'Gemini trả về phản hồi rỗng.';
 
   @override
   String get aiModelRequestFailed =>
-      'Unable to get a Gemini response right now.';
+      'Không thể nhận phản hồi từ Gemini lúc này.';
 
   @override
   String get aiModelLocalSectionTitle => 'Model local';
 
   @override
-  String get aiModelDownload => 'Download';
+  String get aiModelDownload => 'Tải xuống';
 
   @override
   String get aiModelGemmaDownloadConfirmMessage =>
       'Dung lượng file: ~1.35 GB. Hãy đảm bảo bạn có đủ bộ nhớ và kết nối ổn định trước khi tải xuống.';
 
   @override
+  String get aiModelDeleteModel => 'Xóa model';
+
+  @override
+  String get aiModelGemmaDeleteConfirmMessage =>
+      'Xóa model AI khỏi thiết bị? Bạn sẽ cần tải lại để sử dụng tiếp.';
+
+  @override
   String get aiModelGemmaDescription =>
-      'Source provenance is pinned to the official Google Gemma docs and the google/gemma-2b-it distribution channel. The app download URL will be managed separately later.';
+      'Nguồn gốc được ghim theo tài liệu chính thức của Google Gemma và kênh phân phối google/gemma-2b-it. URL tải xuống trong ứng dụng sẽ được quản lý riêng sau.';
 
   @override
   String get aiModelComingSoon => 'Sắp có';
@@ -581,13 +605,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get aiModelSelectModelConfirmMessage =>
-      'Model nay se duoc dung cho cac yeu cau Gemini tiep theo tren thiet bi nay.';
+      'Model này sẽ được dùng cho các yêu cầu Gemini tiếp theo trên thiết bị này.';
 
   @override
-  String get aiModelUseThisModel => 'Dung model nay';
+  String get aiModelUseThisModel => 'Dùng model này';
 
   @override
-  String get aiModelSavingModelSelection => 'Dang luu model da chon...';
+  String get aiModelSavingModelSelection => 'Đang lưu model đã chọn...';
 
   @override
   String get appBarBrandTitle => 'SmartSpending';
@@ -1031,6 +1055,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticSelectPeriodTitle => 'Chọn mốc thời gian';
 
   @override
+  String get scanBillNoAiAvailable =>
+      'Chưa có AI nào sẵn sàng. Cài đặt API key hoặc tải model AI về.';
+
+  @override
   String get scanBillAiError =>
       'Không thể phân tích hóa đơn. Vui lòng thử lại hoặc nhập tay.';
 
@@ -1210,10 +1238,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get familyManagementHostBadge => 'Chủ';
 
   @override
-  String get familyManagementHostSubtitle => 'Chủ gia đình';
+  String get familyManagementHostSubtitle => 'Chủ';
 
   @override
-  String get familyManagementParentSubtitle => 'Phụ huynh';
+  String get familyManagementParentSubtitle => 'Thành viên gia đình';
 
   @override
   String get familyManagementInviteCodeLabel => 'Mã mời gia đình';
@@ -1328,4 +1356,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get familyManagementRemoveLimitError => 'Lỗi khi xóa hạn mức';
+
+  @override
+  String get familyManagementBannerTitle => 'Xây dựng tương lai cùng con';
+
+  @override
+  String get familyManagementBannerSubtitle =>
+      'Dạy trẻ cách quản lý chi tiêu thông minh từ hôm nay.';
 }

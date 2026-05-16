@@ -14,8 +14,8 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
   static const String _downloadUrl =
       'https://huggingface.co/innermost47/gemma-2b-it-int4-mediapipe/resolve/main/gemma-1.1-2b-it-cpu-int4.bin?download=true';
 
-  // 1.35 GB — Android only
-  static const int _minExpectedBytes = 1_350_000_000;
+  // 800 MB minimum — actual file is ~1.346 GB, threshold guards against empty/partial downloads
+  static const int _minExpectedBytes = 800_000_000;
   static const int _magicBytesLength = 8;
 
   final Dio _dio = Dio();
@@ -31,11 +31,24 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
     final path = await getCachedModelPath();
     final file = File(path);
 
-    if (!await file.exists()) return false;
+    if (!await file.exists()) {
+      _logger.d('GemmaRepo.isModelCached: file not found at $path');
+      return false;
+    }
 
     final size = await file.length();
+    _logger.d(
+      'GemmaRepo.isModelCached: file found — '
+      '${(size / 1e9).toStringAsFixed(3)} GB ($size bytes) | '
+      'threshold ${(_minExpectedBytes / 1e9).toStringAsFixed(3)} GB',
+    );
+
     if (size < _minExpectedBytes) {
-      _logger.w('GemmaRepo: file too small ($size bytes), deleting.');
+      _logger.w(
+        'GemmaRepo.isModelCached: FAIL size check — '
+        '${(size / 1e9).toStringAsFixed(3)} GB < ${(_minExpectedBytes / 1e9).toStringAsFixed(3)} GB. '
+        'Deleting incomplete file.',
+      );
       await file.delete();
       return false;
     }
@@ -45,11 +58,15 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
     final magic = await raf.read(_magicBytesLength);
     await raf.close();
     if (magic.every((b) => b == 0)) {
-      _logger.w('GemmaRepo: magic bytes invalid, deleting.');
+      _logger.w('GemmaRepo.isModelCached: FAIL magic bytes — all zero, deleting.');
       await file.delete();
       return false;
     }
 
+    _logger.i(
+      'GemmaRepo.isModelCached: OK — model ready '
+      '(${(size / 1e9).toStringAsFixed(3)} GB) at $path',
+    );
     return true;
   }
 

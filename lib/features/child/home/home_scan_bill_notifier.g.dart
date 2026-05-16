@@ -7,7 +7,7 @@ part of 'home_scan_bill_notifier.dart';
 // **************************************************************************
 
 String _$homeScanBillNotifierHash() =>
-    r'be2734f1b41d3b063fae194af9308ae3eebcabc4';
+    r'319ae453e489d6e3c7999fca714acb41ef3fca50';
 
 /// See also [HomeScanBillNotifier].
 @ProviderFor(HomeScanBillNotifier)

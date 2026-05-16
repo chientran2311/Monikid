@@ -21,4 +21,5 @@ class StorageKeys {
 
   // AI model selection
   static const String selectedAiModel = 'selected_ai_model';
+  static const String useLocalModel = 'useLocalModel';
 }

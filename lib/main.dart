@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/firebase_options.dart';
 import 'package:monikid/core/utils/logger.dart';
@@ -12,6 +13,9 @@ import 'package:monikid/core/di/di.dart';
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize FlutterGemma (local model inference engine)
+  await FlutterGemma.initialize();
 
   // Load environment variables (non-fatal if .env is empty/missing)
   try {

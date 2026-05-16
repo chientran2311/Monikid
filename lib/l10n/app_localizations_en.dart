@@ -509,6 +509,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiModelGeminiName => 'Gemini';
 
   @override
+  String get aiModelUseApiKeyModel => 'Use API key model';
+
+  @override
+  String get aiModelUseLocalModel => 'Use local model';
+
+  @override
+  String get aiModelApiKeyAddSuccess => 'API key verified and saved';
+
+  @override
+  String get aiModelApiKeyInvalid =>
+      'Invalid API key. Please check and try again.';
+
+  @override
+  String get aiModelApiKeyTestFailed =>
+      'Could not verify API key. Check your internet connection.';
+
+  @override
   String get aiModelGemmaName => 'gemma 2b';
 
   @override
@@ -563,6 +580,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiModelGemmaDownloadConfirmMessage =>
       'File size: ~1.35 GB. Make sure you have enough storage and a stable connection before downloading.';
+
+  @override
+  String get aiModelDeleteModel => 'Delete model';
+
+  @override
+  String get aiModelGemmaDeleteConfirmMessage =>
+      'Delete AI model from device? You will need to re-download it to use it again.';
 
   @override
   String get aiModelGemmaDescription =>
@@ -1033,6 +1057,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticSelectPeriodTitle => 'Select period';
 
   @override
+  String get scanBillNoAiAvailable =>
+      'No AI available. Set up an API key or download the local AI model.';
+
+  @override
   String get scanBillAiError =>
       'Unable to analyze the bill. Please try again or enter manually.';
 
@@ -1212,10 +1240,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get familyManagementHostBadge => 'Host';
 
   @override
-  String get familyManagementHostSubtitle => 'Family host';
+  String get familyManagementHostSubtitle => 'Host';
 
   @override
-  String get familyManagementParentSubtitle => 'Parent';
+  String get familyManagementParentSubtitle => 'Family member';
 
   @override
   String get familyManagementInviteCodeLabel => 'Family invite code';
@@ -1330,4 +1358,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get familyManagementRemoveLimitError => 'Error removing limit';
+
+  @override
+  String get familyManagementBannerTitle => 'Building a future together';
+
+  @override
+  String get familyManagementBannerSubtitle =>
+      'Teach your children to manage money wisely from today.';
 }

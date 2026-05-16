@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChooseAiModelState {
 
- ChooseAiModelStatus get status; String get apiKeyInput; String get promptInput; bool get hasSavedApiKey; String get selectedModel; String? get responseText; TransactionAiResult? get transactionAiResult; ChooseAiModelError? get error; GemmaDownloadStatus get gemmaStatus; double get gemmaDownloadProgress; String? get gemmaDownloadError;
+ ChooseAiModelStatus get status; String get apiKeyInput; String get promptInput; bool get hasSavedApiKey; bool get hasKeyInStorage; String get selectedModel; String? get responseText; TransactionAiResult? get transactionAiResult; ChooseAiModelError? get error; GemmaDownloadStatus get gemmaStatus; double get gemmaDownloadProgress; String? get gemmaDownloadError; bool get useLocalModel;
 /// Create a copy of ChooseAiModelState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ChooseAiModelStateCopyWith<ChooseAiModelState> get copyWith => _$ChooseAiModelS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChooseAiModelState&&(identical(other.status, status) || other.status == status)&&(identical(other.apiKeyInput, apiKeyInput) || other.apiKeyInput == apiKeyInput)&&(identical(other.promptInput, promptInput) || other.promptInput == promptInput)&&(identical(other.hasSavedApiKey, hasSavedApiKey) || other.hasSavedApiKey == hasSavedApiKey)&&(identical(other.selectedModel, selectedModel) || other.selectedModel == selectedModel)&&(identical(other.responseText, responseText) || other.responseText == responseText)&&(identical(other.transactionAiResult, transactionAiResult) || other.transactionAiResult == transactionAiResult)&&(identical(other.error, error) || other.error == error)&&(identical(other.gemmaStatus, gemmaStatus) || other.gemmaStatus == gemmaStatus)&&(identical(other.gemmaDownloadProgress, gemmaDownloadProgress) || other.gemmaDownloadProgress == gemmaDownloadProgress)&&(identical(other.gemmaDownloadError, gemmaDownloadError) || other.gemmaDownloadError == gemmaDownloadError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChooseAiModelState&&(identical(other.status, status) || other.status == status)&&(identical(other.apiKeyInput, apiKeyInput) || other.apiKeyInput == apiKeyInput)&&(identical(other.promptInput, promptInput) || other.promptInput == promptInput)&&(identical(other.hasSavedApiKey, hasSavedApiKey) || other.hasSavedApiKey == hasSavedApiKey)&&(identical(other.hasKeyInStorage, hasKeyInStorage) || other.hasKeyInStorage == hasKeyInStorage)&&(identical(other.selectedModel, selectedModel) || other.selectedModel == selectedModel)&&(identical(other.responseText, responseText) || other.responseText == responseText)&&(identical(other.transactionAiResult, transactionAiResult) || other.transactionAiResult == transactionAiResult)&&(identical(other.error, error) || other.error == error)&&(identical(other.gemmaStatus, gemmaStatus) || other.gemmaStatus == gemmaStatus)&&(identical(other.gemmaDownloadProgress, gemmaDownloadProgress) || other.gemmaDownloadProgress == gemmaDownloadProgress)&&(identical(other.gemmaDownloadError, gemmaDownloadError) || other.gemmaDownloadError == gemmaDownloadError)&&(identical(other.useLocalModel, useLocalModel) || other.useLocalModel == useLocalModel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,apiKeyInput,promptInput,hasSavedApiKey,selectedModel,responseText,transactionAiResult,error,gemmaStatus,gemmaDownloadProgress,gemmaDownloadError);
+int get hashCode => Object.hash(runtimeType,status,apiKeyInput,promptInput,hasSavedApiKey,hasKeyInStorage,selectedModel,responseText,transactionAiResult,error,gemmaStatus,gemmaDownloadProgress,gemmaDownloadError,useLocalModel);
 
 @override
 String toString() {
-  return 'ChooseAiModelState(status: $status, apiKeyInput: $apiKeyInput, promptInput: $promptInput, hasSavedApiKey: $hasSavedApiKey, selectedModel: $selectedModel, responseText: $responseText, transactionAiResult: $transactionAiResult, error: $error, gemmaStatus: $gemmaStatus, gemmaDownloadProgress: $gemmaDownloadProgress, gemmaDownloadError: $gemmaDownloadError)';
+  return 'ChooseAiModelState(status: $status, apiKeyInput: $apiKeyInput, promptInput: $promptInput, hasSavedApiKey: $hasSavedApiKey, hasKeyInStorage: $hasKeyInStorage, selectedModel: $selectedModel, responseText: $responseText, transactionAiResult: $transactionAiResult, error: $error, gemmaStatus: $gemmaStatus, gemmaDownloadProgress: $gemmaDownloadProgress, gemmaDownloadError: $gemmaDownloadError, useLocalModel: $useLocalModel)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ChooseAiModelStateCopyWith<$Res>  {
   factory $ChooseAiModelStateCopyWith(ChooseAiModelState value, $Res Function(ChooseAiModelState) _then) = _$ChooseAiModelStateCopyWithImpl;
 @useResult
 $Res call({
- ChooseAiModelStatus status, String apiKeyInput, String promptInput, bool hasSavedApiKey, String selectedModel, String? responseText, TransactionAiResult? transactionAiResult, ChooseAiModelError? error, GemmaDownloadStatus gemmaStatus, double gemmaDownloadProgress, String? gemmaDownloadError
+ ChooseAiModelStatus status, String apiKeyInput, String promptInput, bool hasSavedApiKey, bool hasKeyInStorage, String selectedModel, String? responseText, TransactionAiResult? transactionAiResult, ChooseAiModelError? error, GemmaDownloadStatus gemmaStatus, double gemmaDownloadProgress, String? gemmaDownloadError, bool useLocalModel
 });
 
 
@@ -63,12 +63,13 @@ class _$ChooseAiModelStateCopyWithImpl<$Res>
 
 /// Create a copy of ChooseAiModelState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? apiKeyInput = null,Object? promptInput = null,Object? hasSavedApiKey = null,Object? selectedModel = null,Object? responseText = freezed,Object? transactionAiResult = freezed,Object? error = freezed,Object? gemmaStatus = null,Object? gemmaDownloadProgress = null,Object? gemmaDownloadError = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? apiKeyInput = null,Object? promptInput = null,Object? hasSavedApiKey = null,Object? hasKeyInStorage = null,Object? selectedModel = null,Object? responseText = freezed,Object? transactionAiResult = freezed,Object? error = freezed,Object? gemmaStatus = null,Object? gemmaDownloadProgress = null,Object? gemmaDownloadError = freezed,Object? useLocalModel = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ChooseAiModelStatus,apiKeyInput: null == apiKeyInput ? _self.apiKeyInput : apiKeyInput // ignore: cast_nullable_to_non_nullable
 as String,promptInput: null == promptInput ? _self.promptInput : promptInput // ignore: cast_nullable_to_non_nullable
 as String,hasSavedApiKey: null == hasSavedApiKey ? _self.hasSavedApiKey : hasSavedApiKey // ignore: cast_nullable_to_non_nullable
+as bool,hasKeyInStorage: null == hasKeyInStorage ? _self.hasKeyInStorage : hasKeyInStorage // ignore: cast_nullable_to_non_nullable
 as bool,selectedModel: null == selectedModel ? _self.selectedModel : selectedModel // ignore: cast_nullable_to_non_nullable
 as String,responseText: freezed == responseText ? _self.responseText : responseText // ignore: cast_nullable_to_non_nullable
 as String?,transactionAiResult: freezed == transactionAiResult ? _self.transactionAiResult : transactionAiResult // ignore: cast_nullable_to_non_nullable
@@ -76,7 +77,8 @@ as TransactionAiResult?,error: freezed == error ? _self.error : error // ignore:
 as ChooseAiModelError?,gemmaStatus: null == gemmaStatus ? _self.gemmaStatus : gemmaStatus // ignore: cast_nullable_to_non_nullable
 as GemmaDownloadStatus,gemmaDownloadProgress: null == gemmaDownloadProgress ? _self.gemmaDownloadProgress : gemmaDownloadProgress // ignore: cast_nullable_to_non_nullable
 as double,gemmaDownloadError: freezed == gemmaDownloadError ? _self.gemmaDownloadError : gemmaDownloadError // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,useLocalModel: null == useLocalModel ? _self.useLocalModel : useLocalModel // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of ChooseAiModelState
@@ -99,13 +101,14 @@ $TransactionAiResultCopyWith<$Res>? get transactionAiResult {
 
 
 class _ChooseAiModelState extends ChooseAiModelState {
-  const _ChooseAiModelState({this.status = ChooseAiModelStatus.initial, this.apiKeyInput = '', this.promptInput = '', this.hasSavedApiKey = false, this.selectedModel = 'gemini-2.5-flash', this.responseText, this.transactionAiResult, this.error, this.gemmaStatus = GemmaDownloadStatus.idle, this.gemmaDownloadProgress = 0.0, this.gemmaDownloadError}): super._();
+  const _ChooseAiModelState({this.status = ChooseAiModelStatus.initial, this.apiKeyInput = '', this.promptInput = '', this.hasSavedApiKey = false, this.hasKeyInStorage = false, this.selectedModel = 'gemini-2.5-flash', this.responseText, this.transactionAiResult, this.error, this.gemmaStatus = GemmaDownloadStatus.idle, this.gemmaDownloadProgress = 0.0, this.gemmaDownloadError, this.useLocalModel = false}): super._();
   
 
 @override@JsonKey() final  ChooseAiModelStatus status;
 @override@JsonKey() final  String apiKeyInput;
 @override@JsonKey() final  String promptInput;
 @override@JsonKey() final  bool hasSavedApiKey;
+@override@JsonKey() final  bool hasKeyInStorage;
 @override@JsonKey() final  String selectedModel;
 @override final  String? responseText;
 @override final  TransactionAiResult? transactionAiResult;
@@ -113,6 +116,7 @@ class _ChooseAiModelState extends ChooseAiModelState {
 @override@JsonKey() final  GemmaDownloadStatus gemmaStatus;
 @override@JsonKey() final  double gemmaDownloadProgress;
 @override final  String? gemmaDownloadError;
+@override@JsonKey() final  bool useLocalModel;
 
 /// Create a copy of ChooseAiModelState
 /// with the given fields replaced by the non-null parameter values.
@@ -124,16 +128,16 @@ _$ChooseAiModelStateCopyWith<_ChooseAiModelState> get copyWith => __$ChooseAiMod
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChooseAiModelState&&(identical(other.status, status) || other.status == status)&&(identical(other.apiKeyInput, apiKeyInput) || other.apiKeyInput == apiKeyInput)&&(identical(other.promptInput, promptInput) || other.promptInput == promptInput)&&(identical(other.hasSavedApiKey, hasSavedApiKey) || other.hasSavedApiKey == hasSavedApiKey)&&(identical(other.selectedModel, selectedModel) || other.selectedModel == selectedModel)&&(identical(other.responseText, responseText) || other.responseText == responseText)&&(identical(other.transactionAiResult, transactionAiResult) || other.transactionAiResult == transactionAiResult)&&(identical(other.error, error) || other.error == error)&&(identical(other.gemmaStatus, gemmaStatus) || other.gemmaStatus == gemmaStatus)&&(identical(other.gemmaDownloadProgress, gemmaDownloadProgress) || other.gemmaDownloadProgress == gemmaDownloadProgress)&&(identical(other.gemmaDownloadError, gemmaDownloadError) || other.gemmaDownloadError == gemmaDownloadError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChooseAiModelState&&(identical(other.status, status) || other.status == status)&&(identical(other.apiKeyInput, apiKeyInput) || other.apiKeyInput == apiKeyInput)&&(identical(other.promptInput, promptInput) || other.promptInput == promptInput)&&(identical(other.hasSavedApiKey, hasSavedApiKey) || other.hasSavedApiKey == hasSavedApiKey)&&(identical(other.hasKeyInStorage, hasKeyInStorage) || other.hasKeyInStorage == hasKeyInStorage)&&(identical(other.selectedModel, selectedModel) || other.selectedModel == selectedModel)&&(identical(other.responseText, responseText) || other.responseText == responseText)&&(identical(other.transactionAiResult, transactionAiResult) || other.transactionAiResult == transactionAiResult)&&(identical(other.error, error) || other.error == error)&&(identical(other.gemmaStatus, gemmaStatus) || other.gemmaStatus == gemmaStatus)&&(identical(other.gemmaDownloadProgress, gemmaDownloadProgress) || other.gemmaDownloadProgress == gemmaDownloadProgress)&&(identical(other.gemmaDownloadError, gemmaDownloadError) || other.gemmaDownloadError == gemmaDownloadError)&&(identical(other.useLocalModel, useLocalModel) || other.useLocalModel == useLocalModel));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,apiKeyInput,promptInput,hasSavedApiKey,selectedModel,responseText,transactionAiResult,error,gemmaStatus,gemmaDownloadProgress,gemmaDownloadError);
+int get hashCode => Object.hash(runtimeType,status,apiKeyInput,promptInput,hasSavedApiKey,hasKeyInStorage,selectedModel,responseText,transactionAiResult,error,gemmaStatus,gemmaDownloadProgress,gemmaDownloadError,useLocalModel);
 
 @override
 String toString() {
-  return 'ChooseAiModelState(status: $status, apiKeyInput: $apiKeyInput, promptInput: $promptInput, hasSavedApiKey: $hasSavedApiKey, selectedModel: $selectedModel, responseText: $responseText, transactionAiResult: $transactionAiResult, error: $error, gemmaStatus: $gemmaStatus, gemmaDownloadProgress: $gemmaDownloadProgress, gemmaDownloadError: $gemmaDownloadError)';
+  return 'ChooseAiModelState(status: $status, apiKeyInput: $apiKeyInput, promptInput: $promptInput, hasSavedApiKey: $hasSavedApiKey, hasKeyInStorage: $hasKeyInStorage, selectedModel: $selectedModel, responseText: $responseText, transactionAiResult: $transactionAiResult, error: $error, gemmaStatus: $gemmaStatus, gemmaDownloadProgress: $gemmaDownloadProgress, gemmaDownloadError: $gemmaDownloadError, useLocalModel: $useLocalModel)';
 }
 
 
@@ -144,7 +148,7 @@ abstract mixin class _$ChooseAiModelStateCopyWith<$Res> implements $ChooseAiMode
   factory _$ChooseAiModelStateCopyWith(_ChooseAiModelState value, $Res Function(_ChooseAiModelState) _then) = __$ChooseAiModelStateCopyWithImpl;
 @override @useResult
 $Res call({
- ChooseAiModelStatus status, String apiKeyInput, String promptInput, bool hasSavedApiKey, String selectedModel, String? responseText, TransactionAiResult? transactionAiResult, ChooseAiModelError? error, GemmaDownloadStatus gemmaStatus, double gemmaDownloadProgress, String? gemmaDownloadError
+ ChooseAiModelStatus status, String apiKeyInput, String promptInput, bool hasSavedApiKey, bool hasKeyInStorage, String selectedModel, String? responseText, TransactionAiResult? transactionAiResult, ChooseAiModelError? error, GemmaDownloadStatus gemmaStatus, double gemmaDownloadProgress, String? gemmaDownloadError, bool useLocalModel
 });
 
 
@@ -161,12 +165,13 @@ class __$ChooseAiModelStateCopyWithImpl<$Res>
 
 /// Create a copy of ChooseAiModelState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? apiKeyInput = null,Object? promptInput = null,Object? hasSavedApiKey = null,Object? selectedModel = null,Object? responseText = freezed,Object? transactionAiResult = freezed,Object? error = freezed,Object? gemmaStatus = null,Object? gemmaDownloadProgress = null,Object? gemmaDownloadError = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? apiKeyInput = null,Object? promptInput = null,Object? hasSavedApiKey = null,Object? hasKeyInStorage = null,Object? selectedModel = null,Object? responseText = freezed,Object? transactionAiResult = freezed,Object? error = freezed,Object? gemmaStatus = null,Object? gemmaDownloadProgress = null,Object? gemmaDownloadError = freezed,Object? useLocalModel = null,}) {
   return _then(_ChooseAiModelState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ChooseAiModelStatus,apiKeyInput: null == apiKeyInput ? _self.apiKeyInput : apiKeyInput // ignore: cast_nullable_to_non_nullable
 as String,promptInput: null == promptInput ? _self.promptInput : promptInput // ignore: cast_nullable_to_non_nullable
 as String,hasSavedApiKey: null == hasSavedApiKey ? _self.hasSavedApiKey : hasSavedApiKey // ignore: cast_nullable_to_non_nullable
+as bool,hasKeyInStorage: null == hasKeyInStorage ? _self.hasKeyInStorage : hasKeyInStorage // ignore: cast_nullable_to_non_nullable
 as bool,selectedModel: null == selectedModel ? _self.selectedModel : selectedModel // ignore: cast_nullable_to_non_nullable
 as String,responseText: freezed == responseText ? _self.responseText : responseText // ignore: cast_nullable_to_non_nullable
 as String?,transactionAiResult: freezed == transactionAiResult ? _self.transactionAiResult : transactionAiResult // ignore: cast_nullable_to_non_nullable
@@ -174,7 +179,8 @@ as TransactionAiResult?,error: freezed == error ? _self.error : error // ignore:
 as ChooseAiModelError?,gemmaStatus: null == gemmaStatus ? _self.gemmaStatus : gemmaStatus // ignore: cast_nullable_to_non_nullable
 as GemmaDownloadStatus,gemmaDownloadProgress: null == gemmaDownloadProgress ? _self.gemmaDownloadProgress : gemmaDownloadProgress // ignore: cast_nullable_to_non_nullable
 as double,gemmaDownloadError: freezed == gemmaDownloadError ? _self.gemmaDownloadError : gemmaDownloadError // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,useLocalModel: null == useLocalModel ? _self.useLocalModel : useLocalModel // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

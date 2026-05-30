@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/home/home_tab_provider.dart';
-import 'package:monikid/features/child/home/home_tab_skeleton.dart';
 import 'package:monikid/features/child/home/home_tab_state.dart';
+import 'package:monikid/shared/widgets/skeleton_widget/home_child_skeleton.dart';
 import 'package:monikid/features/child/home/widgets/home_header.dart';
 import 'package:monikid/features/child/home/widgets/home_monthly_summary_card.dart';
 import 'package:monikid/features/child/home/widgets/home_quick_actions.dart';
@@ -47,10 +46,49 @@ class HomeTabStudentBody extends ConsumerWidget {
         (value) => value.monthlyTransactions.take(6).toList(growable: false),
       ),
     );
+    final transactionCount = ref.watch(
+      transactionHistoryProvider.select(
+        (value) => value.monthlyTransactions.length,
+      ),
+    );
+
+    final todayTransactionCount = ref.watch(
+      transactionHistoryProvider.select((value) {
+        final today = DateTime.now();
+        return value.monthlyTransactions
+            .where(
+              (tx) =>
+                  tx.dateTs.year == today.year &&
+                  tx.dateTs.month == today.month &&
+                  tx.dateTs.day == today.day,
+            )
+            .length;
+      }),
+    );
+
+    final topCategory = ref.watch(
+      transactionHistoryProvider.select((value) {
+        final expenses =
+            value.monthlyTransactions.where((tx) => tx.type == 'expense');
+        if (expenses.isEmpty) return null;
+        final Map<String, ({String label, int amount})> totals = {};
+        for (final tx in expenses) {
+          final prev = totals[tx.categoryKey];
+          totals[tx.categoryKey] = (
+            label: tx.categoryLabel,
+            amount: (prev?.amount ?? 0) + tx.amountMinor,
+          );
+        }
+        final top = totals.entries
+            .reduce((a, b) => a.value.amount > b.value.amount ? a : b);
+        return (label: top.value.label, amount: top.value.amount.toDouble());
+      }),
+    );
 
     final hasMonthlyLimit = limitState.hasStoredLimit;
-    final remainingBudget = hasMonthlyLimit
-        ? (limitState.storedLimitMinor ?? 0) - state.monthlyExpense
+    final limitMinor = limitState.storedLimitMinor;
+    final remainingBudget = hasMonthlyLimit && limitMinor != null
+        ? limitMinor.toDouble() - state.monthlyExpense
         : null;
 
     final horizontalPadding = 24.w;
@@ -69,7 +107,7 @@ class HomeTabStudentBody extends ConsumerWidget {
         state.isLoading ||
         sharedTransactionStatus == TransactionHistorySharedStatus.initial ||
         sharedTransactionStatus == TransactionHistorySharedStatus.loading) {
-      return const HomeTabSkeleton();
+      return const HomeChildSkeleton();
     }
 
     if (state.isError) {
@@ -83,7 +121,7 @@ class HomeTabStudentBody extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 48.r, color: Colors.red),
+                  Icon(Icons.error_outline, size: 48.r, color: AppTheme.redAlert),
                   SizedBox(height: 16.h),
                   Text(
                     state.errorMessage ?? s.homeStudentLoadError,
@@ -118,11 +156,9 @@ class HomeTabStudentBody extends ConsumerWidget {
                 smallSpacing,
               ),
               child: HomeHeader(
-                greeting: s.homeStudentGreeting,
                 userName: userName,
                 avatarUrl: avatarUrl,
                 isDark: isDark,
-                textColor: textColor,
               ),
             ),
           ),
@@ -138,20 +174,14 @@ class HomeTabStudentBody extends ConsumerWidget {
                 smallSpacing,
               ),
               child: HomeMonthlySummaryCard(
-                title: s.homeStudentRemainingBudget,
-                remainingAmount: hasMonthlyLimit
-                    ? NumberFormat.currency(
-                        locale: 'vi_VN',
-                        symbol: 'VND',
-                        decimalDigits: 0,
-                      ).format(remainingBudget)
-                    : s.homeStudentMonthlyLimitNotSet,
-                incomeLabel: s.homeStudentMonthlyIncome,
-                expenseLabel: s.homeStudentMonthlyExpense,
-                monthlyIncome: state.monthlyIncome,
                 monthlyExpense: state.monthlyExpense,
+                limitAmount: limitMinor?.toDouble(),
+                remainingBudget: remainingBudget,
+                transactionCount: transactionCount,
                 isLimitConfigured: hasMonthlyLimit,
-                emptyStateLabel: s.homeStudentMonthlyLimitNotSet,
+                todayTransactionCount: todayTransactionCount,
+                topCategoryLabel: topCategory?.label,
+                topCategoryAmount: topCategory?.amount,
               ),
             ),
           ),

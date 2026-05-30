@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/router.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/home/home_scan_bill_notifier.dart';
 import 'package:monikid/features/child/home/widgets/quick_action.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
@@ -33,7 +34,6 @@ class HomeQuickActions extends ConsumerWidget {
 
     if (!context.mounted || imageSelection == null) return;
 
-    // Start pipeline then immediately show loading dialog.
     ref
         .read(homeScanBillNotifierProvider.notifier)
         .scanAndAnalyze(imageSelection);
@@ -45,7 +45,6 @@ class HomeQuickActions extends ConsumerWidget {
       builder: (_) => const ScanBillLoadingDialog(),
     );
 
-    // Dialog auto-closed (pipeline done or user cancelled). Handle result.
     if (!context.mounted) return;
     final finalState = ref.read(homeScanBillNotifierProvider);
     if (finalState.status == HomeScanBillStatus.ready &&
@@ -70,64 +69,44 @@ class HomeQuickActions extends ConsumerWidget {
       homeScanBillNotifierProvider.select((s) => s.isBusy),
     );
 
-    final actions = [
-      (
-        icon: Icons.qr_code_scanner,
-        label: s.scanbill,
-        color: Colors.orange,
-        onTap: isBusy ? null : () => _handleScanBill(context, ref),
-      ),
-      (
-        icon: Icons.track_changes,
-        label: s.homeStudentSetMonthlyLimit,
-        color: Colors.teal,
-        onTap: onSetLimitTap,
-      ),
-    ];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = ScreenUtils.screenWidth;
-        final screenHeight = ScreenUtils.screenHeight;
-        final spacing = 12.w;
-        final availableWidth = constraints.maxWidth - (spacing * 2);
-        final itemWidth = availableWidth / 3;
-        final circleSize = (screenWidth * 0.14).clamp(48.0, 62.0);
-        final iconSize = (circleSize * 0.48).clamp(22.0, 30.0);
-        final labelFontSize = screenHeight < 700 ? 11.5.r : 12.5.r;
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: actions
-              .map((action) {
-                final index = actions.indexOf(action);
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      right: index == actions.length - 1 ? 0 : spacing,
-                    ),
-                    child: Opacity(
-                      opacity: action.onTap == null ? 0.5 : 1.0,
-                      child: SizedBox(
-                        width: itemWidth,
-                        child: QuickAction(
-                          icon: action.icon,
-                          label: action.label,
-                          color: action.color,
-                          isDark: isDark,
-                          circleSize: circleSize,
-                          iconSize: iconSize,
-                          labelFontSize: labelFontSize,
-                          onTap: action.onTap,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              })
-              .toList(growable: false),
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          s.homeStudentQuickActionsTitle,
+          style: context.typo.title.small.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.textBlack,
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          children: [
+            Expanded(
+              child: Opacity(
+                opacity: isBusy ? 0.5 : 1.0,
+                child: QuickAction(
+                  emoji: '🧾',
+                  title: s.homeStudentScanBillTitle,
+                  subtitle: s.homeStudentScanBillSubtitle,
+                  isDark: isDark,
+                  onTap: isBusy ? null : () => _handleScanBill(context, ref),
+                ),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: QuickAction(
+                emoji: '🎯',
+                title: s.homeStudentSetMonthlyLimit,
+                subtitle: s.homeStudentSetLimitSubtitle,
+                isDark: isDark,
+                onTap: onSetLimitTap,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

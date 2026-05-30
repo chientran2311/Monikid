@@ -18,6 +18,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get languageVietnameseSubtitle =>
+      'Display the entire app in Vietnamese';
+
+  @override
+  String get languageEnglishSubtitle => 'Use English across the app interface';
+
+  @override
   String get close => 'Close';
 
   @override
@@ -37,17 +44,99 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingContinueAction => 'Continue';
 
   @override
-  String get onboardingCurrencyTitle => 'Choose currency';
+  String get onboardingLanguageSubtitle =>
+      'You can change this later in settings.';
 
   @override
-  String get onboardingCurrencyDescription =>
-      'Please choose the currency you want to use to manage transactions in the app.';
+  String get onboardingLanguageCardTitle => 'Display language';
 
   @override
-  String get onboardingCurrencyVnd => 'Vietnamese Dong (VND)';
+  String get onboardingLanguageCardDesc =>
+      'Monikid will use this language for lessons and notifications.';
 
   @override
-  String get onboardingCurrencyUsd => 'US Dollar (USD)';
+  String get onboardingLanguageViDesc => 'For users in Vietnam';
+
+  @override
+  String get onboardingLanguageEnDesc => 'For bilingual learners and parents';
+
+  @override
+  String get onboardingLanguageHint =>
+      'Next step: Monikid will ask for notification permission to remind you of schedules and important updates.';
+
+  @override
+  String get onboardingSkipLater => 'Later';
+
+  @override
+  String get onboardingNotificationTitle =>
+      'Enable notifications to track spending on time';
+
+  @override
+  String get onboardingNotificationSubtitle =>
+      'Monikid will send updates when there are new transactions, balance changes, and important spending activities so parents always stay informed.';
+
+  @override
+  String get onboardingNotificationBenefitsTitle =>
+      'Benefits of enabling notifications';
+
+  @override
+  String get onboardingNotificationBenefitsDesc =>
+      'Only useful updates to help parents manage spending more easily every day.';
+
+  @override
+  String get onboardingNotificationEnableBtn => 'Enable notifications';
+
+  @override
+  String get onboardingNotificationBenefit1Title =>
+      'Know instantly about new transactions';
+
+  @override
+  String get onboardingNotificationBenefit1Desc =>
+      'Track your child\'s spending almost immediately after it happens.';
+
+  @override
+  String get onboardingNotificationBenefit2Title =>
+      'Get alerts when balance changes';
+
+  @override
+  String get onboardingNotificationBenefit2Desc =>
+      'Helps control budget and detect notable fluctuations.';
+
+  @override
+  String get onboardingNotificationBenefit3Title =>
+      'Parents always stay informed';
+
+  @override
+  String get onboardingNotificationBenefit3Desc =>
+      'Support your child in learning how to manage money wisely.';
+
+  @override
+  String get onboardingNotificationSheetTitle =>
+      '\"Monikid\" wants to send you notifications';
+
+  @override
+  String get onboardingNotificationSheetDesc =>
+      'Notifications may include new transactions, balance changes, and important spending updates.';
+
+  @override
+  String get onboardingNotificationSheetRowTitle =>
+      'Track transactions on time';
+
+  @override
+  String get onboardingNotificationSheetRowDesc =>
+      'Helps parents know about their child\'s spending faster.';
+
+  @override
+  String get onboardingNotificationSheetDeny => 'Don\'t allow';
+
+  @override
+  String get onboardingNotificationSheetAllow => 'Allow';
+
+  @override
+  String get onboardingNotificationMiniAmount => '-120.000đ';
+
+  @override
+  String get onboardingNotificationMiniMeta => 'Buy books • 2 minutes ago';
 
   @override
   String get validationEmptyFields =>
@@ -291,6 +380,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transactionEditAction => 'Edit transaction';
 
   @override
+  String get transactionDeleteAction => 'Delete transaction';
+
+  @override
   String get transactionEvidenceSectionTitle => 'Evidence image';
 
   @override
@@ -499,6 +591,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanReceiptDesc => 'Choose how to add receipt image to process.';
 
   @override
+  String get scanReceiptCameraSubtitle => 'Open camera to take photo directly';
+
+  @override
+  String get scanReceiptGallerySubtitle => 'Choose from device photo library';
+
+  @override
   String get chooseAiModelTitle => 'Choose AI model';
 
   @override
@@ -603,6 +701,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiModelSelectModelLabel => 'Select model';
+
+  @override
+  String get aiModelHeroEyebrow => 'AI model setup';
+
+  @override
+  String get aiModelHeroTitle => 'Choose your AI analysis model';
+
+  @override
+  String get aiModelHeroSubtitle =>
+      'Connect via Gemini API or download a local model for on-device processing.';
+
+  @override
+  String get aiModelGeminiCardDescription =>
+      'Use cloud AI to categorize transactions and get quick spending insights.';
+
+  @override
+  String get aiModelRecommendedBadge => 'Recommended';
+
+  @override
+  String get aiModelGemmaCardDescription =>
+      'Runs on-device for enhanced privacy. Keeps all data on your phone.';
+
+  @override
+  String get aiModelPrivateBadge => 'Private';
+
+  @override
+  String get aiModelFooterNote =>
+      'You can switch models anytime in AI settings.';
+
+  @override
+  String get aiModelEnableGemini => 'Enable Gemini';
 
   @override
   String get aiModelSelectModelConfirmMessage =>
@@ -776,6 +905,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingStuFamilyCodeLabel => 'Family Code';
 
   @override
+  String get settingStuEyebrow => 'Account & App';
+
+  @override
+  String get settingStuSubtitle =>
+      'Manage your language, notifications and family connection.';
+
+  @override
+  String get settingStuNotificationsSubtitle =>
+      'Receive new transaction alerts';
+
+  @override
+  String get settingStuAiModelSubtitle => 'Smart budget assistant';
+
+  @override
+  String get settingStuFamilyCodeSubtitle => 'Connect with parent account';
+
+  @override
+  String get settingStuProfileEditLabel => 'Edit Profile';
+
+  @override
+  String get settingStuProfileEditSubtitle => 'Update your personal info';
+
+  @override
+  String get settingStuFaqSubtitle => 'Answers to common questions';
+
+  @override
   String get settingSignOutConfirm => 'Are you sure you want to sign out?';
 
   @override
@@ -792,6 +947,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiModelDownloadingNote => 'Do not close the app';
+
+  @override
+  String get loginWelcomeTitle => 'Welcome back';
+
+  @override
+  String get loginWelcomeSubtitle => 'Sign in to continue.';
+
+  @override
+  String get loginTagline => 'Smart family finance';
+
+  @override
+  String get loginAccountLabel => 'Account';
+
+  @override
+  String get loginEmailPlaceholder => 'Email / phone number';
+
+  @override
+  String get loginPasswordLabel => 'Password';
+
+  @override
+  String get loginPasswordPlaceholder => 'Enter password';
+
+  @override
+  String get loginForgotPassword => 'Forgot password?';
+
+  @override
+  String get loginRegisterButton => 'Sign up if you don\'t have an account';
+
+  @override
+  String get registerTitle => 'Create new account';
+
+  @override
+  String get registerSubtitle =>
+      'Fill in your details to get started with Monikid.';
+
+  @override
+  String get registerTagline => 'Begin your financial journey';
+
+  @override
+  String get registerEmailPlaceholder => 'you@example.com';
+
+  @override
+  String get registerUsernameLabel => 'Username';
+
+  @override
+  String get registerUsernamePlaceholder => 'Enter your name';
+
+  @override
+  String get registerPhoneLabel => 'Phone number';
+
+  @override
+  String get registerPhonePlaceholder => 'Enter phone number';
+
+  @override
+  String get registerPasswordPlaceholder => 'Create a password';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get registerConfirmPasswordPlaceholder => 'Re-enter your password';
+
+  @override
+  String get registerRoleParent => 'Parent';
+
+  @override
+  String get registerRoleStudent => 'Student';
+
+  @override
+  String get registerHaveAccountText => 'Already have an account?';
+
+  @override
+  String get validationPasswordMismatch => 'Passwords do not match.';
 
   @override
   String get authPasswordLabel => 'Password';
@@ -890,7 +1118,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeStudentMonthlyLimitNotSet => 'Set your monthly limit';
 
   @override
+  String get homeStudentSummaryEyebrow => 'Monthly overview';
+
+  @override
+  String homeStudentSummaryTitle(int month) {
+    return 'Month $month spending';
+  }
+
+  @override
+  String homeStudentTodayTransactionsSub(int count) {
+    return '$count transactions today';
+  }
+
+  @override
+  String get homeStudentTopCategoryLabel => 'Top spending';
+
+  @override
+  String homeStudentMonthPill(int month) {
+    return 'Month $month';
+  }
+
+  @override
+  String homeStudentUsedPercent(int percent) {
+    return 'Used $percent%';
+  }
+
+  @override
+  String get homeStudentTransactionsLabel => 'Transactions';
+
+  @override
+  String homeStudentTransactionCountLabel(int count) {
+    return '$count transactions';
+  }
+
+  @override
+  String homeStudentRemainingAmount(String amount) {
+    return 'Left: $amount';
+  }
+
+  @override
+  String get homeStudentQuickActionsTitle => 'Quick actions';
+
+  @override
+  String get homeStudentScanBillTitle => 'Scan bill AI';
+
+  @override
+  String get homeStudentScanBillSubtitle => 'Scan receipts and save quickly';
+
+  @override
+  String get homeStudentSetLimitSubtitle => 'Control monthly spending';
+
+  @override
+  String get homeStudentMonthlyIncomeLabel => 'Income';
+
+  @override
+  String get homeStudentUsedLabel => 'Used';
+
+  @override
   String get setMoneyLimitTitle => 'Set monthly limit';
+
+  @override
+  String get setMoneyLimitFieldLabel => 'Limit';
 
   @override
   String get setMoneyLimitDescription =>
@@ -920,6 +1208,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statisticByMonth => 'By month';
+
+  @override
+  String get statisticByYear => 'Yearly';
+
+  @override
+  String get statisticHeaderEyebrow => 'Track your child\'s spending';
+
+  @override
+  String get statisticHeaderSubhead =>
+      'Transaction summary, budget alerts, and top spending categories at a glance.';
+
+  @override
+  String get statisticAlertTitle => 'Spending Alert';
+
+  @override
+  String get statisticAlertPriority => 'Priority Check';
+
+  @override
+  String get statisticProgressUsageLabel => 'Usage progress';
+
+  @override
+  String get statisticBudgetAdjustAnytime =>
+      'Parents can adjust the limit at any time';
+
+  @override
+  String get statisticChartSectionTitle => 'Spending Chart';
+
+  @override
+  String get statisticChartComparisonTitle => 'Compare Over Time';
 
   @override
   String get statisticWeekNoun => 'week';
@@ -1099,6 +1416,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joinFamilyErrorUnknown => 'Failed to join. Please try again.';
 
   @override
+  String get joinFamilyEyebrow => 'Connect Account';
+
+  @override
+  String get joinFamilyHeroTitle => 'Enter family code to get started';
+
+  @override
+  String get joinFamilyHeroSubtitle =>
+      'Join your family group so parents can safely monitor transactions and manage your spending.';
+
+  @override
+  String get joinFamilyMiniCardTitle => 'Family Space';
+
+  @override
+  String get joinFamilyMiniCardDesc =>
+      'Transparent transactions, easy to track';
+
+  @override
+  String get joinFamilyEnterCodeTitle => 'Enter 6-digit code';
+
+  @override
+  String get joinFamilyEnterCodeSubtitle =>
+      'This code is sent to you by the parent or family creator.';
+
+  @override
+  String get joinFamilyCodeOnlyDigits => 'Only accepts a 6-digit numeric code';
+
+  @override
+  String get joinFamilyJoinNow => 'Join now';
+
+  @override
+  String get joinFamilyNoCode => 'Don\'t have a code?';
+
+  @override
   String get unlinkFamilyTitle => 'My Family';
 
   @override
@@ -1122,7 +1472,44 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to leave family. Please try again.';
 
   @override
+  String get familyMembersTitle => 'Family Members';
+
+  @override
+  String get familyStatusJoined => 'Currently Joined';
+
+  @override
+  String get familyLinkedSuccess => 'Linked Successfully';
+
+  @override
+  String get familyMemberListLabel => 'Members';
+
+  @override
+  String get familyMembersUnit => 'members';
+
+  @override
+  String get familyRoleParent => 'Parent';
+
+  @override
+  String get familyRoleChild => 'Child';
+
+  @override
+  String get familyRoleOwner => 'Family Owner';
+
+  @override
+  String get familyMemberYou => 'You';
+
+  @override
+  String get familyMemberActive => 'Active';
+
+  @override
+  String get unlinkFamilyButtonFull => 'Leave Family';
+
+  @override
   String get customCategoryAdd => 'Add custom category';
+
+  @override
+  String get customCategoryAddSubtitle =>
+      'Category will be added as expense type';
 
   @override
   String get customCategoryLabelHint => 'Category name';
@@ -1166,7 +1553,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customCategorySelectTitle => 'Select category';
 
   @override
-  String get customCategoryConfirmSelection => 'Confirm';
+  String get customCategoryConfirmSelection => 'Done';
+
+  @override
+  String get customCategoryAddNew => 'Add new';
 
   @override
   String get setMoneyLimitManagedByParent =>
@@ -1365,4 +1755,242 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyManagementBannerSubtitle =>
       'Teach your children to manage money wisely from today.';
+
+  @override
+  String get notificationSettingsTitle => 'Notifications';
+
+  @override
+  String get notificationSettingsDailySection => 'DAILY NOTIFICATIONS';
+
+  @override
+  String get notificationSettingsEnableLabel => 'Enable notifications';
+
+  @override
+  String get notificationSettingsTimeLabel => 'Notification time';
+
+  @override
+  String get notificationSettingsAboutSection => 'ABOUT NOTIFICATIONS';
+
+  @override
+  String get notificationSettingsDescription =>
+      'Notifications will remind you to check your spending every day at the selected time. This helps you maintain better financial management habits.';
+
+  @override
+  String get settingNotificationsLabel => 'Notifications';
+
+  @override
+  String get scheduleNotificationSmartTitle => 'Save 15% more effectively';
+
+  @override
+  String get scheduleNotificationSmartSubtitle =>
+      'Based on the habits of 500 other users';
+
+  @override
+  String get notificationSettingsEyebrow => 'Track spending';
+
+  @override
+  String get notificationSettingsHeroTitle =>
+      'Enable notifications to stay on top of your child\'s transactions';
+
+  @override
+  String get notificationSettingsHeroSubtitle =>
+      'Get instant alerts when new spending occurs, at the time you choose to stay informed — so managing finances feels effortless.';
+
+  @override
+  String get notificationSettingsEnableHint =>
+      'Notify when your child makes payments, transfers, or balance changes.';
+
+  @override
+  String get notificationSettingsScheduleSection => 'Notification schedule';
+
+  @override
+  String get notificationSettingsScheduleNote => 'Can be changed';
+
+  @override
+  String get notificationSettingsTimeHint =>
+      'The app will prioritize sending notifications during this time window to avoid interruptions during rest hours.';
+
+  @override
+  String get notificationSettingsInstructionTitle =>
+      'Notifications help parents track spending in time';
+
+  @override
+  String get notificationSettingsInstructionDesc =>
+      'When you enable this feature, you will receive alerts whenever a new transaction occurs or your child\'s balance changes unusually.';
+
+  @override
+  String get notificationSettingsTip1 =>
+      'Tap Allow when the system asks for notification permission so everything works properly.';
+
+  @override
+  String get notificationSettingsTip2 =>
+      'Choose a suitable time to avoid evening interruptions while still catching important transactions.';
+
+  @override
+  String get notificationSettingsTip3 =>
+      'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.';
+
+  @override
+  String get onboardingWelcomeTitle => 'Family finances\nat your fingertips';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'The smart app connecting parents and children, building healthy spending habits from today.';
+
+  @override
+  String get onboardingWelcomeFeature1Title => 'Smart management';
+
+  @override
+  String get onboardingWelcomeFeature1Desc =>
+      'Track income and expenses, set spending limits and monitor budgets visually.';
+
+  @override
+  String get onboardingWelcomeFeature2Title => 'AI receipt scanning';
+
+  @override
+  String get onboardingWelcomeFeature2Desc =>
+      'Automatic super-fast data entry with just a single screenshot.';
+
+  @override
+  String get onboardingWelcomeFeature3Title => 'Grow with your child';
+
+  @override
+  String get onboardingWelcomeFeature3Desc =>
+      'Teach the value of money and encourage daily savings.';
+
+  @override
+  String get onboardingWelcomeStartBtn => 'Get started with MoniKid';
+
+  @override
+  String get validationEmailEmpty => 'Please enter your email';
+
+  @override
+  String get validationEmailInvalid => 'Invalid email address';
+
+  @override
+  String get validationPasswordEmpty => 'Please enter your password';
+
+  @override
+  String get validationPasswordTooShort =>
+      'Password must be at least 6 characters';
+
+  @override
+  String get validationPasswordTooLong =>
+      'Password must be 128 characters or fewer';
+
+  @override
+  String get validationUsernameEmpty => 'Please enter your name';
+
+  @override
+  String get validationUsernameTooShort => 'Name must be at least 2 characters';
+
+  @override
+  String get validationUsernameTooLong => 'Name must be 50 characters or fewer';
+
+  @override
+  String get validationPhoneInvalid => 'Invalid phone number';
+
+  @override
+  String get validationConfirmPasswordEmpty => 'Please confirm your password';
+
+  @override
+  String get validationConfirmPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get forgotPasswordTitle => 'Forgot Password?';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Don\'t worry! Enter your registered email and we\'ll send a reset link to help you change your password.';
+
+  @override
+  String get forgotPasswordEmailPlaceholder => 'Enter your email';
+
+  @override
+  String get forgotPasswordSubmitBtn => 'Get reset link';
+
+  @override
+  String get forgotPasswordBackToLogin => 'Back to Login';
+
+  @override
+  String get forgotPasswordEmailSentTitle => 'Email sent!';
+
+  @override
+  String forgotPasswordEmailSentMessage(String email) {
+    return 'We sent a password reset link to\n$email\n\nPlease check your inbox and click the link to change your password.';
+  }
+
+  @override
+  String get forgotPasswordEmailSentBtn => 'Back to Login';
+
+  @override
+  String get forgotPasswordEmailHint =>
+      'The verification code will be sent to your email. Please check both your inbox and spam folder.';
+
+  @override
+  String get forgotPasswordChipLabel => 'Send verification code';
+
+  @override
+  String get forgotPasswordRememberPassword => 'Remember your password?';
+
+  @override
+  String get forgotPasswordLoginAction => 'Log in';
+
+  @override
+  String get txStatusSuccess => 'Success';
+
+  @override
+  String get txStatusCompleted => 'Completed';
+
+  @override
+  String get dateToday => 'Today';
+
+  @override
+  String get dateYesterday => 'Yesterday';
+
+  @override
+  String get transactionViewAllCategories => 'View all';
+
+  @override
+  String get transactionDetailsSection => 'Details';
+
+  @override
+  String get transactionReceiptLabel => 'Receipt photo';
+
+  @override
+  String get transactionAddPhoto => 'Add photo';
+
+  @override
+  String get transactionChangePhoto => 'Change photo';
+
+  @override
+  String get transactionReceiptEmptyTitle => 'Receipt will appear here';
+
+  @override
+  String get faqCommonQuestions => 'Frequently Asked Questions';
+
+  @override
+  String get transactionReceiptScanHint => 'System will scan automatically';
+
+  @override
+  String get transactionDateToday => 'Today';
+
+  @override
+  String get successDialogDefaultTitle => 'Success!';
+
+  @override
+  String get successDialogDefaultMessage => 'Operation completed.';
+
+  @override
+  String get successDialogDefaultButton => 'OK';
+
+  @override
+  String get transactionHistoryEyebrow => 'Spending management';
+
+  @override
+  String get transactionHistoryTitle => 'Transaction history';
+
+  @override
+  String get transactionHistorySubhead =>
+      'All your income and expenses over time.';
 }

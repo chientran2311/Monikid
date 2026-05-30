@@ -1,281 +1,306 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
+import 'package:monikid/core/font/font.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
-import 'package:monikid/features/child/home/widgets/summary_mini_card.dart';
 
 class HomeMonthlySummaryCard extends StatelessWidget {
   const HomeMonthlySummaryCard({
     super.key,
-    required this.title,
-    required this.remainingAmount,
-    required this.incomeLabel,
-    required this.expenseLabel,
-    required this.monthlyIncome,
     required this.monthlyExpense,
+    required this.limitAmount,
+    required this.remainingBudget,
+    required this.transactionCount,
     required this.isLimitConfigured,
-    this.emptyStateLabel,
+    required this.todayTransactionCount,
+    required this.topCategoryLabel,
+    required this.topCategoryAmount,
   });
 
-  final String title;
-  final String remainingAmount;
-  final String incomeLabel;
-  final String expenseLabel;
-  final double monthlyIncome;
   final double monthlyExpense;
+  final double? limitAmount;
+  final double? remainingBudget;
+  final int transactionCount;
   final bool isLimitConfigured;
-  final String? emptyStateLabel;
+  final int todayTransactionCount;
+  final String? topCategoryLabel;
+  final double? topCategoryAmount;
+
+  int get _usedPercent {
+    if (!isLimitConfigured || limitAmount == null || limitAmount! <= 0) return 0;
+    return ((monthlyExpense / limitAmount!) * 100).round().clamp(0, 999);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.sizeOf(context);
+    final s = context.l10n;
+    final now = DateTime.now();
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cardWidth = constraints.maxWidth;
-        final isCompact = cardWidth < 360.w;
-        final minCardHeight = 220.h;
-        final maxCardHeight = math.max(minCardHeight, screenSize.height * 0.34);
-        final cardHeight = math.min(
-          math.max(cardWidth * 0.72, minCardHeight),
-          maxCardHeight,
-        );
-        final contentPadding = EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 18.h);
-        final bottomPanelHeight = isCompact ? cardHeight * 0.4 : cardHeight * 0.32;
-        final contentBottomSpacing = bottomPanelHeight + 6.h;
-        final summaryContent = isCompact
-            ? Column(
-                children: [
-                  Expanded(
-                    child: SummaryMiniCard(
-                      title: incomeLabel,
-                      amount: CurrencyFormatter.format(monthlyIncome),
-                      icon: Icons.arrow_downward_rounded,
-                      iconColor: const Color(0xFF3B82F6),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
-                    child: const Divider(
-                      height: 1,
-                      color: Color(0xFFD7E3DB),
-                    ),
-                  ),
-                  Expanded(
-                    child: SummaryMiniCard(
-                      title: expenseLabel,
-                      amount: CurrencyFormatter.format(monthlyExpense),
-                      icon: Icons.arrow_upward_rounded,
-                      iconColor: const Color(0xFFEF4444),
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: SummaryMiniCard(
-                      title: incomeLabel,
-                      amount: CurrencyFormatter.format(monthlyIncome),
-                      icon: Icons.arrow_downward_rounded,
-                      iconColor: const Color(0xFF3B82F6),
-                    ),
-                  ),
-                  Container(
-                    width: 1.w,
-                    height: 58.h,
-                    margin: EdgeInsets.symmetric(horizontal: 18.w),
-                    color: const Color(0xFFD7E3DB),
-                  ),
-                  Expanded(
-                    child: SummaryMiniCard(
-                      title: expenseLabel,
-                      amount: CurrencyFormatter.format(monthlyExpense),
-                      icon: Icons.arrow_upward_rounded,
-                      iconColor: const Color(0xFFEF4444),
-                    ),
-                  ),
-                ],
-              );
-
-        return SizedBox(
-          width: double.infinity,
-          height: cardHeight,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28.r),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF195B34),
-                  Color(0xFF14532D),
-                  Color(0xFF0F4427),
-                ],
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 20.h),
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: const Alignment(-0.6, -1),
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(Colors.white, AppTheme.primary, 0.16)!,
+            Colors.white,
+          ],
+        ),
+        border: Border.all(
+          color: Color.lerp(Colors.white, AppTheme.primary, 0.14)!,
+        ),
+        borderRadius: BorderRadius.circular(28.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.10),
+            blurRadius: 32.r,
+            offset: Offset(0, 12.h),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -88.h,
+            right: -70.w,
+            child: Container(
+              width: 210.r,
+              height: 210.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Color.lerp(Colors.white, AppTheme.primary, 0.20)!,
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.7],
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0x19000000),
-                  blurRadius: 28.r,
-                  offset: Offset(0, 14.h),
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -36.w,
-                  top: 32.h,
-                  child: _CardDecorationCircle(size: 176.r, opacity: 0.06),
-                ),
-                Positioned(
-                  left: -20.w,
-                  bottom: 8.h,
-                  child: _CardDecorationCircle(size: 90.r, opacity: 0.07),
-                ),
-                Positioned(
-                  right: 26.w,
-                  top: 26.h,
-                  child: _CardDecorationDiamond(size: 12.r, opacity: 0.22),
-                ),
-                Positioned(
-                  right: 56.w,
-                  top: 22.h,
-                  child: const _CardDecorationDot(opacity: 0.24),
-                ),
-                Positioned.fill(
-                  child: Padding(
-                    padding: contentPadding.copyWith(bottom: contentBottomSpacing),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.r,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const Spacer(),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              isLimitConfigured
-                                  ? remainingAmount
-                                  : (emptyStateLabel ?? remainingAmount),
-                              maxLines: 1,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: isCompact ? 36.r : 48.r,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -1.2,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 20.w,
-                  right: 20.w,
-                  bottom: 18.h,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(22.r),
-                    child: Container(
-                      height: bottomPanelHeight,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 18.w,
-                        vertical: 16.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC).withValues(alpha: 0.86),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.35),
-                        ),
-                      ),
-                      child: summaryContent,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
-        );
-      },
-    );
-  }
-}
-
-class _CardDecorationCircle extends StatelessWidget {
-  const _CardDecorationCircle({
-    required this.size,
-    required this.opacity,
-  });
-
-  final double size;
-  final double opacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: opacity),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _HeaderRow(month: now.month),
+              SizedBox(height: 14.h),
+              _AmountRow(
+                monthlyExpense: monthlyExpense,
+                remainingBudget: remainingBudget,
+                isLimitConfigured: isLimitConfigured,
+              ),
+              SizedBox(height: 14.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      label: s.homeStudentSetMonthlyLimit.toUpperCase(),
+                      value: isLimitConfigured && limitAmount != null
+                          ? CurrencyFormatter.format(limitAmount!)
+                          : 'N/A',
+                      subtitle: isLimitConfigured
+                          ? s.homeStudentUsedPercent(_usedPercent)
+                          : null,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: _StatCard(
+                      label: s.homeStudentTransactionsLabel.toUpperCase(),
+                      value: s.homeStudentTransactionCountLabel(transactionCount),
+                      subtitle: s.homeStudentTodayTransactionsSub(todayTransactionCount),
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: _StatCard(
+                      label: s.homeStudentTopCategoryLabel.toUpperCase(),
+                      value: topCategoryLabel ?? 'N/A',
+                      subtitle: topCategoryAmount != null
+                          ? CurrencyFormatter.format(topCategoryAmount!)
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _CardDecorationDiamond extends StatelessWidget {
-  const _CardDecorationDiamond({
-    required this.size,
-    required this.opacity,
-  });
+class _HeaderRow extends StatelessWidget {
+  const _HeaderRow({required this.month});
 
-  final double size;
-  final double opacity;
+  final int month;
 
   @override
   Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: 0.78,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: opacity),
-          borderRadius: BorderRadius.circular(2.r),
+    final s = context.l10n;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                s.homeStudentSummaryEyebrow.toUpperCase(),
+                style: context.typo.caption.small.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Color.lerp(AppTheme.textGrey, AppTheme.primary, 0.60),
+                  letterSpacing: 0.5,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                s.homeStudentSummaryTitle(month),
+                style: AppTextStyleFactory.style(
+                  size: AppFontSizes.titleMedium,
+                  weight: FontWeight.w800,
+                  color: AppTheme.textBlack,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        SizedBox(width: 12.w),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 8.h),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.7),
+            border: Border.all(
+              color: Color.lerp(Colors.white, AppTheme.primary, 0.18)!,
+            ),
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+          child: Text(
+            s.homeStudentMonthPill(month),
+            style: AppTextStyleFactory.style(
+              size: AppFontSizes.labelSmall,
+              weight: FontWeight.w800,
+              color: AppTheme.primary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _CardDecorationDot extends StatelessWidget {
-  const _CardDecorationDot({required this.opacity});
+class _AmountRow extends StatelessWidget {
+  const _AmountRow({
+    required this.monthlyExpense,
+    required this.remainingBudget,
+    required this.isLimitConfigured,
+  });
 
-  final double opacity;
+  final double monthlyExpense;
+  final double? remainingBudget;
+  final bool isLimitConfigured;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.l10n;
+    return Wrap(
+      spacing: 10.w,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          CurrencyFormatter.format(monthlyExpense),
+          style: AppTextStyleFactory.style(
+            size: 38,
+            weight: FontWeight.w900,
+            color: AppTheme.textBlack,
+            letterSpacing: -1.5,
+          ),
+        ),
+        if (isLimitConfigured && remainingBudget != null)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(999.r),
+            ),
+            child: Text(
+              s.homeStudentRemainingAmount(CurrencyFormatter.format(remainingBudget!)),
+              style: AppTextStyleFactory.style(
+                size: AppFontSizes.labelSmall,
+                weight: FontWeight.w800,
+                color: AppTheme.primary,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  const _StatCard({
+    required this.label,
+    required this.value,
+    this.subtitle,
+  });
+
+  final String label;
+  final String value;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 8.r,
-      height: 8.r,
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: opacity),
-        shape: BoxShape.circle,
+        color: Colors.white.withValues(alpha: 0.68),
+        border: Border.all(
+          color: Color.lerp(Colors.white, AppTheme.primary, 0.12)!,
+        ),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.typo.caption.small.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Color.lerp(AppTheme.textGrey, AppTheme.primary, 0.55),
+              letterSpacing: 0.4,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyleFactory.style(
+              size: AppFontSizes.labelBig,
+              weight: FontWeight.w800,
+              color: AppTheme.textBlack,
+              letterSpacing: -0.4,
+            ),
+          ),
+          if (subtitle != null) ...[
+            SizedBox(height: 4.h),
+            Text(
+              subtitle!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.typo.caption.small.copyWith(
+                color: Color.lerp(AppTheme.textGrey, AppTheme.primary, 0.40),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

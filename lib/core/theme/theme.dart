@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:monikid/core/font/font.dart';
 
 /// MoniKid App Theme - Updated to exactly match HTML reference
@@ -59,10 +58,80 @@ class AppTheme {
   static const Color chartGreen = Color(0xFF22C55E);
   static const Color successSurface = Color(0xFFECFDF3);
   static const Color successBorder = Color(0xFF86EFAC);
+  static const Color warningSurface = Color(0xFFFFFBEB); // Amber surface for warning state
+  static const Color warningText = Color(0xFFD97706); // Amber text for warning state
   static const Color dangerSurface = Color(0xFFFEF2F2);
   static const Color dangerBorder = Color(0xFFFECACA);
   static const Color infoSurface = Color(0xFFEFF6FF);
   static const Color infoBorder = Color(0xFFBFDBFE);
+
+  // ==========================================================================
+  // EXTENDED COLOR PALETTE (Added for hardcoded color replacement)
+  // ==========================================================================
+
+  // Light green variants (custom surfaces)
+  static const Color surfaceLightGreen = Color(0xFFEAF2EB); // custom light green surface
+
+  // Grey variants (for additional UI states)
+  static const Color surfaceGrey = Color(0xFFF3F4F6); // grey-100: alternate light surface
+  static const Color backgroundVeryDark = Color(0xFF111827); // grey-900: very dark bg
+  static const Color textGreyDark = Color(0xFF9CA3AF); // grey-400: darker muted text
+  static const Color textGreyMedium = Color(0xFF4B5563); // grey-600: medium grey text
+  static const Color textGreyDarker = Color(0xFF374151); // grey-700: darker grey text
+  static const Color borderGrey = Color(0xFFD1D5DB); // grey-300: light border
+  static const Color controlTrack = Color(0xFFEBECEB); // segmented control track background
+
+  // Red variants (errors, alerts, danger states)
+  static const Color redDark = Color(0xFFDC2626); // red-600: dark red for strong errors
+  static const Color redMedium = Color(0xFFEF4444); // red-500: medium red (can also use redAlert)
+  static const Color redLight = Color(0xFFFCA5A5); // red-300: light red for backgrounds
+  static const Color redVeryLight = Color(0xFFF87171); // red-400: very light red
+
+  // Green variants (success, positive states)
+  static const Color greenBright = Color(0xFF10B981); // emerald-500: bright green
+  static const Color greenDark = Color(0xFF166534); // green-800: dark green
+  static const Color greenDarker = Color(0xFF1E5222); // green-900: very dark green
+
+  // Blue variants (info, links, primary actions)
+  static const Color blueDark = Color(0xFF2563EB); // blue-600: dark blue
+  static const Color blueLight = Color(0xFF93C5FD); // blue-300: light blue
+
+  // iOS system colors (for native-looking UI)
+  static const Color iosSystemGrey = Color(0xFFE5E5EA); // iOS system grey
+  static const Color iosSystemGreyDark = Color(0xFFC5C5CA); // iOS system grey variant
+
+  // ==========================================================================
+  // TRANSACTION CATEGORY ICON COLORS (from monikid-home-upgrade-Child.html)
+  // ==========================================================================
+  static const Color txCategoryBookBg = Color(0xFFF3FBF3);
+  static const Color txCategoryBookBorder = Color(0xFFDCEEDC);
+  static const Color txCategoryFoodBg = Color(0xFFFFF6EC);
+  static const Color txCategoryFoodBorder = Color(0xFFF1DEC1);
+  static const Color txCategoryFoodIcon = Color(0xFFC97E23);
+  static const Color txCategorySchoolBg = Color(0xFFF1F7FF);
+  static const Color txCategorySchoolBorder = Color(0xFFD8E4F7);
+  static const Color txCategorySchoolIcon = Color(0xFF3F7EC7);
+  static const Color txCategoryTopupBg = Color(0xFFEEF9F0);
+  static const Color txCategoryTopupBorder = Color(0xFFD7EED8);
+  static const Color txCategoryOtherBg = Color(0xFFF8F5FF);
+  static const Color txCategoryOtherBorder = Color(0xFFE3DDF8);
+  static const Color txCategoryOtherIcon = Color(0xFF7A57C4);
+  static const Color txStatusWarnIcon = Color(0xFFD18A2E);
+  static const Color txStatusWarnBg = Color(0xFFFFF6EC);
+
+  // ==========================================================================
+  // ONBOARDING BUTTON GRADIENT
+  // Extracted from HTML: linear-gradient(180deg,
+  //   color-mix(in oklab, #2F7F33 98%, white),
+  //   color-mix(in oklab, #2F7F33 82%, black))
+  // ==========================================================================
+  static const Color primaryButtonGradientTop = Color(0xFF338437);
+  static const Color primaryButtonGradientBottom = Color(0xFF1E5421);
+  static const LinearGradient primaryButtonGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [primaryButtonGradientTop, primaryButtonGradientBottom],
+  );
 
   // ==========================================================================
   // NOTIFICATION SCREEN (Light theme — used regardless of system dark mode)
@@ -110,9 +179,8 @@ class AppTheme {
       ),
 
       // Font chữ mặc định
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
-      ).apply(bodyColor: textWhite, displayColor: textWhite),
+      textTheme: ThemeData.dark().textTheme
+          .apply(fontFamily: 'Inter', bodyColor: textWhite, displayColor: textWhite),
 
       // Style cho AppBar
       appBarTheme: AppBarTheme(
@@ -133,7 +201,7 @@ class AppTheme {
         filled: true,
         fillColor: surfaceDark,
         hintStyle: AppTextStyleFactory.style(
-          size: AppFontSizes.textMedium,
+          size: AppFontSizes.bodyMedium,
           weight: FontWeight.w400,
           color: textGrey,
           scaled: false,
@@ -200,9 +268,8 @@ class AppTheme {
       ),
 
       // Font chữ
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.light().textTheme,
-      ).apply(bodyColor: textBlack, displayColor: textBlack),
+      textTheme: ThemeData.light().textTheme
+          .apply(fontFamily: 'Inter', bodyColor: textBlack, displayColor: textBlack),
 
       // AppBar Light Mode
       appBarTheme: AppBarTheme(
@@ -223,7 +290,7 @@ class AppTheme {
         filled: true,
         fillColor: surfaceLight,
         hintStyle: AppTextStyleFactory.style(
-          size: AppFontSizes.textMedium,
+          size: AppFontSizes.bodyMedium,
           weight: FontWeight.w400,
           color: textGrey.withValues(alpha: 0.8),
           scaled: false,

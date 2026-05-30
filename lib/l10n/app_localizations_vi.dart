@@ -18,6 +18,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get english => 'Tiếng Anh';
 
   @override
+  String get languageVietnameseSubtitle =>
+      'Hiển thị toàn bộ ứng dụng bằng tiếng Việt';
+
+  @override
+  String get languageEnglishSubtitle => 'Dùng tiếng Anh cho toàn bộ ứng dụng';
+
+  @override
   String get close => 'Đóng';
 
   @override
@@ -37,17 +44,99 @@ class AppLocalizationsVi extends AppLocalizations {
   String get onboardingContinueAction => 'Tiếp tục';
 
   @override
-  String get onboardingCurrencyTitle => 'Chọn loại tiền tệ';
+  String get onboardingLanguageSubtitle =>
+      'Bạn có thể đổi lại sau trong phần cài đặt.';
 
   @override
-  String get onboardingCurrencyDescription =>
-      'Vui lòng chọn loại tiền tệ bạn muốn sử dụng để quản lý các giao dịch trong ứng dụng.';
+  String get onboardingLanguageCardTitle => 'Ngôn ngữ hiển thị';
 
   @override
-  String get onboardingCurrencyVnd => 'Việt Nam Đồng (VND)';
+  String get onboardingLanguageCardDesc =>
+      'Monikid sẽ dùng ngôn ngữ này cho bài học và thông báo.';
 
   @override
-  String get onboardingCurrencyUsd => 'Đô la Mỹ (USD)';
+  String get onboardingLanguageViDesc => 'Phù hợp cho người dùng tại Việt Nam';
+
+  @override
+  String get onboardingLanguageEnDesc =>
+      'Dành cho học sinh và phụ huynh song ngữ';
+
+  @override
+  String get onboardingLanguageHint =>
+      'Bước tiếp theo: Monikid sẽ xin quyền thông báo để nhắc lịch học và cập nhật quan trọng.';
+
+  @override
+  String get onboardingSkipLater => 'Để sau';
+
+  @override
+  String get onboardingNotificationTitle =>
+      'Bật thông báo để theo dõi chi tiêu kịp thời';
+
+  @override
+  String get onboardingNotificationSubtitle =>
+      'Monikid sẽ gửi cập nhật khi có giao dịch mới, biến động số dư và hoạt động chi tiêu quan trọng để phụ huynh luôn nắm được tình hình của con.';
+
+  @override
+  String get onboardingNotificationBenefitsTitle => 'Lợi ích khi bật thông báo';
+
+  @override
+  String get onboardingNotificationBenefitsDesc =>
+      'Chỉ những cập nhật hữu ích để phụ huynh kiểm soát chi tiêu dễ hơn mỗi ngày.';
+
+  @override
+  String get onboardingNotificationEnableBtn => 'Bật thông báo ngay';
+
+  @override
+  String get onboardingNotificationBenefit1Title =>
+      'Biết ngay khi có giao dịch mới';
+
+  @override
+  String get onboardingNotificationBenefit1Desc =>
+      'Theo dõi khoản chi của con gần như ngay lập tức sau khi phát sinh.';
+
+  @override
+  String get onboardingNotificationBenefit2Title =>
+      'Nhận cảnh báo khi số dư thay đổi';
+
+  @override
+  String get onboardingNotificationBenefit2Desc =>
+      'Giúp kiểm soát ngân sách và phát hiện các biến động đáng chú ý.';
+
+  @override
+  String get onboardingNotificationBenefit3Title =>
+      'Phụ huynh luôn nắm được tình hình';
+
+  @override
+  String get onboardingNotificationBenefit3Desc =>
+      'Đồng hành cùng con trong việc học cách quản lý tiền bạc hợp lý hơn.';
+
+  @override
+  String get onboardingNotificationSheetTitle =>
+      '\"Monikid\" muốn gửi thông báo cho bạn';
+
+  @override
+  String get onboardingNotificationSheetDesc =>
+      'Thông báo có thể bao gồm giao dịch mới, biến động số dư và các cập nhật quan trọng về chi tiêu.';
+
+  @override
+  String get onboardingNotificationSheetRowTitle =>
+      'Theo dõi giao dịch đúng lúc';
+
+  @override
+  String get onboardingNotificationSheetRowDesc =>
+      'Giúp phụ huynh nắm được các khoản chi tiêu của con nhanh hơn.';
+
+  @override
+  String get onboardingNotificationSheetDeny => 'Không cho phép';
+
+  @override
+  String get onboardingNotificationSheetAllow => 'Cho phép';
+
+  @override
+  String get onboardingNotificationMiniAmount => '-120.000đ';
+
+  @override
+  String get onboardingNotificationMiniMeta => 'Mua sách • 2 phút trước';
 
   @override
   String get validationEmptyFields =>
@@ -293,6 +382,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get transactionEditAction => 'Chỉnh sửa giao dịch';
 
   @override
+  String get transactionDeleteAction => 'Xóa giao dịch';
+
+  @override
   String get transactionEvidenceSectionTitle => 'Ảnh minh chứng';
 
   @override
@@ -498,6 +590,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scanReceiptDesc => 'Chọn cách thêm ảnh hoá đơn để xử lý.';
 
   @override
+  String get scanReceiptCameraSubtitle => 'Mở camera để chụp trực tiếp';
+
+  @override
+  String get scanReceiptGallerySubtitle => 'Chọn từ thư viện ảnh thiết bị';
+
+  @override
   String get chooseAiModelTitle => 'Chọn AI model';
 
   @override
@@ -602,6 +700,37 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get aiModelSelectModelLabel => 'Chọn model';
+
+  @override
+  String get aiModelHeroEyebrow => 'AI model setup';
+
+  @override
+  String get aiModelHeroTitle => 'Chọn mô hình AI để phân tích chi tiêu';
+
+  @override
+  String get aiModelHeroSubtitle =>
+      'Kết nối Gemini bằng API hoặc tải local model để xử lý trực tiếp trên thiết bị.';
+
+  @override
+  String get aiModelGeminiCardDescription =>
+      'Dùng AI cloud để phân loại giao dịch, tóm tắt chi tiêu và gợi ý cảnh báo nhanh.';
+
+  @override
+  String get aiModelRecommendedBadge => 'Khuyên dùng';
+
+  @override
+  String get aiModelGemmaCardDescription =>
+      'Xử lý trên thiết bị để tăng riêng tư. Phù hợp khi muốn dữ liệu không rời máy.';
+
+  @override
+  String get aiModelPrivateBadge => 'Riêng tư';
+
+  @override
+  String get aiModelFooterNote =>
+      'Bạn có thể đổi model bất kỳ lúc nào trong phần cài đặt AI.';
+
+  @override
+  String get aiModelEnableGemini => 'Bật Gemini';
 
   @override
   String get aiModelSelectModelConfirmMessage =>
@@ -774,6 +903,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingStuFamilyCodeLabel => 'Mã liên kết gia đình';
 
   @override
+  String get settingStuEyebrow => 'Tài khoản & ứng dụng';
+
+  @override
+  String get settingStuSubtitle =>
+      'Quản lý ngôn ngữ, thông báo và kết nối gia đình của bạn.';
+
+  @override
+  String get settingStuNotificationsSubtitle => 'Nhận cảnh báo giao dịch mới';
+
+  @override
+  String get settingStuAiModelSubtitle => 'Trợ lý phân tích thông minh';
+
+  @override
+  String get settingStuFamilyCodeSubtitle => 'Kết nối với tài khoản phụ huynh';
+
+  @override
+  String get settingStuProfileEditLabel => 'Chỉnh sửa hồ sơ';
+
+  @override
+  String get settingStuProfileEditSubtitle => 'Cập nhật thông tin cá nhân';
+
+  @override
+  String get settingStuFaqSubtitle => 'Giải đáp thắc mắc thường gặp';
+
+  @override
   String get settingSignOutConfirm => 'Bạn có chắc chắn muốn đăng xuất không?';
 
   @override
@@ -790,6 +944,78 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get aiModelDownloadingNote => 'Không đóng ứng dụng';
+
+  @override
+  String get loginWelcomeTitle => 'Chào mừng quay lại';
+
+  @override
+  String get loginWelcomeSubtitle => 'Đăng nhập để tiếp tục.';
+
+  @override
+  String get loginTagline => 'Quản lý chi tiêu thông minh';
+
+  @override
+  String get loginAccountLabel => 'Tài khoản';
+
+  @override
+  String get loginEmailPlaceholder => 'Email / số điện thoại';
+
+  @override
+  String get loginPasswordLabel => 'Mật khẩu';
+
+  @override
+  String get loginPasswordPlaceholder => 'Nhập mật khẩu';
+
+  @override
+  String get loginForgotPassword => 'Quên mật khẩu?';
+
+  @override
+  String get loginRegisterButton => 'Đăng ký nếu chưa có tài khoản';
+
+  @override
+  String get registerTitle => 'Tạo tài khoản mới';
+
+  @override
+  String get registerSubtitle => 'Điền thông tin để bắt đầu với Monikid.';
+
+  @override
+  String get registerTagline => 'Bắt đầu hành trình tài chính';
+
+  @override
+  String get registerEmailPlaceholder => 'you@example.com';
+
+  @override
+  String get registerUsernameLabel => 'Tên người dùng';
+
+  @override
+  String get registerUsernamePlaceholder => 'Nhập tên người dùng';
+
+  @override
+  String get registerPhoneLabel => 'Số điện thoại';
+
+  @override
+  String get registerPhonePlaceholder => 'Nhập số điện thoại';
+
+  @override
+  String get registerPasswordPlaceholder => 'Tạo mật khẩu';
+
+  @override
+  String get registerConfirmPasswordLabel => 'Nhập lại mật khẩu';
+
+  @override
+  String get registerConfirmPasswordPlaceholder => 'Nhập lại mật khẩu';
+
+  @override
+  String get registerRoleParent => 'Phụ huynh';
+
+  @override
+  String get registerRoleStudent => 'Học sinh';
+
+  @override
+  String get registerHaveAccountText => 'Bạn đã có tài khoản?';
+
+  @override
+  String get validationPasswordMismatch => 'Mật khẩu xác nhận không khớp.';
 
   @override
   String get authPasswordLabel => 'Mật khẩu';
@@ -888,7 +1114,68 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeStudentMonthlyLimitNotSet => 'Hãy thiết lập hạn mức tháng';
 
   @override
+  String get homeStudentSummaryEyebrow => 'Tổng quan tháng này';
+
+  @override
+  String homeStudentSummaryTitle(int month) {
+    return 'Chi tiêu tháng $month của con';
+  }
+
+  @override
+  String homeStudentTodayTransactionsSub(int count) {
+    return '$count giao dịch hôm nay';
+  }
+
+  @override
+  String get homeStudentTopCategoryLabel => 'Chi nhiều nhất';
+
+  @override
+  String homeStudentMonthPill(int month) {
+    return 'Tháng $month';
+  }
+
+  @override
+  String homeStudentUsedPercent(int percent) {
+    return 'Đã dùng $percent%';
+  }
+
+  @override
+  String get homeStudentTransactionsLabel => 'Giao dịch';
+
+  @override
+  String homeStudentTransactionCountLabel(int count) {
+    return '$count giao dịch';
+  }
+
+  @override
+  String homeStudentRemainingAmount(String amount) {
+    return 'Còn $amount';
+  }
+
+  @override
+  String get homeStudentQuickActionsTitle => 'Thao tác nhanh';
+
+  @override
+  String get homeStudentScanBillTitle => 'Scan bill AI';
+
+  @override
+  String get homeStudentScanBillSubtitle =>
+      'Quét hóa đơn và lưu giao dịch nhanh';
+
+  @override
+  String get homeStudentSetLimitSubtitle => 'Kiểm soát chi tiêu theo tháng';
+
+  @override
+  String get homeStudentMonthlyIncomeLabel => 'Tổng thu';
+
+  @override
+  String get homeStudentUsedLabel => 'Đã dùng';
+
+  @override
   String get setMoneyLimitTitle => 'Thiết lập hạn mức tháng';
+
+  @override
+  String get setMoneyLimitFieldLabel => 'Hạn mức';
 
   @override
   String get setMoneyLimitDescription =>
@@ -918,6 +1205,35 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get statisticByMonth => 'Theo tháng';
+
+  @override
+  String get statisticByYear => 'Theo năm';
+
+  @override
+  String get statisticHeaderEyebrow => 'Theo dõi chi tiêu của con';
+
+  @override
+  String get statisticHeaderSubhead =>
+      'Tổng hợp giao dịch, cảnh báo vượt hạn mức và các danh mục chi tiêu nổi bật.';
+
+  @override
+  String get statisticAlertTitle => 'Cảnh báo chi tiêu';
+
+  @override
+  String get statisticAlertPriority => 'Ưu tiên kiểm tra';
+
+  @override
+  String get statisticProgressUsageLabel => 'Tiến độ sử dụng';
+
+  @override
+  String get statisticBudgetAdjustAnytime =>
+      'Phụ huynh có thể điều chỉnh hạn mức bất cứ lúc nào';
+
+  @override
+  String get statisticChartSectionTitle => 'Biểu đồ chi tiêu';
+
+  @override
+  String get statisticChartComparisonTitle => 'So sánh theo thời gian';
 
   @override
   String get statisticWeekNoun => 'tuần';
@@ -1097,6 +1413,38 @@ class AppLocalizationsVi extends AppLocalizations {
   String get joinFamilyErrorUnknown => 'Không thể tham gia. Vui lòng thử lại.';
 
   @override
+  String get joinFamilyEyebrow => 'Kết nối tài khoản';
+
+  @override
+  String get joinFamilyHeroTitle => 'Nhập mã gia đình để bắt đầu';
+
+  @override
+  String get joinFamilyHeroSubtitle =>
+      'Tham gia nhóm gia đình để phụ huynh theo dõi giao dịch và quản lý chi tiêu của con an toàn hơn.';
+
+  @override
+  String get joinFamilyMiniCardTitle => 'Không gian gia đình';
+
+  @override
+  String get joinFamilyMiniCardDesc => 'Minh bạch giao dịch, dễ theo dõi';
+
+  @override
+  String get joinFamilyEnterCodeTitle => 'Nhập mã 6 số';
+
+  @override
+  String get joinFamilyEnterCodeSubtitle =>
+      'Mã này được phụ huynh hoặc người tạo gia đình gửi cho bạn.';
+
+  @override
+  String get joinFamilyCodeOnlyDigits => 'Chỉ chấp nhận mã số gồm 6 chữ số';
+
+  @override
+  String get joinFamilyJoinNow => 'Tham gia ngay';
+
+  @override
+  String get joinFamilyNoCode => 'Bạn chưa có mã?';
+
+  @override
   String get unlinkFamilyTitle => 'Gia đình của tôi';
 
   @override
@@ -1120,7 +1468,44 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể rời gia đình. Vui lòng thử lại.';
 
   @override
+  String get familyMembersTitle => 'Thành viên gia đình';
+
+  @override
+  String get familyStatusJoined => 'Đang tham gia';
+
+  @override
+  String get familyLinkedSuccess => 'Liên kết thành công';
+
+  @override
+  String get familyMemberListLabel => 'Danh sách thành viên';
+
+  @override
+  String get familyMembersUnit => 'người';
+
+  @override
+  String get familyRoleParent => 'Phụ huynh';
+
+  @override
+  String get familyRoleChild => 'Con';
+
+  @override
+  String get familyRoleOwner => 'Chủ gia đình';
+
+  @override
+  String get familyMemberYou => 'Bạn';
+
+  @override
+  String get familyMemberActive => 'Đang hoạt động';
+
+  @override
+  String get unlinkFamilyButtonFull => 'Hủy liên kết gia đình';
+
+  @override
   String get customCategoryAdd => 'Thêm danh mục';
+
+  @override
+  String get customCategoryAddSubtitle =>
+      'Danh mục sẽ được thêm vào loại chi tiêu';
 
   @override
   String get customCategoryLabelHint => 'Tên danh mục';
@@ -1164,7 +1549,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customCategorySelectTitle => 'Chọn danh mục';
 
   @override
-  String get customCategoryConfirmSelection => 'Xác nhận';
+  String get customCategoryConfirmSelection => 'Xong';
+
+  @override
+  String get customCategoryAddNew => 'Thêm mới';
 
   @override
   String get setMoneyLimitManagedByParent => 'Hạn mức do phụ huynh quản lý';
@@ -1363,4 +1751,241 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get familyManagementBannerSubtitle =>
       'Dạy trẻ cách quản lý chi tiêu thông minh từ hôm nay.';
+
+  @override
+  String get notificationSettingsTitle => 'Thông báo';
+
+  @override
+  String get notificationSettingsDailySection => 'THÔNG BÁO HÀNG NGÀY';
+
+  @override
+  String get notificationSettingsEnableLabel => 'Bật thông báo';
+
+  @override
+  String get notificationSettingsTimeLabel => 'Giờ nhận thông báo';
+
+  @override
+  String get notificationSettingsAboutSection => 'VỀ THÔNG BÁO';
+
+  @override
+  String get notificationSettingsDescription =>
+      'Thông báo sẽ nhắc bạn kiểm tra chi tiêu mỗi ngày vào giờ đã chọn. Điều này giúp bạn duy trì thói quen quản lý tài chính tốt hơn.';
+
+  @override
+  String get settingNotificationsLabel => 'Thông báo';
+
+  @override
+  String get scheduleNotificationSmartTitle => 'Tiết kiệm 15% hiệu quả hơn';
+
+  @override
+  String get scheduleNotificationSmartSubtitle =>
+      'Dựa trên thói quen của 500 người dùng khác';
+
+  @override
+  String get notificationSettingsEyebrow => 'Theo dõi chi tiêu';
+
+  @override
+  String get notificationSettingsHeroTitle =>
+      'Bật thông báo để không bỏ lỡ giao dịch của con';
+
+  @override
+  String get notificationSettingsHeroSubtitle =>
+      'Nhận cảnh báo ngay khi có chi tiêu mới, đúng khung giờ bạn muốn theo dõi để việc quản lý nhẹ nhàng hơn.';
+
+  @override
+  String get notificationSettingsEnableHint =>
+      'Thông báo khi con thanh toán, chuyển tiền hoặc phát sinh biến động số dư.';
+
+  @override
+  String get notificationSettingsScheduleSection => 'Lịch nhận thông báo';
+
+  @override
+  String get notificationSettingsScheduleNote => 'Có thể thay đổi';
+
+  @override
+  String get notificationSettingsTimeHint =>
+      'Ứng dụng sẽ ưu tiên gửi thông báo trong khung giờ này để tránh làm phiền ngoài giờ nghỉ.';
+
+  @override
+  String get notificationSettingsInstructionTitle =>
+      'Thông báo giúp phụ huynh theo dõi chi tiêu kịp thời';
+
+  @override
+  String get notificationSettingsInstructionDesc =>
+      'Khi bật tính năng này, bạn sẽ nhận được cảnh báo ngay khi có giao dịch mới hoặc khi số dư của con thay đổi bất thường.';
+
+  @override
+  String get notificationSettingsTip1 =>
+      'Nhấn Cho phép khi hệ thống hỏi quyền gửi thông báo để hệ thống hoạt động đầy đủ.';
+
+  @override
+  String get notificationSettingsTip2 =>
+      'Chọn giờ nhận phù hợp để không bị làm phiền vào buổi tối nhưng vẫn nắm được giao dịch quan trọng.';
+
+  @override
+  String get notificationSettingsTip3 =>
+      'Bạn vẫn sẽ nhận cảnh báo ngay lập tức với các giao dịch cần chú ý như chi tiêu vượt hạn mức hoặc thanh toán bất thường.';
+
+  @override
+  String get onboardingWelcomeTitle => 'Tài chính gia đình\ntrong tầm tay';
+
+  @override
+  String get onboardingWelcomeSubtitle =>
+      'Ứng dụng thông minh kết nối phụ huynh và con cái, xây dựng thói quen chi tiêu từ hôm nay.';
+
+  @override
+  String get onboardingWelcomeFeature1Title => 'Quản lý thông minh';
+
+  @override
+  String get onboardingWelcomeFeature1Desc =>
+      'Kiểm soát thu chi, thiết lập hạn mức và theo dõi ngân sách trực quan.';
+
+  @override
+  String get onboardingWelcomeFeature2Title => 'Quét AI hóa đơn';
+
+  @override
+  String get onboardingWelcomeFeature2Desc =>
+      'Nhập liệu tự động siêu tốc chỉ qua một thao tác chụp màn hình.';
+
+  @override
+  String get onboardingWelcomeFeature3Title => 'Đồng hành cùng con';
+
+  @override
+  String get onboardingWelcomeFeature3Desc =>
+      'Giáo dục giá trị đồng tiền và khuyến khích tiết kiệm mỗi ngày.';
+
+  @override
+  String get onboardingWelcomeStartBtn => 'Bắt đầu với MoniKid';
+
+  @override
+  String get validationEmailEmpty => 'Vui lòng nhập email';
+
+  @override
+  String get validationEmailInvalid => 'Email không hợp lệ';
+
+  @override
+  String get validationPasswordEmpty => 'Vui lòng nhập mật khẩu';
+
+  @override
+  String get validationPasswordTooShort => 'Mật khẩu tối thiểu 6 ký tự';
+
+  @override
+  String get validationPasswordTooLong => 'Mật khẩu tối đa 128 ký tự';
+
+  @override
+  String get validationUsernameEmpty => 'Vui lòng nhập họ tên';
+
+  @override
+  String get validationUsernameTooShort => 'Họ tên tối thiểu 2 ký tự';
+
+  @override
+  String get validationUsernameTooLong => 'Họ tên tối đa 50 ký tự';
+
+  @override
+  String get validationPhoneInvalid => 'Số điện thoại không hợp lệ';
+
+  @override
+  String get validationConfirmPasswordEmpty => 'Vui lòng xác nhận mật khẩu';
+
+  @override
+  String get validationConfirmPasswordMismatch =>
+      'Mật khẩu xác nhận không khớp';
+
+  @override
+  String get forgotPasswordTitle => 'Quên mật khẩu?';
+
+  @override
+  String get forgotPasswordDescription =>
+      'Đừng lo lắng! Hãy nhập email đã đăng ký, chúng tôi sẽ gửi link đặt lại mật khẩu để bạn thay đổi mật khẩu.';
+
+  @override
+  String get forgotPasswordEmailPlaceholder => 'Nhập email của bạn';
+
+  @override
+  String get forgotPasswordSubmitBtn => 'Nhận link đặt mật khẩu';
+
+  @override
+  String get forgotPasswordBackToLogin => 'Quay về đăng nhập';
+
+  @override
+  String get forgotPasswordEmailSentTitle => 'Email đã được gửi!';
+
+  @override
+  String forgotPasswordEmailSentMessage(String email) {
+    return 'Chúng tôi đã gửi link đặt lại mật khẩu đến\n$email\n\nVui lòng kiểm tra hộp thư rồi nhấn vào link để đổi mật khẩu.';
+  }
+
+  @override
+  String get forgotPasswordEmailSentBtn => 'Quay về đăng nhập';
+
+  @override
+  String get forgotPasswordEmailHint =>
+      'Mã xác thực sẽ được gửi về email của bạn. Vui lòng kiểm tra cả hộp thư chính và thư rác.';
+
+  @override
+  String get forgotPasswordChipLabel => 'Gửi mã xác thực';
+
+  @override
+  String get forgotPasswordRememberPassword => 'Bạn nhớ lại mật khẩu?';
+
+  @override
+  String get forgotPasswordLoginAction => 'Đăng nhập';
+
+  @override
+  String get txStatusSuccess => 'Thành công';
+
+  @override
+  String get txStatusCompleted => 'Hoàn tất';
+
+  @override
+  String get dateToday => 'Hôm nay';
+
+  @override
+  String get dateYesterday => 'Hôm qua';
+
+  @override
+  String get transactionViewAllCategories => 'Xem tất cả';
+
+  @override
+  String get transactionDetailsSection => 'Chi tiết';
+
+  @override
+  String get transactionReceiptLabel => 'Ảnh hóa đơn';
+
+  @override
+  String get transactionAddPhoto => 'Thêm ảnh';
+
+  @override
+  String get transactionChangePhoto => 'Đổi ảnh';
+
+  @override
+  String get transactionReceiptEmptyTitle => 'Ảnh hóa đơn sẽ hiển thị ở đây';
+
+  @override
+  String get faqCommonQuestions => 'Câu hỏi thường gặp';
+
+  @override
+  String get transactionReceiptScanHint => 'Hệ thống sẽ tự động quét thông tin';
+
+  @override
+  String get transactionDateToday => 'Hôm nay';
+
+  @override
+  String get successDialogDefaultTitle => 'Thành công!';
+
+  @override
+  String get successDialogDefaultMessage => 'Thao tác đã hoàn thành.';
+
+  @override
+  String get successDialogDefaultButton => 'OK';
+
+  @override
+  String get transactionHistoryEyebrow => 'Quản lý chi tiêu';
+
+  @override
+  String get transactionHistoryTitle => 'Lịch sử giao dịch';
+
+  @override
+  String get transactionHistorySubhead =>
+      'Tất cả khoản thu chi của bạn theo thời gian.';
 }

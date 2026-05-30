@@ -116,6 +116,18 @@ abstract class AppLocalizations {
   /// **'English'**
   String get english;
 
+  /// No description provided for @languageVietnameseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Display the entire app in Vietnamese'**
+  String get languageVietnameseSubtitle;
+
+  /// No description provided for @languageEnglishSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use English across the app interface'**
+  String get languageEnglishSubtitle;
+
   /// No description provided for @close.
   ///
   /// In en, this message translates to:
@@ -152,29 +164,161 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get onboardingContinueAction;
 
-  /// No description provided for @onboardingCurrencyTitle.
+  /// No description provided for @onboardingLanguageSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose currency'**
-  String get onboardingCurrencyTitle;
+  /// **'You can change this later in settings.'**
+  String get onboardingLanguageSubtitle;
 
-  /// No description provided for @onboardingCurrencyDescription.
+  /// No description provided for @onboardingLanguageCardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Please choose the currency you want to use to manage transactions in the app.'**
-  String get onboardingCurrencyDescription;
+  /// **'Display language'**
+  String get onboardingLanguageCardTitle;
 
-  /// No description provided for @onboardingCurrencyVnd.
+  /// No description provided for @onboardingLanguageCardDesc.
   ///
   /// In en, this message translates to:
-  /// **'Vietnamese Dong (VND)'**
-  String get onboardingCurrencyVnd;
+  /// **'Monikid will use this language for lessons and notifications.'**
+  String get onboardingLanguageCardDesc;
 
-  /// No description provided for @onboardingCurrencyUsd.
+  /// No description provided for @onboardingLanguageViDesc.
   ///
   /// In en, this message translates to:
-  /// **'US Dollar (USD)'**
-  String get onboardingCurrencyUsd;
+  /// **'For users in Vietnam'**
+  String get onboardingLanguageViDesc;
+
+  /// No description provided for @onboardingLanguageEnDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'For bilingual learners and parents'**
+  String get onboardingLanguageEnDesc;
+
+  /// No description provided for @onboardingLanguageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Next step: Monikid will ask for notification permission to remind you of schedules and important updates.'**
+  String get onboardingLanguageHint;
+
+  /// No description provided for @onboardingSkipLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get onboardingSkipLater;
+
+  /// No description provided for @onboardingNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to track spending on time'**
+  String get onboardingNotificationTitle;
+
+  /// No description provided for @onboardingNotificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monikid will send updates when there are new transactions, balance changes, and important spending activities so parents always stay informed.'**
+  String get onboardingNotificationSubtitle;
+
+  /// No description provided for @onboardingNotificationBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefits of enabling notifications'**
+  String get onboardingNotificationBenefitsTitle;
+
+  /// No description provided for @onboardingNotificationBenefitsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Only useful updates to help parents manage spending more easily every day.'**
+  String get onboardingNotificationBenefitsDesc;
+
+  /// No description provided for @onboardingNotificationEnableBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications'**
+  String get onboardingNotificationEnableBtn;
+
+  /// No description provided for @onboardingNotificationBenefit1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Know instantly about new transactions'**
+  String get onboardingNotificationBenefit1Title;
+
+  /// No description provided for @onboardingNotificationBenefit1Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your child\'s spending almost immediately after it happens.'**
+  String get onboardingNotificationBenefit1Desc;
+
+  /// No description provided for @onboardingNotificationBenefit2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Get alerts when balance changes'**
+  String get onboardingNotificationBenefit2Title;
+
+  /// No description provided for @onboardingNotificationBenefit2Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Helps control budget and detect notable fluctuations.'**
+  String get onboardingNotificationBenefit2Desc;
+
+  /// No description provided for @onboardingNotificationBenefit3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents always stay informed'**
+  String get onboardingNotificationBenefit3Title;
+
+  /// No description provided for @onboardingNotificationBenefit3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Support your child in learning how to manage money wisely.'**
+  String get onboardingNotificationBenefit3Desc;
+
+  /// No description provided for @onboardingNotificationSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'\"Monikid\" wants to send you notifications'**
+  String get onboardingNotificationSheetTitle;
+
+  /// No description provided for @onboardingNotificationSheetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications may include new transactions, balance changes, and important spending updates.'**
+  String get onboardingNotificationSheetDesc;
+
+  /// No description provided for @onboardingNotificationSheetRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track transactions on time'**
+  String get onboardingNotificationSheetRowTitle;
+
+  /// No description provided for @onboardingNotificationSheetRowDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Helps parents know about their child\'s spending faster.'**
+  String get onboardingNotificationSheetRowDesc;
+
+  /// No description provided for @onboardingNotificationSheetDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t allow'**
+  String get onboardingNotificationSheetDeny;
+
+  /// No description provided for @onboardingNotificationSheetAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get onboardingNotificationSheetAllow;
+
+  /// No description provided for @onboardingNotificationMiniAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'-120.000đ'**
+  String get onboardingNotificationMiniAmount;
+
+  /// No description provided for @onboardingNotificationMiniMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy books • 2 minutes ago'**
+  String get onboardingNotificationMiniMeta;
 
   /// No description provided for @validationEmptyFields.
   ///
@@ -626,6 +770,12 @@ abstract class AppLocalizations {
   /// **'Edit transaction'**
   String get transactionEditAction;
 
+  /// No description provided for @transactionDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transaction'**
+  String get transactionDeleteAction;
+
   /// No description provided for @transactionEvidenceSectionTitle.
   ///
   /// In en, this message translates to:
@@ -1004,6 +1154,18 @@ abstract class AppLocalizations {
   /// **'Choose how to add receipt image to process.'**
   String get scanReceiptDesc;
 
+  /// No description provided for @scanReceiptCameraSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open camera to take photo directly'**
+  String get scanReceiptCameraSubtitle;
+
+  /// No description provided for @scanReceiptGallerySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from device photo library'**
+  String get scanReceiptGallerySubtitle;
+
   /// No description provided for @chooseAiModelTitle.
   ///
   /// In en, this message translates to:
@@ -1195,6 +1357,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select model'**
   String get aiModelSelectModelLabel;
+
+  /// No description provided for @aiModelHeroEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'AI model setup'**
+  String get aiModelHeroEyebrow;
+
+  /// No description provided for @aiModelHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your AI analysis model'**
+  String get aiModelHeroTitle;
+
+  /// No description provided for @aiModelHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect via Gemini API or download a local model for on-device processing.'**
+  String get aiModelHeroSubtitle;
+
+  /// No description provided for @aiModelGeminiCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use cloud AI to categorize transactions and get quick spending insights.'**
+  String get aiModelGeminiCardDescription;
+
+  /// No description provided for @aiModelRecommendedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get aiModelRecommendedBadge;
+
+  /// No description provided for @aiModelGemmaCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs on-device for enhanced privacy. Keeps all data on your phone.'**
+  String get aiModelGemmaCardDescription;
+
+  /// No description provided for @aiModelPrivateBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get aiModelPrivateBadge;
+
+  /// No description provided for @aiModelFooterNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You can switch models anytime in AI settings.'**
+  String get aiModelFooterNote;
+
+  /// No description provided for @aiModelEnableGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Gemini'**
+  String get aiModelEnableGemini;
 
   /// No description provided for @aiModelSelectModelConfirmMessage.
   ///
@@ -1508,6 +1724,54 @@ abstract class AppLocalizations {
   /// **'Family Code'**
   String get settingStuFamilyCodeLabel;
 
+  /// No description provided for @settingStuEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & App'**
+  String get settingStuEyebrow;
+
+  /// No description provided for @settingStuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your language, notifications and family connection.'**
+  String get settingStuSubtitle;
+
+  /// No description provided for @settingStuNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive new transaction alerts'**
+  String get settingStuNotificationsSubtitle;
+
+  /// No description provided for @settingStuAiModelSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart budget assistant'**
+  String get settingStuAiModelSubtitle;
+
+  /// No description provided for @settingStuFamilyCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with parent account'**
+  String get settingStuFamilyCodeSubtitle;
+
+  /// No description provided for @settingStuProfileEditLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get settingStuProfileEditLabel;
+
+  /// No description provided for @settingStuProfileEditSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your personal info'**
+  String get settingStuProfileEditSubtitle;
+
+  /// No description provided for @settingStuFaqSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Answers to common questions'**
+  String get settingStuFaqSubtitle;
+
   /// No description provided for @settingSignOutConfirm.
   ///
   /// In en, this message translates to:
@@ -1543,6 +1807,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Do not close the app'**
   String get aiModelDownloadingNote;
+
+  /// No description provided for @loginWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get loginWelcomeTitle;
+
+  /// No description provided for @loginWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to continue.'**
+  String get loginWelcomeSubtitle;
+
+  /// No description provided for @loginTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart family finance'**
+  String get loginTagline;
+
+  /// No description provided for @loginAccountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get loginAccountLabel;
+
+  /// No description provided for @loginEmailPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Email / phone number'**
+  String get loginEmailPlaceholder;
+
+  /// No description provided for @loginPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginPasswordLabel;
+
+  /// No description provided for @loginPasswordPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get loginPasswordPlaceholder;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get loginForgotPassword;
+
+  /// No description provided for @loginRegisterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up if you don\'t have an account'**
+  String get loginRegisterButton;
+
+  /// No description provided for @registerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new account'**
+  String get registerTitle;
+
+  /// No description provided for @registerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in your details to get started with Monikid.'**
+  String get registerSubtitle;
+
+  /// No description provided for @registerTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Begin your financial journey'**
+  String get registerTagline;
+
+  /// No description provided for @registerEmailPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'you@example.com'**
+  String get registerEmailPlaceholder;
+
+  /// No description provided for @registerUsernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get registerUsernameLabel;
+
+  /// No description provided for @registerUsernamePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get registerUsernamePlaceholder;
+
+  /// No description provided for @registerPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get registerPhoneLabel;
+
+  /// No description provided for @registerPhonePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter phone number'**
+  String get registerPhonePlaceholder;
+
+  /// No description provided for @registerPasswordPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a password'**
+  String get registerPasswordPlaceholder;
+
+  /// No description provided for @registerConfirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get registerConfirmPasswordLabel;
+
+  /// No description provided for @registerConfirmPasswordPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter your password'**
+  String get registerConfirmPasswordPlaceholder;
+
+  /// No description provided for @registerRoleParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get registerRoleParent;
+
+  /// No description provided for @registerRoleStudent.
+  ///
+  /// In en, this message translates to:
+  /// **'Student'**
+  String get registerRoleStudent;
+
+  /// No description provided for @registerHaveAccountText.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get registerHaveAccountText;
+
+  /// No description provided for @validationPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get validationPasswordMismatch;
 
   /// No description provided for @authPasswordLabel.
   ///
@@ -1724,11 +2132,107 @@ abstract class AppLocalizations {
   /// **'Set your monthly limit'**
   String get homeStudentMonthlyLimitNotSet;
 
+  /// No description provided for @homeStudentSummaryEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly overview'**
+  String get homeStudentSummaryEyebrow;
+
+  /// No description provided for @homeStudentSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Month {month} spending'**
+  String homeStudentSummaryTitle(int month);
+
+  /// No description provided for @homeStudentTodayTransactionsSub.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} transactions today'**
+  String homeStudentTodayTransactionsSub(int count);
+
+  /// No description provided for @homeStudentTopCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Top spending'**
+  String get homeStudentTopCategoryLabel;
+
+  /// No description provided for @homeStudentMonthPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Month {month}'**
+  String homeStudentMonthPill(int month);
+
+  /// No description provided for @homeStudentUsedPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Used {percent}%'**
+  String homeStudentUsedPercent(int percent);
+
+  /// No description provided for @homeStudentTransactionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get homeStudentTransactionsLabel;
+
+  /// No description provided for @homeStudentTransactionCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} transactions'**
+  String homeStudentTransactionCountLabel(int count);
+
+  /// No description provided for @homeStudentRemainingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Left: {amount}'**
+  String homeStudentRemainingAmount(String amount);
+
+  /// No description provided for @homeStudentQuickActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get homeStudentQuickActionsTitle;
+
+  /// No description provided for @homeStudentScanBillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan bill AI'**
+  String get homeStudentScanBillTitle;
+
+  /// No description provided for @homeStudentScanBillSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan receipts and save quickly'**
+  String get homeStudentScanBillSubtitle;
+
+  /// No description provided for @homeStudentSetLimitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Control monthly spending'**
+  String get homeStudentSetLimitSubtitle;
+
+  /// No description provided for @homeStudentMonthlyIncomeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get homeStudentMonthlyIncomeLabel;
+
+  /// No description provided for @homeStudentUsedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get homeStudentUsedLabel;
+
   /// No description provided for @setMoneyLimitTitle.
   ///
   /// In en, this message translates to:
   /// **'Set monthly limit'**
   String get setMoneyLimitTitle;
+
+  /// No description provided for @setMoneyLimitFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get setMoneyLimitFieldLabel;
 
   /// No description provided for @setMoneyLimitDescription.
   ///
@@ -1777,6 +2281,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By month'**
   String get statisticByMonth;
+
+  /// No description provided for @statisticByYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get statisticByYear;
+
+  /// No description provided for @statisticHeaderEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your child\'s spending'**
+  String get statisticHeaderEyebrow;
+
+  /// No description provided for @statisticHeaderSubhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction summary, budget alerts, and top spending categories at a glance.'**
+  String get statisticHeaderSubhead;
+
+  /// No description provided for @statisticAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Alert'**
+  String get statisticAlertTitle;
+
+  /// No description provided for @statisticAlertPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Check'**
+  String get statisticAlertPriority;
+
+  /// No description provided for @statisticProgressUsageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage progress'**
+  String get statisticProgressUsageLabel;
+
+  /// No description provided for @statisticBudgetAdjustAnytime.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents can adjust the limit at any time'**
+  String get statisticBudgetAdjustAnytime;
+
+  /// No description provided for @statisticChartSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Chart'**
+  String get statisticChartSectionTitle;
+
+  /// No description provided for @statisticChartComparisonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Over Time'**
+  String get statisticChartComparisonTitle;
 
   /// No description provided for @statisticWeekNoun.
   ///
@@ -2088,6 +2646,66 @@ abstract class AppLocalizations {
   /// **'Failed to join. Please try again.'**
   String get joinFamilyErrorUnknown;
 
+  /// No description provided for @joinFamilyEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Account'**
+  String get joinFamilyEyebrow;
+
+  /// No description provided for @joinFamilyHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter family code to get started'**
+  String get joinFamilyHeroTitle;
+
+  /// No description provided for @joinFamilyHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join your family group so parents can safely monitor transactions and manage your spending.'**
+  String get joinFamilyHeroSubtitle;
+
+  /// No description provided for @joinFamilyMiniCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Space'**
+  String get joinFamilyMiniCardTitle;
+
+  /// No description provided for @joinFamilyMiniCardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Transparent transactions, easy to track'**
+  String get joinFamilyMiniCardDesc;
+
+  /// No description provided for @joinFamilyEnterCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 6-digit code'**
+  String get joinFamilyEnterCodeTitle;
+
+  /// No description provided for @joinFamilyEnterCodeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This code is sent to you by the parent or family creator.'**
+  String get joinFamilyEnterCodeSubtitle;
+
+  /// No description provided for @joinFamilyCodeOnlyDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'Only accepts a 6-digit numeric code'**
+  String get joinFamilyCodeOnlyDigits;
+
+  /// No description provided for @joinFamilyJoinNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Join now'**
+  String get joinFamilyJoinNow;
+
+  /// No description provided for @joinFamilyNoCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have a code?'**
+  String get joinFamilyNoCode;
+
   /// No description provided for @unlinkFamilyTitle.
   ///
   /// In en, this message translates to:
@@ -2130,11 +2748,83 @@ abstract class AppLocalizations {
   /// **'Failed to leave family. Please try again.'**
   String get unlinkFamilyErrorFailed;
 
+  /// No description provided for @familyMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Members'**
+  String get familyMembersTitle;
+
+  /// No description provided for @familyStatusJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently Joined'**
+  String get familyStatusJoined;
+
+  /// No description provided for @familyLinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked Successfully'**
+  String get familyLinkedSuccess;
+
+  /// No description provided for @familyMemberListLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get familyMemberListLabel;
+
+  /// No description provided for @familyMembersUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'members'**
+  String get familyMembersUnit;
+
+  /// No description provided for @familyRoleParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get familyRoleParent;
+
+  /// No description provided for @familyRoleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get familyRoleChild;
+
+  /// No description provided for @familyRoleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Owner'**
+  String get familyRoleOwner;
+
+  /// No description provided for @familyMemberYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get familyMemberYou;
+
+  /// No description provided for @familyMemberActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get familyMemberActive;
+
+  /// No description provided for @unlinkFamilyButtonFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Family'**
+  String get unlinkFamilyButtonFull;
+
   /// No description provided for @customCategoryAdd.
   ///
   /// In en, this message translates to:
   /// **'Add custom category'**
   String get customCategoryAdd;
+
+  /// No description provided for @customCategoryAddSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category will be added as expense type'**
+  String get customCategoryAddSubtitle;
 
   /// No description provided for @customCategoryLabelHint.
   ///
@@ -2217,8 +2907,14 @@ abstract class AppLocalizations {
   /// No description provided for @customCategoryConfirmSelection.
   ///
   /// In en, this message translates to:
-  /// **'Confirm'**
+  /// **'Done'**
   String get customCategoryConfirmSelection;
+
+  /// No description provided for @customCategoryAddNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new'**
+  String get customCategoryAddNew;
 
   /// No description provided for @setMoneyLimitManagedByParent.
   ///
@@ -2573,6 +3269,438 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Teach your children to manage money wisely from today.'**
   String get familyManagementBannerSubtitle;
+
+  /// No description provided for @notificationSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationSettingsTitle;
+
+  /// No description provided for @notificationSettingsDailySection.
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY NOTIFICATIONS'**
+  String get notificationSettingsDailySection;
+
+  /// No description provided for @notificationSettingsEnableLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications'**
+  String get notificationSettingsEnableLabel;
+
+  /// No description provided for @notificationSettingsTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification time'**
+  String get notificationSettingsTimeLabel;
+
+  /// No description provided for @notificationSettingsAboutSection.
+  ///
+  /// In en, this message translates to:
+  /// **'ABOUT NOTIFICATIONS'**
+  String get notificationSettingsAboutSection;
+
+  /// No description provided for @notificationSettingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications will remind you to check your spending every day at the selected time. This helps you maintain better financial management habits.'**
+  String get notificationSettingsDescription;
+
+  /// No description provided for @settingNotificationsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingNotificationsLabel;
+
+  /// No description provided for @scheduleNotificationSmartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save 15% more effectively'**
+  String get scheduleNotificationSmartTitle;
+
+  /// No description provided for @scheduleNotificationSmartSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on the habits of 500 other users'**
+  String get scheduleNotificationSmartSubtitle;
+
+  /// No description provided for @notificationSettingsEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Track spending'**
+  String get notificationSettingsEyebrow;
+
+  /// No description provided for @notificationSettingsHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to stay on top of your child\'s transactions'**
+  String get notificationSettingsHeroTitle;
+
+  /// No description provided for @notificationSettingsHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant alerts when new spending occurs, at the time you choose to stay informed — so managing finances feels effortless.'**
+  String get notificationSettingsHeroSubtitle;
+
+  /// No description provided for @notificationSettingsEnableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when your child makes payments, transfers, or balance changes.'**
+  String get notificationSettingsEnableHint;
+
+  /// No description provided for @notificationSettingsScheduleSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification schedule'**
+  String get notificationSettingsScheduleSection;
+
+  /// No description provided for @notificationSettingsScheduleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Can be changed'**
+  String get notificationSettingsScheduleNote;
+
+  /// No description provided for @notificationSettingsTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The app will prioritize sending notifications during this time window to avoid interruptions during rest hours.'**
+  String get notificationSettingsTimeHint;
+
+  /// No description provided for @notificationSettingsInstructionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications help parents track spending in time'**
+  String get notificationSettingsInstructionTitle;
+
+  /// No description provided for @notificationSettingsInstructionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When you enable this feature, you will receive alerts whenever a new transaction occurs or your child\'s balance changes unusually.'**
+  String get notificationSettingsInstructionDesc;
+
+  /// No description provided for @notificationSettingsTip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Allow when the system asks for notification permission so everything works properly.'**
+  String get notificationSettingsTip1;
+
+  /// No description provided for @notificationSettingsTip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a suitable time to avoid evening interruptions while still catching important transactions.'**
+  String get notificationSettingsTip2;
+
+  /// No description provided for @notificationSettingsTip3.
+  ///
+  /// In en, this message translates to:
+  /// **'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.'**
+  String get notificationSettingsTip3;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family finances\nat your fingertips'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The smart app connecting parents and children, building healthy spending habits from today.'**
+  String get onboardingWelcomeSubtitle;
+
+  /// No description provided for @onboardingWelcomeFeature1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart management'**
+  String get onboardingWelcomeFeature1Title;
+
+  /// No description provided for @onboardingWelcomeFeature1Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track income and expenses, set spending limits and monitor budgets visually.'**
+  String get onboardingWelcomeFeature1Desc;
+
+  /// No description provided for @onboardingWelcomeFeature2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'AI receipt scanning'**
+  String get onboardingWelcomeFeature2Title;
+
+  /// No description provided for @onboardingWelcomeFeature2Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic super-fast data entry with just a single screenshot.'**
+  String get onboardingWelcomeFeature2Desc;
+
+  /// No description provided for @onboardingWelcomeFeature3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Grow with your child'**
+  String get onboardingWelcomeFeature3Title;
+
+  /// No description provided for @onboardingWelcomeFeature3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Teach the value of money and encourage daily savings.'**
+  String get onboardingWelcomeFeature3Desc;
+
+  /// No description provided for @onboardingWelcomeStartBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Get started with MoniKid'**
+  String get onboardingWelcomeStartBtn;
+
+  /// No description provided for @validationEmailEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get validationEmailEmpty;
+
+  /// No description provided for @validationEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get validationEmailInvalid;
+
+  /// No description provided for @validationPasswordEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get validationPasswordEmpty;
+
+  /// No description provided for @validationPasswordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get validationPasswordTooShort;
+
+  /// No description provided for @validationPasswordTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be 128 characters or fewer'**
+  String get validationPasswordTooLong;
+
+  /// No description provided for @validationUsernameEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your name'**
+  String get validationUsernameEmpty;
+
+  /// No description provided for @validationUsernameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be at least 2 characters'**
+  String get validationUsernameTooShort;
+
+  /// No description provided for @validationUsernameTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be 50 characters or fewer'**
+  String get validationUsernameTooLong;
+
+  /// No description provided for @validationPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number'**
+  String get validationPhoneInvalid;
+
+  /// No description provided for @validationConfirmPasswordEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get validationConfirmPasswordEmpty;
+
+  /// No description provided for @validationConfirmPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get validationConfirmPasswordMismatch;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t worry! Enter your registered email and we\'ll send a reset link to help you change your password.'**
+  String get forgotPasswordDescription;
+
+  /// No description provided for @forgotPasswordEmailPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get forgotPasswordEmailPlaceholder;
+
+  /// No description provided for @forgotPasswordSubmitBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Get reset link'**
+  String get forgotPasswordSubmitBtn;
+
+  /// No description provided for @forgotPasswordBackToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Login'**
+  String get forgotPasswordBackToLogin;
+
+  /// No description provided for @forgotPasswordEmailSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email sent!'**
+  String get forgotPasswordEmailSentTitle;
+
+  /// No description provided for @forgotPasswordEmailSentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a password reset link to\n{email}\n\nPlease check your inbox and click the link to change your password.'**
+  String forgotPasswordEmailSentMessage(String email);
+
+  /// No description provided for @forgotPasswordEmailSentBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Login'**
+  String get forgotPasswordEmailSentBtn;
+
+  /// No description provided for @forgotPasswordEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The verification code will be sent to your email. Please check both your inbox and spam folder.'**
+  String get forgotPasswordEmailHint;
+
+  /// No description provided for @forgotPasswordChipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get forgotPasswordChipLabel;
+
+  /// No description provided for @forgotPasswordRememberPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember your password?'**
+  String get forgotPasswordRememberPassword;
+
+  /// No description provided for @forgotPasswordLoginAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get forgotPasswordLoginAction;
+
+  /// No description provided for @txStatusSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get txStatusSuccess;
+
+  /// No description provided for @txStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get txStatusCompleted;
+
+  /// No description provided for @dateToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get dateToday;
+
+  /// No description provided for @dateYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get dateYesterday;
+
+  /// No description provided for @transactionViewAllCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get transactionViewAllCategories;
+
+  /// No description provided for @transactionDetailsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get transactionDetailsSection;
+
+  /// No description provided for @transactionReceiptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt photo'**
+  String get transactionReceiptLabel;
+
+  /// No description provided for @transactionAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get transactionAddPhoto;
+
+  /// No description provided for @transactionChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get transactionChangePhoto;
+
+  /// No description provided for @transactionReceiptEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt will appear here'**
+  String get transactionReceiptEmptyTitle;
+
+  /// No description provided for @faqCommonQuestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Asked Questions'**
+  String get faqCommonQuestions;
+
+  /// No description provided for @transactionReceiptScanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'System will scan automatically'**
+  String get transactionReceiptScanHint;
+
+  /// No description provided for @transactionDateToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get transactionDateToday;
+
+  /// No description provided for @successDialogDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Success!'**
+  String get successDialogDefaultTitle;
+
+  /// No description provided for @successDialogDefaultMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation completed.'**
+  String get successDialogDefaultMessage;
+
+  /// No description provided for @successDialogDefaultButton.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get successDialogDefaultButton;
+
+  /// No description provided for @transactionHistoryEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending management'**
+  String get transactionHistoryEyebrow;
+
+  /// No description provided for @transactionHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction history'**
+  String get transactionHistoryTitle;
+
+  /// No description provided for @transactionHistorySubhead.
+  ///
+  /// In en, this message translates to:
+  /// **'All your income and expenses over time.'**
+  String get transactionHistorySubhead;
 }
 
 class _AppLocalizationsDelegate

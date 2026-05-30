@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/join_family/join_family_state.dart';
+import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/models/entities/link_family/family_model.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -114,4 +115,11 @@ Future<FamilyModel?> linkedFamily(Ref ref) async {
   final familyId = ref.watch(authSessionProvider).account?.familyId;
   if (familyId == null) return null;
   return getIt<LinkFamilyRepository>().getFamilyById(familyId);
+}
+
+@riverpod
+Stream<List<FamilyMemberModel>> familyMembers(Ref ref) {
+  final familyId = ref.watch(authSessionProvider).account?.familyId;
+  if (familyId == null) return Stream.value([]);
+  return getIt<LinkFamilyRepository>().watchFamilyMembers(familyId);
 }

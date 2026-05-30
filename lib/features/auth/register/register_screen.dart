@@ -1,140 +1,137 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:monikid/app/router.dart';
+
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/features/auth/providers/auth_session_state.dart';
+import 'package:monikid/features/auth/auth_field_error.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_state.dart';
 import 'package:monikid/features/auth/register/register_provider.dart';
 import 'package:monikid/features/auth/register/widgets/register_form_card.dart';
-import 'package:monikid/features/auth/register/widgets/register_header.dart';
-import 'package:monikid/shared/widgets/auth_redirect_prompt.dart';
-import 'package:monikid/shared/widgets/auth_social_section.dart';
+import 'package:monikid/shared/widgets/brand_hero.dart';
+import 'package:monikid/shared/widgets/brand_row.dart';
 
 class RegisterScreen extends HookConsumerWidget {
   const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
-    final fullNameController = useTextEditingController();
     final emailController = useTextEditingController();
+    final usernameController = useTextEditingController();
     final phoneController = useTextEditingController();
     final passwordController = useTextEditingController();
-    final selectedRole = useState('parent');
+    final confirmPasswordController = useTextEditingController();
+    final selectedRoleIndex = useState(0);
     final registerNotifier = ref.read(registerProvider.notifier);
     final registerState = ref.watch(registerProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
 
     useEffect(() {
-      return () {
-        registerNotifier.reset();
-      };
-    }, [registerNotifier]);
+      return registerNotifier.reset;
+    }, const []);
 
-    ref.listen<AuthSessionState>(authSessionProvider, (previous, next) async {
+    ref.listen<AuthSessionState>(authSessionProvider, (previous, next) {
       final wasAuthenticated = previous?.isAuthenticated ?? false;
-      if (!wasAuthenticated &&
-          next.isAuthenticated &&
-          registerState.isLoading &&
-          context.mounted) {
+      if (!wasAuthenticated && next.isAuthenticated && registerState.isLoading) {
         registerNotifier.reset();
       }
     });
 
     Future<void> handleSignUp() async {
-      final fullName = fullNameController.text.trim();
-      final email = emailController.text.trim();
-      final phone = phoneController.text.trim();
-      final password = passwordController.text;
-
-      if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(s.validationEmptyFields),
-            backgroundColor: AppTheme.redAlert,
-          ),
-        );
-        return;
-      }
-
       await registerNotifier.signUp(
-        email: email,
-        password: password,
-        fullName: fullName,
-        phone: phone,
-        role: selectedRole.value,
+        email: emailController.text,
+        password: passwordController.text,
+        fullName: usernameController.text,
+        phone: phoneController.text,
+        role: selectedRoleIndex.value == 0 ? 'parent' : 'child',
       );
     }
 
+    final canSubmit = !registerState.hasFieldErrors &&
+        emailController.text.trim().isNotEmpty &&
+        usernameController.text.trim().isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        confirmPasswordController.text.isNotEmpty;
+
     return Scaffold(
-      backgroundColor:
-          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - 64,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const RegisterHeader(),
-                        const SizedBox(height: 32),
-                        RegisterFormCard(
-                          selectedRole: selectedRole.value,
-                          onRoleChanged: (role) {
-                            selectedRole.value = role;
-                          },
-                          fullNameController: fullNameController,
-                          emailController: emailController,
-                          phoneController: phoneController,
-                          passwordController: passwordController,
-                          isLoading: registerState.isLoading,
-                          buttonText: registerState.errorMessage != null
-                              ? s.actionRetry
-                              : s.authSignUpAction,
-                          errorMessage: registerState.errorMessage,
-                          onSubmit: handleSignUp,
-                        ),
-                        const SizedBox(height: 32),
-                        AuthSocialSection(
-                          onGooglePressed: () {},
-                          onApplePressed: () {},
-                        ),
-                        const SizedBox(height: 32),
-                        AuthRedirectPrompt(
-                          promptText: s.authHaveAccountPrompt,
-                          actionText: s.authSignInAction,
-                          onTap: () => context.go(AppRoutes.login),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.lerp(AppTheme.backgroundLight, AppTheme.primaryLight, 0.15)!,
+              Color.lerp(AppTheme.backgroundLight, AppTheme.primaryLight, 0.40)!,
+            ],
           ),
-          if (registerState.isLoading) ...[
-            const ModalBarrier(
-              dismissible: false,
-              color: Colors.black54,
-            ),
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
-          ],
-        ],
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 20.h),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 40.h),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const BrandRow(),
+                      BrandHero(
+                        tagline: s.registerTagline,
+                        floatie1: '✨',
+                        floatie2: '💳',
+                        floatie3: '🌱',
+                      ),
+                      RegisterFormCard(
+                        emailController: emailController,
+                        usernameController: usernameController,
+                        phoneController: phoneController,
+                        passwordController: passwordController,
+                        confirmPasswordController: confirmPasswordController,
+                        isLoading: registerState.isLoading,
+                        errorMessage: registerState.errorMessage,
+                        emailErrorText: registerState.emailError.message(context),
+                        usernameErrorText: registerState.usernameError.message(context),
+                        phoneErrorText: registerState.phoneError.message(context),
+                        passwordErrorText: registerState.passwordError.message(context),
+                        confirmPasswordErrorText: registerState.confirmPasswordError.message(context),
+                        onSubmit: canSubmit ? handleSignUp : null,
+                        onEmailChanged: registerNotifier.validateEmail,
+                        onUsernameChanged: registerNotifier.validateUsername,
+                        onPhoneChanged: registerNotifier.validatePhone,
+                        onPasswordChanged: registerNotifier.validatePassword,
+                        onConfirmPasswordChanged: (value) =>
+                            registerNotifier.validateConfirmPassword(value, passwordController.text),
+                        title: s.registerTitle,
+                        subtitle: s.registerSubtitle,
+                        emailLabel: s.profileEditEmail,
+                        emailPlaceholder: s.registerEmailPlaceholder,
+                        usernameLabel: s.registerUsernameLabel,
+                        usernamePlaceholder: s.registerUsernamePlaceholder,
+                        phoneLabel: s.registerPhoneLabel,
+                        phonePlaceholder: s.registerPhonePlaceholder,
+                        passwordLabel: s.loginPasswordLabel,
+                        passwordPlaceholder: s.registerPasswordPlaceholder,
+                        confirmPasswordLabel: s.registerConfirmPasswordLabel,
+                        confirmPasswordPlaceholder: s.registerConfirmPasswordPlaceholder,
+                        submitButtonText: s.authSignUpAction,
+                        haveAccountText: s.registerHaveAccountText,
+                        signInText: s.authSignInAction,
+                        selectedRoleIndex: selectedRoleIndex.value,
+                        onRoleChanged: (i) => selectedRoleIndex.value = i,
+                        roleParentText: s.registerRoleParent,
+                        roleStudentText: s.registerRoleStudent,
+                      ),
+                      SizedBox(height: 24.h),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

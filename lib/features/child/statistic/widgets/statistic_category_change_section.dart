@@ -70,38 +70,26 @@ class _ChangeInsightTile extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 10.r,
-              fontWeight: FontWeight.w800,
-              color: AppTheme.textGrey,
-            ),
+            style: context.typo.caption.small.copyWith(fontWeight: FontWeight.w800, color: AppTheme.textGrey),
           ),
           SizedBox(height: 10.h),
           if (insight == null)
             Text(
               context.l10n.statisticNoCategoryChange,
-              style: TextStyle(
-                fontSize: 13.r,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textBlack,
-              ),
+              style: context.typo.body.small.copyWith(fontWeight: FontWeight.w600, color: AppTheme.textBlack),
             )
           else
             Row(
               children: [
                 Text(
                   insight!.categoryIcon ?? '•',
-                  style: TextStyle(fontSize: 20.r),
+                  style: context.typo.title.medium,
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     insight!.categoryLabel,
-                    style: TextStyle(
-                      fontSize: 13.r,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textBlack,
-                    ),
+                    style: context.typo.body.small.copyWith(fontWeight: FontWeight.w800, color: AppTheme.textBlack),
                   ),
                 ),
               ],

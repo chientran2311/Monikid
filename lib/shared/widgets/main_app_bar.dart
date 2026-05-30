@@ -55,9 +55,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Center(
                   child: Text(
                     s.appBarBrandTitle,
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
+                    style: context.typo.subtitle.small.copyWith(
                       color: textColor,
                     ),
                   ),
@@ -104,7 +102,7 @@ class _AvatarWidget extends StatelessWidget {
             ? Icon(
                 Icons.person_outline_rounded,
                 size: 18.r,
-                color: isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey,
+                color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
               )
             : null,
       ),

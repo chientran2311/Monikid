@@ -6,7 +6,7 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/family_management/family_management_notifier.dart';
 import 'package:monikid/features/parent/family_management/family_management_state.dart';
 import 'package:monikid/features/parent/family_management/widgets/child_member_card.dart';
@@ -20,7 +20,6 @@ class FamilyManagementScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
 
     final authState = ref.watch(authSessionProvider);
@@ -77,9 +76,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
                 s.familyManagementSectionMembers,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w500,
+                style: context.typo.caption.medium.copyWith(
                   color: AppTheme.textGrey,
                   letterSpacing: 1.5,
                 ),
@@ -147,9 +144,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
         ),
         title: Text(
           s.familyManagementTitle,
-          style: TextStyle(
-            fontSize: 17.sp,
-            fontWeight: FontWeight.w600,
+          style: context.typo.subtitle.small.copyWith(
             color: AppTheme.textBlack,
           ),
         ),
@@ -165,10 +160,10 @@ class FamilyManagementScreen extends HookConsumerWidget {
 
   Color _childAvatarColor(int index) {
     const colors = [
-      Color(0xFF039BE5),
-      Color(0xFFFB8C00),
-      Color(0xFF00897B),
-      Color(0xFF8E24AA),
+      AppTheme.chartBlue,
+      AppTheme.chartOrange,
+      AppTheme.chartGreen,
+      AppTheme.chartPurple,
     ];
     return colors[index % colors.length];
   }
@@ -249,9 +244,7 @@ class _EmptyChildrenState extends StatelessWidget {
             SizedBox(height: 12.h),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w400,
+              style: context.typo.body.medium.copyWith(
                 color: AppTheme.textGrey,
               ),
             ),
@@ -276,7 +269,7 @@ class _FamilyBanner extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.r),
         gradient: const LinearGradient(
-          colors: [Color(0xFF1B5E20), Color(0xFF2F7F33), Color(0xFF43A047)],
+          colors: [AppTheme.greenDark, AppTheme.primary, AppTheme.chartGreen],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -303,18 +296,14 @@ class _FamilyBanner extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+                  style: context.typo.subtitle.small.copyWith(
                     color: Colors.white,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w400,
+                  style: context.typo.caption.big.copyWith(
                     color: Colors.white.withOpacity(0.85),
                   ),
                 ),

@@ -26,23 +26,28 @@ class StatisticPeriodFilterSection extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 280.w,
           padding: EdgeInsets.all(4.r),
           decoration: BoxDecoration(
-            color: isDark ? AppTheme.surfaceVariant : const Color(0xFFE5E7EB),
+            color: isDark ? AppTheme.surfaceVariant : AppTheme.surfaceGrey,
             borderRadius: BorderRadius.circular(14.r),
           ),
           child: Row(
             children: [
               _ModeButton(
+                label: context.l10n.statisticByMonth,
+                selected: selectedMonthIndex == 1,
+                onTap: () => onModeChanged(1),
+              ),
+              _ModeButton(
                 label: context.l10n.statisticByWeek,
                 selected: selectedMonthIndex == 0,
                 onTap: () => onModeChanged(0),
               ),
+              // Year tab: requires provider support for index 2
               _ModeButton(
-                label: context.l10n.statisticByMonth,
-                selected: selectedMonthIndex == 1,
-                onTap: () => onModeChanged(1),
+                label: context.l10n.statisticByYear,
+                selected: selectedMonthIndex == 2,
+                onTap: () => onModeChanged(2),
               ),
             ],
           ),
@@ -56,7 +61,7 @@ class StatisticPeriodFilterSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(999.r),
-              border: Border.all(color: const Color(0xFFF3F4F6)),
+              border: Border.all(color: AppTheme.surfaceGrey),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x0D000000),
@@ -73,17 +78,13 @@ class StatisticPeriodFilterSection extends StatelessWidget {
                     selectedMonthIndex: selectedMonthIndex,
                     anchorDate: selectedDate,
                   ),
-                  style: TextStyle(
-                    fontSize: 12.r,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4B5563),
-                  ),
+                  style: context.typo.caption.big.copyWith(fontWeight: FontWeight.w600, color: AppTheme.textGreyMedium),
                 ),
                 SizedBox(width: 8.w),
                 Icon(
                   Icons.keyboard_arrow_down_rounded,
                   size: 18.r,
-                  color: const Color(0xFF9CA3AF),
+                  color: AppTheme.textGreyDark,
                 ),
               ],
             ),
@@ -118,18 +119,14 @@ class StatisticPeriodFilterSection extends StatelessWidget {
                     width: 44.w,
                     height: 4.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD1D5DB),
+                      color: AppTheme.borderGrey,
                       borderRadius: BorderRadius.circular(999.r),
                     ),
                   ),
                   SizedBox(height: 16.h),
                   Text(
                     context.l10n.statisticSelectPeriodTitle,
-                    style: TextStyle(
-                      fontSize: 16.r,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textBlack,
-                    ),
+                    style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.w700, color: AppTheme.textBlack),
                   ),
                   SizedBox(height: 12.h),
                   Flexible(
@@ -149,10 +146,7 @@ class StatisticPeriodFilterSection extends StatelessWidget {
                               selectedMonthIndex: selectedMonthIndex,
                               anchorDate: option,
                             ),
-                            style: TextStyle(
-                              fontSize: 14.r,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          style: context.typo.body.medium,
                           ),
                           onTap: () {
                             sheetContext.pop();
@@ -219,11 +213,7 @@ class _ModeButton extends StatelessWidget {
           child: Center(
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 13.r,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppTheme.textBlack : AppTheme.textGrey,
-              ),
+              style: context.typo.body.small.copyWith(fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: selected ? AppTheme.textBlack : AppTheme.textGrey),
             ),
           ),
         ),

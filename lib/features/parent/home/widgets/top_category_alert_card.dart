@@ -63,8 +63,7 @@ class TopCategoryAlertCard extends StatelessWidget {
                   children: [
                     Text(
                       s.homeParTopCategoryAlertTitle(topCategory.categoryLabel),
-                      style: TextStyle(
-                        fontSize: 14.sp,
+                      style: context.typo.body.medium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white : AppTheme.textBlack,
                       ),
@@ -72,16 +71,14 @@ class TopCategoryAlertCard extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       s.homeParTopCategoryAlertBody,
-                      style: TextStyle(
-                        fontSize: 13.sp,
+                      style: context.typo.body.small.copyWith(
                         color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
                       ),
                     ),
                     SizedBox(height: 8.h),
                     Text(
                       amountText,
-                      style: TextStyle(
-                        fontSize: 18.sp,
+                      style: context.typo.subtitle.medium.copyWith(
                         fontWeight: FontWeight.w700,
                         color: AppTheme.amberText,
                       ),
@@ -92,7 +89,7 @@ class TopCategoryAlertCard extends StatelessWidget {
               Icon(
                 Icons.chevron_right,
                 size: 20.r,
-                color: isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey,
+                color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
               ),
             ],
           ),

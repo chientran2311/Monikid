@@ -28,11 +28,7 @@ class StatisticErrorCard extends StatelessWidget {
           Text(
             context.l10n.errorGeneric(message),
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13.r,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.redAlert,
-            ),
+            style: context.typo.body.small.copyWith(fontWeight: FontWeight.w600, color: AppTheme.redAlert),
           ),
           SizedBox(height: 12.h),
           FilledButton(
@@ -56,7 +52,7 @@ class StatisticEmptyCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        border: Border.all(color: AppTheme.surfaceGrey),
       ),
       child: Column(
         children: [
@@ -69,21 +65,13 @@ class StatisticEmptyCard extends StatelessWidget {
           Text(
             context.l10n.statisticNoDataTitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18.r,
-              fontWeight: FontWeight.w800,
-              color: AppTheme.textBlack,
-            ),
+            style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.w800, color: AppTheme.textBlack),
           ),
           SizedBox(height: 8.h),
           Text(
             context.l10n.statisticNoDataDescription,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13.r,
-              height: 1.5,
-              color: AppTheme.textGrey,
-            ),
+            style: context.typo.body.small.copyWith(height: 1.5, color: AppTheme.textGrey),
           ),
         ],
       ),

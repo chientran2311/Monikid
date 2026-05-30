@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TransactionHistoryState {
 
- List<TransactionModel> get monthlyTransactions; List<TransactionModel> get transactions; TransactionHistorySharedStatus get sharedStatus; bool get isLoading; bool get isListLoading; bool get isLoadingMore; bool get hasMore; int get monthLimit; String? get sharedErrorMessage; String? get errorMessage;// Legacy state properties kept for backward compatibility
+ List<TransactionModel> get monthlyTransactions; List<TransactionModel> get transactions; TransactionHistorySharedStatus get sharedStatus; bool get isLoading; bool get isListLoading; TransactionListLoadingTrigger get listLoadingTrigger; bool get isLoadingMore; bool get hasMore; int get monthLimit; String? get sharedErrorMessage; String? get errorMessage;// Legacy state properties kept for backward compatibility
  DateTime? get selectedDate; String? get transactionTypeFilter; String? get selectedCategoryKey; TransactionModel? get selectedTransaction; String? get selectedTransactionId; String? get selectionErrorMessage;
 /// Create a copy of TransactionHistoryState
 /// with the given fields replaced by the non-null parameter values.
@@ -27,16 +27,16 @@ $TransactionHistoryStateCopyWith<TransactionHistoryState> get copyWith => _$Tran
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionHistoryState&&const DeepCollectionEquality().equals(other.monthlyTransactions, monthlyTransactions)&&const DeepCollectionEquality().equals(other.transactions, transactions)&&(identical(other.sharedStatus, sharedStatus) || other.sharedStatus == sharedStatus)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isListLoading, isListLoading) || other.isListLoading == isListLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.monthLimit, monthLimit) || other.monthLimit == monthLimit)&&(identical(other.sharedErrorMessage, sharedErrorMessage) || other.sharedErrorMessage == sharedErrorMessage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionTypeFilter, transactionTypeFilter) || other.transactionTypeFilter == transactionTypeFilter)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedTransaction, selectedTransaction) || other.selectedTransaction == selectedTransaction)&&(identical(other.selectedTransactionId, selectedTransactionId) || other.selectedTransactionId == selectedTransactionId)&&(identical(other.selectionErrorMessage, selectionErrorMessage) || other.selectionErrorMessage == selectionErrorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionHistoryState&&const DeepCollectionEquality().equals(other.monthlyTransactions, monthlyTransactions)&&const DeepCollectionEquality().equals(other.transactions, transactions)&&(identical(other.sharedStatus, sharedStatus) || other.sharedStatus == sharedStatus)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isListLoading, isListLoading) || other.isListLoading == isListLoading)&&(identical(other.listLoadingTrigger, listLoadingTrigger) || other.listLoadingTrigger == listLoadingTrigger)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.monthLimit, monthLimit) || other.monthLimit == monthLimit)&&(identical(other.sharedErrorMessage, sharedErrorMessage) || other.sharedErrorMessage == sharedErrorMessage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionTypeFilter, transactionTypeFilter) || other.transactionTypeFilter == transactionTypeFilter)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedTransaction, selectedTransaction) || other.selectedTransaction == selectedTransaction)&&(identical(other.selectedTransactionId, selectedTransactionId) || other.selectedTransactionId == selectedTransactionId)&&(identical(other.selectionErrorMessage, selectionErrorMessage) || other.selectionErrorMessage == selectionErrorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(monthlyTransactions),const DeepCollectionEquality().hash(transactions),sharedStatus,isLoading,isListLoading,isLoadingMore,hasMore,monthLimit,sharedErrorMessage,errorMessage,selectedDate,transactionTypeFilter,selectedCategoryKey,selectedTransaction,selectedTransactionId,selectionErrorMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(monthlyTransactions),const DeepCollectionEquality().hash(transactions),sharedStatus,isLoading,isListLoading,listLoadingTrigger,isLoadingMore,hasMore,monthLimit,sharedErrorMessage,errorMessage,selectedDate,transactionTypeFilter,selectedCategoryKey,selectedTransaction,selectedTransactionId,selectionErrorMessage);
 
 @override
 String toString() {
-  return 'TransactionHistoryState(monthlyTransactions: $monthlyTransactions, transactions: $transactions, sharedStatus: $sharedStatus, isLoading: $isLoading, isListLoading: $isListLoading, isLoadingMore: $isLoadingMore, hasMore: $hasMore, monthLimit: $monthLimit, sharedErrorMessage: $sharedErrorMessage, errorMessage: $errorMessage, selectedDate: $selectedDate, transactionTypeFilter: $transactionTypeFilter, selectedCategoryKey: $selectedCategoryKey, selectedTransaction: $selectedTransaction, selectedTransactionId: $selectedTransactionId, selectionErrorMessage: $selectionErrorMessage)';
+  return 'TransactionHistoryState(monthlyTransactions: $monthlyTransactions, transactions: $transactions, sharedStatus: $sharedStatus, isLoading: $isLoading, isListLoading: $isListLoading, listLoadingTrigger: $listLoadingTrigger, isLoadingMore: $isLoadingMore, hasMore: $hasMore, monthLimit: $monthLimit, sharedErrorMessage: $sharedErrorMessage, errorMessage: $errorMessage, selectedDate: $selectedDate, transactionTypeFilter: $transactionTypeFilter, selectedCategoryKey: $selectedCategoryKey, selectedTransaction: $selectedTransaction, selectedTransactionId: $selectedTransactionId, selectionErrorMessage: $selectionErrorMessage)';
 }
 
 
@@ -47,7 +47,7 @@ abstract mixin class $TransactionHistoryStateCopyWith<$Res>  {
   factory $TransactionHistoryStateCopyWith(TransactionHistoryState value, $Res Function(TransactionHistoryState) _then) = _$TransactionHistoryStateCopyWithImpl;
 @useResult
 $Res call({
- List<TransactionModel> monthlyTransactions, List<TransactionModel> transactions, TransactionHistorySharedStatus sharedStatus, bool isLoading, bool isListLoading, bool isLoadingMore, bool hasMore, int monthLimit, String? sharedErrorMessage, String? errorMessage, DateTime? selectedDate, String? transactionTypeFilter, String? selectedCategoryKey, TransactionModel? selectedTransaction, String? selectedTransactionId, String? selectionErrorMessage
+ List<TransactionModel> monthlyTransactions, List<TransactionModel> transactions, TransactionHistorySharedStatus sharedStatus, bool isLoading, bool isListLoading, TransactionListLoadingTrigger listLoadingTrigger, bool isLoadingMore, bool hasMore, int monthLimit, String? sharedErrorMessage, String? errorMessage, DateTime? selectedDate, String? transactionTypeFilter, String? selectedCategoryKey, TransactionModel? selectedTransaction, String? selectedTransactionId, String? selectionErrorMessage
 });
 
 
@@ -64,14 +64,15 @@ class _$TransactionHistoryStateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionHistoryState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? monthlyTransactions = null,Object? transactions = null,Object? sharedStatus = null,Object? isLoading = null,Object? isListLoading = null,Object? isLoadingMore = null,Object? hasMore = null,Object? monthLimit = null,Object? sharedErrorMessage = freezed,Object? errorMessage = freezed,Object? selectedDate = freezed,Object? transactionTypeFilter = freezed,Object? selectedCategoryKey = freezed,Object? selectedTransaction = freezed,Object? selectedTransactionId = freezed,Object? selectionErrorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? monthlyTransactions = null,Object? transactions = null,Object? sharedStatus = null,Object? isLoading = null,Object? isListLoading = null,Object? listLoadingTrigger = null,Object? isLoadingMore = null,Object? hasMore = null,Object? monthLimit = null,Object? sharedErrorMessage = freezed,Object? errorMessage = freezed,Object? selectedDate = freezed,Object? transactionTypeFilter = freezed,Object? selectedCategoryKey = freezed,Object? selectedTransaction = freezed,Object? selectedTransactionId = freezed,Object? selectionErrorMessage = freezed,}) {
   return _then(_self.copyWith(
 monthlyTransactions: null == monthlyTransactions ? _self.monthlyTransactions : monthlyTransactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,transactions: null == transactions ? _self.transactions : transactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,sharedStatus: null == sharedStatus ? _self.sharedStatus : sharedStatus // ignore: cast_nullable_to_non_nullable
 as TransactionHistorySharedStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isListLoading: null == isListLoading ? _self.isListLoading : isListLoading // ignore: cast_nullable_to_non_nullable
-as bool,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,listLoadingTrigger: null == listLoadingTrigger ? _self.listLoadingTrigger : listLoadingTrigger // ignore: cast_nullable_to_non_nullable
+as TransactionListLoadingTrigger,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
 as bool,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
 as bool,monthLimit: null == monthLimit ? _self.monthLimit : monthLimit // ignore: cast_nullable_to_non_nullable
 as int,sharedErrorMessage: freezed == sharedErrorMessage ? _self.sharedErrorMessage : sharedErrorMessage // ignore: cast_nullable_to_non_nullable
@@ -105,7 +106,7 @@ $TransactionModelCopyWith<$Res>? get selectedTransaction {
 
 
 class _TransactionHistoryState extends TransactionHistoryState {
-  const _TransactionHistoryState({final  List<TransactionModel> monthlyTransactions = const [], final  List<TransactionModel> transactions = const [], this.sharedStatus = TransactionHistorySharedStatus.initial, this.isLoading = true, this.isListLoading = false, this.isLoadingMore = false, this.hasMore = true, this.monthLimit = 8, this.sharedErrorMessage, this.errorMessage, this.selectedDate, this.transactionTypeFilter, this.selectedCategoryKey, this.selectedTransaction, this.selectedTransactionId, this.selectionErrorMessage}): _monthlyTransactions = monthlyTransactions,_transactions = transactions,super._();
+  const _TransactionHistoryState({final  List<TransactionModel> monthlyTransactions = const [], final  List<TransactionModel> transactions = const [], this.sharedStatus = TransactionHistorySharedStatus.initial, this.isLoading = true, this.isListLoading = false, this.listLoadingTrigger = TransactionListLoadingTrigger.none, this.isLoadingMore = false, this.hasMore = true, this.monthLimit = 8, this.sharedErrorMessage, this.errorMessage, this.selectedDate, this.transactionTypeFilter, this.selectedCategoryKey, this.selectedTransaction, this.selectedTransactionId, this.selectionErrorMessage}): _monthlyTransactions = monthlyTransactions,_transactions = transactions,super._();
   
 
  final  List<TransactionModel> _monthlyTransactions;
@@ -125,6 +126,7 @@ class _TransactionHistoryState extends TransactionHistoryState {
 @override@JsonKey() final  TransactionHistorySharedStatus sharedStatus;
 @override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  bool isListLoading;
+@override@JsonKey() final  TransactionListLoadingTrigger listLoadingTrigger;
 @override@JsonKey() final  bool isLoadingMore;
 @override@JsonKey() final  bool hasMore;
 @override@JsonKey() final  int monthLimit;
@@ -148,16 +150,16 @@ _$TransactionHistoryStateCopyWith<_TransactionHistoryState> get copyWith => __$T
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionHistoryState&&const DeepCollectionEquality().equals(other._monthlyTransactions, _monthlyTransactions)&&const DeepCollectionEquality().equals(other._transactions, _transactions)&&(identical(other.sharedStatus, sharedStatus) || other.sharedStatus == sharedStatus)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isListLoading, isListLoading) || other.isListLoading == isListLoading)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.monthLimit, monthLimit) || other.monthLimit == monthLimit)&&(identical(other.sharedErrorMessage, sharedErrorMessage) || other.sharedErrorMessage == sharedErrorMessage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionTypeFilter, transactionTypeFilter) || other.transactionTypeFilter == transactionTypeFilter)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedTransaction, selectedTransaction) || other.selectedTransaction == selectedTransaction)&&(identical(other.selectedTransactionId, selectedTransactionId) || other.selectedTransactionId == selectedTransactionId)&&(identical(other.selectionErrorMessage, selectionErrorMessage) || other.selectionErrorMessage == selectionErrorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionHistoryState&&const DeepCollectionEquality().equals(other._monthlyTransactions, _monthlyTransactions)&&const DeepCollectionEquality().equals(other._transactions, _transactions)&&(identical(other.sharedStatus, sharedStatus) || other.sharedStatus == sharedStatus)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isListLoading, isListLoading) || other.isListLoading == isListLoading)&&(identical(other.listLoadingTrigger, listLoadingTrigger) || other.listLoadingTrigger == listLoadingTrigger)&&(identical(other.isLoadingMore, isLoadingMore) || other.isLoadingMore == isLoadingMore)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.monthLimit, monthLimit) || other.monthLimit == monthLimit)&&(identical(other.sharedErrorMessage, sharedErrorMessage) || other.sharedErrorMessage == sharedErrorMessage)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.transactionTypeFilter, transactionTypeFilter) || other.transactionTypeFilter == transactionTypeFilter)&&(identical(other.selectedCategoryKey, selectedCategoryKey) || other.selectedCategoryKey == selectedCategoryKey)&&(identical(other.selectedTransaction, selectedTransaction) || other.selectedTransaction == selectedTransaction)&&(identical(other.selectedTransactionId, selectedTransactionId) || other.selectedTransactionId == selectedTransactionId)&&(identical(other.selectionErrorMessage, selectionErrorMessage) || other.selectionErrorMessage == selectionErrorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_monthlyTransactions),const DeepCollectionEquality().hash(_transactions),sharedStatus,isLoading,isListLoading,isLoadingMore,hasMore,monthLimit,sharedErrorMessage,errorMessage,selectedDate,transactionTypeFilter,selectedCategoryKey,selectedTransaction,selectedTransactionId,selectionErrorMessage);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_monthlyTransactions),const DeepCollectionEquality().hash(_transactions),sharedStatus,isLoading,isListLoading,listLoadingTrigger,isLoadingMore,hasMore,monthLimit,sharedErrorMessage,errorMessage,selectedDate,transactionTypeFilter,selectedCategoryKey,selectedTransaction,selectedTransactionId,selectionErrorMessage);
 
 @override
 String toString() {
-  return 'TransactionHistoryState(monthlyTransactions: $monthlyTransactions, transactions: $transactions, sharedStatus: $sharedStatus, isLoading: $isLoading, isListLoading: $isListLoading, isLoadingMore: $isLoadingMore, hasMore: $hasMore, monthLimit: $monthLimit, sharedErrorMessage: $sharedErrorMessage, errorMessage: $errorMessage, selectedDate: $selectedDate, transactionTypeFilter: $transactionTypeFilter, selectedCategoryKey: $selectedCategoryKey, selectedTransaction: $selectedTransaction, selectedTransactionId: $selectedTransactionId, selectionErrorMessage: $selectionErrorMessage)';
+  return 'TransactionHistoryState(monthlyTransactions: $monthlyTransactions, transactions: $transactions, sharedStatus: $sharedStatus, isLoading: $isLoading, isListLoading: $isListLoading, listLoadingTrigger: $listLoadingTrigger, isLoadingMore: $isLoadingMore, hasMore: $hasMore, monthLimit: $monthLimit, sharedErrorMessage: $sharedErrorMessage, errorMessage: $errorMessage, selectedDate: $selectedDate, transactionTypeFilter: $transactionTypeFilter, selectedCategoryKey: $selectedCategoryKey, selectedTransaction: $selectedTransaction, selectedTransactionId: $selectedTransactionId, selectionErrorMessage: $selectionErrorMessage)';
 }
 
 
@@ -168,7 +170,7 @@ abstract mixin class _$TransactionHistoryStateCopyWith<$Res> implements $Transac
   factory _$TransactionHistoryStateCopyWith(_TransactionHistoryState value, $Res Function(_TransactionHistoryState) _then) = __$TransactionHistoryStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<TransactionModel> monthlyTransactions, List<TransactionModel> transactions, TransactionHistorySharedStatus sharedStatus, bool isLoading, bool isListLoading, bool isLoadingMore, bool hasMore, int monthLimit, String? sharedErrorMessage, String? errorMessage, DateTime? selectedDate, String? transactionTypeFilter, String? selectedCategoryKey, TransactionModel? selectedTransaction, String? selectedTransactionId, String? selectionErrorMessage
+ List<TransactionModel> monthlyTransactions, List<TransactionModel> transactions, TransactionHistorySharedStatus sharedStatus, bool isLoading, bool isListLoading, TransactionListLoadingTrigger listLoadingTrigger, bool isLoadingMore, bool hasMore, int monthLimit, String? sharedErrorMessage, String? errorMessage, DateTime? selectedDate, String? transactionTypeFilter, String? selectedCategoryKey, TransactionModel? selectedTransaction, String? selectedTransactionId, String? selectionErrorMessage
 });
 
 
@@ -185,14 +187,15 @@ class __$TransactionHistoryStateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionHistoryState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? monthlyTransactions = null,Object? transactions = null,Object? sharedStatus = null,Object? isLoading = null,Object? isListLoading = null,Object? isLoadingMore = null,Object? hasMore = null,Object? monthLimit = null,Object? sharedErrorMessage = freezed,Object? errorMessage = freezed,Object? selectedDate = freezed,Object? transactionTypeFilter = freezed,Object? selectedCategoryKey = freezed,Object? selectedTransaction = freezed,Object? selectedTransactionId = freezed,Object? selectionErrorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? monthlyTransactions = null,Object? transactions = null,Object? sharedStatus = null,Object? isLoading = null,Object? isListLoading = null,Object? listLoadingTrigger = null,Object? isLoadingMore = null,Object? hasMore = null,Object? monthLimit = null,Object? sharedErrorMessage = freezed,Object? errorMessage = freezed,Object? selectedDate = freezed,Object? transactionTypeFilter = freezed,Object? selectedCategoryKey = freezed,Object? selectedTransaction = freezed,Object? selectedTransactionId = freezed,Object? selectionErrorMessage = freezed,}) {
   return _then(_TransactionHistoryState(
 monthlyTransactions: null == monthlyTransactions ? _self._monthlyTransactions : monthlyTransactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,transactions: null == transactions ? _self._transactions : transactions // ignore: cast_nullable_to_non_nullable
 as List<TransactionModel>,sharedStatus: null == sharedStatus ? _self.sharedStatus : sharedStatus // ignore: cast_nullable_to_non_nullable
 as TransactionHistorySharedStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isListLoading: null == isListLoading ? _self.isListLoading : isListLoading // ignore: cast_nullable_to_non_nullable
-as bool,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
+as bool,listLoadingTrigger: null == listLoadingTrigger ? _self.listLoadingTrigger : listLoadingTrigger // ignore: cast_nullable_to_non_nullable
+as TransactionListLoadingTrigger,isLoadingMore: null == isLoadingMore ? _self.isLoadingMore : isLoadingMore // ignore: cast_nullable_to_non_nullable
 as bool,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
 as bool,monthLimit: null == monthLimit ? _self.monthLimit : monthLimit // ignore: cast_nullable_to_non_nullable
 as int,sharedErrorMessage: freezed == sharedErrorMessage ? _self.sharedErrorMessage : sharedErrorMessage // ignore: cast_nullable_to_non_nullable

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class TransactionFormField extends StatelessWidget {
   const TransactionFormField({
@@ -30,11 +31,7 @@ class TransactionFormField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-          ),
+          style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w500, color: isDark ? AppTheme.iconLight : AppTheme.borderDark),
         ),
         const SizedBox(height: 8),
         Container(
@@ -43,7 +40,7 @@ class TransactionFormField extends StatelessWidget {
             color: surfaceColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+              color: isDark ? AppTheme.borderDark : const Color(0xFFF1F5F9),
             ),
             boxShadow: [
               if (!isDark)
@@ -66,22 +63,18 @@ class TransactionFormField extends StatelessWidget {
                 child: Center(
                   child: _isCalendarIcon
                       ? Icon(Icons.calendar_today, color: iconColor, size: 20)
-                      : Text(iconOrEmoji, style: const TextStyle(fontSize: 20)),
+                      : Text(iconOrEmoji, style: context.typo.title.medium),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
+                  style: context.typo.subtitle.small.copyWith(fontWeight: FontWeight.w500, color: isDark ? Colors.white : AppTheme.surfaceVeryDark),
                 ),
               ),
               if (showChevron)
-                const Icon(Icons.chevron_right, color: Color(0xFF94A3B8)),
+                const Icon(Icons.chevron_right, color: AppTheme.textMuted),
             ],
           ),
         ),

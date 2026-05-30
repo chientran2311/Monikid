@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/category_dialog.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 import 'package:monikid/features/child/transaction/update_transaction/update_transaction_provider.dart';
@@ -22,8 +21,6 @@ class UpdateTransactionScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final amountController = useTextEditingController();
     final noteController = useTextEditingController();
     final isSyncingControllers = useRef(false);

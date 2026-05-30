@@ -23,7 +23,7 @@ class AppIosSwitch extends StatelessWidget {
         value: value,
         onChanged: onChanged,
         activeTrackColor: activeColor,
-        inactiveTrackColor: const Color(0xFFE5E5EA),
+        inactiveTrackColor: AppTheme.iosSystemGrey,
       ),
     );
   }

@@ -4,7 +4,7 @@ import 'package:monikid/core/config/storage_keys.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/storage/secure_storage.dart';
 import 'package:monikid/core/utils/bcrypt_util.dart';
-import 'package:monikid/features/auth/pin/domain/pin_security_snapshot.dart';
+import 'package:monikid/features/auth/pin/pin_code_snapshot/pin_security_snapshot.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'pin_code_repository.g.dart';
@@ -33,6 +33,8 @@ abstract class PinCodeRepository {
   Future<PinSecuritySnapshot> registerFailedAttempt();
 
   Future<void> resetPinAttemptState();
+
+  Future<void> clearPinCode();
 }
 
 class PinCodeRepositoryImpl implements PinCodeRepository {
@@ -212,6 +214,23 @@ class PinCodeRepositoryImpl implements PinCodeRepository {
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to reset the PIN attempt state.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> clearPinCode() async {
+    _logger.d('PinCodeRepositoryImpl.clearPinCode: start.');
+    try {
+      await _secureStorage.delete(key: StorageKeys.hashedPinKey);
+      await resetPinAttemptState();
+      _logger.i('PinCodeRepositoryImpl.clearPinCode: success.');
+    } catch (error, stackTrace) {
+      _logger.e(
+        'PinCodeRepositoryImpl.clearPinCode failed.',
         error: error,
         stackTrace: stackTrace,
       );

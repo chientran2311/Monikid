@@ -6,7 +6,7 @@ part of 'create_new_pin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$createNewPINHash() => r'2295d9be824eb76312c767d46caf8f7da11bcc03';
+String _$createNewPINHash() => r'c53498557991688514f499e11e6750b5e193003e';
 
 /// See also [CreateNewPIN].
 @ProviderFor(CreateNewPIN)

@@ -202,7 +202,7 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
     final twoDigitMinute = uploadedAt.minute.toString().padLeft(2, '0');
     final twoDigitSecond = uploadedAt.second.toString().padLeft(2, '0');
 
-    return '${uploadedAt.year}${twoDigitMonth}${twoDigitDay}_${twoDigitHour}${twoDigitMinute}${twoDigitSecond}';
+    return '${uploadedAt.year}$twoDigitMonth${twoDigitDay}_$twoDigitHour$twoDigitMinute$twoDigitSecond';
   }
 
   String _resolveExtension(String fileName, String mimeType) {

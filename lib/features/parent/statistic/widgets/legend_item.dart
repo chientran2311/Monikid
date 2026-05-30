@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class LegendItem extends StatelessWidget {
   final String label;
@@ -25,11 +26,10 @@ class LegendItem extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: textSubColor,
-          ),
+          style: context.typo.caption.big.copyWith(
+          fontWeight: FontWeight.w500,
+          color: textSubColor,
+        ),
         ),
       ],
     );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 
@@ -51,7 +52,9 @@ class UploadPicDialog extends HookConsumerWidget {
       if (!context.mounted) return;
       AppSnackBar.error(context, error.toString());
     } finally {
-      isPicking.value = false;
+      if (context.mounted) {
+        isPicking.value = false;
+      }
     }
   }
 
@@ -65,102 +68,204 @@ class UploadPicDialog extends HookConsumerWidget {
       bottom: false,
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 40,
+              offset: const Offset(0, -10),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 40.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Drag handle
               Container(
-                width: 44,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 12),
+                width: 40.w,
+                height: 5.h,
+                margin: EdgeInsets.only(bottom: 24.h),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppTheme.borderDark
-                      : AppTheme.borderLight,
-                  borderRadius: BorderRadius.circular(999),
+                  color: AppTheme.iconLight.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(99.r),
                 ),
               ),
-              const SizedBox(height: 4),
+              
+              // Title
               Text(
                 title ?? s.scanReceiptTitle,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark,
+                style: context.typo.headline.medium.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
+                  letterSpacing: -0.03,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                description ?? s.scanReceiptDesc,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? AppTheme.textMuted
-                      : AppTheme.textGrey,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: Text(s.takePicture),
-                enabled: !isPicking.value,
-                onTap: () => _pickImage(
-                  context,
-                  isPicking,
-                  s.transactionEvidenceUnsupportedFormat,
-                  s.transactionEvidenceLoadError,
-                  imageIntake.pickFromCamera,
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: Text(s.chooseFromGallery),
-                enabled: !isPicking.value,
-                onTap: () => _pickImage(
-                  context,
-                  isPicking,
-                  s.transactionEvidenceUnsupportedFormat,
-                  s.transactionEvidenceLoadError,
-                  imageIntake.pickFromGallery,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: isPicking.value
-                      ? null
-                      : () => context.pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? AppTheme.backgroundDark.withValues(alpha: 0.5)
-                        : AppTheme.backgroundLight.withValues(alpha: 0.5),
-                    foregroundColor: isDark
-                        ? Colors.white
-                        : AppTheme.surfaceVeryDark,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              SizedBox(height: 28.h),
+              
+              // Action Group
+              Column(
+                children: [
+                  // Camera Action
+                  _ActionRow(
+                    icon: Icons.photo_camera_outlined,
+                    label: s.takePicture,
+                    subtitle: s.scanReceiptCameraSubtitle,
+                    enabled: !isPicking.value,
+                    isDark: isDark,
+                    onTap: () => _pickImage(
+                      context,
+                      isPicking,
+                      s.transactionEvidenceUnsupportedFormat,
+                      s.transactionEvidenceLoadError,
+                      imageIntake.pickFromCamera,
                     ),
                   ),
-                  child: Text(s.actionCancel),
+                  SizedBox(height: 12.h),
+                  
+                  // Gallery Action
+                  _ActionRow(
+                    icon: Icons.photo_library_outlined,
+                    label: s.chooseFromGallery,
+                    subtitle: s.scanReceiptGallerySubtitle,
+                    enabled: !isPicking.value,
+                    isDark: isDark,
+                    onTap: () => _pickImage(
+                      context,
+                      isPicking,
+                      s.transactionEvidenceUnsupportedFormat,
+                      s.transactionEvidenceLoadError,
+                      imageIntake.pickFromGallery,
+                    ),
+                  ),
+                ],
+              ),
+              
+              SizedBox(height: 24.h),
+              
+              // Cancel Button
+              SizedBox(
+                width: double.infinity,
+                height: 58.h,
+                child: ElevatedButton(
+                  onPressed: isPicking.value ? null : () => context.pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark
+                        ? AppTheme.surfaceLightGrey.withValues(alpha: 0.15)
+                        : AppTheme.surfaceLightGrey,
+                    foregroundColor: isDark
+                        ? AppTheme.textWhite
+                        : AppTheme.textBlack,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.r),
+                    ),
+                  ),
+                  child: Text(
+                    s.actionCancel,
+                    style: context.typo.button.medium.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.enabled,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final bool enabled;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(20.r),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
+          border: Border.all(
+            color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+          ),
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Row(
+          children: [
+            // Icon Container
+            Container(
+              width: 48.w,
+              height: 48.h,
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
+                borderRadius: BorderRadius.circular(14.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                icon,
+                size: 22.sp,
+                color: AppTheme.primary,
+              ),
+            ),
+            
+            SizedBox(width: 16.w),
+            
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: context.typo.button.medium.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitle,
+                    style: context.typo.caption.small.copyWith(
+                      color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Arrow
+            Icon(
+              Icons.chevron_right,
+              size: 22.sp,
+              color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+            ),
+          ],
         ),
       ),
     );

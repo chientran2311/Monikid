@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/category/custom_category_repository.dart';
 

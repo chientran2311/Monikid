@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:logger/logger.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_provider.dart';
+import 'package:monikid/features/auth/pin/pin_input_validator.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 're_enter_pin_state.dart';
@@ -11,11 +14,13 @@ part 're_enter_pin_provider.g.dart';
 
 @riverpod
 class ReEnterPIN extends _$ReEnterPIN {
+  late final Logger _logger;
   late final PinCodeRepository _pinCodeRepository;
   Timer? _errorResetTimer;
 
   @override
   ReEnterPINState build() {
+    _logger = getIt<Logger>();
     _pinCodeRepository = ref.read(pinCodeRepositoryProvider);
     ref.onDispose(() {
       _errorResetTimer?.cancel();
@@ -24,7 +29,7 @@ class ReEnterPIN extends _$ReEnterPIN {
   }
 
   Future<void> addNumber(String digit) async {
-    if (state.isLoading || !_isDigit(digit)) {
+    if (state.isLoading || !isPinDigit(digit)) {
       return;
     }
 
@@ -74,6 +79,7 @@ class ReEnterPIN extends _$ReEnterPIN {
   }
 
   Future<void> confirmAndSavePinCode(String pin) async {
+    _logger.d('ReEnterPIN.confirmAndSavePinCode: start.');
     final draftPinCode = ref.read(createNewPINProvider).draftPinCode;
     if (draftPinCode == null || draftPinCode.length != 6) {
       state = state.copyWith(
@@ -85,7 +91,6 @@ class ReEnterPIN extends _$ReEnterPIN {
     }
 
     state = state.copyWith(
-      isLoading: true,
       status: ReEnterPINCodeStatus.loading,
       errorMessage: null,
     );
@@ -94,7 +99,6 @@ class ReEnterPIN extends _$ReEnterPIN {
       if (pin != draftPinCode) {
         state = state.copyWith(
           currentPin: '',
-          isLoading: false,
           status: ReEnterPINCodeStatus.mismatch,
           errorMessage: null,
         );
@@ -106,16 +110,20 @@ class ReEnterPIN extends _$ReEnterPIN {
       await _pinCodeRepository.savePinCodeHash(pinCodeHash);
       ref.read(createNewPINProvider.notifier).reset();
       ref.read(authSessionProvider.notifier).markPinVerified();
+      _logger.i('ReEnterPIN.confirmAndSavePinCode: success.');
       state = state.copyWith(
         currentPin: '',
-        isLoading: false,
         status: ReEnterPINCodeStatus.success,
         errorMessage: null,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.e(
+        'ReEnterPIN.confirmAndSavePinCode failed.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
         currentPin: '',
-        isLoading: false,
         status: ReEnterPINCodeStatus.error,
         errorMessage: 'Failed to save the PIN code.',
       );
@@ -138,9 +146,5 @@ class ReEnterPIN extends _$ReEnterPIN {
         );
       }
     });
-  }
-
-  bool _isDigit(String value) {
-    return RegExp(r'^\d$').hasMatch(value);
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class NoteCard extends StatelessWidget {
   const NoteCard({
@@ -40,13 +42,13 @@ class NoteCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF1E293B)
+                  ? AppTheme.surfaceVariant
                   : const Color(0xFFF1F5F9),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.edit_note,
-              color: Color(0xFF64748B),
+              color: AppTheme.textGrey,
             ),
           ),
           const SizedBox(width: 16),
@@ -56,11 +58,7 @@ class NoteCard extends StatelessWidget {
               children: [
                 Text(
                   s.transactionNoteLabel,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF64748B),
-                  ),
+                  style: context.typo.caption.big.copyWith(fontWeight: FontWeight.w500, color: AppTheme.textGrey),
                 ),
                 TextField(
                   controller: controller,
@@ -72,7 +70,7 @@ class NoteCard extends StatelessWidget {
                   ),
                   decoration: InputDecoration(
                     hintText: s.updateTransactionNoteHint,
-                    hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                    hintStyle: const TextStyle(color: AppTheme.textMuted),
                     border: InputBorder.none,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 4),

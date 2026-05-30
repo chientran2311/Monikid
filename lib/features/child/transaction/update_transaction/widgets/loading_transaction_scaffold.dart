@@ -14,7 +14,7 @@ class LoadingTransactionScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textColor = isDark ? Colors.white : AppTheme.surfaceVeryDark;
 
     return Scaffold(
       backgroundColor: bgColor,

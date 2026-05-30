@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class CodeInputRow extends StatelessWidget {
@@ -65,24 +66,37 @@ class _CodeBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 44.r,
-      height: 56.r,
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isActive ? AppTheme.primary : borderColor,
-          width: isActive ? 2 : 1,
+    return AnimatedScale(
+      scale: isActive ? 1.05 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 44.w,
+        height: 56.h,
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isActive
+                ? AppTheme.primary.withValues(alpha: 0.45)
+                : borderColor,
+            width: isActive ? 1.5 : 1.0,
+          ),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.12),
+                    blurRadius: 0,
+                    spreadRadius: 4.r,
+                  ),
+                ]
+              : null,
         ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        char,
-        style: TextStyle(
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w700,
-          color: textColor,
+        alignment: Alignment.center,
+        child: Text(
+          char,
+          style: context.typo.title.big.copyWith(color: textColor),
         ),
       ),
     );

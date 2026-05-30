@@ -44,7 +44,7 @@ class UpdateTransactionView extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textColor = isDark ? Colors.white : AppTheme.surfaceVeryDark;
     final isBusy = state.isLoading || state.isSubmitting;
     final s = context.l10n;
 

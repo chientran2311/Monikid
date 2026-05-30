@@ -23,7 +23,6 @@ class StatisticTabParent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(parentStatisticNotifierProvider);
@@ -48,11 +47,10 @@ class StatisticTabParent extends ConsumerWidget {
               children: [
                 Text(
                   s.parentStatisticTitle,
-                  style: TextStyle(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : AppTheme.textBlack,
-                  ),
+                  style: context.typo.headline.small.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : AppTheme.textBlack,
+                ),
                 ),
                 AppPopupMenuButton<String>(
                   onSelected: (childId) {
@@ -76,7 +74,7 @@ class StatisticTabParent extends ConsumerWidget {
                                       child.displayName.isNotEmpty
                                           ? child.displayName[0].toUpperCase()
                                           : 'C',
-                                      style: TextStyle(fontSize: 12.sp),
+                                      style: context.typo.caption.big,
                                     )
                                   : null,
                             ),
@@ -99,10 +97,9 @@ class StatisticTabParent extends ConsumerWidget {
                                 selectedChild.displayName.isNotEmpty
                                     ? selectedChild.displayName[0].toUpperCase()
                                     : 'C',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16.sp,
-                                ),
+                                style: context.typo.subtitle.small.copyWith(
+                                color: Colors.white,
+                              ),
                               )
                             : Icon(
                                 Icons.people,

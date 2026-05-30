@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/choose_ai_model/choose_ai_model_state.dart';
 import 'package:monikid/shared/widgets/app_ios_switch.dart';
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 class GemmaSectionCard extends StatelessWidget {
   const GemmaSectionCard({
@@ -67,9 +68,9 @@ class GemmaSectionCard extends StatelessWidget {
     final s = context.l10n;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final errorColor = isDark ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626);
+    final errorColor = isDark ? AppTheme.redLight : AppTheme.redDark;
 
     final isDownloaded = gemmaStatus == GemmaDownloadStatus.downloaded;
     final isDownloading = gemmaStatus == GemmaDownloadStatus.downloading;
@@ -78,236 +79,249 @@ class GemmaSectionCard extends StatelessWidget {
     final isError = gemmaStatus == GemmaDownloadStatus.error;
     final isBusy = isDownloading || isDeleting || isChecking;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
-          child: Row(
-            children: [
-              Text(
-                s.aiModelLocalSectionTitle.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                  color: mutedColor,
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(99.r),
-                ),
-                child: Text(
-                  s.aiModelBetaLabel.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary,
-                  ),
-                ),
-              ),
-              if (activeAiSource == AiSource.local) ...[
-                SizedBox(width: 8.w),
-                Icon(
-                  Icons.check_circle_rounded,
-                  color: AppTheme.primary,
-                  size: 16.r,
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 30,
+                  offset: Offset(0, 12.h),
                 ),
               ],
-            ],
-          ),
-        ),
-        SizedBox(height: 8.h),
-        Container(
-          decoration: BoxDecoration(
-            color: surfaceColor,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: borderColor, width: 0.5),
-            boxShadow: isDark
-                ? null
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 44.r,
+                  height: 44.r,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryLight,
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
+                  child: Icon(Icons.phone_android,
+                      color: AppTheme.primary, size: 22.r),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        s.aiModelGemmaName,
+                        style: context.typo.title.small.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: textColor,
+                          fontSize: 18.sp,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        s.aiModelGemmaCardDescription,
+                        style: context.typo.body.small.copyWith(
+                          color: mutedColor,
+                          fontSize: 13.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                if (isDeleting || isChecking)
+                  SizedBox(
+                    width: 22.r,
+                    height: 22.r,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: AppTheme.primary,
                     ),
-                  ],
-          ),
-          child: Column(
-            children: [
+                  )
+                else if (isDownloaded)
+                  _DeletePill(
+                    label: s.aiModelDeleteModel,
+                    color: errorColor,
+                    isBusy: isBusy,
+                    onTap: () => _handleDeleteTap(context),
+                  )
+                else if (activeAiSource == AiSource.local)
+                  Icon(Icons.check_circle_rounded,
+                      color: AppTheme.primary, size: 20.r)
+                else
+                  _BadgePill(label: s.aiModelPrivateBadge),
+              ],
+            ),
+            // Use local model toggle (only when downloaded)
+            if (isDownloaded) ...[
+              SizedBox(height: 14.h),
+              Divider(height: 1, thickness: 1, color: borderColor),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(vertical: 14.h),
                 child: Row(
                   children: [
                     Expanded(
                       child: Text(
-                        s.aiModelGemmaName,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w500,
+                        s.aiModelUseLocalModel,
+                        style: context.typo.body.medium.copyWith(
+                          fontWeight: FontWeight.w700,
                           color: textColor,
+                          fontSize: 15.sp,
                         ),
                       ),
                     ),
-                    if (isDeleting || isChecking)
-                      SizedBox(
-                        width: 22.r,
-                        height: 22.r,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: AppTheme.primary,
-                        ),
-                      )
-                    else if (isDownloaded)
-                      ElevatedButton(
-                        onPressed: isBusy ? null : () => _handleDeleteTap(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: errorColor,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.w, vertical: 4.h),
-                          minimumSize: Size.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          elevation: 0,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: Text(
-                          s.aiModelDeleteModel,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Divider(height: 1, thickness: 0.5, color: borderColor),
-              // Use local model toggle (only visible when model is downloaded)
-              if (isDownloaded) ...[
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 16.w, vertical: 12.h),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          s.aiModelUseLocalModel,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
-                          ),
-                        ),
-                      ),
-                      AppIosSwitch(
-                        value: useLocalModel,
-                        onChanged: isBusy ? null : onToggleLocalModel,
-                        scale: 0.6,
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(height: 1, thickness: 0.5, color: borderColor),
-              ],
-              Padding(
-                padding: EdgeInsets.all(16.r),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      s.aiModelGemmaDescription,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        height: 1.4,
-                        color: mutedColor,
-                      ),
+                    AppIosSwitch(
+                      value: useLocalModel,
+                      onChanged: isBusy ? null : onToggleLocalModel,
+                      scale: 0.6,
                     ),
-                    if (isError && gemmaError != null) ...[
-                      SizedBox(height: 8.h),
-                      Text(
-                        gemmaError!,
-                        style: TextStyle(fontSize: 12.sp, color: errorColor),
-                      ),
-                    ],
-                    if (isDownloading) ...[
-                      SizedBox(height: 14.h),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4.r),
-                        child: LinearProgressIndicator(
-                          value: gemmaProgress,
-                          minHeight: 6.h,
-                          backgroundColor: borderColor,
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(AppTheme.primary),
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        '${(gemmaProgress * 100).toStringAsFixed(0)}% — ${s.aiModelDownloadingNote}',
-                        style: TextStyle(fontSize: 11.sp, color: mutedColor),
-                      ),
-                      SizedBox(height: 14.h),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: onCancel,
-                          icon: Icon(Icons.cancel_outlined, size: 18.r),
-                          label: Text(
-                            s.actionCancel,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: errorColor,
-                            side: BorderSide(color: errorColor),
-                            padding: EdgeInsets.symmetric(vertical: 13.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ] else if (!isDownloaded && !isDeleting && !isChecking) ...[
-                      SizedBox(height: 14.h),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => _handleDownloadTap(context),
-                          icon: Icon(Icons.download_rounded, size: 18.r),
-                          label: Text(
-                            s.aiModelDownload,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primary,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
             ],
+            SizedBox(height: 14.h),
+            Divider(height: 1, thickness: 1, color: borderColor),
+            SizedBox(height: 14.h),
+            // Description + states
+            Text(
+              s.aiModelGemmaDescription,
+              style: context.typo.caption.big.copyWith(
+                height: 1.4,
+                color: mutedColor,
+              ),
+            ),
+            if (isError && gemmaError != null) ...[
+              SizedBox(height: 8.h),
+              Text(
+                gemmaError!,
+                style: context.typo.caption.big.copyWith(color: errorColor),
+              ),
+            ],
+            if (isDownloading) ...[
+              SizedBox(height: 14.h),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4.r),
+                child: LinearProgressIndicator(
+                  value: gemmaProgress,
+                  minHeight: 6.h,
+                  backgroundColor: borderColor,
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                '${(gemmaProgress * 100).toStringAsFixed(0)}% — ${s.aiModelDownloadingNote}',
+                style: context.typo.caption.medium.copyWith(color: mutedColor),
+              ),
+              SizedBox(height: 14.h),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onCancel,
+                  icon: Icon(Icons.cancel_outlined, size: 18.r),
+                  label: Text(
+                    s.actionCancel,
+                    style: context.typo.body.medium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: errorColor,
+                    side: BorderSide(color: errorColor),
+                    padding: EdgeInsets.symmetric(vertical: 13.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                ),
+              ),
+            ] else if (!isDownloaded && !isDeleting && !isChecking) ...[
+              SizedBox(height: 14.h),
+              PrimaryButton(
+                title: s.aiModelDownload,
+                icon: const Icon(Icons.download_rounded),
+                onTap: () => _handleDownloadTap(context),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeletePill extends StatelessWidget {
+  const _DeletePill({
+    required this.label,
+    required this.color,
+    required this.isBusy,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color color;
+  final bool isBusy;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isBusy ? null : onTap,
+      child: Container(
+        height: 28.h,
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999.r),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: context.typo.caption.medium.copyWith(
+            fontWeight: FontWeight.w800,
+            color: color,
+            fontSize: 11.sp,
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _BadgePill extends StatelessWidget {
+  const _BadgePill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 28.h,
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryLight,
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(color: AppTheme.primaryLight, width: 1),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: context.typo.caption.medium.copyWith(
+          fontWeight: FontWeight.w800,
+          color: AppTheme.primary,
+          fontSize: 11.sp,
+        ),
+      ),
     );
   }
 }

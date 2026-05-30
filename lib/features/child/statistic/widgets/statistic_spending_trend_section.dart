@@ -5,7 +5,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 
-class StatisticSpendingTrendSection extends StatelessWidget {
+class StatisticSpendingTrendSection extends StatefulWidget {
   const StatisticSpendingTrendSection({
     super.key,
     required this.selectedMonthIndex,
@@ -20,163 +20,75 @@ class StatisticSpendingTrendSection extends StatelessWidget {
   final double? comparisonPercent;
 
   @override
-  Widget build(BuildContext context) {
-    final directionColor = statisticTrendColor(comparisonDirection);
-    final badgeBackground = statisticTrendSurfaceColor(comparisonDirection);
-    final comparisonLabel = switch (comparisonDirection) {
-      StatisticTrendDirection.up => context.l10n.statisticHigher,
-      StatisticTrendDirection.down => context.l10n.statisticLower,
-      StatisticTrendDirection.stable || StatisticTrendDirection.none =>
-        context.l10n.statisticStable,
-    };
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.statisticSpendingTrendTitle,
-          style: TextStyle(
-            fontSize: 17.r,
-            fontWeight: FontWeight.w800,
-            color: AppTheme.textBlack,
-          ),
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: [
-            Expanded(
-              child: _TrendMetricCard(
-                title: context.l10n.statisticCurrentPeriodTotal(
-                  selectedMonthIndex == 0
-                      ? context.l10n.statisticWeekNoun
-                      : context.l10n.statisticMonthNoun,
-                ),
-                value: context.formatStatisticCurrency(
-                  currentOverview.totalExpenseMinor,
-                ),
-                dailyExpenses: currentOverview.dailyExpenses,
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Container(
-                height: 144.h,
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: const Color(0xFFF3F4F6)),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0D000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      context.l10n.statisticComparedToPrevious(
-                        selectedMonthIndex == 0
-                            ? context.l10n.statisticWeekNoun
-                            : context.l10n.statisticMonthNoun,
-                      ),
-                      style: TextStyle(
-                        fontSize: 12.r,
-                        color: AppTheme.textGrey,
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    Row(
-                      children: [
-                        Text(
-                          comparisonPercent == null
-                              ? '--'
-                              : '${comparisonDirection == StatisticTrendDirection.down ? '-' : '+'}${comparisonPercent!.toStringAsFixed(0)}%',
-                          style: TextStyle(
-                            fontSize: 24.r,
-                            fontWeight: FontWeight.w800,
-                            color: directionColor,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.all(6.r),
-                          decoration: BoxDecoration(
-                            color: badgeBackground,
-                            borderRadius: BorderRadius.circular(999.r),
-                          ),
-                          child: Icon(
-                            comparisonDirection == StatisticTrendDirection.down
-                                ? Icons.trending_down_rounded
-                                : comparisonDirection == StatisticTrendDirection.up
-                                    ? Icons.trending_up_rounded
-                                    : Icons.remove_rounded,
-                            size: 16.r,
-                            color: directionColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                      decoration: BoxDecoration(
-                        color: badgeBackground,
-                        borderRadius: BorderRadius.circular(999.r),
-                      ),
-                      child: Text(
-                        comparisonLabel,
-                        style: TextStyle(
-                          fontSize: 10.r,
-                          fontWeight: FontWeight.w700,
-                          color: directionColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  State<StatisticSpendingTrendSection> createState() =>
+      _StatisticSpendingTrendSectionState();
 }
 
-class _TrendMetricCard extends StatelessWidget {
-  const _TrendMetricCard({
-    required this.title,
-    required this.value,
-    required this.dailyExpenses,
-  });
+class _StatisticSpendingTrendSectionState
+    extends State<StatisticSpendingTrendSection>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
 
-  final String title;
-  final String value;
-  final List<StatisticDailyExpenseData> dailyExpenses;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..forward();
+  }
+
+  @override
+  void didUpdateWidget(StatisticSpendingTrendSection old) {
+    super.didUpdateWidget(old);
+    if (old.currentOverview != widget.currentOverview ||
+        old.selectedMonthIndex != widget.selectedMonthIndex) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Animation<double> _barAnimation(int index) {
+    final start = (0.05 * index).clamp(0.0, 0.5);
+    final end = (start + 0.55).clamp(0.0, 1.0);
+    return Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Interval(start, end, curve: Curves.elasticOut),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final dailyExpenses =
+        widget.currentOverview.dailyExpenses.take(7).toList();
     final maxAmount = dailyExpenses.fold<int>(
       0,
-      (current, point) => point.amountMinor > current ? point.amountMinor : current,
+      (v, p) => p.amountMinor > v ? p.amountMinor : v,
     );
+    final periodLabel = widget.selectedMonthIndex == 2
+        ? context.l10n.statisticByYear
+        : widget.selectedMonthIndex == 0
+            ? context.l10n.statisticByWeek
+            : context.l10n.statisticByMonth;
 
     return Container(
-      height: 144.h,
-      padding: EdgeInsets.all(16.r),
+      padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: const Color(0xFFF3F4F6)),
+        borderRadius: BorderRadius.circular(26.r),
+        border: Border.all(color: AppTheme.borderLight),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: Color(0x0F111811),
+            blurRadius: 28,
+            offset: Offset(0, 12),
           ),
         ],
       ),
@@ -184,40 +96,198 @@ class _TrendMetricCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
-            style: TextStyle(
-              fontSize: 12.r,
+            context.l10n.statisticChartSectionTitle,
+            style: context.typo.caption.medium.copyWith(
+              fontWeight: FontWeight.w700,
               color: AppTheme.textGrey,
+              letterSpacing: 0.1,
             ),
           ),
-          SizedBox(height: 6.h),
+          SizedBox(height: 4.h),
           Text(
-            value,
-            style: TextStyle(
-              fontSize: 21.r,
+            context.l10n.statisticChartComparisonTitle,
+            style: context.typo.title.medium.copyWith(
               fontWeight: FontWeight.w800,
               color: AppTheme.textBlack,
+              letterSpacing: -0.5,
             ),
           ),
-          const Spacer(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: dailyExpenses.take(7).map((point) {
-              final barHeight = maxAmount <= 0
-                  ? 6.h
-                  : ((point.amountMinor / maxAmount) * 42.h).clamp(6.h, 42.h);
-              final isPeak = point.amountMinor == maxAmount && maxAmount > 0;
-              return Expanded(
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 2.w),
-                  height: barHeight,
-                  decoration: BoxDecoration(
-                    color: isPeak ? AppTheme.primary : const Color(0xFFE5E7EB),
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(4.r)),
+          SizedBox(height: 16.h),
+          SizedBox(
+            height: 180.h,
+            child: dailyExpenses.isEmpty
+                ? Center(
+                    child: Text(
+                      context.l10n.statisticNoPreviousData(periodLabel),
+                      style: context.typo.caption.big
+                          .copyWith(color: AppTheme.textGrey),
+                    ),
+                  )
+                : _BarChart(
+                    dailyExpenses: dailyExpenses,
+                    maxAmount: maxAmount,
+                    animationOf: _barAnimation,
+                    selectedMonthIndex: widget.selectedMonthIndex,
+                  ),
+          ),
+          SizedBox(height: 14.h),
+          _PeriodPill(label: periodLabel),
+        ],
+      ),
+    );
+  }
+}
+
+class _BarChart extends StatelessWidget {
+  const _BarChart({
+    required this.dailyExpenses,
+    required this.maxAmount,
+    required this.animationOf,
+    required this.selectedMonthIndex,
+  });
+
+  final List<StatisticDailyExpenseData> dailyExpenses;
+  final int maxAmount;
+  final Animation<double> Function(int index) animationOf;
+  final int selectedMonthIndex;
+
+  String _dayLabel(StatisticDailyExpenseData point, int index) {
+    if (selectedMonthIndex == 0) {
+      const weekLabels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+      return weekLabels[index % 7];
+    }
+    return '${point.date.day}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: List.generate(dailyExpenses.length, (i) {
+        final point = dailyExpenses[i];
+        final isMax = point.amountMinor == maxAmount && maxAmount > 0;
+        final isEmpty = point.amountMinor == 0;
+        final heightFactor = maxAmount <= 0
+            ? 0.03
+            : (point.amountMinor / maxAmount).clamp(0.03, 1.0);
+
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 3.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  context.formatStatisticCompactCurrency(point.amountMinor),
+                  textAlign: TextAlign.center,
+                  style: context.typo.caption.small.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: isMax ? AppTheme.primaryDark : AppTheme.textGrey,
+                    fontSize: 9.sp,
                   ),
                 ),
-              );
-            }).toList(growable: false),
+                SizedBox(height: 4.h),
+                AnimatedBuilder(
+                  animation: animationOf(i),
+                  builder: (context, _) {
+                    final factor =
+                        (heightFactor * animationOf(i).value).clamp(0.03, 1.0);
+                    return SizedBox(
+                      height: 120.h,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: FractionallySizedBox(
+                          heightFactor: factor,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: isMax
+                                    ? [
+                                        const Color(0xFF4E9B52),
+                                        AppTheme.primaryDark,
+                                      ]
+                                    : isEmpty
+                                        ? [
+                                            const Color(0xFFD9E8DA),
+                                            const Color(0xFFA7CDA9),
+                                          ]
+                                        : [
+                                            const Color(0xFF5AA05D),
+                                            AppTheme.primary,
+                                          ],
+                              ),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(8.r),
+                                bottom: Radius.circular(4.r),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  _dayLabel(point, i),
+                  style: context.typo.caption.small.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: isMax ? AppTheme.primaryDark : AppTheme.textGrey,
+                    fontSize: 10.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _PeriodPill extends StatelessWidget {
+  const _PeriodPill({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(14.w, 0, 12.w, 0),
+      height: 38.h,
+      decoration: BoxDecoration(
+        color: AppTheme.primaryLight,
+        borderRadius: BorderRadius.circular(999.r),
+        border: Border.all(
+          color: AppTheme.primary.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: context.typo.caption.big.copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppTheme.primaryDark,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Container(
+            width: 18.w,
+            height: 18.w,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 12.r,
+              color: AppTheme.primary,
+            ),
           ),
         ],
       ),

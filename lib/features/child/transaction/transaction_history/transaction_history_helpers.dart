@@ -79,7 +79,7 @@ class TransactionHistoryHelpers {
     }
 
     if (isRefresh) {
-      return LoadingStateParams(
+      return const LoadingStateParams(
         isLoading: false,
         isListLoading: false,
         isLoadingMore: false,
@@ -88,7 +88,7 @@ class TransactionHistoryHelpers {
     }
 
     if (hasTransactions) {
-      return LoadingStateParams(
+      return const LoadingStateParams(
         isLoading: false,
         isListLoading: true,
         isLoadingMore: false,
@@ -96,7 +96,7 @@ class TransactionHistoryHelpers {
       );
     }
 
-    return LoadingStateParams(
+    return const LoadingStateParams(
       isLoading: true,
       isListLoading: false,
       isLoadingMore: false,

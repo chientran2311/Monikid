@@ -6,7 +6,7 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
 import 'package:monikid/features/parent/home/widgets/family_members_section.dart';
@@ -15,7 +15,6 @@ import 'package:monikid/features/parent/home/widgets/no_family_empty_state.dart'
 import 'package:monikid/features/parent/home/widgets/parent_home_section_header.dart';
 import 'package:monikid/features/parent/home/widgets/parent_transaction_list_card.dart';
 import 'package:monikid/features/parent/home/widgets/top_category_alert_card.dart';
-import 'package:monikid/features/parent/notification/parent_notification_provider.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_provider.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
@@ -26,7 +25,6 @@ class HomeTabParent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -178,8 +176,7 @@ class HomeTabParent extends HookConsumerWidget {
                       child: Center(
                         child: Text(
                           s.msgNoData,
-                          style: TextStyle(
-                            fontSize: 14.sp,
+                          style: context.typo.body.medium.copyWith(
                             color: mutedColor,
                           ),
                         ),
@@ -197,11 +194,7 @@ class HomeTabParent extends HookConsumerWidget {
     return Scaffold(
       backgroundColor:
           isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      appBar: MainAppBar(
-        avatarUrl: resolvedAvatarUrl,
-        notifCount: ref.watch(parentUnreadNotificationCountProvider),
-        onNotificationTap: () => context.push(AppRoutes.parentNotifications),
-      ),
+      appBar: MainAppBar(avatarUrl: resolvedAvatarUrl),
       body: body,
     );
   }

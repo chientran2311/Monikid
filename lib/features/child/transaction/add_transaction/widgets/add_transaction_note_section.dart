@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class AddTransactionNoteSection extends StatelessWidget {
   const AddTransactionNoteSection({
@@ -30,13 +31,9 @@ class AddTransactionNoteSection extends StatelessWidget {
           children: [
             Text(
               s.transactionNoteLabel,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF334155),
-              ),
+              style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w500, color: isDark
+                    ? AppTheme.iconLight
+                    : AppTheme.borderDark),
             ),
             if (showAiBadge)
               Container(
@@ -58,11 +55,7 @@ class AddTransactionNoteSection extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       s.transactionAiAutoLabel,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.primary,
-                      ),
+                      style: context.typo.caption.big.copyWith(fontWeight: FontWeight.w500, color: AppTheme.primary),
                     ),
                   ],
                 ),
@@ -76,7 +69,7 @@ class AddTransactionNoteSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF334155)
+                  ? AppTheme.borderDark
                   : const Color(0xFFF1F5F9),
             ),
             boxShadow: [
@@ -95,7 +88,7 @@ class AddTransactionNoteSection extends StatelessWidget {
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
               hintText: s.addTransactionNoteHint,
-              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+              hintStyle: const TextStyle(color: AppTheme.textMuted),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(16),
             ),

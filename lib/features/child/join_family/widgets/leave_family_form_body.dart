@@ -5,8 +5,9 @@ import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/join_family/join_family_provider.dart';
 import 'package:monikid/features/child/join_family/join_family_state.dart';
-import 'package:monikid/shared/widgets/common_buttons.dart';
+
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 class LeaveFamilyFormBody extends ConsumerWidget {
   const LeaveFamilyFormBody({
@@ -24,7 +25,7 @@ class LeaveFamilyFormBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
@@ -51,9 +52,7 @@ class LeaveFamilyFormBody extends ConsumerWidget {
         SizedBox(height: 20.h),
         Text(
           s.unlinkFamilyTitle,
-          style: TextStyle(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.w700,
+          style: context.typo.title.big.copyWith(
             color: textColor,
           ),
         ),
@@ -61,7 +60,7 @@ class LeaveFamilyFormBody extends ConsumerWidget {
         Text(
           s.unlinkFamilySubtitle,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14.sp, color: mutedColor, height: 1.5),
+          style: context.typo.body.medium.copyWith(color: mutedColor, height: 1.5),
         ),
         if (familyName.isNotEmpty) ...[
           SizedBox(height: 24.h),
@@ -84,8 +83,7 @@ class LeaveFamilyFormBody extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     familyName,
-                    style: TextStyle(
-                      fontSize: 15.sp,
+                    style: context.typo.body.big.copyWith(
                       fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
@@ -96,10 +94,10 @@ class LeaveFamilyFormBody extends ConsumerWidget {
           ),
         ],
         SizedBox(height: 40.h),
-        AppDangerButton(
-          label: s.unlinkFamilyButton,
+        PrimaryButton.danger(
+          title: s.unlinkFamilyButton,
           isLoading: state.isBusy,
-          onPressed: () async {
+          onTap: () async {
             final confirmed = await showDialog<bool>(
               context: context,
               builder: (_) => ConfirmDialog(

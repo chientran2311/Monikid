@@ -44,21 +44,19 @@ class NoFamilyEmptyState extends StatelessWidget {
             SizedBox(height: 20.h),
             Text(
               s.homeParNoFamilyTitle,
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: textColor,
-              ),
+              style: context.typo.subtitle.medium.copyWith(
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 8.h),
             Text(
               s.homeParNoFamilySubtitle,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: mutedColor,
-                height: 1.5,
-              ),
+              style: context.typo.body.medium.copyWith(
+              color: mutedColor,
+              height: 1.5,
+            ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 28.h),
@@ -86,12 +84,11 @@ class NoFamilyEmptyState extends StatelessWidget {
                       )
                     : Text(
                         s.homeParCreateFamilyBtn,
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: context.typo.body.big.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
-              ),
+                    ),
+                ),
             ),
           ],
         ),

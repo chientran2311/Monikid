@@ -89,8 +89,7 @@ class AIModelMarkDown extends HookConsumerWidget {
                   Expanded(
                     child: Text(
                       modelName,
-                      style: TextStyle(
-                        fontSize: 16.sp,
+                      style: context.typo.subtitle.small.copyWith(
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : AppTheme.textBlack,
                       ),
@@ -162,22 +161,21 @@ class AIModelMarkDown extends HookConsumerWidget {
                               : Icon(Icons.delete_outline_rounded, size: 20.r),
                           label: Text(
                             removeApiKeyText,
-                            style: TextStyle(
-                              fontSize: 13.sp,
+                            style: context.typo.body.small.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           style: TextButton.styleFrom(
                             foregroundColor: isDark
-                                ? const Color(0xFFFCA5A5)
-                                : const Color(0xFFDC2626),
+                                ? AppTheme.redLight
+                                : AppTheme.redDark,
                             padding: EdgeInsets.symmetric(horizontal: 14.w),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14.r),
                               side: BorderSide(
                                 color: isDark
-                                    ? const Color(0xFFFCA5A5)
-                                    : const Color(0xFFDC2626),
+                                    ? AppTheme.redLight
+                                    : AppTheme.redDark,
                               ),
                             ),
                           ),
@@ -203,8 +201,7 @@ class AIModelMarkDown extends HookConsumerWidget {
                                 )
                               : Text(
                                   addApiKeyText,
-                                  style: TextStyle(
-                                    fontSize: 13.sp,
+                                  style: context.typo.body.small.copyWith(
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -217,7 +214,7 @@ class AIModelMarkDown extends HookConsumerWidget {
               SizedBox(height: 8.h),
               Text(
                 sessionKeyText,
-                style: TextStyle(fontSize: 12.sp, color: mutedColor),
+                style: context.typo.caption.big.copyWith(color: mutedColor),
               ),
             ],
 
@@ -226,8 +223,7 @@ class AIModelMarkDown extends HookConsumerWidget {
             // Model selector
             Text(
               s.aiModelSelectModelLabel,
-              style: TextStyle(
-                fontSize: 13.sp,
+              style: context.typo.body.small.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark ? Colors.white : AppTheme.textBlack,
               ),
@@ -286,8 +282,7 @@ class AIModelMarkDown extends HookConsumerWidget {
                       )
                     : Text(
                         sendPromptText,
-                        style: TextStyle(
-                          fontSize: 14.sp,
+                        style: context.typo.body.medium.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -298,12 +293,11 @@ class AIModelMarkDown extends HookConsumerWidget {
               SizedBox(height: 12.h),
               Text(
                 errorText,
-                style: TextStyle(
-                  fontSize: 12.sp,
+                style: context.typo.caption.big.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isDark
-                      ? const Color(0xFFFCA5A5)
-                      : const Color(0xFFDC2626),
+                      ? AppTheme.redLight
+                      : AppTheme.redDark,
                 ),
               ),
             ],
@@ -312,8 +306,7 @@ class AIModelMarkDown extends HookConsumerWidget {
               SizedBox(height: 16.h),
               Text(
                 responseTitleText,
-                style: TextStyle(
-                  fontSize: 13.sp,
+                style: context.typo.body.small.copyWith(
                   fontWeight: FontWeight.w700,
                   color: isDark ? Colors.white : AppTheme.textBlack,
                 ),
@@ -324,15 +317,14 @@ class AIModelMarkDown extends HookConsumerWidget {
                 padding: EdgeInsets.all(14.r),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF111827)
-                      : const Color(0xFFF8FAFC),
+                      ? AppTheme.backgroundVeryDark
+                      : AppTheme.surfaceVeryLight,
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(color: borderColor),
                 ),
                 child: Text(
                   state.responseText ?? '',
-                  style: TextStyle(
-                    fontSize: 13.sp,
+                  style: context.typo.body.small.copyWith(
                     height: 1.5,
                     color: isDark ? Colors.white : AppTheme.textBlack,
                   ),

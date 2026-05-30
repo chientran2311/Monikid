@@ -81,16 +81,14 @@ class SetChildLimitSheet extends HookConsumerWidget {
             SizedBox(height: 20.h),
             Text(
               s.parentSetLimitTitle,
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textBlack,
-              ),
+              style: context.typo.subtitle.small.copyWith(
+              color: AppTheme.textBlack,
+            ),
             ),
             SizedBox(height: 4.h),
             Text(
               s.parentSetLimitDescription,
-              style: TextStyle(fontSize: 13.sp, color: AppTheme.textGrey),
+              style: context.typo.body.small.copyWith(color: AppTheme.textGrey),
             ),
             SizedBox(height: 20.h),
             TextField(
@@ -98,18 +96,14 @@ class SetChildLimitSheet extends HookConsumerWidget {
               autofocus: true,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w700,
+              style: context.typo.title.medium.copyWith(
                 color: AppTheme.textBlack,
               ),
               decoration: InputDecoration(
                 hintText: '0',
                 suffixText: 'đ',
                 labelText: childName,
-                suffixStyle: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
+                suffixStyle: context.typo.subtitle.small.copyWith(
                   color: AppTheme.textGrey,
                 ),
               ),
@@ -141,8 +135,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
                     ),
                     child: Text(
                       s.setMoneyLimitSkipAction,
-                      style: TextStyle(
-                        fontSize: 15.sp,
+                      style: context.typo.body.big.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -172,8 +165,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
                           )
                         : Text(
                             s.actionConfirm,
-                            style: TextStyle(
-                              fontSize: 16.sp,
+                            style: context.typo.subtitle.small.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -212,8 +204,7 @@ class _PresetChip extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 13.sp,
+            style: context.typo.body.small.copyWith(
               fontWeight: FontWeight.w600,
               color: AppTheme.primary,
             ),

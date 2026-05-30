@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:uuid/uuid.dart';

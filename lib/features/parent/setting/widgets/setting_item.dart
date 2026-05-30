@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class SettingItem extends StatelessWidget {
@@ -59,8 +60,7 @@ class SettingItem extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 17.sp,
+                      style: context.typo.subtitle.small.copyWith(
                         fontWeight: FontWeight.w500,
                         color: textColor,
                       ),
@@ -69,8 +69,7 @@ class SettingItem extends StatelessWidget {
                       SizedBox(height: 2.h),
                       Text(
                         subtitle!,
-                        style: TextStyle(
-                          fontSize: 12.sp,
+                        style: context.typo.caption.big.copyWith(
                           color: mutedColor,
                         ),
                       ),

@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -70,6 +70,20 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
   }
 
   Future<void> selectMember(String uid) async {
+    // Validate member còn trong family không
+    final memberExists = state.members.any((m) => m.uid == uid);
+    if (!memberExists) {
+      _logger.w('Member $uid no longer in family, skipping select');
+      state = state.copyWith(
+        selectedMemberId: null,
+        selectedMemberTransactions: const [],
+        selectedMemberExpenseMinor: 0,
+        selectedMemberIncomeMinor: 0,
+        isLoadingMemberData: false,
+      );
+      return;
+    }
+
     state = state.copyWith(
       selectedMemberId: uid,
       isLoadingMemberData: true,
@@ -148,10 +162,27 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
     try {
       final members = await _familyRepo.watchFamilyMembers(familyId).first;
       state = state.copyWith(members: members);
+      
+      if (members.isEmpty) {
+        // Không còn member nào → clear selection
+        state = state.copyWith(
+          selectedMemberId: null,
+          selectedMemberTransactions: const [],
+          selectedMemberExpenseMinor: 0,
+          selectedMemberIncomeMinor: 0,
+        );
+        return;
+      }
+
       final selectedId = state.selectedMemberId;
-      if (selectedId != null) {
+      final stillExists = selectedId != null && 
+          members.any((m) => m.uid == selectedId);
+
+      if (stillExists) {
+        // Member còn tồn tại → re-select
         await selectMember(selectedId);
-      } else if (members.isNotEmpty) {
+      } else {
+        // Member đã leave → chọn member đầu tiên
         await selectMember(members.first.uid);
       }
     } catch (error, stackTrace) {

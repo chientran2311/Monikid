@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/auth_error_enum.dart';
 import 'package:monikid/models/entities/account/account_model.dart';
 import 'package:monikid/models/entities/auth/params/auth_param.dart';
 import 'package:monikid/models/entities/auth/responses/auth_response.dart';
@@ -20,9 +21,9 @@ abstract class AuthRepository {
 
   Stream<User?> get authStateChanges;
 
-  Future<AuthResponse> signUp(SignUpParam param);
+  Future<AuthResult> signUp(SignUpParam param);
 
-  Future<AuthResponse> signIn(SignInParam param);
+  Future<AuthResult> signIn(SignInParam param);
 
   Future<void> signOut();
 
@@ -30,7 +31,7 @@ abstract class AuthRepository {
 
   Future<AccountModel?> fetchAccountByUid(String uid);
 
-  Future<AccountModel> createInitialAccount({
+  Future<AuthResult> createInitialAccount({
     required String uid,
     required String email,
     required String displayName,
@@ -52,7 +53,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   @override
-  Future<AuthResponse> signIn(SignInParam param) async {
+  Future<AuthResult> signIn(SignInParam param) async {
     try {
       _logger.i('Attempting sign in for email: ${param.email}');
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
@@ -62,7 +63,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
       final user = credential.user;
       if (user == null) {
-        throw Exception('Sign in failed. Firebase did not return a user.');
+        _logger.e('Sign in failed: Firebase did not return a user.');
+        return const AuthResult(error: AuthErrorEnumRepo.firebaseUserNull);
       }
 
       final account = await fetchAccountByUid(user.uid);
@@ -71,7 +73,7 @@ class AuthRepositoryImpl implements AuthRepository {
           'Sign in blocked: no Firestore account document for uid=${user.uid}.',
         );
         await signOut();
-        throw Exception('Account setup is incomplete.');
+        return const AuthResult(error: AuthErrorEnumRepo.accountNotFound);
       }
 
       if (!account.isValid) {
@@ -80,18 +82,21 @@ class AuthRepositoryImpl implements AuthRepository {
           'Issues: ${account.validationIssues.join(', ')}',
         );
         await signOut();
-        throw Exception('Account setup is incomplete.');
+        return const AuthResult(error: AuthErrorEnumRepo.accountInvalid);
       }
 
-      return AuthResponse(user: user, role: account.role);
+      return AuthResult(response: AuthResponse(user: user, role: account.role));
+    } on FirebaseAuthException catch (e, stackTrace) {
+      _logger.e('FirebaseAuth error during sign in', error: e, stackTrace: stackTrace);
+      return const AuthResult(error: AuthErrorEnumRepo.firebaseAuthException);
     } catch (e, stackTrace) {
-      _logger.e('Sign in failed', error: e, stackTrace: stackTrace);
-      rethrow;
+      _logger.e('Unexpected error during sign in', error: e, stackTrace: stackTrace);
+      return const AuthResult(error: AuthErrorEnumRepo.unknownError);
     }
   }
 
   @override
-  Future<AuthResponse> signUp(SignUpParam param) async {
+  Future<AuthResult> signUp(SignUpParam param) async {
     User? createdUser;
     try {
       _logger.i('Starting sign up process for email: ${param.email}');
@@ -103,27 +108,34 @@ class AuthRepositoryImpl implements AuthRepository {
 
       createdUser = credential.user;
       if (createdUser == null) {
-        throw Exception('Sign up failed. Firebase did not return a user.');
+        _logger.e('Sign up failed: Firebase did not return a user.');
+        return const AuthResult(error: AuthErrorEnumRepo.firebaseUserNull);
       }
 
-      final account = await createInitialAccount(
+      final accountResult = await createInitialAccount(
         uid: createdUser.uid,
         email: param.email,
         displayName: param.fullName,
         role: param.role,
       );
 
+      if (accountResult.isFailure) {
+        await _signOutAfterFailedSignUp(createdUser);
+        return accountResult;
+      }
+
+      final account = accountResult.response as AccountModel;
       if (!account.isValid) {
         _logger.w(
           'Sign up produced an invalid Firestore account for uid=${createdUser.uid}. '
           'Issues: ${account.validationIssues.join(', ')}',
         );
         await signOut();
-        throw Exception('Sign up failed. The account document is incomplete.');
+        return const AuthResult(error: AuthErrorEnumRepo.accountInvalid);
       }
 
       final resolvedUser = _firebaseAuth.currentUser ?? createdUser;
-      return AuthResponse(user: resolvedUser, role: account.role);
+      return AuthResult(response: AuthResponse(user: resolvedUser, role: account.role));
     } on FirebaseAuthException catch (e, stackTrace) {
       await _signOutAfterFailedSignUp(createdUser);
       _logger.e(
@@ -131,7 +143,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error: e,
         stackTrace: stackTrace,
       );
-      rethrow;
+      return const AuthResult(error: AuthErrorEnumRepo.firebaseAuthException);
     } on FirebaseException catch (e, stackTrace) {
       await _signOutAfterFailedSignUp(createdUser);
       _logger.e(
@@ -139,7 +151,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error: e,
         stackTrace: stackTrace,
       );
-      rethrow;
+      return const AuthResult(error: AuthErrorEnumRepo.firestoreException);
     } catch (e, stackTrace) {
       await _signOutAfterFailedSignUp(createdUser);
       _logger.e(
@@ -147,7 +159,7 @@ class AuthRepositoryImpl implements AuthRepository {
         error: e,
         stackTrace: stackTrace,
       );
-      rethrow;
+      return const AuthResult(error: AuthErrorEnumRepo.unknownError);
     }
   }
 
@@ -166,12 +178,15 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> resetPassword(ResetPasswordParam param) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: param.email);
-    } on FirebaseAuthException catch (e) {
+      _logger.i('Password reset email sent to ${param.email}');
+    } on FirebaseAuthException catch (e, stackTrace) {
+      _logger.e(
+        'resetPassword failed with code=${e.code}',
+        error: e,
+        stackTrace: stackTrace,
+      );
       String errorMessage;
       switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'No account was found for this email address.';
-          break;
         case 'invalid-email':
           errorMessage = 'Please enter a valid email address.';
           break;
@@ -183,7 +198,8 @@ class AuthRepositoryImpl implements AuthRepository {
               e.message ?? 'An unexpected error occurred while sending the reset email.';
       }
       throw Exception(errorMessage);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      _logger.e('resetPassword system error', error: e, stackTrace: stackTrace);
       throw Exception('System error: ${e.toString()}');
     }
   }
@@ -205,8 +221,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       final account = AccountModel.fromFirestore(data);
       _logger.i(
-        'Fetched account uid=$uid role=${account.role} memberStatus=${account.memberStatus} '
-        'hasSpendingAlert=${account.spendingAlert != null}',
+        'Fetched account uid=$uid role=${account.role} familyId=${account.familyId}',
       );
       if (!account.isValid) {
         _logger.w(
@@ -222,7 +237,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AccountModel> createInitialAccount({
+  Future<AuthResult> createInitialAccount({
     required String uid,
     required String email,
     required String displayName,
@@ -239,29 +254,22 @@ class AuthRepositoryImpl implements AuthRepository {
         photoUrl: 'https://i.pravatar.cc/150?img=11',
         role: normalizedRole,
         familyId: null,
-        memberStatus: 'active',
         createdAt: now,
         updatedAt: now,
-        spendingAlert: normalizedRole == 'child'
-            ? const SpendingAlertModel(
-                enabled: true,
-                dailyLimitMinor: 100000,
-                monthlyLimitMinor: 1500000,
-              )
-            : null,
       );
 
       await _firestore.collection('users').doc(uid).set(account.toFirestore());
 
       final createdAccount = await fetchAccountByUid(uid);
       if (createdAccount == null) {
-        throw Exception('Failed to read back the account after creation.');
+        _logger.e('Failed to read back the account after creation for uid=$uid');
+        return const AuthResult(error: AuthErrorEnumRepo.accountReadbackFailed);
       }
 
-      return createdAccount;
+      return AuthResult(response: createdAccount);
     } catch (e, stackTrace) {
       _logger.e('createInitialAccount failed', error: e, stackTrace: stackTrace);
-      rethrow;
+      return const AuthResult(error: AuthErrorEnumRepo.accountCreationFailed);
     }
   }
 

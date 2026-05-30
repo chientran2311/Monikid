@@ -5,24 +5,34 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/join_family/join_family_provider.dart';
+import 'package:monikid/features/child/join_family/widgets/family_members_form_body.dart';
 import 'package:monikid/features/child/join_family/widgets/join_family_form_body.dart';
-import 'package:monikid/features/child/join_family/widgets/leave_family_form_body.dart';
+
+enum JoinFamilyPhase { phase1, phase2 }
 
 class JoinFamilyScreen extends HookConsumerWidget {
   const JoinFamilyScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
-    final focusNode = useFocusNode();
 
     final hasFamily = ref.watch(
       authSessionProvider.select((a) => a.account?.familyId != null),
     );
+
+    final phase = hasFamily ? JoinFamilyPhase.phase2 : JoinFamilyPhase.phase1;
+
+    useEffect(() {
+      if (phase == JoinFamilyPhase.phase2) {
+        ref.invalidate(linkedFamilyProvider);
+        ref.invalidate(familyMembersProvider);
+      }
+      return null;
+    }, [phase]);
 
     final notifier = ref.read(joinFamilyNotifierProvider.notifier);
     final state = ref.watch(joinFamilyNotifierProvider);
@@ -46,6 +56,9 @@ class JoinFamilyScreen extends HookConsumerWidget {
     });
 
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
+    final appBarTitle = phase == JoinFamilyPhase.phase2
+        ? s.familyMembersTitle
+        : s.joinFamilyTitle;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -53,30 +66,101 @@ class JoinFamilyScreen extends HookConsumerWidget {
         backgroundColor: bgColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, size: 20.r),
+        centerTitle: true,
+        title: Text(
+          appBarTitle,
+          style: context.typo.title.small.copyWith(
+            color: isDark ? Colors.white : AppTheme.textBlack,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+          ),
+        ),
+        leading: _CircleIconButton(
+          isDark: isDark,
+          icon: Icons.arrow_back_ios_new_rounded,
           onPressed: () {
             notifier.reset();
             context.pop();
           },
         ),
+        actions: [
+          _CircleIconButton(
+            isDark: isDark,
+            icon: Icons.help_outline_rounded,
+            onPressed: null,
+          ),
+          SizedBox(width: 8.w),
+        ],
       ),
       body: SafeArea(
         child: GestureDetector(
-          onTap: () => focusNode.unfocus(),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: hasFamily
-                ? LeaveFamilyFormBody(
-                    isDark: isDark,
-                    state: state,
-                    notifier: notifier,
-                  )
-                : JoinFamilyFormBody(
-                    isDark: isDark,
-                    state: state,
-                    notifier: notifier,
-                  ),
+          behavior: HitTestBehavior.translucent,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: switch (phase) {
+            JoinFamilyPhase.phase2 => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: FamilyMembersFormBody(
+                  isDark: isDark,
+                  state: state,
+                  notifier: notifier,
+                ),
+              ),
+            JoinFamilyPhase.phase1 => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: JoinFamilyFormBody(
+                  isDark: isDark,
+                  state: state,
+                  notifier: notifier,
+                ),
+              ),
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _CircleIconButton extends StatelessWidget {
+  const _CircleIconButton({
+    required this.isDark,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final bool isDark;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          width: 42.r,
+          height: 42.r,
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppTheme.surfaceDark
+                : Colors.white.withValues(alpha: 0.72),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isDark
+                  ? AppTheme.borderDark
+                  : Colors.white.withValues(alpha: 0.86),
+            ),
+            boxShadow: [
+              BoxShadow(
+                offset: Offset(0, 8.h),
+                blurRadius: 18.r,
+                color: const Color(0xFF4D5F7C).withValues(alpha: 0.06),
+              ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            size: 18.r,
+            color: isDark ? Colors.white : AppTheme.textBlack,
           ),
         ),
       ),

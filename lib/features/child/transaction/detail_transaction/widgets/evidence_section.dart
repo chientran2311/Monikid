@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_state.dart';
 
@@ -17,93 +19,110 @@ class EvidenceSection extends ConsumerWidget {
     final hasLegacyEvidencePath = _hasLegacyEvidencePath(
       transaction.evidenceImage?.storagePath,
     );
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
+    final bgColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey;
+    final labelColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final iconColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            s.transactionEvidenceSectionTitle,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (!state.hasEvidenceImage)
-            EvidenceEmptyState(isDark: isDark)
-          else if (state.isResolvingEvidenceImage)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: CircularProgressIndicator(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 36.r,
+                height: 36.r,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.camera_alt_rounded, size: 18.r, color: iconColor),
               ),
-            )
-          else if (state.evidenceImageUrl == null)
-            EvidenceErrorState(
-              errorMessage: hasLegacyEvidencePath
-                  ? s.transactionEvidenceLegacyUnavailable
-                  : state.evidenceImageErrorMessage,
-              onRetry: hasLegacyEvidencePath
-                  ? null
-                  : () => ref
-                        .read(detailTransactionNotifierProvider.notifier)
-                        .retryEvidenceImage(),
-            )
-          else ...[
-            GestureDetector(
-              onTap: () => _showEvidenceImageViewer(
-                context,
-                imageUrl: state.evidenceImageUrl!,
-                fileName: transaction.evidenceImage?.fileName,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  state.evidenceImageUrl!,
-                  height: 220,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const BrokenImagePlaceholder();
-                  },
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 2.h),
+                  child: Text(
+                    s.transactionEvidenceSectionTitle,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                      color: labelColor,
+                    ),
+                  ),
                 ),
               ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(18.w, 0, 18.w, 16.h),
+          child: _buildContent(context, ref, transaction, hasLegacyEvidencePath),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic transaction,
+    bool hasLegacyEvidencePath,
+  ) {
+    if (!state.hasEvidenceImage) return EvidenceEmptyState(isDark: isDark);
+    if (state.isResolvingEvidenceImage) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if (state.evidenceImageUrl == null) {
+      return EvidenceErrorState(
+        errorMessage: hasLegacyEvidencePath
+            ? s.transactionEvidenceLegacyUnavailable
+            : state.evidenceImageErrorMessage,
+        onRetry: hasLegacyEvidencePath
+            ? null
+            : () => ref
+                  .read(detailTransactionNotifierProvider.notifier)
+                  .retryEvidenceImage(),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => _showEvidenceImageViewer(
+            context,
+            imageUrl: state.evidenceImageUrl!,
+            fileName: transaction.evidenceImage?.fileName,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14.r),
+            child: Image.network(
+              state.evidenceImageUrl!,
+              height: 180.h,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const BrokenImagePlaceholder();
+              },
             ),
-            const SizedBox(height: 12),
-            Text(
-              transaction.evidenceImage?.fileName ??
-                  s.transactionEvidenceAttachedLabel,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF475569),
-              ),
-            ),
-          ],
-        ],
-      ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Text(
+          transaction.evidenceImage?.fileName ?? s.transactionEvidenceAttachedLabel,
+          style: context.typo.body.medium.copyWith(
+            color: isDark ? AppTheme.iconLight : AppTheme.textDark,
+          ),
+        ),
+      ],
     );
   }
 
@@ -145,18 +164,17 @@ class EvidenceEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 140,
+      height: 140.h,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? AppTheme.surfaceVeryDark : AppTheme.surfaceVeryLight,
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Center(
         child: Text(
           s.transactionEvidenceEmpty,
-          style: TextStyle(
-            fontSize: 14,
-            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
+          style: context.typo.body.medium.copyWith(
+            color: isDark ? AppTheme.iconLight : AppTheme.textGrey,
           ),
         ),
       ),
@@ -178,20 +196,20 @@ class EvidenceErrorState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
+        color: AppTheme.surfaceVeryLight,
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
         children: [
           Text(
             errorMessage ?? s.transactionEvidenceLoadError,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+            style: context.typo.body.medium.copyWith(color: AppTheme.textGrey),
           ),
           if (onRetry != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
@@ -210,14 +228,14 @@ class BrokenImagePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
+      height: 180.h,
       width: double.infinity,
-      color: const Color(0xFFF8FAFC),
+      color: AppTheme.surfaceVeryLight,
       child: Center(
         child: Text(
           s.transactionEvidenceLoadError,
           style: const TextStyle(
-            color: Color(0xFF64748B),
+            color: AppTheme.textGrey,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -280,18 +298,18 @@ class EvidenceImageViewerDialog extends StatelessWidget {
                   left: 16,
                   right: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Text(
                       fileName!,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: labelColor, fontSize: 14),
+                      style: context.typo.body.medium.copyWith(color: labelColor),
                     ),
                   ),
                 ),

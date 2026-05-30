@@ -27,170 +27,163 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
 
     final overview = budgetOverview!;
     final limitMinor = overview.limitMinor ?? 0;
-    final remainingMinor = overview.remainingMinor ?? 0;
+    final remainingMinor = (overview.remainingMinor ?? 0).clamp(0, limitMinor);
+    final usagePercent = (overview.usageRatio * 100).clamp(0.0, 100.0);
     final statusLabel = context.statisticBudgetStatusLabel(overview.status);
+    final statusColor = _statusColor(overview.status);
+    final statusSurface = _statusSurface(overview.status);
 
     return Container(
-      padding: EdgeInsets.all(24.r),
+      padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primary, AppTheme.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24.r),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(26.r),
+        border: Border.all(color: AppTheme.borderLight),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x24000000),
-            blurRadius: 24,
-            offset: Offset(0, 8),
+            color: Color(0x0F111811),
+            blurRadius: 28,
+            offset: Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Color(0x0A111811),
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            top: -36.h,
-            right: -36.w,
-            child: Container(
-              width: 132.w,
-              height: 132.w,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.10),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Positioned(
-            left: -28.w,
-            bottom: -40.h,
-            child: Container(
-              width: 96.w,
-              height: 96.w,
-              decoration: BoxDecoration(
-                color: AppTheme.chartGreen.withValues(alpha: 0.14),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Column(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.statisticSpendingLimitLabel,
+                      style: context.typo.caption.medium.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textGrey,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          context.l10n.statisticSpendingLimitLabel.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 10.r,
-                            letterSpacing: 1.2,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white.withValues(alpha: 0.72),
+                          context.formatStatisticCompactCurrency(overview.spentMinor),
+                          style: context.typo.display.small.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.textBlack,
+                            letterSpacing: -1.2,
                           ),
                         ),
-                        SizedBox(height: 6.h),
+                        SizedBox(width: 8.w),
                         Text(
-                          context.formatStatisticCurrency(limitMinor),
-                          style: TextStyle(
-                            fontSize: 30.r,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                          '/ ${context.formatStatisticCurrency(limitMinor)}',
+                          style: context.typo.body.small.copyWith(
+                            color: AppTheme.textGrey,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(999.r),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.18),
-                      ),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: TextStyle(
-                        fontSize: 9.r,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 22.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: _BudgetMetric(
-                      label: context.l10n.statisticSpentLabel,
-                      value: context.formatStatisticCurrency(overview.spentMinor),
-                    ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: _BudgetMetric(
-                      label: context.l10n.statisticRemainingLabel,
-                      value: context.formatStatisticCurrency(
-                        remainingMinor.clamp(0, limitMinor),
-                      ),
-                      alignEnd: true,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 14.h),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999.r),
-                child: LinearProgressIndicator(
-                  minHeight: 8.h,
-                  value: overview.usageRatio.clamp(0.0, 1.0),
-                  backgroundColor: Colors.black.withValues(alpha: 0.20),
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    overview.status == StatisticBudgetStatus.exceeded
-                        ? AppTheme.redAlert
-                        : AppTheme.chartGreen,
-                  ),
-                ),
-              ),
-              SizedBox(height: 14.h),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(top: 12.h),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _comparisonIcon(overview.comparisonDirection),
-                      size: 16.r,
-                      color: _comparisonColor(overview.comparisonDirection),
-                    ),
-                    SizedBox(width: 6.w),
-                    Flexible(
-                      child: Text(
-                        comparisonMessage,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11.r,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.86),
-                        ),
-                      ),
-                    ),
                   ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: statusSurface,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: statusColor.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: context.typo.caption.small.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.l10n.statisticProgressUsageLabel,
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textGrey,
+                ),
+              ),
+              Text(
+                '${usagePercent.toStringAsFixed(0)}%',
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textGrey,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999.r),
+            child: Container(
+              height: 12.h,
+              color: const Color(0xFFEAF1EA),
+              child: FractionallySizedBox(
+                widthFactor: overview.usageRatio.clamp(0.0, 1.0),
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: overview.status == StatisticBudgetStatus.exceeded
+                          ? [AppTheme.redAlert, AppTheme.redAlert]
+                          : [AppTheme.primary, AppTheme.primaryDark],
+                    ),
+                    borderRadius: BorderRadius.circular(999.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        offset: const Offset(0, -1),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${context.l10n.statisticRemainingLabel} ${context.formatStatisticCurrency(remainingMinor)}',
+                style: context.typo.caption.medium.copyWith(
+                  color: AppTheme.textGrey,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Flexible(
+                child: Text(
+                  context.l10n.statisticBudgetAdjustAnytime,
+                  textAlign: TextAlign.end,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.typo.caption.small.copyWith(
+                    color: AppTheme.textGrey,
+                    height: 1.35,
+                  ),
                 ),
               ),
             ],
@@ -200,35 +193,35 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
     );
   }
 
-  IconData _comparisonIcon(StatisticTrendDirection direction) {
-    switch (direction) {
-      case StatisticTrendDirection.down:
-        return Icons.trending_down_rounded;
-      case StatisticTrendDirection.up:
-        return Icons.trending_up_rounded;
-      case StatisticTrendDirection.stable:
-      case StatisticTrendDirection.none:
-        return Icons.remove_rounded;
+  Color _statusColor(StatisticBudgetStatus status) {
+    switch (status) {
+      case StatisticBudgetStatus.onTrack:
+        return AppTheme.primary;
+      case StatisticBudgetStatus.warning:
+        return AppTheme.amberText;
+      case StatisticBudgetStatus.exceeded:
+        return AppTheme.redAlert;
+      case StatisticBudgetStatus.noLimit:
+        return AppTheme.primary;
     }
   }
 
-  Color _comparisonColor(StatisticTrendDirection direction) {
-    switch (direction) {
-      case StatisticTrendDirection.down:
-        return AppTheme.chartGreen;
-      case StatisticTrendDirection.up:
-        return AppTheme.redAlert;
-      case StatisticTrendDirection.stable:
-      case StatisticTrendDirection.none:
-        return Colors.white;
+  Color _statusSurface(StatisticBudgetStatus status) {
+    switch (status) {
+      case StatisticBudgetStatus.onTrack:
+        return AppTheme.successSurface;
+      case StatisticBudgetStatus.warning:
+        return AppTheme.amberSurface;
+      case StatisticBudgetStatus.exceeded:
+        return AppTheme.dangerSurface;
+      case StatisticBudgetStatus.noLimit:
+        return AppTheme.primaryLight;
     }
   }
 }
 
 class _NoLimitCard extends StatelessWidget {
-  const _NoLimitCard({
-    required this.onSetupLimit,
-  });
+  const _NoLimitCard({required this.onSetupLimit});
 
   final VoidCallback onSetupLimit;
 
@@ -246,8 +239,7 @@ class _NoLimitCard extends StatelessWidget {
         children: [
           Text(
             context.l10n.statisticBudgetNoLimitTitle,
-            style: TextStyle(
-              fontSize: 20.r,
+            style: context.typo.title.medium.copyWith(
               fontWeight: FontWeight.w800,
               color: AppTheme.primaryDark,
             ),
@@ -255,8 +247,7 @@ class _NoLimitCard extends StatelessWidget {
           SizedBox(height: 8.h),
           Text(
             context.l10n.statisticBudgetNoLimitDescription,
-            style: TextStyle(
-              fontSize: 13.r,
+            style: context.typo.body.small.copyWith(
               height: 1.5,
               color: AppTheme.primaryDark,
             ),
@@ -273,54 +264,11 @@ class _NoLimitCard extends StatelessWidget {
             ),
             child: Text(
               context.l10n.homeStudentSetMonthlyLimit,
-              style: TextStyle(
-                fontSize: 14.r,
-                fontWeight: FontWeight.w700,
-              ),
+              style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BudgetMetric extends StatelessWidget {
-  const _BudgetMetric({
-    required this.label,
-    required this.value,
-    this.alignEnd = false,
-  });
-
-  final String label;
-  final String value;
-  final bool alignEnd;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 9.r,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.8,
-            color: Colors.white.withValues(alpha: 0.64),
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14.r,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }

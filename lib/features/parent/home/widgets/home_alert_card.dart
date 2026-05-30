@@ -50,8 +50,7 @@ class HomeAlertCard extends StatelessWidget {
                   children: [
                     Text(
                       context.l10n.homeParAlertWeeklyLimitTitle,
-                      style: TextStyle(
-                        fontSize: 15.sp,
+                      style: context.typo.body.big.copyWith(
                         fontWeight: FontWeight.w500,
                         color: isDark ? Colors.white : AppTheme.textBlack,
                       ),
@@ -59,8 +58,7 @@ class HomeAlertCard extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       context.l10n.homeParAlertWeeklyLimitBody,
-                      style: TextStyle(
-                        fontSize: 13.sp,
+                      style: context.typo.body.small.copyWith(
                         color: AppTheme.textGrey,
                       ),
                     ),

@@ -60,22 +60,20 @@ class ParentSpendingSummaryCard extends StatelessWidget {
               SizedBox(width: 12.w),
               Text(
                 s.parentStatisticTotalSpentTitle,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: mutedColor,
-                ),
+                style: context.typo.body.medium.copyWith(
+                fontWeight: FontWeight.w500,
+                color: mutedColor,
+              ),
               ),
             ],
           ),
           SizedBox(height: 16.h),
           Text(
             totalAmountLabel,
-            style: TextStyle(
-              fontSize: 32.sp,
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
+            style: context.typo.display.medium.copyWith(
+            fontWeight: FontWeight.w700,
+            color: textColor,
+          ),
           ),
           SizedBox(height: 8.h),
           _TrendBadge(
@@ -113,19 +111,19 @@ class _TrendBadge extends StatelessWidget {
 
     switch (trendDirection) {
       case StatisticTrendDirection.up:
-        badgeColor = const Color(0xFFFFEEEE);
-        textColor = const Color(0xFFE53E3E);
+        badgeColor = AppTheme.dangerSurface;
+        textColor = AppTheme.redAlert;
         label = s.parentStatisticSpendingUp(percentChange.toStringAsFixed(1));
       case StatisticTrendDirection.down:
-        badgeColor = const Color(0xFFEEFFF4);
-        textColor = const Color(0xFF22C55E);
+        badgeColor = AppTheme.successSurface;
+        textColor = AppTheme.chartGreen;
         label = s.parentStatisticSpendingDown(
           percentChange.abs().toStringAsFixed(1),
         );
       case StatisticTrendDirection.stable:
       case StatisticTrendDirection.none:
-        badgeColor = isDark ? AppTheme.backgroundDark : const Color(0xFFF4F4F5);
-        textColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+        badgeColor = isDark ? AppTheme.backgroundDark : AppTheme.surfaceGrey;
+        textColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
         label = s.parentStatisticSpendingStable;
     }
 
@@ -139,8 +137,7 @@ class _TrendBadge extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 12.sp,
+            style: context.typo.caption.big.copyWith(
               fontWeight: FontWeight.w600,
               color: textColor,
             ),
@@ -149,10 +146,9 @@ class _TrendBadge extends StatelessWidget {
         SizedBox(width: 6.w),
         Text(
           vsLabel,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey,
-          ),
+          style: context.typo.caption.big.copyWith(
+          color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+        ),
         ),
       ],
     );

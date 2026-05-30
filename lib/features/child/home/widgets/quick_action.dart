@@ -1,73 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class QuickAction extends StatelessWidget {
   const QuickAction({
     super.key,
-    required this.icon,
-    required this.label,
-    required this.color,
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
     required this.isDark,
-    required this.circleSize,
-    required this.iconSize,
-    required this.labelFontSize,
     this.onTap,
   });
 
-  final IconData icon;
-  final String label;
-  final MaterialColor color;
+  final String emoji;
+  final String title;
+  final String subtitle;
   final bool isDark;
-  final double circleSize;
-  final double iconSize;
-  final double labelFontSize;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Material(
-          color: Colors.transparent,
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: Ink(
-              width: circleSize,
-              height: circleSize,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        constraints: BoxConstraints(minHeight: 72.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppTheme.surfaceDark.withValues(alpha: 0.84)
+              : Colors.white.withValues(alpha: 0.84),
+          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.16)),
+          borderRadius: BorderRadius.circular(24.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: 0.07),
+              blurRadius: 28.r,
+              offset: Offset(0, 12.h),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42.r,
+              height: 42.r,
               decoration: BoxDecoration(
-                color: isDark
-                    ? color.shade900.withValues(alpha: 0.3)
-                    : color.shade100,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(16.r),
+                color: Color.lerp(Colors.white, AppTheme.primary, 0.10),
+                border: Border.all(
+                  color: Color.lerp(Colors.white, AppTheme.primary, 0.18)!,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: isDark ? color.shade400 : color.shade600,
-                size: iconSize,
+              child: Center(
+                child: Text(emoji, style: TextStyle(fontSize: 18.sp)),
               ),
             ),
-          ),
-        ),
-        SizedBox(height: 10.h),
-        SizedBox(
-          width: double.infinity,
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: labelFontSize,
-              fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.typo.button.small.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.typo.label.small.copyWith(
+                      color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+                      height: 1.25,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

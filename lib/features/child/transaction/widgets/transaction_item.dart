@@ -1,121 +1,281 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/l10n/app_localizations.dart';
+import 'package:monikid/models/entities/transaction_model.dart';
 
 class TransactionItem extends StatelessWidget {
-  final TransactionModel transaction;
-  final VoidCallback onTap;
-
   const TransactionItem({
-    Key? key,
+    super.key,
     required this.transaction,
     required this.onTap,
-  }) : super(key: key);
+  });
+
+  final TransactionModel transaction;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isExpense = transaction.type == 'expense';
+    final style = _catStyleFor(transaction.categoryKey);
+    final emoji = transaction.categoryIcon ?? (isExpense ? '🛍️' : '💸');
+    final title = (transaction.note?.isNotEmpty ?? false)
+        ? transaction.note!
+        : transaction.categoryLabel;
+    final amountStr =
+        '${isExpense ? '-' : '+'}${CurrencyFormatter.format(transaction.amountMinor.toDouble())}';
 
-    // Format currency and date
-    final formattedAmount = CurrencyFormatter.format(transaction.amount);
-    final formattedDate = DateFormat(
-      'dd MMM yyyy, HH:mm',
-    ).format(transaction.date);
-
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 10.h),
         decoration: BoxDecoration(
-          color: isDark ? AppTheme.surfaceDark : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isDark
+              ? AppTheme.surfaceDark.withValues(alpha: 0.88)
+              : Colors.white.withValues(alpha: 0.88),
+          border: Border.all(
+            color: isDark
+                ? AppTheme.borderDark
+                : AppTheme.primary.withValues(alpha: 0.16),
+          ),
+          borderRadius: BorderRadius.circular(22.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: AppTheme.primary.withValues(alpha: 0.06),
+              blurRadius: 28.r,
+              offset: Offset(0, 12.h),
             ),
           ],
         ),
-        child: Row(
-          children: [
-            // Icon
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: isExpense
-                    ? Colors.redAccent.withValues(alpha: 0.1)
-                    : Colors.green.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  transaction.categoryEmoji ?? (isExpense ? '🍔' : '💰'),
-                  style: const TextStyle(fontSize: 24),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-
-            // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22.r),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Padding(
+              padding: EdgeInsets.all(13.w),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    transaction.category,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppTheme.textWhite : AppTheme.surfaceVariant,
+                  _CategoryIcon(emoji: emoji, style: style),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: _TransactionContent(
+                      title: title,
+                      date: transaction.dateTs,
+                      categoryLabel: transaction.categoryLabel,
+                      isDark: isDark,
+                      s: context.l10n,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  if (transaction.note != null && transaction.note!.isNotEmpty)
-                    Text(
-                      transaction.note!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? AppTheme.textMuted
-                            : AppTheme.textGrey,
-                      ),
-                    ),
-                  const SizedBox(height: 4),
-                  Text(
-                    formattedDate,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark
-                          ? AppTheme.textMuted
-                          : AppTheme.textMuted,
-                    ),
+                  SizedBox(width: 8.w),
+                  _AmountBadge(
+                    amountStr: amountStr,
+                    isExpense: isExpense,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-
-            // Amount
-            Text(
-              isExpense ? '-$formattedAmount' : '+$formattedAmount',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isExpense ? Colors.redAccent : Colors.green,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
+}
+
+class _CategoryIcon extends StatelessWidget {
+  const _CategoryIcon({required this.emoji, required this.style});
+
+  final String emoji;
+  final _CatStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44.r,
+      height: 44.r,
+      decoration: BoxDecoration(
+        color: style.bg,
+        border: Border.all(color: style.border),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Center(
+        child: Text(emoji, style: TextStyle(fontSize: 18.sp)),
+      ),
+    );
+  }
+}
+
+class _TransactionContent extends StatelessWidget {
+  const _TransactionContent({
+    required this.title,
+    required this.date,
+    required this.categoryLabel,
+    required this.isDark,
+    required this.s,
+  });
+
+  final String title;
+  final DateTime date;
+  final String categoryLabel;
+  final bool isDark;
+  final AppLocalizations s;
+
+  @override
+  Widget build(BuildContext context) {
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.typo.body.medium.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.2,
+            color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
+          ),
+        ),
+        SizedBox(height: 4.h),
+        Row(
+          children: [
+            Text(
+              _metaText(date, s),
+              style: context.typo.caption.medium.copyWith(color: mutedColor),
+            ),
+            SizedBox(width: 6.w),
+            Container(
+              width: 4.r,
+              height: 4.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: mutedColor.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(width: 6.w),
+            Flexible(
+              child: Text(
+                categoryLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style:
+                    context.typo.caption.medium.copyWith(color: mutedColor),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AmountBadge extends StatelessWidget {
+  const _AmountBadge({
+    required this.amountStr,
+    required this.isExpense,
+  });
+
+  final String amountStr;
+  final bool isExpense;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          amountStr,
+          style: context.typo.body.medium.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.3,
+            color: isExpense ? AppTheme.redAlert : AppTheme.primary,
+          ),
+        ),
+        SizedBox(height: 5.h),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+          decoration: BoxDecoration(
+            color: AppTheme.primary.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+          child: Text(
+            isExpense ? s.txStatusSuccess : s.txStatusCompleted,
+            style: context.typo.caption.small.copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppTheme.primary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CatStyle {
+  const _CatStyle({required this.bg, required this.border});
+  final Color bg;
+  final Color border;
+}
+
+_CatStyle _catStyleFor(String categoryKey) {
+  final k = categoryKey.toLowerCase();
+  if (k.contains('food') ||
+      k.contains('an_uong') ||
+      k.contains('eat') ||
+      k.contains('drink')) {
+    return const _CatStyle(
+      bg: AppTheme.txCategoryFoodBg,
+      border: AppTheme.txCategoryFoodBorder,
+    );
+  }
+  if (k.contains('school') ||
+      k.contains('hoc_phi') ||
+      k.contains('education') ||
+      k.contains('fee')) {
+    return const _CatStyle(
+      bg: AppTheme.txCategorySchoolBg,
+      border: AppTheme.txCategorySchoolBorder,
+    );
+  }
+  if (k.contains('topup') ||
+      k.contains('nap_tien') ||
+      k.contains('income') ||
+      k.contains('thu_nhap') ||
+      k.contains('deposit')) {
+    return const _CatStyle(
+      bg: AppTheme.txCategoryTopupBg,
+      border: AppTheme.txCategoryTopupBorder,
+    );
+  }
+  if (k.contains('book') ||
+      k.contains('hoc_tap') ||
+      k.contains('learning') ||
+      k.contains('study')) {
+    return const _CatStyle(
+      bg: AppTheme.txCategoryBookBg,
+      border: AppTheme.txCategoryBookBorder,
+    );
+  }
+  return const _CatStyle(
+    bg: AppTheme.txCategoryOtherBg,
+    border: AppTheme.txCategoryOtherBorder,
+  );
+}
+
+String _metaText(DateTime date, AppLocalizations s) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final txDay = DateTime(date.year, date.month, date.day);
+  final time = DateFormat('HH:mm').format(date);
+  if (txDay == today) return '$time · ${s.dateToday}';
+  final yesterday = today.subtract(const Duration(days: 1));
+  if (txDay == yesterday) return '${s.dateYesterday} · $time';
+  return '${DateFormat('dd MMM').format(date)} · $time';
 }

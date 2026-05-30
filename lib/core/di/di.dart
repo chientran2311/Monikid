@@ -3,12 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/service/ai_analysis_service.dart';
+import 'package:monikid/core/service/local_notification_service.dart';
 import 'package:monikid/core/service/ai_provider_resolver.dart';
 import 'package:monikid/core/service/gemini_ai_analysis_service.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
 import 'package:monikid/core/service/local_gemma_ai_analysis_service.dart';
-import 'package:monikid/core/service/notification_service.dart';
-import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository_impl.dart';
 import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
@@ -21,7 +20,6 @@ import 'package:monikid/repositories/category/category_repository.dart';
 import 'package:monikid/repositories/category/custom_category_repository.dart';
 import 'package:monikid/repositories/fqa/fqa_repository.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
-import 'package:monikid/repositories/request_money/request_money_repository.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';
 import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
@@ -47,6 +45,11 @@ Future<void> setupLocator() async {
     () => FirebaseFirestore.instance,
   );
   getIt.registerLazySingleton<Logger>(() => Logger());
+
+  // Register notification service
+  getIt.registerLazySingleton<LocalNotificationService>(
+    () => LocalNotificationService(getIt<Logger>()),
+  );
 
   // Register AI Service
   getIt.registerLazySingleton<GeminiAiService>(
@@ -127,9 +130,6 @@ getIt.registerLazySingleton<PinCodeRepository>(
     () => ProfileRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
-  getIt.registerLazySingleton<RequestMoneyRepository>(
-    () => RequestMoneyRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
-  );
 
   getIt.registerLazySingleton<SetMoneyLimitRepository>(
     () => FirestoreSpendingLimitRepositoryImpl(
@@ -158,20 +158,6 @@ getIt.registerLazySingleton<PinCodeRepository>(
     ),
   );
 
-  getIt.registerLazySingleton<NotificationRepository>(
-    () => NotificationRepositoryImpl(
-      getIt<FirebaseFirestore>(),
-      getIt<Logger>(),
-    ),
-  );
-
-  getIt.registerLazySingleton<NotificationService>(
-    () => NotificationService(
-      getIt<NotificationRepository>(),
-      getIt<FirebaseFirestore>(),
-      getIt<Logger>(),
-    ),
-  );
 }
 
 Future<void> configureDependencies() => setupLocator();

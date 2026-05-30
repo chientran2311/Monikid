@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class EmptyTransactionState extends StatelessWidget {
   final bool isDark;
@@ -24,8 +25,7 @@ class EmptyTransactionState extends StatelessWidget {
           Text(
             'Không có giao dịch nào.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
+            style: context.typo.body.medium.copyWith(
               color: isDark ? AppTheme.textWhite.withValues(alpha: 0.54) : AppTheme.textMuted,
             ),
           ),

@@ -15,7 +15,6 @@ class ParentBottomNavBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentIndex = useState(0);
@@ -76,8 +75,7 @@ class ParentBottomNavBar extends HookConsumerWidget {
                             SizedBox(height: 3.h),
                             Text(
                               navItems[i].$2,
-                              style: TextStyle(
-                                fontSize: 10.sp,
+                              style: context.typo.caption.small.copyWith(
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.w400,

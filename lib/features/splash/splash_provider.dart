@@ -2,13 +2,15 @@ import 'package:logger/logger.dart';
 import 'package:monikid/core/config/storage_keys.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/storage/local_storage.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/features/auth/providers/auth_session_state.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'splash_state.dart';
 
 part 'splash_provider.g.dart';
+
+const _devForceOnboarding = false;
 
 @Riverpod(keepAlive: true)
 class SplashNotifier extends _$SplashNotifier {
@@ -38,14 +40,31 @@ class SplashNotifier extends _$SplashNotifier {
       state = state.copyWith(loadingProgress: 25);
       await Future.delayed(const Duration(milliseconds: 300));
 
-      final hasSignedInBefore =
-          await _localStorage.readBool(StorageKeys.hasSignedInBefore) ?? false;
-
-      if (!hasSignedInBefore) {
+      // DEV: Force onboarding for UI testing — remove this block to restore normal flow.
+      if (_devForceOnboarding) {
         state = state.copyWith(
           isLoading: false,
           loadingProgress: 100,
-          routeTarget: SplashRouteTarget.login,
+          routeTarget: SplashRouteTarget.onboarding,
+        );
+        return;
+      }
+
+      final hasSignedInBefore =
+          await _localStorage.readBool(StorageKeys.hasSignedInBefore) ?? false;
+
+      // Normal flow: show onboarding for first-time users if not yet completed.
+      // DEV: isOnboardingComplete check is commented out — restore when onboarding UI is finalized.
+      if (!hasSignedInBefore) {
+        // final isComplete = await _onboardingRepository.isOnboardingComplete();
+        // if (isComplete) {
+        //   state = state.copyWith(isLoading: false, loadingProgress: 100, routeTarget: SplashRouteTarget.login);
+        //   return;
+        // }
+        state = state.copyWith(
+          isLoading: false,
+          loadingProgress: 100,
+          routeTarget: SplashRouteTarget.onboarding,
         );
         return;
       }

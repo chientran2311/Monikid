@@ -23,6 +23,25 @@ final linkedFamilyProvider = AutoDisposeFutureProvider<FamilyModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LinkedFamilyRef = AutoDisposeFutureProviderRef<FamilyModel?>;
+String _$familyMembersHash() => r'ef7acef4a93bd55385852031e036741d2561ba86';
+
+/// See also [familyMembers].
+@ProviderFor(familyMembers)
+final familyMembersProvider =
+    AutoDisposeStreamProvider<List<FamilyMemberModel>>.internal(
+      familyMembers,
+      name: r'familyMembersProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$familyMembersHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FamilyMembersRef =
+    AutoDisposeStreamProviderRef<List<FamilyMemberModel>>;
 String _$joinFamilyNotifierHash() =>
     r'a2f08985424487fbafc4d0f54199638fd6a4bb78';
 

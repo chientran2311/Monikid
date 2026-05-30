@@ -6,6 +6,7 @@
 /// - Compile-time safety (typos caught early)
 /// - Easy refactoring if paths change
 /// - IDE autocomplete support
+library;
 
 
 // =============================================================================

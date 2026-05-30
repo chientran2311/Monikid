@@ -51,7 +51,7 @@ Widget _shimmerBox({
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
         borderRadius: BorderRadius.circular(radius),
       ),
     ),
@@ -73,7 +73,7 @@ class TransactionItemSkeleton extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? AppTheme.surfaceVariant : Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -85,8 +85,8 @@ class TransactionItemSkeleton extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF334155)
-                    : const Color(0xFFE2E8F0),
+                    ? AppTheme.borderDark
+                    : AppTheme.borderLight,
                 shape: BoxShape.circle,
               ),
             ),
@@ -112,68 +112,3 @@ class TransactionItemSkeleton extends StatelessWidget {
   }
 }
 
-// =============================================================================
-// FULL PAGE SKELETON
-// =============================================================================
-
-/// Full-page skeleton shown on initial load
-class TransactionHistorySkeleton extends StatelessWidget {
-  final bool isDark;
-  const TransactionHistorySkeleton({super.key, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    final shimmerCardColor = isDark
-        ? const Color(0xFF1E3A2F)
-        : AppTheme.primary.withValues(alpha: 0.12);
-
-    return CustomScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      slivers: [
-        // Summary card skeleton
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: _Shimmer(
-              child: Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: shimmerCardColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Date group + 5 item skeletons × 2 groups
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, groupIndex) => Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Date header row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _shimmerBox(isDark: isDark, width: 96, height: 10),
-                      _shimmerBox(isDark: isDark, width: 64, height: 10),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // 3 transaction item skeletons per group
-                  ...List.generate(
-                    3,
-                    (_) => TransactionItemSkeleton(isDark: isDark),
-                  ),
-                ],
-              ),
-            ),
-            childCount: 2,
-          ),
-        ),
-      ],
-    );
-  }
-}

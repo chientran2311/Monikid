@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_skeleton.dart';
 
 class LoadMoreIndicator extends StatelessWidget {
@@ -35,8 +36,7 @@ class LoadMoreIndicator extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
             'Đã hiển thị tất cả giao dịch',
-            style: TextStyle(
-              fontSize: 12,
+            style: context.typo.caption.big.copyWith(
               color: isDark ? Colors.white38 : Colors.black26,
             ),
           ),

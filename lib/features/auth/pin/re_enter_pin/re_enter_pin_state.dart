@@ -15,12 +15,12 @@ abstract class ReEnterPINState with _$ReEnterPINState {
   const factory ReEnterPINState({
     @Default('') String currentPin,
     @Default(ReEnterPINCodeStatus.initial) ReEnterPINCodeStatus status,
-    @Default(false) bool isLoading,
     String? errorMessage,
   }) = _ReEnterPINState;
 
   const ReEnterPINState._();
 
+  bool get isLoading => status == ReEnterPINCodeStatus.loading;
   bool get isSuccess => status == ReEnterPINCodeStatus.success;
   bool get hasError =>
       status == ReEnterPINCodeStatus.mismatch ||

@@ -22,7 +22,7 @@ class ParentTransactionDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final isEdited = transaction.updatedAt != null &&
         transaction.createdAt != null &&
         transaction.updatedAt!.isAfter(transaction.createdAt!);
@@ -48,11 +48,10 @@ class ParentTransactionDetailCard extends StatelessWidget {
                 ),
                 child: Text(
                   context.l10n.homeParTransactionTagEdited,
-                  style: TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: context.typo.caption.small.copyWith(
+                  color: AppTheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
                 ),
               ),
             ),
@@ -61,21 +60,20 @@ class ParentTransactionDetailCard extends StatelessWidget {
             children: [
               Text(
                 transaction.categoryIcon ?? '💸',
-                style: TextStyle(fontSize: 42.sp),
+                style: context.typo.display.big,
               ),
               SizedBox(height: 12.h),
               Text(
                 CurrencyFormatter.format(transaction.amountMinor),
-                style: TextStyle(
+                style: context.typo.display.small.copyWith(
                   color: textColor,
-                  fontSize: 28.sp,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               SizedBox(height: 8.h),
               Text(
                 transaction.categoryLabel,
-                style: TextStyle(color: mutedColor, fontSize: 14.sp),
+                style: context.typo.body.medium.copyWith(color: mutedColor),
               ),
               SizedBox(height: 24.h),
               TransactionDetailInfoRow(

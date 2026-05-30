@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_item.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -25,7 +26,7 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textColor = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
-        : const Color(0xFF0F172A);
+        : AppTheme.surfaceVeryDark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,8 +36,7 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 18,
+              style: context.typo.subtitle.medium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: textColor,
               ),
@@ -45,8 +45,7 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
               onTap: () => context.push(AppRoutes.transactionHistory),
               child: Text(
                 viewAllLabel,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: context.typo.body.medium.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppTheme.primary,
                 ),

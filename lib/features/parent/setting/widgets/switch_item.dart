@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/shared/widgets/app_ios_switch.dart';
 
@@ -54,11 +55,10 @@ class SwitchItem extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-              ),
+              style: context.typo.subtitle.small.copyWith(
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
             ),
           ),
           AppIosSwitch(

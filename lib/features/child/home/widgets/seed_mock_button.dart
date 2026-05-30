@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/home/home_tab_provider.dart';
 import 'package:monikid/mock_up/transaction/mock_transaction_seeder.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
@@ -55,16 +56,16 @@ class SeedMockButton extends HookConsumerWidget {
     return Column(
       children: [
         PrimaryButton(
-          text: 'Seed Transactions',
+          title: 'Seed Transactions',
           isLoading: isSeeding.value,
-          onPressed: () => handleSeed(),
+          onTap: () => handleSeed(),
         ),
         if (resultMessage.value != null) ...[
           const SizedBox(height: 8),
           Text(
             resultMessage.value!,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12),
+            style: context.typo.caption.big,
           ),
         ],
       ],

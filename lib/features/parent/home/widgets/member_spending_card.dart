@@ -77,7 +77,7 @@ class MemberSpendingCard extends StatelessWidget {
                         label: s.homeParMonthlyExpense,
                         amount: _formatAmount(expenseMinor),
                         icon: Icons.arrow_downward_rounded,
-                        iconBgColor: const Color(0xFFFFE5E5),
+                        iconBgColor: AppTheme.dangerSurface,
                         iconColor: AppTheme.redAlert,
                         textColor: textColor,
                         mutedColor: mutedColor,
@@ -90,8 +90,8 @@ class MemberSpendingCard extends StatelessWidget {
                         label: s.homeParMonthlyIncome,
                         amount: _formatAmount(incomeMinor),
                         icon: Icons.arrow_upward_rounded,
-                        iconBgColor: const Color(0xFFE6F7ED),
-                        iconColor: const Color(0xFF10B981),
+                        iconBgColor: AppTheme.successSurface,
+                        iconColor: AppTheme.greenBright,
                         textColor: textColor,
                         mutedColor: mutedColor,
                       ),
@@ -111,10 +111,7 @@ class MemberSpendingCard extends StatelessWidget {
                           .clamp(0, 999)
                           .toStringAsFixed(1),
                     ),
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: mutedColor,
-                    ),
+                    style: context.typo.caption.big.copyWith(color: mutedColor),
                   ),
                 ],
               ],
@@ -146,8 +143,7 @@ class _CardHeader extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 15.sp,
+          style: context.typo.body.big.copyWith(
             fontWeight: FontWeight.w700,
             color: textColor,
           ),
@@ -161,8 +157,7 @@ class _CardHeader extends StatelessWidget {
             children: [
               Text(
                 actionLabel,
-                style: TextStyle(
-                  fontSize: 13.sp,
+                style: context.typo.body.small.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppTheme.primary,
                 ),
@@ -221,22 +216,19 @@ class _MetricColumn extends StatelessWidget {
             SizedBox(width: 8.w),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: mutedColor,
-                fontWeight: FontWeight.w500,
-              ),
+              style: context.typo.body.small.copyWith(
+              fontWeight: FontWeight.w500,
+              color: mutedColor,
+            ),
             ),
           ],
         ),
         SizedBox(height: 8.h),
         Text(
           amount,
-          style: TextStyle(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w700,
-            color: textColor,
-          ),
+          style: context.typo.title.medium.copyWith(
+          color: textColor,
+        ),
         ),
       ],
     );
@@ -270,7 +262,7 @@ class _SpendingProgressBar extends StatelessWidget {
             if (ratio < 1.0)
               Expanded(
                 flex: ((1.0 - ratio) * 1000).toInt(),
-                child: Container(color: const Color(0xFF10B981)),
+                child: Container(color: AppTheme.greenBright),
               ),
           ],
         ),

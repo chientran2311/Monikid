@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';

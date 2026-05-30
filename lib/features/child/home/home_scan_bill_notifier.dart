@@ -142,7 +142,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
 
       TransactionAiResult? aiResult;
       try {
-        aiResult = await service.analyzeReceipt(ocrResult.rawText, categories);
+        aiResult = await service.analyzeReceipt(ocrResult, categories);
       } catch (inferenceError, inferenceStack) {
         _logger.e(
           'scanAndAnalyze: AI service failed, attempting fallback.',
@@ -156,7 +156,7 @@ class HomeScanBillNotifier extends _$HomeScanBillNotifier {
         if (hasApiKey) {
           _logger.i('scanAndAnalyze: retrying via Gemini fallback.');
           aiResult = await _resolver.geminiService
-              .analyzeReceipt(ocrResult.rawText, categories);
+              .analyzeReceipt(ocrResult, categories);
         } else {
           rethrow;
         }

@@ -31,8 +31,7 @@ class ParentTopCategoriesSection extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
           child: Text(
             s.parentStatisticTopCategoriesTitle.toUpperCase(),
-            style: TextStyle(
-              fontSize: 13.sp,
+            style: context.typo.body.small.copyWith(
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
               color: mutedColor,
@@ -82,7 +81,7 @@ class _EmptyState extends StatelessWidget {
     final s = context.l10n;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Container(
       width: double.infinity,
@@ -95,7 +94,7 @@ class _EmptyState extends StatelessWidget {
       child: Text(
         s.parentStatisticNoData,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14.sp, color: mutedColor),
+        style: context.typo.body.medium.copyWith(color: mutedColor),
       ),
     );
   }
@@ -118,7 +117,7 @@ class _CategoryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Column(
       children: [
@@ -138,7 +137,7 @@ class _CategoryRow extends StatelessWidget {
                   child: Center(
                     child: Text(
                       item.categoryIcon ?? '💸',
-                      style: TextStyle(fontSize: 18.sp),
+                      style: context.typo.subtitle.medium,
                     ),
                   ),
                 ),
@@ -149,8 +148,7 @@ class _CategoryRow extends StatelessWidget {
                     children: [
                       Text(
                         item.categoryLabel,
-                        style: TextStyle(
-                          fontSize: 14.sp,
+                        style: context.typo.body.medium.copyWith(
                           fontWeight: FontWeight.w600,
                           color: textColor,
                         ),
@@ -160,8 +158,7 @@ class _CategoryRow extends StatelessWidget {
                         context.l10n.parentStatisticTransactionCount(
                           item.transactionCount,
                         ),
-                        style: TextStyle(
-                          fontSize: 12.sp,
+                        style: context.typo.caption.big.copyWith(
                           color: mutedColor,
                         ),
                       ),
@@ -170,13 +167,12 @@ class _CategoryRow extends StatelessWidget {
                 ),
                 Text(
                   context.formatStatisticCurrency(item.amountMinor),
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
+                  style: context.typo.body.medium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
                 ),
-                SizedBox(width: 8.w),
+              ),
+              SizedBox(width: 8.w),
                 Icon(Icons.chevron_right_rounded,
                     size: 20.r, color: mutedColor),
               ],

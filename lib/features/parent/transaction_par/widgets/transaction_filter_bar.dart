@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
@@ -163,11 +164,10 @@ class _MonthPickerChip extends StatelessWidget {
               selectedDate == null
                   ? 'Chọn ngày'
                   : DateFormat('dd/MM/yyyy').format(selectedDate!),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
-              ),
+              style: context.typo.body.medium.copyWith(
+              fontWeight: FontWeight.w500,
+              color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
+            ),
             ),
             if (selectedDate != null) ...[
               const SizedBox(width: 4),
@@ -269,16 +269,15 @@ class _ActiveCategoryChip extends StatelessWidget {
                     orElse: () => const CategoryModel(id: '', label: '', icon: '📦'),
                   )
                   .icon,
-              style: const TextStyle(fontSize: 13),
+              style: context.typo.body.small,
             ),
             const SizedBox(width: 4),
             Text(
               selectedCategoryModel?.label ?? selectedCategory,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppTheme.textWhite,
-                fontWeight: FontWeight.w500,
-              ),
+              style: context.typo.caption.big.copyWith(
+              color: AppTheme.textWhite,
+              fontWeight: FontWeight.w500,
+            ),
             ),
             const SizedBox(width: 4),
             const Icon(Icons.close, size: 14, color: AppTheme.textWhite),

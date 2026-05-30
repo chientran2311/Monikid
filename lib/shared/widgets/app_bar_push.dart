@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 /// Custom AppBar with back button and title
 /// Used for screens that need navigation back functionality
@@ -37,9 +38,8 @@ class AppBarPush extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+        style: context.typo.subtitle.medium.copyWith(
+          fontWeight: FontWeight.w700,
           color: textColor,
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class FQAContactSupportCard extends StatelessWidget {
   const FQAContactSupportCard({required this.isDark, super.key});
@@ -31,21 +32,13 @@ class FQAContactSupportCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             s.helpStillNeedHelp, // "Vẫn cần trợ giúp?"
-            style: TextStyle(
-              color: isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            style: context.typo.button.medium.copyWith(color: isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark),
           ),
           const SizedBox(height: 8),
           Text(
             s.helpContactSupportDesc, // "Nếu bạn không tìm thấy câu trả lời, hãy liên hệ..."
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color:
-                  isDark ? AppTheme.textMuted : AppTheme.textDark,
-              fontSize: 14,
-            ),
+            style: context.typo.body.medium.copyWith(color: isDark ? AppTheme.textMuted : AppTheme.textDark),
           ),
           const SizedBox(height: 16),
           SizedBox(

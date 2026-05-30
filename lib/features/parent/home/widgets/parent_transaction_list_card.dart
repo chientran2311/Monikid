@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/home/widgets/home_transaction_row.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -53,7 +54,7 @@ class ParentTransactionListCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       emptyLabel,
-                      style: TextStyle(color: mutedColor, fontSize: 14.sp),
+                      style: context.typo.body.medium.copyWith(color: mutedColor),
                     ),
                   ),
                 )

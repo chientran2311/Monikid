@@ -6,6 +6,7 @@ import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/choose_ai_model/choose_ai_model_provider.dart';
 import 'package:monikid/features/child/choose_ai_model/choose_ai_model_state.dart';
+import 'package:monikid/features/child/choose_ai_model/widget/ai_model_hero_card.dart';
 import 'package:monikid/features/child/choose_ai_model/widget/gemini_section_card.dart';
 import 'package:monikid/features/child/choose_ai_model/widget/gemma_section_card.dart';
 import 'package:monikid/shared/widgets/loading_screen.dart';
@@ -15,14 +16,13 @@ class ChooseAiModelScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
-    // Group 3: snackbars for API key save result
     ref.listen(chooseAiModelNotifierProvider, (previous, next) {
       final prev = previous?.valueOrNull;
       final curr = next.valueOrNull;
@@ -51,30 +51,38 @@ class ChooseAiModelScreen extends ConsumerWidget {
           appBar: AppBar(
             backgroundColor: bgColor,
             elevation: 0,
-            leading: IconButton(
-              onPressed: () => context.pop(),
-              icon: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: textColor,
-                size: 20.r,
+            leading: Container(
+              margin: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: borderColor, width: 1),
+              ),
+              child: IconButton(
+                onPressed: () => context.pop(),
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: textColor,
+                  size: 16.r,
+                ),
+                padding: EdgeInsets.zero,
               ),
             ),
             title: Text(
               s.chooseAiModelTitle,
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w600,
+              style: context.typo.subtitle.small.copyWith(
                 color: textColor,
+                fontWeight: FontWeight.w700,
               ),
             ),
             centerTitle: true,
           ),
           body: ListView(
-            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 40.h),
+            padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 28.h),
             children: [
-              SizedBox(height: 24.h),
+              AiModelHeroCard(isDark: isDark),
+              SizedBox(height: 14.h),
               GeminiSectionCard(isDark: isDark),
-              SizedBox(height: 24.h),
+              SizedBox(height: 14.h),
               GemmaSectionCard(
                 gemmaStatus:
                     state?.gemmaStatus ?? GemmaDownloadStatus.readyToDownload,
@@ -87,6 +95,16 @@ class ChooseAiModelScreen extends ConsumerWidget {
                 onCancel: notifier.cancelModelDownload,
                 onDelete: notifier.deleteLocalModel,
                 onToggleLocalModel: notifier.toggleLocalModel,
+              ),
+              SizedBox(height: 24.h),
+              Text(
+                s.aiModelFooterNote,
+                textAlign: TextAlign.center,
+                style: context.typo.body.small.copyWith(
+                  color: mutedColor,
+                  height: 1.45,
+                  fontSize: 12.sp,
+                ),
               ),
             ],
           ),

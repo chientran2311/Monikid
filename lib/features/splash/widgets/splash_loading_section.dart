@@ -90,7 +90,7 @@ class SplashLoadingSection extends StatelessWidget {
           Text(
             'PhiÃªn báº£n 1.0.2',
             style: context.typo.caption.small.copyWith(
-              color: const Color(0xFF94A3B8),
+              color: AppTheme.textMuted,
             ),
           ),
         ],

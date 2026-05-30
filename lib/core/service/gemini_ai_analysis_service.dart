@@ -4,6 +4,7 @@ import 'package:monikid/core/service/ai_analysis_service.dart';
 import 'package:monikid/core/service/gemini_ai_service.dart';
 import 'package:monikid/core/storage/local_storage.dart';
 import 'package:monikid/models/ai/receipt_scan/receipt_category_option.dart';
+import 'package:monikid/models/ai/receipt_scan/receipt_ocr_result.dart';
 import 'package:monikid/models/ai/transaction_ai_result.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/ai/prompt_util.dart';
@@ -23,7 +24,7 @@ class GeminiAiAnalysisService implements AiAnalysisService {
 
   @override
   Future<TransactionAiResult?> analyzeReceipt(
-    String ocrText,
+    ReceiptOcrResult ocrResult,
     List<CategoryModel> categories,
   ) async {
     final selectedModel =
@@ -35,7 +36,7 @@ class GeminiAiAnalysisService implements AiAnalysisService {
         .toList(growable: false);
 
     final prompt = buildReceiptAnalysisPrompt(
-      ocrText: ocrText,
+      ocrResult: ocrResult,
       languageCode: 'vi',
       categories: categoryOptions,
     );

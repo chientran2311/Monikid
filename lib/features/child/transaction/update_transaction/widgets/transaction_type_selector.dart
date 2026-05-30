@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 
 class TransactionTypeSelector extends StatelessWidget {
@@ -30,8 +31,8 @@ class TransactionTypeSelector extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? const Color(0xFF1E293B)
-              : const Color(0xFFE2E8F0),
+              ? AppTheme.surfaceVariant
+              : AppTheme.borderLight,
         ),
       ),
       child: Row(
@@ -88,21 +89,20 @@ class _TypeTab extends StatelessWidget {
             color: isSelected
                 ? (type == TransactionType.expense
                       ? AppTheme.redAlert
-                      : Colors.green)
+                      : AppTheme.chartGreen)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           alignment: Alignment.center,
           child: Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
+            style: context.typo.body.medium.copyWith(
               fontWeight: FontWeight.w600,
               color: isSelected
                   ? Colors.white
                   : (isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B)),
+                        ? AppTheme.textMuted
+                        : AppTheme.textGrey),
             ),
           ),
         ),

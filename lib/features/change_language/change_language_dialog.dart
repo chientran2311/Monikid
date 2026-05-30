@@ -3,177 +3,278 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
 
 class ChangeLanguageDialog extends ConsumerWidget {
-  const ChangeLanguageDialog({Key? key}) : super(key: key);
+  const ChangeLanguageDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark;
+    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
 
-    // Defaultly hardcoding 2 supported locales for now.
-    // In a real app, this might be tied to a Riverpod Provider that manages Locale state
     final languages = [
-      {'code': 'vi', 'label': s.vietnamese},
-      {'code': 'en', 'label': s.english},
+      {'code': 'vi', 'label': s.vietnamese, 'subtitle': s.languageVietnameseSubtitle},
+      {'code': 'en', 'label': s.english, 'subtitle': s.languageEnglishSubtitle},
     ];
-    // Current locale from Riverpod Provider
     final currentLocaleCode = ref.watch(changeLanguageProvider).localeCode;
 
     return Container(
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(32.r),
+          topRight: Radius.circular(32.r),
         ),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // iOS Style Handle
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                height: 6,
-                width: 48,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppTheme.borderDark
-                      : AppTheme.borderLight,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    s.language,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(
-                      Icons.close,
-                      color: isDark
-                          ? AppTheme.textMuted
-                          : AppTheme.textGrey,
-                    ),
-                    splashRadius: 24,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ),
-
-            const Divider(height: 1),
-
-            // Language List
+            _DialogHeader(isDark: isDark, onDone: () => context.pop()),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 18.h),
                 child: Column(
                   children: languages.map((lang) {
                     final isSelected = currentLocaleCode == lang['code'];
-                    return GestureDetector(
+                    return _LanguageOption(
+                      label: lang['label']!,
+                      subtitle: lang['subtitle']!,
+                      isSelected: isSelected,
+                      isDark: isDark,
                       onTap: () async {
-                        await ref.read(changeLanguageProvider.notifier).setLanguage(lang['code']!);
-                        if (context.mounted) {
-                          context.pop(lang['code']);
-                        }
+                        await ref
+                            .read(changeLanguageProvider.notifier)
+                            .setLanguage(lang['code']!);
+                        if (context.mounted) context.pop(lang['code']);
                       },
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isSelected
-                                ? Theme.of(context).primaryColor
-                                : isDark
-                                  ? AppTheme.borderDark
-                                  : AppTheme.borderLight,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              lang['label']!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? Theme.of(context).primaryColor
-                                    : textColor,
-                              ),
-                            ),
-                            if (isSelected)
-                              Icon(
-                                Icons.check_circle,
-                                color: Theme.of(context).primaryColor,
-                                size: 24,
-                              )
-                            else 
-                              Icon(
-                                Icons.circle_outlined,
-                                color: isDark
-                                  ? AppTheme.textGrey
-                                  : AppTheme.textMuted,
-                                size: 24,
-                              ),
-                          ],
-                        ),
-                      ),
                     );
                   }).toList(),
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            // Footer Action
-            Padding(
-              padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-              child: ElevatedButton(
-                onPressed: () => context.pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark
-                      ? AppTheme.borderDark
-                      : AppTheme.surfaceVeryDark,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  s.close,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+class _DialogHeader extends StatelessWidget {
+  const _DialogHeader({required this.isDark, required this.onDone});
+
+  final bool isDark;
+  final VoidCallback onDone;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(22.w, 22.h, 22.w, 16.h),
+          child: Row(
+            children: [
+              const Spacer(),
+              Text(
+                s.language,
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppTheme.textWhite : AppTheme.primaryDark,
+                  letterSpacing: -0.4,
                 ),
               ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: _DoneChip(isDark: isDark, onTap: onDone),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Divider(
+          height: 1,
+          color: isDark
+              ? AppTheme.borderDark
+              : AppTheme.primary.withValues(alpha: 0.10),
+        ),
+      ],
+    );
+  }
+}
+
+class _DoneChip extends StatelessWidget {
+  const _DoneChip({required this.isDark, required this.onTap});
+
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppTheme.primary.withValues(alpha: 0.15)
+              : AppTheme.primaryLight,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: AppTheme.primary.withValues(alpha: 0.15),
+            width: 1,
+          ),
+        ),
+        child: Text(
+          s.actionDone,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.primary,
+            letterSpacing: 0.1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  const _LanguageOption({
+    required this.label,
+    required this.subtitle,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  final String label;
+  final String subtitle;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark
+                  ? AppTheme.primary.withValues(alpha: 0.12)
+                  : AppTheme.primaryLight.withValues(alpha: 0.9))
+              : (isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLight),
+          borderRadius: BorderRadius.circular(22.r),
+          border: Border.all(
+            color: isSelected
+                ? AppTheme.primary.withValues(alpha: 0.35)
+                : (isDark ? AppTheme.borderDark : AppTheme.borderLight),
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected
+                          ? (isDark ? AppTheme.textWhite : AppTheme.primaryDark)
+                          : (isDark
+                              ? AppTheme.textWhite
+                              : AppTheme.surfaceVeryDark),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            SizedBox(width: 12.w),
+            _CheckCircle(isSelected: isSelected),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CheckCircle extends StatelessWidget {
+  const _CheckCircle({required this.isSelected});
+
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      width: 28.r,
+      height: 28.r,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: isSelected
+            ? const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppTheme.primaryButtonGradientTop,
+                  AppTheme.primaryButtonGradientBottom,
+                ],
+              )
+            : null,
+        border: Border.all(
+          color: isSelected
+              ? Colors.transparent
+              : AppTheme.primary.withValues(alpha: 0.25),
+          width: 1.5,
+        ),
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                  color: AppTheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
+      ),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: isSelected ? 1.0 : 0.0,
+        child: Icon(
+          Icons.check_rounded,
+          color: Colors.white,
+          size: 16.r,
         ),
       ),
     );

@@ -1,7 +1,10 @@
 import 'dart:async';
 
-import 'package:monikid/features/auth/pin/domain/pin_security_snapshot.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:logger/logger.dart';
+import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/auth/pin/pin_code_snapshot/pin_security_snapshot.dart';
+import 'package:monikid/features/auth/pin/pin_input_validator.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,12 +14,14 @@ part 'enter_pin_code_provider.g.dart';
 
 @riverpod
 class EnterPINCode extends _$EnterPINCode {
+  late final Logger _logger;
   late final PinCodeRepository _pinCodeRepository;
   Timer? _errorResetTimer;
   Timer? _lockTimer;
 
   @override
   EnterPINCodeState build() {
+    _logger = getIt<Logger>();
     _pinCodeRepository = ref.read(pinCodeRepositoryProvider);
     ref.onDispose(() {
       _errorResetTimer?.cancel();
@@ -34,7 +39,7 @@ class EnterPINCode extends _$EnterPINCode {
   }
 
   Future<void> addNumber(String digit) async {
-    if (state.isLoading || state.isLocked || !_isDigit(digit)) {
+    if (state.isLoading || state.isLocked || !isPinDigit(digit)) {
       return;
     }
 
@@ -84,8 +89,8 @@ class EnterPINCode extends _$EnterPINCode {
   }
 
   Future<void> verifyCurrentPin(String pin) async {
+    _logger.d('EnterPINCode.verifyCurrentPin: start.');
     state = state.copyWith(
-      isLoading: true,
       status: EnterPINCodeStatus.loading,
       errorMessage: null,
     );
@@ -95,7 +100,6 @@ class EnterPINCode extends _$EnterPINCode {
       if (!snapshot.hasPinCode) {
         state = state.copyWith(
           currentPin: '',
-          isLoading: false,
           status: EnterPINCodeStatus.error,
           errorMessage: 'Stored PIN data is missing.',
         );
@@ -113,11 +117,11 @@ class EnterPINCode extends _$EnterPINCode {
       );
 
       if (correct) {
+        _logger.i('EnterPINCode.verifyCurrentPin: success.');
         await _pinCodeRepository.resetPinAttemptState();
         ref.read(authSessionProvider.notifier).markPinVerified();
         state = state.copyWith(
           currentPin: '',
-          isLoading: false,
           failedCount: 0,
           lockedUntil: null,
           remainingLockSeconds: 0,
@@ -135,7 +139,6 @@ class EnterPINCode extends _$EnterPINCode {
 
       state = state.copyWith(
         currentPin: '',
-        isLoading: false,
         failedCount: updatedSnapshot.failedCount,
         lockedUntil: null,
         remainingLockSeconds: 0,
@@ -143,10 +146,14 @@ class EnterPINCode extends _$EnterPINCode {
         errorMessage: null,
       );
       _scheduleResetAfterError();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.e(
+        'EnterPINCode.verifyCurrentPin failed.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
         currentPin: '',
-        isLoading: false,
         status: EnterPINCodeStatus.error,
         errorMessage: 'Failed to verify the PIN code.',
       );
@@ -160,8 +167,8 @@ class EnterPINCode extends _$EnterPINCode {
   }
 
   Future<void> _loadSecuritySnapshot() async {
+    _logger.d('EnterPINCode._loadSecuritySnapshot: start.');
     state = state.copyWith(
-      isLoading: true,
       status: EnterPINCodeStatus.loading,
       errorMessage: null,
     );
@@ -170,7 +177,6 @@ class EnterPINCode extends _$EnterPINCode {
       final snapshot = await _pinCodeRepository.getPinSecuritySnapshot();
       if (!snapshot.hasPinCode) {
         state = state.copyWith(
-          isLoading: false,
           status: EnterPINCodeStatus.error,
           errorMessage: 'Stored PIN data is missing.',
         );
@@ -182,17 +188,23 @@ class EnterPINCode extends _$EnterPINCode {
         return;
       }
 
+      _logger.i(
+        'EnterPINCode._loadSecuritySnapshot: ready. failedCount=${snapshot.failedCount}',
+      );
       state = state.copyWith(
-        isLoading: false,
         status: EnterPINCodeStatus.ready,
         failedCount: snapshot.failedCount,
         lockedUntil: null,
         remainingLockSeconds: 0,
         errorMessage: null,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      _logger.e(
+        'EnterPINCode._loadSecuritySnapshot failed.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       state = state.copyWith(
-        isLoading: false,
         status: EnterPINCodeStatus.error,
         errorMessage: 'Failed to load the PIN security state.',
       );
@@ -206,7 +218,6 @@ class EnterPINCode extends _$EnterPINCode {
     _lockTimer?.cancel();
     state = state.copyWith(
       currentPin: keepCurrentPin ? state.currentPin : '',
-      isLoading: false,
       failedCount: snapshot.failedCount,
       lockedUntil: snapshot.lockedUntil,
       remainingLockSeconds: snapshot.remainingLockSeconds,
@@ -248,9 +259,5 @@ class EnterPINCode extends _$EnterPINCode {
         remainingLockSeconds: ((remainingMilliseconds + 999) / 1000).floor(),
       );
     });
-  }
-
-  bool _isDigit(String value) {
-    return RegExp(r'^\d$').hasMatch(value);
   }
 }

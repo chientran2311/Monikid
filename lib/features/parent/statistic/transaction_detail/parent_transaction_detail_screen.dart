@@ -21,7 +21,6 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
@@ -71,9 +70,8 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
         ),
         title: Text(
           context.l10n.transactionDetailTitle,
-          style: TextStyle(
+          style: context.typo.subtitle.medium.copyWith(
             color: textColor,
-            fontSize: 18.sp,
             fontWeight: FontWeight.w700,
           ),
         ),

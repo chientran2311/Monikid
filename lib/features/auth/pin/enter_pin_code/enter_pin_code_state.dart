@@ -17,7 +17,6 @@ abstract class EnterPINCodeState with _$EnterPINCodeState {
   const factory EnterPINCodeState({
     @Default('') String currentPin,
     @Default(EnterPINCodeStatus.initial) EnterPINCodeStatus status,
-    @Default(false) bool isLoading,
     @Default(0) int failedCount,
     DateTime? lockedUntil,
     @Default(0) int remainingLockSeconds,
@@ -26,9 +25,11 @@ abstract class EnterPINCodeState with _$EnterPINCodeState {
 
   const EnterPINCodeState._();
 
+  bool get isLoading => status == EnterPINCodeStatus.loading;
   bool get isSuccess => status == EnterPINCodeStatus.success;
   bool get hasError =>
       status == EnterPINCodeStatus.incorrect ||
       status == EnterPINCodeStatus.error;
-  bool get isLocked => status == EnterPINCodeStatus.locked && remainingLockSeconds > 0;
+  bool get isLocked =>
+      status == EnterPINCodeStatus.locked && remainingLockSeconds > 0;
 }

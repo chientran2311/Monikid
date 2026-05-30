@@ -2,104 +2,126 @@ import 'package:flutter/material.dart';
 import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class LanguageOptionTile extends StatelessWidget {
   const LanguageOptionTile({
     super.key,
     required this.flag,
     required this.label,
+    required this.description,
     required this.isSelected,
     required this.onPressed,
   });
 
   final String flag;
   final String label;
+  final String description;
   final bool isSelected;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
-    final textColor =
-        isSelected ? Theme.of(context).colorScheme.onSurface : AppTheme.textGrey;
     final borderColor = isSelected
-        ? AppTheme.primary
-        : AppTheme.textWhite.withValues(alpha: 0);
+        ? Color.lerp(AppTheme.primary, Colors.white, 0.45)!
+        : Color.lerp(AppTheme.textBlack, Colors.transparent, 0.82)!;
+    final flagBg = Color.lerp(AppTheme.primary, Colors.white, 0.90)!;
+    final flagBorder = Color.lerp(AppTheme.primary, Colors.white, 0.82)!;
 
-    return Material(
-      color: surfaceColor,
-      borderRadius: BorderRadius.circular(12.r),
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(12.r),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: EdgeInsets.all(16.r),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: borderColor, width: 2.w),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.textBlack.withValues(alpha: 0.04),
-                blurRadius: 12.r,
-                offset: Offset(0, 4.h),
-              ),
-            ],
+    return BounceTap(
+      onTap: onPressed,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: EdgeInsets.all(14.w),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceLight,
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(
+            color: borderColor,
+            width: isSelected ? 1.5 : 1.0,
           ),
-          child: Row(
-            children: [
-              Text(
-                flag,
-                style: AppTextStyleFactory.style(
-                  size: AppFontSizes.titleLarge,
-                  weight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Text(
-                  label,
-                  style: AppTextStyleFactory.style(
-                    size: AppFontSizes.subtitleSmall,
-                    weight: FontWeight.w700,
-                    color: textColor,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    blurRadius: 0,
+                    spreadRadius: 1.r,
+                    color: AppTheme.primary.withValues(alpha: 0.08),
                   ),
-                ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38.r,
+              height: 38.r,
+              decoration: BoxDecoration(
+                color: flagBg,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: flagBorder),
               ),
-              _SelectionMark(isSelected: isSelected, isDark: isDark),
-            ],
-          ),
+              child: Center(
+                child: Text(flag, style: TextStyle(fontSize: 18.sp)),
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTextStyleFactory.style(
+                      size: 15,
+                      weight: FontWeight.w900,
+                      color: AppTheme.textBlack,
+                      letterSpacing: -0.015,
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+                  Text(
+                    description,
+                    style: AppTextStyleFactory.style(
+                      size: AppFontSizes.captionBig,
+                      weight: FontWeight.w400,
+                      color: AppTheme.textGrey,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 12.w),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 24.r,
+              height: 24.r,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? AppTheme.primary : AppTheme.surfaceLight,
+                border: Border.all(
+                  color: isSelected
+                      ? AppTheme.primary
+                      : Color.lerp(AppTheme.primary, Colors.white, 0.82)!,
+                  width: 1.5,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          blurRadius: 18.r,
+                          color: AppTheme.primary.withValues(alpha: 0.22),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: isSelected
+                  ? Icon(Icons.check_rounded,
+                      color: AppTheme.textWhite, size: 14.r)
+                  : null,
+            ),
+          ],
         ),
       ),
-    );
-  }
-}
-
-class _SelectionMark extends StatelessWidget {
-  const _SelectionMark({required this.isSelected, required this.isDark});
-
-  final bool isSelected;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      width: 24.r,
-      height: 24.r,
-      decoration: BoxDecoration(
-        color: isSelected
-            ? AppTheme.primary
-            : AppTheme.textWhite.withValues(alpha: 0),
-        shape: BoxShape.circle,
-        border: isSelected ? null : Border.all(color: borderColor, width: 2.w),
-      ),
-      child: isSelected
-          ? Icon(Icons.check_rounded, color: AppTheme.textWhite, size: 16.r)
-          : const SizedBox.shrink(),
     );
   }
 }

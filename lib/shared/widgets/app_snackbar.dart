@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 enum SnackBarType { success, error, warning, info }
@@ -51,8 +52,6 @@ class _SnackBarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtils.init(context);
-
     final cfg = _configFor(type);
     final textColor = AppTheme.textBlack;
     final closeColor = AppTheme.textGrey;
@@ -93,8 +92,7 @@ class _SnackBarContent extends StatelessWidget {
               Expanded(
                 child: Text(
                   message,
-                  style: TextStyle(
-                    fontSize: 15.sp,
+                  style: context.typo.body.big.copyWith(
                     fontWeight: FontWeight.w500,
                     color: textColor,
                   ),

@@ -1,3 +1,4 @@
+import 'package:monikid/features/auth/pin/pin_input_validator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'create_new_pin_state.dart';
@@ -12,7 +13,7 @@ class CreateNewPIN extends _$CreateNewPIN {
   }
 
   void addNumber(String digit) {
-    if (!_isDigit(digit) || state.currentPin.length >= 6) {
+    if (!isPinDigit(digit) || state.currentPin.length >= 6) {
       return;
     }
 
@@ -50,9 +51,5 @@ class CreateNewPIN extends _$CreateNewPIN {
 
   void reset() {
     state = const CreateNewPINState();
-  }
-
-  bool _isDigit(String value) {
-    return RegExp(r'^\d$').hasMatch(value);
   }
 }

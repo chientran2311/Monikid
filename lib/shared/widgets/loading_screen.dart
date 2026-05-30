@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class LoadingScreen extends StatelessWidget {
@@ -16,8 +17,6 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtils.init(context);
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final resolvedBackgroundColor =
         backgroundColor ??
@@ -46,8 +45,7 @@ class LoadingScreen extends StatelessWidget {
                 child: Text(
                   message!,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14.sp,
+                  style: context.typo.body.medium.copyWith(
                     fontWeight: FontWeight.w600,
                     color: textColor,
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class SettingGroup extends StatelessWidget {
@@ -28,12 +29,11 @@ class SettingGroup extends StatelessWidget {
           padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
           child: Text(
             title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-              letterSpacing: 0.8,
-            ),
+            style: context.typo.caption.big.copyWith(
+            fontWeight: FontWeight.w600,
+            color: titleColor,
+            letterSpacing: 0.8,
+          ),
           ),
         ),
         ClipRRect(

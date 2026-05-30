@@ -5,9 +5,9 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
-import 'package:monikid/shared/widgets/app_theme_switch.dart';
+import 'package:monikid/shared/widgets/app_ios_switch.dart';
 import 'widgets/setting_group.dart';
 import 'widgets/setting_item.dart';
 
@@ -16,7 +16,6 @@ class SettingTabParent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -42,13 +41,13 @@ class SettingTabParent extends ConsumerWidget {
     }
 
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppTheme.backgroundDark : const Color(0xFFF4F4F5),
+          isDark ? AppTheme.backgroundDark : AppTheme.surfaceGrey,
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -58,11 +57,9 @@ class SettingTabParent extends ConsumerWidget {
               padding: EdgeInsets.only(left: 4.w, bottom: 24.h),
               child: Text(
                 s.settingParTitle,
-                style: TextStyle(
-                  fontSize: 30.sp,
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
+                style: context.typo.display.small.copyWith(
+                color: textColor,
+              ),
               ),
             ),
             SettingGroup(
@@ -101,6 +98,26 @@ class SettingTabParent extends ConsumerWidget {
                   borderColor: borderColor,
                   showBorder: false,
                   onTap: () => context.push(AppRoutes.manageFamily),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            SettingGroup(
+              title: s.settingNotificationsLabel,
+              titleColor: mutedColor,
+              surfaceColor: surfaceColor,
+              borderColor: borderColor,
+              isDark: isDark,
+              children: [
+                SettingItem(
+                  icon: Icons.notifications_outlined,
+                  iconColor: AppTheme.primary,
+                  iconBgColor: AppTheme.primaryLight,
+                  title: s.notificationSettingsTitle,
+                  textColor: textColor,
+                  borderColor: borderColor,
+                  showBorder: false,
+                  onTap: () => context.push(AppRoutes.scheduleNotification),
                 ),
               ],
             ),
@@ -174,9 +191,7 @@ class _SignOutButton extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 17.sp,
-              fontWeight: FontWeight.w600,
+            style: context.typo.subtitle.small.copyWith(
               color: AppTheme.redAlert,
             ),
           ),
@@ -224,17 +239,13 @@ class _ThemeSettingItem extends StatelessWidget {
           Expanded(
             child: Text(
               s.settingParThemeLabel,
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.w500,
-                color: textColor,
-              ),
+              style: context.typo.subtitle.small.copyWith(
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
             ),
           ),
-          AppThemeSwitch(
-            isDark: isDark,
-            onChanged: onChanged,
-          ),
+          AppIosSwitch(value: isDark, onChanged: onChanged),
         ],
       ),
     );

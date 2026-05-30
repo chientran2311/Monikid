@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class TransactionEvidenceSection extends StatelessWidget {
   const TransactionEvidenceSection({
@@ -41,11 +42,7 @@ class TransactionEvidenceSection extends StatelessWidget {
       children: [
         Text(
           s.transactionEvidenceAddOptionalLabel,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isDark ? AppTheme.iconLight : AppTheme.borderDark,
-          ),
+          style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w500, color: isDark ? AppTheme.iconLight : AppTheme.borderDark),
         ),
         const SizedBox(height: 8),
         Container(
@@ -77,12 +74,9 @@ class TransactionEvidenceSection extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 _buildDescription(),
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark
-                      ? AppTheme.iconLight
-                      : AppTheme.textDark,
-                ),
+                style: context.typo.body.medium.copyWith(color: isDark
+                    ? AppTheme.iconLight
+                    : AppTheme.textDark),
               ),
               const SizedBox(height: 16),
               Row(
@@ -181,10 +175,10 @@ class _EmptyPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final bgColor = isDark ? AppTheme.surfaceVeryDark : AppTheme.surfaceVeryLight;
     final iconColor = hasExistingImage
         ? AppTheme.primary
-        : const Color(0xFF94A3B8);
+        : AppTheme.textMuted;
 
     return Container(
       height: 120,
@@ -208,11 +202,7 @@ class _EmptyPreview extends StatelessWidget {
             hasExistingImage
                 ? s.transactionEvidenceAttachedLabel
                 : s.transactionEvidenceEmpty,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isDark ? AppTheme.iconLight : AppTheme.textDark,
-            ),
+            style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w500, color: isDark ? AppTheme.iconLight : AppTheme.textDark),
           ),
         ],
       ),

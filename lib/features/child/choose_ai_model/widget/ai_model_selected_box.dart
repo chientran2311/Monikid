@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/choose_ai_model/choose_ai_model_state.dart';
 
@@ -58,8 +59,7 @@ class AiModelSelectedBox extends StatelessWidget {
                     selectedOption.displayName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14.sp,
+                    style: context.typo.body.medium.copyWith(
                       fontWeight: FontWeight.w700,
                       color: enabled ? textColor : AppTheme.textGrey,
                     ),
@@ -89,8 +89,7 @@ class AiModelSelectedBox extends StatelessWidget {
           ),
           child: Text(
             option.displayName,
-            style: TextStyle(
-              fontSize: 13.sp,
+            style: context.typo.body.small.copyWith(
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               color: textColor,
             ),

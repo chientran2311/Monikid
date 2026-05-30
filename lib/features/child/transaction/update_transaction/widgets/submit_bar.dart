@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class SubmitBar extends StatelessWidget {
   const SubmitBar({
@@ -27,8 +28,8 @@ class SubmitBar extends StatelessWidget {
         border: Border(
           top: BorderSide(
             color: isDark
-                ? const Color(0xFF1E293B)
-                : const Color(0xFFE2E8F0),
+                ? AppTheme.surfaceVariant
+                : AppTheme.borderLight,
           ),
         ),
       ),
@@ -56,10 +57,7 @@ class SubmitBar extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     s.updateTransactionAction,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

@@ -4,8 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:monikid/firebase_options.dart';
 import 'package:monikid/core/utils/logger.dart';
+import 'package:monikid/core/service/local_notification_service.dart';
 
 import 'app/app.dart';
 import 'package:monikid/core/di/di.dart';
@@ -13,9 +15,6 @@ import 'package:monikid/core/di/di.dart';
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize FlutterGemma (local model inference engine)
-  await FlutterGemma.initialize();
 
   // Load environment variables (non-fatal if .env is empty/missing)
   try {
@@ -47,8 +46,17 @@ void main() async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  // Initialize flutter_gemma (required by 0.11.10+)
+  await FlutterGemma.initialize();
+
+  // Initialize timezone data
+  tz.initializeTimeZones();
+
   // Initialize dependency injection
   await setupLocator();
+
+  // Initialize local notifications
+  await getIt<LocalNotificationService>().initialize();
 
   // Run the app
   runApp(const ProviderScope(child: MoniKidApp()));

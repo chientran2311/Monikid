@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class TransactionTypeTab extends StatelessWidget {
   final String title;
@@ -27,7 +28,7 @@ class TransactionTypeTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? (isDark ? const Color(0xFF334155) : Colors.white)
+                ? (isDark ? AppTheme.borderDark : Colors.white)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             boxShadow: isSelected
@@ -43,15 +44,11 @@ class TransactionTypeTab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isSelected
+            style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w600, color: isSelected
                   ? AppTheme.primary
                   : (isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B)),
-            ),
+                        ? AppTheme.textMuted
+                        : AppTheme.textGrey)),
           ),
         ),
       ),

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_state.dart';
 import 'package:monikid/features/child/transaction/add_transaction/widgets/add_transaction_app_bar.dart';
@@ -13,7 +12,7 @@ import 'package:monikid/features/child/transaction/add_transaction/widgets/add_t
 import 'package:monikid/features/child/transaction/add_transaction/widgets/transaction_save_helper.dart';
 import 'package:monikid/features/child/transaction/add_transaction/widgets/transaction_submit_button.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
-import 'package:monikid/features/child/transaction/transaction_history/widgets/category_dialog.dart';
+import 'package:monikid/features/child/transaction/transaction_history/widgets/calendar_dialog.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/models/ai/transaction_ai_result.dart';
@@ -27,8 +26,6 @@ class AddTransactionScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final actionState = ref.watch(addTransactionNotifierProvider);
     final categories =
         ref.watch(categoryStreamProvider).value ?? defaultCategories;
@@ -127,33 +124,13 @@ class AddTransactionScreen extends HookConsumerWidget {
       }
     }
 
-    void showCategoryPicker() {
-      if (isBusy) {
-        return;
-      }
-
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => CategoryDialog(
-          selectedCategory: selectedCategory.value,
-          showAllOption: false,
-          categoryType: currentType,
-          onCategorySelected: (category) {
-            if (category == null) {
-              return;
-            }
-
-            selectedCategoryKey.value = transactionCategoryKeyForCategory(
-              category,
-            );
-            selectedCategory.value = category.label;
-            selectedEmoji.value = category.icon;
-          },
-        ),
-      );
+    void selectCategory(CategoryModel category) {
+      if (isBusy) return;
+      selectedCategoryKey.value = transactionCategoryKeyForCategory(category);
+      selectedCategory.value = category.label;
+      selectedEmoji.value = category.icon;
     }
+
 
     Future<void> saveTransaction() async {
       await saveTransactionData(
@@ -206,29 +183,33 @@ class AddTransactionScreen extends HookConsumerWidget {
               expenseLabel: s.transactionExpenseType,
               incomeLabel: s.transactionIncomeType,
               amountController: amountController,
-              selectedCategory: selectedCategory.value,
-              selectedEmoji: selectedEmoji.value,
+              categories: categories,
+              selectedCategoryKey: selectedCategoryKey.value,
+              onCategoryChipSelected: selectCategory,
               selectedDate: selectedDate.value,
               noteController: noteController,
               evidenceImageBytes: actionState.evidenceImageBytes,
               evidenceImageFileName: actionState.evidenceImageFileName,
               hasEvidenceImageSelection: actionState.hasEvidenceImageSelection,
-              onCategoryTap: showCategoryPicker,
-              onDateTap: () async {
-                final picked = await showDatePicker(
+              onDateTap: () {
+                if (!context.mounted) return;
+                showModalBottomSheet<void>(
                   context: context,
-                  initialDate: selectedDate.value,
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (picked == null || !context.mounted) return;
-                selectedDate.value = DateTime(
-                  picked.year,
-                  picked.month,
-                  picked.day,
-                  selectedDate.value.hour,
-                  selectedDate.value.minute,
-                  selectedDate.value.second,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => CalendarDialog(
+                    initialMonth: selectedDate.value,
+                    onDateConfirmed: (picked) {
+                      selectedDate.value = DateTime(
+                        picked.year,
+                        picked.month,
+                        picked.day,
+                        selectedDate.value.hour,
+                        selectedDate.value.minute,
+                        selectedDate.value.second,
+                      );
+                    },
+                  ),
                 );
               },
               onPickImage: () async {

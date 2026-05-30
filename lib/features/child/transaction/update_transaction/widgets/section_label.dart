@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class SectionLabel extends StatelessWidget {
   const SectionLabel({super.key, required this.text});
@@ -9,11 +11,7 @@ class SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: Color(0xFF94A3B8),
-      ),
+      style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w500, color: AppTheme.textMuted),
     );
   }
 }

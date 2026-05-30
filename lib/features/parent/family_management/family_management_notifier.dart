@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/family_management/family_management_state.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';

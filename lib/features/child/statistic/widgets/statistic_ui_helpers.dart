@@ -162,10 +162,11 @@ Color statisticTrendSurfaceColor(StatisticTrendDirection direction) {
 }
 
 List<Color> statisticAllocationColors = const [
-  AppTheme.chartOrange,
-  AppTheme.chartPurple,
-  AppTheme.chartBlue,
-  AppTheme.chartGreen,
+  Color(0xFF2F7F33),
+  Color(0xFF4D9A50),
+  Color(0xFF77B579),
+  Color(0xFFA4CEA6),
+  Color(0xFFD3E8D4),
 ];
 
 DateTime _weekStart(DateTime date) {

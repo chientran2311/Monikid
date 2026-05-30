@@ -18,6 +18,7 @@ abstract class CustomCategoryRepository {
     required String userId,
     required String label,
     required String type,
+    String icon,
   });
   Future<void> deleteCategory({
     required String userId,
@@ -70,6 +71,7 @@ class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
     required String userId,
     required String label,
     required String type,
+    String icon = '📦',
   }) async {
     final docRef = _customCategoriesOf(userId).doc();
     final categoryId = docRef.id;
@@ -77,6 +79,7 @@ class CustomCategoryRepositoryImpl implements CustomCategoryRepository {
       'category_id': categoryId,
       'label': label.trim(),
       'type': type,
+      'icon': icon,
       'is_active': true,
       'created_at': FieldValue.serverTimestamp(),
     });

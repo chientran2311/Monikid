@@ -87,13 +87,6 @@ service cloud.firestore {
         && (!preferences.keys().hasAny(['language']) || preferences.language is string);
     }
 
-    function isValidSpendingAlert(alert) {
-      return alert.keys().hasOnly(['enabled', 'daily_limit_minor', 'monthly_limit_minor'])
-        && (!alert.keys().hasAny(['enabled']) || alert.enabled is bool)
-        && (!alert.keys().hasAny(['daily_limit_minor']) || (alert.daily_limit_minor is int && alert.daily_limit_minor >= 0))
-        && (!alert.keys().hasAny(['monthly_limit_minor']) || (alert.monthly_limit_minor is int && alert.monthly_limit_minor >= 0));
-    }
-
     function isValidUserCreate(uid) {
       let data = request.resource.data;
       return data.keys().hasOnly([
@@ -106,8 +99,7 @@ service cloud.firestore {
           'member_status',
           'created_at',
           'updated_at',
-          'preferences',
-          'spending_alert'
+          'preferences'
         ])
         && data.keys().hasAll([
           'uid',
@@ -129,8 +121,7 @@ service cloud.firestore {
         && data.updated_at is timestamp
         && (!data.keys().hasAny(['photo_url']) || data.photo_url == null || data.photo_url is string)
         && (!data.keys().hasAny(['family_id']) || data.family_id == null || data.family_id is string)
-        && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)))
-        && (!data.keys().hasAny(['spending_alert']) || (data.spending_alert is map && isValidSpendingAlert(data.spending_alert)));
+        && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)));
     }
 
     function isValidUserSelfUpdate(uid) {
@@ -147,7 +138,6 @@ service cloud.firestore {
           'gender',
           'updated_at',
           'preferences',
-          'spending_alert',
           'monthly_limit_minor'
         ])
         && data.uid == resource.data.uid
@@ -175,7 +165,6 @@ service cloud.firestore {
         && (!data.keys().hasAny(['gender']) || data.gender == null || (data.gender is string && data.gender.size() <= 32))
         && data.updated_at is timestamp
         && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)))
-        && (!data.keys().hasAny(['spending_alert']) || (data.spending_alert is map && isValidSpendingAlert(data.spending_alert)))
         && (!data.keys().hasAny(['monthly_limit_minor'])
             || data.monthly_limit_minor == null
             || (data.monthly_limit_minor is int && data.monthly_limit_minor >= 0));

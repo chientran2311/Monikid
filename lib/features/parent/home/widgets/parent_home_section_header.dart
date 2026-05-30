@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class ParentHomeSectionHeader extends StatelessWidget {
   const ParentHomeSectionHeader({
@@ -26,8 +26,7 @@ class ParentHomeSectionHeader extends StatelessWidget {
         Expanded(
           child: Text(
             title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 13.sp,
+            style: context.typo.body.small.copyWith(
               fontWeight: FontWeight.w600,
               color: mutedColor,
               letterSpacing: 0.6,
@@ -39,11 +38,10 @@ class ParentHomeSectionHeader extends StatelessWidget {
             onTap: onTrailingTap,
             child: Text(
               trailingLabel!,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.primary,
-              ),
+              style: context.typo.body.small.copyWith(
+              fontWeight: FontWeight.w500,
+              color: AppTheme.primary,
+            ),
             ),
           ),
       ],

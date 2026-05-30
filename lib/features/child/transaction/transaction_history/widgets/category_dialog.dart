@@ -6,9 +6,10 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
+import 'package:monikid/features/child/transaction/transaction_history/widgets/add_custom_category_sheet.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/category/custom_category_repository.dart';
 
@@ -32,8 +33,7 @@ class CategoryDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? const Color(0xFF1C1C1E) : AppTheme.backgroundLight;
-    final cardColor = isDark ? AppTheme.surfaceDark : Colors.white;
+    final sheetColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final categoriesAsync = ref.watch(categoryStreamProvider);
     final screenHeight = MediaQuery.of(context).size.height;
@@ -42,209 +42,198 @@ class CategoryDialog extends HookConsumerWidget {
     final isInitialized = useState<bool>(false);
 
     String getDialogTitle() {
-      if (categoryType == 'income') {
-        return s.customCategorySelectTitleIncome;
-      }
-      if (categoryType == 'expense') {
-        return s.customCategorySelectTitleExpense;
-      }
+      if (categoryType == 'income') return s.customCategorySelectTitleIncome;
+      if (categoryType == 'expense') return s.customCategorySelectTitleExpense;
       return s.customCategorySelectTitle;
     }
 
-    return SizedBox(
-      height: screenHeight * 0.6,
-      child: Container(
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20.r),
-            topRight: Radius.circular(20.r),
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-            Center(
+    void confirm() {
+      if (localSelectedCategory.value != null) {
+        onCategorySelected(
+          localSelectedCategory.value!.id == 'all'
+              ? null
+              : localSelectedCategory.value,
+        );
+      }
+      context.pop();
+    }
+
+    return GestureDetector(
+      onTap: () => context.pop(),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        height: screenHeight,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () {},
               child: Container(
-                margin: EdgeInsets.only(top: 10.h, bottom: 0),
-                height: 5.h,
-                width: 36.w,
+                height: screenHeight * 0.62,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(3.r),
+                  color: sheetColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32.r),
+                    topRight: Radius.circular(32.r),
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    getDialogTitle(),
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => context.pop(),
-                    customBorder: const CircleBorder(),
-                    child: Container(
-                      width: 30.w,
-                      height: 30.w,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppTheme.surfaceDark
-                            : const Color(0xFFEEEDF3),
-                        shape: BoxShape.circle,
+                child: SafeArea(
+                  top: false,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+                      // Drag handle
+                      Center(
+                        child: Container(
+                          width: 40.w,
+                          height: 5.h,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppTheme.textMuted.withValues(alpha: 0.4)
+                                : AppTheme.textGrey.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(99.r),
+                          ),
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.close,
-                        size: 16.r,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF6E6E73),
+                      // Header: title centered, "Xong" button right
+                      SizedBox(
+                        height: 56.h,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Center(
+                              child: Text(
+                                getDialogTitle(),
+                                style: context.typo.subtitle.small.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: textColor,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 20.w,
+                              child: GestureDetector(
+                                onTap: confirm,
+                                child: Text(
+                                  s.customCategoryConfirmSelection,
+                                  style: context.typo.subtitle.small.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(height: 1, color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-            Flexible(
-              child: categoriesAsync.when(
-                data: (categories) {
-                  final filteredCategories = filterCategoriesByType(
-                    categories,
-                    categoryType,
-                  );
-                  final allCategories = [
-                    if (showAllOption)
-                      const CategoryModel(
-                        id: 'all',
-                        label: 'Tất cả',
-                        icon: '📝',
-                        colorHex: '0xFF9E9E9E',
-                        isDefault: true,
+                      Divider(
+                        height: 0.5,
+                        thickness: 0.5,
+                        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
                       ),
-                    ...filteredCategories,
-                  ];
+                      // Category grid
+                      Flexible(
+                        child: categoriesAsync.when(
+                          data: (categories) {
+                            final filteredCategories = filterCategoriesByType(
+                              categories,
+                              categoryType,
+                            );
+                            final allCategories = [
+                              if (showAllOption)
+                                const CategoryModel(
+                                  id: 'all',
+                                  label: 'Tất cả',
+                                  icon: '📝',
+                                  colorHex: '0xFF9E9E9E',
+                                  isDefault: true,
+                                ),
+                              ...filteredCategories,
+                            ];
 
-                  if (!isInitialized.value) {
-                    final initial = allCategories.cast<CategoryModel?>().firstWhere(
-                      (c) {
-                        if (c?.id == 'all') return selectedCategory == null;
-                        return selectedCategory == c?.label ||
-                            selectedCategory ==
-                                transactionCategoryKeyForCategory(c!);
-                      },
-                      orElse: () => null,
-                    );
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      localSelectedCategory.value = initial;
-                      isInitialized.value = true;
-                    });
-                  }
+                            if (!isInitialized.value) {
+                              final initial = allCategories
+                                  .cast<CategoryModel?>()
+                                  .firstWhere(
+                                    (c) {
+                                      if (c?.id == 'all') return selectedCategory == null;
+                                      return selectedCategory == c?.label ||
+                                          selectedCategory ==
+                                              transactionCategoryKeyForCategory(c!);
+                                    },
+                                    orElse: () => null,
+                                  );
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                localSelectedCategory.value = initial;
+                                isInitialized.value = true;
+                              });
+                            }
 
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        mainAxisSpacing: 12.h,
-                        crossAxisSpacing: 12.w,
-                        childAspectRatio: 0.85,
-                      ),
-                      itemCount: allCategories.length + (showAddButton ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (showAddButton && index == allCategories.length) {
-                          return AddNewCategoryItemWidget(
-                            isDark: isDark,
-                            onTap: () => _showAddCategorySheet(context, ref, categories),
-                          );
-                        }
-
-                        final category = allCategories[index];
-                        final isSelected = localSelectedCategory.value?.id == category.id;
-
-                        return CategoryItemWidget(
-                          category: category,
-                          isSelected: isSelected,
-                          isDark: isDark,
-                          cardColor: cardColor,
-                          onTap: () {
-                            localSelectedCategory.value = category;
+                            return SingleChildScrollView(
+                              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 8.h),
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 16.h,
+                                  crossAxisSpacing: 16.w,
+                                  childAspectRatio: 0.88,
+                                ),
+                                itemCount: allCategories.length + (showAddButton ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (showAddButton && index == allCategories.length) {
+                                    return AddNewCategoryItemWidget(
+                                      isDark: isDark,
+                                      onTap: () => _showAddCategorySheet(
+                                        context,
+                                        ref,
+                                        categories,
+                                        selectedCategory: selectedCategory,
+                                        onCategorySelected: onCategorySelected,
+                                        showAllOption: showAllOption,
+                                        categoryType: categoryType,
+                                        showAddButton: showAddButton,
+                                      ),
+                                    );
+                                  }
+                                  final category = allCategories[index];
+                                  final isSelected =
+                                      localSelectedCategory.value?.id == category.id;
+                                  return CategoryItemWidget(
+                                    category: category,
+                                    isSelected: isSelected,
+                                    isDark: isDark,
+                                    onTap: () => localSelectedCategory.value = category,
+                                    onDelete: () =>
+                                        _confirmDeleteCategory(context, ref, category),
+                                  );
+                                },
+                              ),
+                            );
                           },
-                          onDelete: () => _confirmDeleteCategory(context, ref, category),
-                        );
-                      },
-                    ),
-                  );
-                },
-                loading: () => SizedBox(
-                  height: 240.h,
-                  child: const CategoryDialogLoadingSkeleton(),
-                ),
-                error: (error, _) => SizedBox(
-                  height: 200.h,
-                  child: Center(
-                    child: Text(
-                      'Lỗi: $error',
-                      style: TextStyle(color: textColor),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 20.h),
-              decoration: BoxDecoration(
-                color: cardColor,
-                border: Border(
-                  top: BorderSide(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                    width: 0.5,
-                  ),
-                ),
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (localSelectedCategory.value != null) {
-                    onCategorySelected(localSelectedCategory.value!.id == 'all' ? null : localSelectedCategory.value);
-                  }
-                  context.pop();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  minimumSize: Size(double.infinity, 52.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                ),
-                child: Text(
-                  s.customCategoryConfirmSelection,
-                  style: TextStyle(
-                    fontSize: 17.sp, 
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
+                          loading: () => SizedBox(
+                            height: 240.h,
+                            child: const CategoryDialogLoadingSkeleton(),
+                          ),
+                          error: (error, _) => SizedBox(
+                            height: 200.h,
+                            child: Center(
+                              child: Text(
+                                'Lỗi: $error',
+                                style: TextStyle(color: textColor),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ],
         ),
-      ),
       ),
     );
   }
@@ -253,8 +242,13 @@ class CategoryDialog extends HookConsumerWidget {
 Future<void> _showAddCategorySheet(
   BuildContext context,
   WidgetRef ref,
-  List<CategoryModel> categories,
-) async {
+  List<CategoryModel> categories, {
+  required String? selectedCategory,
+  required void Function(CategoryModel?) onCategorySelected,
+  required bool showAllOption,
+  required String? categoryType,
+  required bool showAddButton,
+}) async {
   final customCount = categories.where((c) => !c.isDefault).length;
   if (customCount >= 5) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -263,22 +257,43 @@ Future<void> _showAddCategorySheet(
     return;
   }
 
+  context.pop();
+
+  if (!context.mounted) return;
+
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => _AddCategorySheet(onAdded: (label, type) async {
-      final userId = ref.read(authSessionProvider).user?.uid;
-      if (userId == null) return;
-      await ref
-          .read(customCategoryRepositoryProvider)
-          .addCategory(userId: userId, label: label, type: type);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.customCategoryCreated)),
+    builder: (ctx) => AddCustomCategorySheet(
+      onAdded: (label) async {
+        final userId = ref.read(authSessionProvider).user?.uid;
+        if (userId == null) return;
+        await ref.read(customCategoryRepositoryProvider).addCategory(
+          userId: userId,
+          label: label,
+          type: 'expense',
+          icon: '📦',
         );
-      }
-    }),
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.customCategoryCreated)),
+          );
+          showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (c) => CategoryDialog(
+              selectedCategory: selectedCategory,
+              onCategorySelected: onCategorySelected,
+              showAllOption: showAllOption,
+              categoryType: categoryType,
+              showAddButton: showAddButton,
+            ),
+          );
+        }
+      },
+    ),
   );
 }
 
@@ -322,88 +337,6 @@ Future<void> _confirmDeleteCategory(
   }
 }
 
-class _AddCategorySheet extends StatefulWidget {
-  const _AddCategorySheet({required this.onAdded});
-  final Future<void> Function(String label, String type) onAdded;
-
-  @override
-  State<_AddCategorySheet> createState() => _AddCategorySheetState();
-}
-
-class _AddCategorySheetState extends State<_AddCategorySheet> {
-  final _labelController = TextEditingController();
-  String _type = 'expense';
-  bool _loading = false;
-  String? _error;
-
-  @override
-  void dispose() {
-    _labelController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final s = context.l10n;
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            controller: _labelController,
-            maxLength: 40,
-            decoration: InputDecoration(
-              hintText: s.customCategoryLabelHint,
-              errorText: _error,
-            ),
-            autofocus: true,
-          ),
-          const SizedBox(height: 12),
-          SegmentedButton<String>(
-            segments: [
-              ButtonSegment(value: 'expense', label: Text(s.customCategoryTypeExpense)),
-              ButtonSegment(value: 'income', label: Text(s.customCategoryTypeIncome)),
-            ],
-            selected: {_type},
-            onSelectionChanged: (v) => setState(() => _type = v.first),
-          ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: _loading ? null : _submit,
-            child: _loading
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                : Text(s.customCategoryConfirm),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _submit() async {
-    final label = _labelController.text.trim();
-    if (label.isEmpty) {
-      setState(() => _error = 'Required');
-      return;
-    }
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    await widget.onAdded(label, _type);
-    if (mounted) context.pop();
-  }
-}
 
 class CategoryItemWidget extends StatelessWidget {
   const CategoryItemWidget({
@@ -412,7 +345,6 @@ class CategoryItemWidget extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.onDelete,
-    required this.cardColor,
     required this.isDark,
   });
 
@@ -420,104 +352,74 @@ class CategoryItemWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onDelete;
-  final Color cardColor;
   final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    Color baseColor = Colors.grey;
-    if (category.colorHex != null) {
-      try {
-        baseColor = Color(int.parse(category.colorHex!));
-      } catch (_) {}
-    }
+    final textColor = isDark ? Colors.white : AppTheme.textBlack;
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
         GestureDetector(
           onTap: onTap,
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: EdgeInsets.all(6.w),
-              decoration: BoxDecoration(
-                color: isSelected ? baseColor.withValues(alpha: 0.06) : cardColor,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(
-                  color: isSelected ? baseColor : Colors.transparent,
-                  width: 1.5,
-                ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? (isDark
+                      ? AppTheme.primaryLight.withValues(alpha: 0.15)
+                      : AppTheme.primaryLight)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(16.r),
+              border: Border.all(
+                color: isSelected ? AppTheme.primary : Colors.transparent,
+                width: 1.5,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 44.w,
-                    height: 44.w,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 60.w,
+                  height: 60.w,
                   decoration: BoxDecoration(
-                    color: baseColor.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                    alignment: Alignment.center,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Center(
-                          child: Text(
-                            category.icon,
-                            style: TextStyle(fontSize: 24.sp),
-                          ),
-                        ),
-                        if (isSelected)
-                          Positioned(
-                            top: -3.h,
-                            right: -3.w,
-                            child: Container(
-                              width: 16.w,
-                              height: 16.w,
-                              decoration: BoxDecoration(
-                                color: baseColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: baseColor.withValues(alpha: 0.4),
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 10.r,
-                              ),
+                    color: isSelected
+                        ? (isDark ? AppTheme.surfaceDark : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppTheme.primary.withValues(alpha: 0.15),
+                              blurRadius: 12.r,
+                              offset: const Offset(0, 4),
                             ),
-                          ),
-                      ],
-                    ),
+                          ]
+                        : null,
                   ),
-                  SizedBox(height: 6.h),
-                  Flexible(
-                    child: Text(
-                      category.label,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                        color: isSelected
-                            ? baseColor
-                            : isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF3D4A3C),
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    category.icon,
+                    style: context.typo.title.big,
                   ),
-                ],
-              ),
+                ),
+                SizedBox(height: 8.h),
+                Flexible(
+                  child: Text(
+                    category.label,
+                    style: context.typo.body.small.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -533,7 +435,10 @@ class CategoryItemWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.red.shade400,
                   shape: BoxShape.circle,
-                  border: Border.all(color: cardColor, width: 2),
+                  border: Border.all(
+                    color: isDark ? AppTheme.surfaceDark : Colors.white,
+                    width: 2,
+                  ),
                 ),
                 child: Icon(Icons.close, color: Colors.white, size: 10.r),
               ),
@@ -557,54 +462,46 @@ class AddNewCategoryItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
+    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
+    final labelColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+
     return GestureDetector(
       onTap: onTap,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: CustomPaint(
-          painter: DashedBorderPainter(
-            color: isDark ? const Color(0xFF475569) : const Color(0xFFC5C5CA),
-            radius: 16.r,
-            strokeWidth: 1.5,
-          ),
-          child: Container(
-            padding: EdgeInsets.all(6.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomPaint(
-                  painter: DashedBorderPainter(
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFC5C5CA),
-                    radius: 18.r,
-                    strokeWidth: 1.5,
-                  ),
-                  child: Container(
-                    width: 44.w,
-                    height: 44.w,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.add,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFFAEAEC2),
-                      size: 20.r,
-                    ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 12.h),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomPaint(
+              painter: DashedBorderPainter(
+                color: borderColor,
+                radius: 16.r,
+                strokeWidth: 2,
+              ),
+              child: SizedBox(
+                width: 60.w,
+                height: 60.w,
+                child: Center(
+                  child: Icon(
+                    Icons.add,
+                    color: labelColor,
+                    size: 24.r,
                   ),
                 ),
-                SizedBox(height: 6.h),
-                Flexible(
-                  child: Text(
-                    s.customCategoryAdd,
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFFAEAEC2),
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            SizedBox(height: 8.h),
+            Text(
+              s.customCategoryAddNew,
+              style: context.typo.body.small.copyWith(
+                fontWeight: FontWeight.w600,
+                color: labelColor,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
@@ -619,7 +516,7 @@ class DashedBorderPainter extends CustomPainter {
   final double radius;
 
   DashedBorderPainter({
-    this.color = Colors.grey,
+    this.color = AppTheme.textGrey,
     this.strokeWidth = 1.0,
     this.gap = 5.0,
     this.dashWidth = 5.0,

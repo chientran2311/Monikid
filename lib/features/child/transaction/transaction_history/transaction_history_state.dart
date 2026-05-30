@@ -11,6 +11,8 @@ enum TransactionHistorySharedStatus {
   error,
 }
 
+enum TransactionListLoadingTrigger { none, tabSwitch, categoryChange, dateChange }
+
 @freezed
 abstract class TransactionHistoryState with _$TransactionHistoryState {
   const factory TransactionHistoryState({
@@ -20,6 +22,7 @@ abstract class TransactionHistoryState with _$TransactionHistoryState {
     TransactionHistorySharedStatus sharedStatus,
     @Default(true) bool isLoading,
     @Default(false) bool isListLoading,
+    @Default(TransactionListLoadingTrigger.none) TransactionListLoadingTrigger listLoadingTrigger,
     @Default(false) bool isLoadingMore,
     @Default(true) bool hasMore,
     @Default(8) int monthLimit,

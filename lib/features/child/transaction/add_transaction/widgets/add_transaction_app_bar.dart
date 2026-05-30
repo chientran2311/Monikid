@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class AddTransactionAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AddTransactionAppBar({
@@ -34,21 +35,13 @@ class AddTransactionAppBar extends StatelessWidget implements PreferredSizeWidge
         onPressed: enabled ? onCancel : null,
         child: Text(
           cancelLabel,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
-          ),
+          style: context.typo.subtitle.small.copyWith(fontWeight: FontWeight.w500, color: isDark ? AppTheme.textMuted : AppTheme.textGrey),
         ),
       ),
       centerTitle: true,
       title: Text(
         title,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
+        style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.bold, color: textColor),
       ),
     );
   }

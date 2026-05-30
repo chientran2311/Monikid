@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class TransactionAppBar extends StatelessWidget implements PreferredSizeWidget {
   const TransactionAppBar({
@@ -31,11 +32,7 @@ class TransactionAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: Text(
         s.updateTransactionTitle,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: textColor,
-        ),
+        style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.bold, color: textColor),
       ),
     );
   }

@@ -14,12 +14,11 @@ set -euo pipefail
 
 # ── Config ────────────────────────────────────────────────────────────────────
 PACKAGE="com.example.monikid"
-MODEL_FILENAME="gemma-2b-it-int4.bin"
-DOWNLOAD_URL="https://huggingface.co/innermost47/gemma-2b-it-int4-mediapipe/resolve/main/gemma-1.1-2b-it-cpu-int4.bin?download=true"
+MODEL_FILENAME="Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
 # Bash-style path (for file existence check, wc, etc.)
-LOCAL_CACHE="/d/Flutter/project/gemma-1.1-2b-it-cpu-int4.bin"
+LOCAL_CACHE="/d/Flutter/project/Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
 # Windows-style path passed to adb push (MSYS_NO_PATHCONV blocks bash conversion)
-LOCAL_CACHE_WIN="D:/Flutter/project/gemma-1.1-2b-it-cpu-int4.bin"
+LOCAL_CACHE_WIN="D:/Flutter/project/Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
 # Flutter path_provider getApplicationDocumentsDirectory() on Android = app_flutter/
 # NOT files/ — verified from device logs: /data/user/0/<package>/app_flutter/
 DEVICE_DIR="/data/data/$PACKAGE/app_flutter"
@@ -48,7 +47,7 @@ echo "→ Emulator: $DEVICE"
 # ── 3. Verify local file exists ───────────────────────────────────────────────
 if [[ ! -f "$LOCAL_CACHE" ]]; then
   echo "ERROR: Model file not found at $LOCAL_CACHE"
-  echo "  Expected: D:\\Flutter\\project\\gemma-1.1-2b-it-cpu-int4.bin"
+  echo "  Expected: D:\\Flutter\\project\\gemma3-1b-it-int4.task"
   exit 1
 fi
 SIZE_BYTES=$(wc -c < "$LOCAL_CACHE")

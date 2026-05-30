@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class NotificationBadge extends StatelessWidget {
@@ -32,8 +33,7 @@ class NotificationBadge extends StatelessWidget {
             ),
             child: Text(
               count > 99 ? '99+' : '$count',
-              style: TextStyle(
-                fontSize: 10.sp,
+              style: context.typo.caption.small.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppTheme.notifBadgeFg,
               ),

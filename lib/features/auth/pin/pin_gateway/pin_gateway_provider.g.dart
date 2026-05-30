@@ -6,7 +6,7 @@ part of 'pin_gateway_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$pinGatewayHash() => r'48ff64223d6aa47d20cc8baa87127f325cf449e6';
+String _$pinGatewayHash() => r'488a6f4b79e3e3db4bf6920b1902672e9403c8c5';
 
 /// See also [PinGateway].
 @ProviderFor(PinGateway)

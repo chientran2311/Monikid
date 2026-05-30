@@ -57,8 +57,7 @@ class InviteCodeSheet extends StatelessWidget {
           SizedBox(height: 16.h),
           Text(
             s.homeParInviteTitle,
-            style: TextStyle(
-              fontSize: 18.sp,
+            style: context.typo.subtitle.medium.copyWith(
               fontWeight: FontWeight.w700,
               color: textColor,
             ),
@@ -66,7 +65,7 @@ class InviteCodeSheet extends StatelessWidget {
           SizedBox(height: 8.h),
           Text(
             s.homeParInviteCodeLabel,
-            style: TextStyle(fontSize: 13.sp, color: mutedColor),
+            style: context.typo.body.small.copyWith(color: mutedColor),
           ),
           SizedBox(height: 16.h),
 
@@ -78,14 +77,13 @@ class InviteCodeSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.06)
-                  : const Color(0xFFF4F4F5),
+                  : AppTheme.surfaceGrey,
               borderRadius: BorderRadius.circular(16.r),
               border: Border.all(color: borderColor, width: 0.5),
             ),
             child: Text(
               _formattedCode,
-              style: TextStyle(
-                fontSize: 36.sp,
+              style: context.typo.display.big.copyWith(
                 fontWeight: FontWeight.w700,
                 letterSpacing: 8,
                 color: AppTheme.primary,
@@ -111,8 +109,7 @@ class InviteCodeSheet extends StatelessWidget {
                 icon: Icon(Icons.copy_rounded, size: 18.r),
                 label: Text(
                   s.homeParCopyCode,
-                  style: TextStyle(
-                    fontSize: 15.sp,
+                  style: context.typo.body.big.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),

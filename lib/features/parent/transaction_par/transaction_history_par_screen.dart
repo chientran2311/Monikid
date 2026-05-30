@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/parent/transaction_par/widgets/transaction_filter_bar.dart';
 import 'package:monikid/features/parent/transaction_par/widgets/transaction_history_par_body.dart';
@@ -13,8 +12,6 @@ class TransactionHistoryParScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class MiniDashboardItem extends StatelessWidget {
   final String title;
@@ -40,21 +42,19 @@ class MiniDashboardItem extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Color(0xFFCBD5E1),
-                    fontSize: 12,
-                  ),
+                  style: context.typo.caption.big.copyWith(
+                  color: AppTheme.iconLight,
+                ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               amount,
-              style: TextStyle(
-                color: color,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: context.typo.subtitle.small.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
             ),
           ],
         ),

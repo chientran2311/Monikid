@@ -78,9 +78,7 @@ class FamilyInfoCard extends StatelessWidget {
                   children: [
                     Text(
                       s.familyManagementInviteCodeLabel.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w500,
+                      style: context.typo.caption.medium.copyWith(
                         color: AppTheme.textGrey,
                         letterSpacing: 0.8,
                       ),
@@ -88,9 +86,7 @@ class FamilyInfoCard extends StatelessWidget {
                     SizedBox(height: 4.h),
                     Text(
                       displayCode,
-                      style: TextStyle(
-                        fontSize: 26.sp,
-                        fontWeight: FontWeight.w700,
+                      style: context.typo.headline.medium.copyWith(
                         color: AppTheme.primary,
                         letterSpacing: 2,
                       ),
@@ -123,8 +119,7 @@ class FamilyInfoCard extends StatelessWidget {
                       horizontal: 10.w,
                       vertical: 7.h,
                     ),
-                    textStyle: TextStyle(
-                      fontSize: 12.sp,
+                    textStyle: context.typo.caption.big.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -160,8 +155,7 @@ class _ParentRow extends StatelessWidget {
           backgroundColor: avatarColor,
           child: Text(
             displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
-            style: TextStyle(
-              fontSize: 14.sp,
+            style: context.typo.body.medium.copyWith(
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
@@ -174,17 +168,14 @@ class _ParentRow extends StatelessWidget {
             children: [
               Text(
                 displayName,
-                style: TextStyle(
-                  fontSize: 15.sp,
+                style: context.typo.body.big.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textBlack,
                 ),
               ),
               Text(
                 subtitle,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
+                style: context.typo.caption.big.copyWith(
                   color: AppTheme.textGrey,
                 ),
               ),
@@ -213,7 +204,7 @@ class _UnlinkParentButton extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
         minimumSize: Size.zero,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        textStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
+        textStyle: context.typo.caption.big.copyWith(fontWeight: FontWeight.w600),
       ),
       child: Text(label),
     );

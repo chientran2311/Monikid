@@ -5,15 +5,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_state.dart';
-import 'package:monikid/features/child/transaction/detail_transaction/widgets/detail_transaction_bottom_bar.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/error_state.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/transaction_content.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 class DetailTransactionScreen extends HookConsumerWidget {
   const DetailTransactionScreen({super.key, required this.transactionId});
@@ -22,8 +23,6 @@ class DetailTransactionScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref
@@ -37,24 +36,9 @@ class DetailTransactionScreen extends HookConsumerWidget {
       previous,
       next,
     ) {
-      if (!context.mounted || previous?.status == next.status) {
-        return;
-      }
-
-      switch (next.status) {
-        case TransactionStatus.error:
-          if (next.errorMessage != null) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
-          }
-          return;
-        case TransactionStatus.initial:
-        case TransactionStatus.loading:
-        case TransactionStatus.ready:
-        case TransactionStatus.submitting:
-        case TransactionStatus.success:
-          break;
+      if (!context.mounted || previous?.status == next.status) return;
+      if (next.status == TransactionStatus.error && next.errorMessage != null) {
+        context.showErrorSnackBar(next.errorMessage!);
       }
     });
 
@@ -62,6 +46,11 @@ class DetailTransactionScreen extends HookConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+
+    final showActions = state.transaction != null &&
+        state.status != TransactionStatus.initial &&
+        state.status != TransactionStatus.loading &&
+        state.status != TransactionStatus.error;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -74,16 +63,35 @@ class DetailTransactionScreen extends HookConsumerWidget {
         ),
         title: Text(
           s.transactionDetailTitle,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
+          style: context.typo.subtitle.medium
+              .copyWith(fontWeight: FontWeight.bold, color: textColor),
         ),
         centerTitle: true,
       ),
-      body: _buildBody(state, isDark),
-      bottomNavigationBar: _buildBottomBar(context, ref, state, isDark, bgColor),
+      body: Stack(
+        children: [
+          _buildBody(state, isDark),
+          if (showActions)
+            Positioned(
+              bottom: 32.h,
+              left: 20.w,
+              right: 20.w,
+              child: PrimaryButton(
+                title: s.transactionEditAction,
+                onTap: () async {
+                  ref
+                      .read(transactionHistoryProvider.notifier)
+                      .selectTransaction(state.transaction!);
+                  await context.push(
+                    AppRoutes.updateTransactionPath(
+                      state.transaction!.transactionId,
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -96,42 +104,12 @@ class DetailTransactionScreen extends HookConsumerWidget {
         return ErrorState(errorMessage: state.errorMessage);
       case TransactionStatus.ready:
       case TransactionStatus.submitting:
-        final transaction = state.transaction;
-        if (transaction == null) {
+        if (state.transaction == null) {
           return Center(child: Text(s.transactionDetailNoData));
         }
         return TransactionContent(state: state, isDark: isDark);
       case TransactionStatus.success:
         return const SizedBox.shrink();
     }
-  }
-
-  Widget _buildBottomBar(
-    BuildContext context,
-    WidgetRef ref,
-    DetailTransactionState state,
-    bool isDark,
-    Color bgColor,
-  ) {
-    final transaction = state.transaction;
-    if (transaction == null ||
-        state.status == TransactionStatus.initial ||
-        state.status == TransactionStatus.loading ||
-        state.status == TransactionStatus.error) {
-      return const SizedBox.shrink();
-    }
-
-    return DetailTransactionBottomBar(
-      isDark: isDark,
-      bgColor: bgColor,
-      onEdit: () async {
-        ref
-            .read(transactionHistoryProvider.notifier)
-            .selectTransaction(transaction);
-        await context.push(
-          AppRoutes.updateTransactionPath(transaction.transactionId),
-        );
-      },
-    );
   }
 }

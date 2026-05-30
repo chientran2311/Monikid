@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class CategoryItem extends StatelessWidget {
   final IconData icon;
@@ -57,16 +59,14 @@ class CategoryItem extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.typo.body.medium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
                     Text(
                       amount,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.typo.body.medium.copyWith(
                         fontWeight: FontWeight.bold,
                         color: textColor,
                       ),
@@ -82,8 +82,8 @@ class CategoryItem extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: value,
                           backgroundColor: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFF3F4F6),
+                              ? AppTheme.textGreyDarker
+                              : AppTheme.surfaceGrey,
                           valueColor: AlwaysStoppedAnimation<Color>(color),
                           minHeight: 6,
                         ),
@@ -95,8 +95,7 @@ class CategoryItem extends StatelessWidget {
                       child: Text(
                         percentage,
                         textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 12,
+                        style: context.typo.caption.big.copyWith(
                           fontWeight: FontWeight.w500,
                           color: textSubColor,
                         ),

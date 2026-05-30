@@ -85,11 +85,10 @@ class ParentSpendingTrendSection extends HookConsumerWidget {
               Expanded(
                 child: Text(
                   s.parentStatisticTrendTitle,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
+                  style: context.typo.subtitle.small.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
                 ),
               ),
               _PeriodSelector(
@@ -113,8 +112,7 @@ class ParentSpendingTrendSection extends HookConsumerWidget {
                 ? Center(
                     child: Text(
                       s.parentStatisticNoData,
-                      style: TextStyle(
-                        fontSize: 14.sp,
+                      style: context.typo.body.medium.copyWith(
                         color: mutedColor,
                         fontWeight: FontWeight.w500,
                       ),
@@ -156,11 +154,10 @@ class ParentSpendingTrendSection extends HookConsumerWidget {
                               child: Text(
                                 CurrencyFormatter.formatCompact(value.toInt()),
                                 textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  color: mutedColor,
-                                  fontWeight: FontWeight.w400,
-                                ),
+                                style: context.typo.caption.small.copyWith(
+                                color: mutedColor,
+                                fontWeight: FontWeight.w400,
+                              ),
                               ),
                             );
                           },
@@ -200,8 +197,8 @@ class ParentSpendingTrendSection extends HookConsumerWidget {
                       enabled: true,
                       touchTooltipData: LineTouchTooltipData(
                         getTooltipColor: (_) => isDark
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFF334155),
+                            ? AppTheme.surfaceVariant
+                            : AppTheme.borderDark,
                         tooltipRoundedRadius: 12.r,
                         tooltipPadding: EdgeInsets.symmetric(
                           horizontal: 12.w,
@@ -216,9 +213,8 @@ class ParentSpendingTrendSection extends HookConsumerWidget {
                           final data = visibleData[index];
                           return LineTooltipItem(
                             '${_labelFor(data.date, locale)}\n${CurrencyFormatter.format(item.y.toInt())}',
-                            TextStyle(
+                            context.typo.caption.big.copyWith(
                               color: Colors.white,
-                              fontSize: 12.sp,
                               fontWeight: FontWeight.w600,
                               height: 1.4,
                             ),
@@ -488,11 +484,10 @@ class _PeriodSelector extends StatelessWidget {
           children: [
             Text(
               _formatSelectedLabel(context),
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
-                color: textColor,
-              ),
+              style: context.typo.caption.big.copyWith(
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
             ),
             SizedBox(width: 4.w),
             Icon(

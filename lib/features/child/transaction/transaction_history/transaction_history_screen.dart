@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_filter_bar.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_history_body.dart';
+import 'package:monikid/shared/widgets/screen_page_header.dart';
 
 class TransactionHistoryScreen extends HookConsumerWidget {
   const TransactionHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
+    final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark;
 
     final scrollCtrl = useScrollController();
 
@@ -51,25 +51,19 @@ class TransactionHistoryScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: isDark
-            ? AppTheme.surfaceDark.withValues(alpha: 0.9)
-            : Colors.white.withValues(alpha: 0.9),
-        elevation: 1,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Lịch sử Giao dịch',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-      ),
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 20.h),
+              child: ScreenPageHeader(
+                eyebrow: s.transactionHistoryEyebrow,
+                title: s.transactionHistoryTitle,
+                subtitle: s.transactionHistorySubhead,
+                isDark: isDark,
+              ),
+            ),
             TransactionFilterBar(isDark: isDark),
             TransactionHistoryBody(
               scrollController: scrollCtrl,

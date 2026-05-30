@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class SettingItem extends StatelessWidget {
@@ -9,6 +10,7 @@ class SettingItem extends StatelessWidget {
     required this.iconColor,
     required this.iconBgColor,
     required this.title,
+    this.subtitle,
     this.onTap,
     this.trailing,
     this.showChevron = true,
@@ -19,6 +21,7 @@ class SettingItem extends StatelessWidget {
   final Color iconColor;
   final Color iconBgColor;
   final String title;
+  final String? subtitle;
   final VoidCallback? onTap;
   final Widget? trailing;
   final bool showChevron;
@@ -29,8 +32,9 @@ class SettingItem extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
+    final subtitleColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final chevronColor =
-        isDark ? const Color(0xFF4B5563) : const Color(0xFF9CA3AF);
+        isDark ? AppTheme.textGreyMedium : AppTheme.textGreyDark;
 
     return Container(
       decoration: BoxDecoration(
@@ -58,13 +62,28 @@ class SettingItem extends StatelessWidget {
                 ),
                 SizedBox(width: 14.w),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.w500,
-                      color: textColor,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: context.typo.subtitle.small.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        SizedBox(height: 2.h),
+                        Text(
+                          subtitle!,
+                          style: context.typo.caption.medium.copyWith(
+                            color: subtitleColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 if (trailing != null) ...[trailing!, SizedBox(width: 4.w)],

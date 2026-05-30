@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class TransactionDetailInfoRow extends StatelessWidget {
@@ -17,7 +18,7 @@ class TransactionDetailInfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +26,7 @@ class TransactionDetailInfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(color: mutedColor, fontSize: 12.sp),
+            style: context.typo.caption.big.copyWith(color: mutedColor),
           ),
         ),
         SizedBox(width: 16.w),
@@ -34,9 +35,8 @@ class TransactionDetailInfoRow extends StatelessWidget {
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: TextStyle(
+            style: context.typo.body.medium.copyWith(
               color: textColor,
-              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
           ),

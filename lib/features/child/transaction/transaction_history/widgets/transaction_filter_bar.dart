@@ -1,12 +1,15 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/calendar_dialog.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/category_dialog.dart';
-import 'package:monikid/models/entities/category_model.dart';
 
 class TransactionFilterBar extends ConsumerWidget {
   const TransactionFilterBar({
@@ -36,141 +39,49 @@ class TransactionFilterBar extends ConsumerWidget {
       selectedCategory,
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Month picker chip
-              GestureDetector(
-                onTap: () => _showMonthPicker(context, selectedDate, notifier),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppTheme.primary.withValues(alpha: 0.2) : const Color(0xFFeaf2eb),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_month,
-                        size: 20,
-                        color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        selectedDate == null
-                            ? 'Chọn ngày'
-                            : DateFormat('dd/MM/yyyy').format(selectedDate),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
-                        ),
-                      ),
-                      if (selectedDate != null) ...[
-                        const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: () => notifier.getTransByDate(null),
-                          child: Icon(
-                            Icons.close,
-                            size: 16,
-                            color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
-                          ),
-                        ),
-                      ] else ...[
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.expand_more,
-                          size: 18,
-                          color: isDark ? const Color(0xFFeaf2eb) : AppTheme.primary,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              // Filter icon (category)
-              GestureDetector(
-                onTap: () => _showCategoryDialog(
-                  context,
-                  selectedCategory,
-                  notifier,
-                  isDark,
-                  transactionTypeFilter,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: selectedCategory != null
-                        ? AppTheme.primary.withValues(alpha: 0.15)
-                        : isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(8),
-                    border: selectedCategory != null
-                        ? Border.all(color: AppTheme.primary.withValues(alpha: 0.4))
-                        : null,
-                  ),
-                  child: Icon(
-                    Icons.filter_list,
-                    size: 20,
-                    color: selectedCategory != null
-                        ? AppTheme.primary
-                        : isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    final dateLabel = selectedDate != null
+        ? DateFormat('dd/MM/yyyy').format(selectedDate)
+        : null;
 
-        // Active category chip
-        if (selectedCategory != null)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => notifier.getTransByCategory(null),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          categories
-                              .firstWhere(
-                                (c) => c.label == selectedCategoryModel?.label,
-                                orElse: () => const CategoryModel(id: '', label: '', icon: '📦'),
-                              )
-                              .icon,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          selectedCategoryModel?.label ?? selectedCategory,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.close, size: 14, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+    final categoryLabel = selectedCategoryModel?.label ?? selectedCategory;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+      child: Row(
+        children: [
+          Expanded(
+            child: _FilterButton(
+              emoji: '📅',
+              label: 'Thời gian',
+              activeLabel: dateLabel,
+              isDark: isDark,
+              onTap: () => _showMonthPicker(context, selectedDate, notifier),
+              onClear: selectedDate != null
+                  ? () => notifier.getTransByDate(null)
+                  : null,
             ),
           ),
-      ],
+          SizedBox(width: 10.w),
+          Expanded(
+            child: _FilterButton(
+              emoji: '🗂',
+              label: 'Danh mục',
+              activeLabel: categoryLabel,
+              isDark: isDark,
+              onTap: () => _showCategoryDialog(
+                context,
+                selectedCategory,
+                notifier,
+                isDark,
+                transactionTypeFilter,
+              ),
+              onClear: selectedCategory != null
+                  ? () => notifier.getTransByCategory(null)
+                  : null,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -179,7 +90,7 @@ class TransactionFilterBar extends ConsumerWidget {
     DateTime? currentDate,
     TransactionHistory notifier,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -197,19 +108,152 @@ class TransactionFilterBar extends ConsumerWidget {
     bool isDark,
     String? transactionTypeFilter,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => CategoryDialog(
         selectedCategory: selectedCategory,
         onCategorySelected: (category) {
-          final categoryKey = category != null 
-              ? transactionCategoryKeyForCategory(category) 
+          final categoryKey = category != null
+              ? transactionCategoryKeyForCategory(category)
               : null;
           notifier.getTransByCategory(categoryKey);
         },
-        categoryType: transactionTypeFilter == 'all' || transactionTypeFilter == null ? null : transactionTypeFilter,
+        categoryType: transactionTypeFilter == 'all' || transactionTypeFilter == null
+            ? null
+            : transactionTypeFilter,
+      ),
+    );
+  }
+}
+
+class _FilterButton extends StatefulWidget {
+  const _FilterButton({
+    required this.emoji,
+    required this.label,
+    required this.activeLabel,
+    required this.isDark,
+    required this.onTap,
+    this.onClear,
+  });
+
+  final String emoji;
+  final String label;
+  final String? activeLabel;
+  final bool isDark;
+  final VoidCallback onTap;
+  final VoidCallback? onClear;
+
+  @override
+  State<_FilterButton> createState() => _FilterButtonState();
+}
+
+class _FilterButtonState extends State<_FilterButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = widget.activeLabel != null;
+    final displayLabel = widget.activeLabel ?? widget.label;
+
+    final bgColor = widget.isDark
+        ? (isActive
+            ? AppTheme.primary.withValues(alpha: 0.18)
+            : AppTheme.surfaceDark.withValues(alpha: 0.84))
+        : Colors.white.withValues(alpha: 0.84);
+
+    final borderColor = widget.isDark
+        ? (isActive
+            ? AppTheme.primary.withValues(alpha: 0.4)
+            : AppTheme.borderDark)
+        : AppTheme.primary.withValues(alpha: 0.16);
+
+    final labelColor = widget.isDark
+        ? (isActive ? AppTheme.surfaceLightGreen : AppTheme.textWhite)
+        : AppTheme.textBlack;
+
+    final mutedColor = widget.isDark ? AppTheme.textMuted : AppTheme.textGrey;
+
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18.r),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              constraints: BoxConstraints(minHeight: 48.h),
+              padding: EdgeInsets.symmetric(horizontal: 14.w),
+              decoration: BoxDecoration(
+                color: bgColor,
+                border: Border.all(color: borderColor),
+                borderRadius: BorderRadius.circular(18.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primary.withValues(alpha: 0.06),
+                    blurRadius: 28.r,
+                    offset: Offset(0, 12.h),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          widget.emoji,
+                          style: TextStyle(fontSize: 16.sp),
+                        ),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            displayLabel,
+                            style: AppTextStyleFactory.style(
+                              size: AppFontSizes.bodyMedium,
+                              weight: FontWeight.w800,
+                              color: isActive ? AppTheme.primary : labelColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  if (isActive && widget.onClear != null)
+                    GestureDetector(
+                      onTap: widget.onClear,
+                      behavior: HitTestBehavior.opaque,
+                      child: Icon(
+                        Icons.close,
+                        size: 16.r,
+                        color: AppTheme.primary,
+                      ),
+                    )
+                  else
+                    Text(
+                      '›',
+                      style: AppTextStyleFactory.style(
+                        size: AppFontSizes.bodyMedium,
+                        weight: FontWeight.w800,
+                        color: mutedColor,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

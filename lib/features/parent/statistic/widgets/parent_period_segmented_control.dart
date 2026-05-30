@@ -60,11 +60,10 @@ class ParentPeriodSegmentedControl extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
-                    color: isActive ? activeTextColor : inactiveTextColor,
-                  ),
+                  style: context.typo.caption.big.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isActive ? activeTextColor : inactiveTextColor,
+                ),
                 ),
               ),
             ),

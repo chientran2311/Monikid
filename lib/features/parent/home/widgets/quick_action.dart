@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class QuickAction extends StatelessWidget {
   final IconData icon;
@@ -24,15 +26,15 @@ class QuickAction extends StatelessWidget {
         ? (isDark
               ? parentPrimary.withValues(alpha: 0.2)
               : parentPrimary.withValues(alpha: 0.1))
-        : (isDark ? const Color(0xFF1E2E1A) : Colors.white);
+        : (isDark ? AppTheme.greenDarker : Colors.white);
 
     final iconColor = isPrimary
         ? parentPrimary
-        : (isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569));
+        : (isDark ? AppTheme.iconLight : AppTheme.textDark);
 
     final borderColor = isPrimary
         ? Colors.transparent
-        : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9));
+        : (isDark ? AppTheme.borderDark : const Color(0xFFF1F5F9));
 
     return Column(
       children: [
@@ -66,11 +68,10 @@ class QuickAction extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF475569),
-          ),
+          style: context.typo.caption.big.copyWith(
+          fontWeight: FontWeight.w500,
+          color: isDark ? AppTheme.borderLight : AppTheme.textDark,
+        ),
         ),
       ],
     );

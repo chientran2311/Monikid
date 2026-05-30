@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class ProfileEditTextField extends StatelessWidget {
@@ -43,8 +44,7 @@ class ProfileEditTextField extends StatelessWidget {
           padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 14.sp,
+            style: context.typo.body.medium.copyWith(
               fontWeight: FontWeight.w600,
               color: labelColor,
             ),
@@ -55,9 +55,8 @@ class ProfileEditTextField extends StatelessWidget {
           enabled: enabled,
           onChanged: onChanged,
           keyboardType: keyboardType,
-          style: TextStyle(
+          style: context.typo.body.big.copyWith(
             color: enabled ? textColor : disabledTextColor,
-            fontSize: 15.sp,
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -91,9 +90,8 @@ class ProfileEditTextField extends StatelessWidget {
               borderSide: BorderSide(color: borderColor),
             ),
             errorText: errorText,
-            errorStyle: TextStyle(
+            errorStyle: context.typo.caption.big.copyWith(
               color: AppTheme.redAlert,
-              fontSize: 12.sp,
             ),
           ),
         ),

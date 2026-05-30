@@ -5,7 +5,7 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/change_language/change_language_dialog.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
 import 'package:monikid/features/child/setting/widgets/setting_group.dart';
@@ -17,16 +17,9 @@ class SettingTabStudent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
-    final mutedColor =
-        isDark ? AppTheme.textMuted : AppTheme.textGrey;
-
-    final langCode =
-        ref.watch(changeLanguageProvider).localeCode;
+    final langCode = ref.watch(changeLanguageProvider).localeCode;
 
     Future<void> handleSignOut() async {
       final confirmed = await showDialog<bool>(
@@ -50,97 +43,21 @@ class SettingTabStudent extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppTheme.backgroundDark : const Color(0xFFF4F4F5),
+          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
       body: SafeArea(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           children: [
             SizedBox(height: 24.h),
-            Padding(
-              padding: EdgeInsets.only(left: 4.w, bottom: 24.h),
-              child: Text(
-                s.settingStuTitle,
-                style: TextStyle(
-                  fontSize: 30.sp,
-                  fontWeight: FontWeight.w700,
-                  color: textColor,
-                ),
-              ),
-            ),
-
-            _SectionLabel(
-                title: s.settingStuSectionGeneral, color: mutedColor),
-            SizedBox(height: 8.h),
-            SettingGroup(
-              children: [
-                SettingItem(
-                  icon: Icons.language_rounded,
-                  iconColor: AppTheme.primary,
-                  iconBgColor: AppTheme.primaryLight,
-                  title: s.language,
-                  showBorder: true,
-                  trailing: Text(
-                    langCode == 'vi' ? s.vietnamese : s.english,
-                    style: TextStyle(fontSize: 14.sp, color: mutedColor),
-                  ),
-                  showChevron: true,
-                  onTap: () => showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => const ChangeLanguageDialog(),
-                  ),
-                ),
-                SettingItem(
-                  icon: Icons.smart_toy_outlined,
-                  iconColor: AppTheme.primary,
-                  iconBgColor: AppTheme.primaryLight,
-                  title: s.chooseAiModelTitle,
-                  showBorder: false,
-                  onTap: () => context.push(AppRoutes.chooseAiModel),
-                ),
-              ],
+            _SettingHeader(
+              eyebrowLabel: s.settingStuEyebrow,
+              title: s.settingStuTitle,
+              subtitle: s.settingStuSubtitle,
+              isDark: isDark,
             ),
             SizedBox(height: 24.h),
-
-            _SectionLabel(
-                title: s.settingStuSectionAccount, color: mutedColor),
-            SizedBox(height: 8.h),
-            SettingGroup(
-              children: [
-                SettingItem(
-                  icon: Icons.account_balance_wallet_outlined,
-                  iconColor: AppTheme.primary,
-                  iconBgColor: AppTheme.primaryLight,
-                  title: s.settingStuBudgetLabel,
-                  showBorder: true,
-                  onTap: () {},
-                ),
-                SettingItem(
-                  icon: Icons.family_restroom_rounded,
-                  iconColor: AppTheme.primary,
-                  iconBgColor: AppTheme.primaryLight,
-                  title: s.settingStuFamilyCodeLabel,
-                  showBorder: true,
-                  trailing: Icon(
-                    Icons.qr_code_2_rounded,
-                    size: 18.r,
-                    color: mutedColor,
-                  ),
-                  onTap: () => context.push(AppRoutes.joinFamily),
-                ),
-                SettingItem(
-                  icon: Icons.lock_reset_rounded,
-                  iconColor: AppTheme.primary,
-                  iconBgColor: AppTheme.primaryLight,
-                  title: s.settingParChangePasswordLabel,
-                  showBorder: false,
-                  onTap: () {},
-                ),
-              ],
-            ),
-            SizedBox(height: 24.h),
-
+            _SettingsList(langCode: langCode, isDark: isDark),
+            SizedBox(height: 20.h),
             _SignOutCard(
               isDark: isDark,
               label: s.settingParLogoutLabel,
@@ -154,25 +71,152 @@ class SettingTabStudent extends ConsumerWidget {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.title, required this.color});
+class _SettingHeader extends StatelessWidget {
+  const _SettingHeader({
+    required this.eyebrowLabel,
+    required this.title,
+    required this.subtitle,
+    required this.isDark,
+  });
 
+  final String eyebrowLabel;
   final String title;
-  final Color color;
+  final String subtitle;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.w, bottom: 0),
-      child: Text(
-        title.toUpperCase(),
-        style: TextStyle(
-          fontSize: 13.sp,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-          color: color,
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 7.h),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryLight,
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 7.r,
+                height: 7.r,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                eyebrowLabel,
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.primary,
+                  letterSpacing: 0.02,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+        SizedBox(height: 14.h),
+        Text(
+          title,
+          style: context.typo.display.small.copyWith(
+            fontWeight: FontWeight.w800,
+            color: textColor,
+            letterSpacing: -0.03,
+          ),
+        ),
+        SizedBox(height: 10.h),
+        Text(
+          subtitle,
+          style: context.typo.body.medium.copyWith(
+            color: mutedColor,
+            height: 1.45,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SettingsList extends StatelessWidget {
+  const _SettingsList({required this.langCode, required this.isDark});
+
+  final String langCode;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.l10n;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+
+    return SettingGroup(
+      children: [
+        SettingItem(
+          icon: Icons.language_rounded,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.language,
+          subtitle: langCode == 'vi' ? s.vietnamese : s.english,
+          showBorder: true,
+          onTap: () => showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (_) => const ChangeLanguageDialog(),
+          ),
+        ),
+        SettingItem(
+          icon: Icons.notifications_outlined,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.settingNotificationsLabel,
+          subtitle: s.settingStuNotificationsSubtitle,
+          showBorder: true,
+          onTap: () => context.push(AppRoutes.scheduleNotification),
+        ),
+        SettingItem(
+          icon: Icons.smart_toy_outlined,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.chooseAiModelTitle,
+          subtitle: s.settingStuAiModelSubtitle,
+          showBorder: true,
+          onTap: () => context.push(AppRoutes.chooseAiModel),
+        ),
+        SettingItem(
+          icon: Icons.person_outline_rounded,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.settingStuProfileEditLabel,
+          subtitle: s.settingStuProfileEditSubtitle,
+          showBorder: true,
+          onTap: () => context.push(AppRoutes.profileEdit),
+        ),
+        SettingItem(
+          icon: Icons.family_restroom_rounded,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.settingStuFamilyCodeLabel,
+          subtitle: s.settingStuFamilyCodeSubtitle,
+          showBorder: true,
+          trailing: Icon(Icons.qr_code_2_rounded, size: 18.r, color: mutedColor),
+          onTap: () => context.push(AppRoutes.joinFamily),
+        ),
+        SettingItem(
+          icon: Icons.help_outline_rounded,
+          iconColor: AppTheme.primary,
+          iconBgColor: AppTheme.primaryLight,
+          title: s.settingFQA,
+          subtitle: s.settingStuFaqSubtitle,
+          showBorder: false,
+          onTap: () => context.push(AppRoutes.fqa),
+        ),
+      ],
     );
   }
 }
@@ -190,41 +234,31 @@ class _SignOutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final errorColor =
-        isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
+    final errorColor = isDark ? AppTheme.redVeryLight : AppTheme.redDark;
+    final bgColor =
+        isDark ? AppTheme.redVeryLight.withValues(alpha: 0.1) : AppTheme.dangerSurface;
+    final borderColor =
+        isDark ? AppTheme.redVeryLight.withValues(alpha: 0.2) : AppTheme.dangerBorder;
 
     return Container(
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: borderColor, width: 0.5),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        color: bgColor,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: borderColor),
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(18.r),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(18.r),
           child: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            padding: EdgeInsets.symmetric(vertical: 18.h),
             child: Center(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w600,
+                style: context.typo.subtitle.small.copyWith(
+                  fontWeight: FontWeight.w800,
                   color: errorColor,
                 ),
               ),

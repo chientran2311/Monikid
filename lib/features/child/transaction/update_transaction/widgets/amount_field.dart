@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/update_transaction/widgets/section_label.dart';
 
 class AmountField extends StatelessWidget {
@@ -25,20 +26,12 @@ class AmountField extends StatelessWidget {
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           enabled: enabled,
-          style: const TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.primary,
-          ),
+          style: context.typo.display.big.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primary),
           decoration: InputDecoration(
             hintText: '0',
-            hintStyle: const TextStyle(color: Color(0xFFCBD5E1)),
+            hintStyle: const TextStyle(color: AppTheme.iconLight),
             suffixText: '₫',
-            suffixStyle: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF94A3B8),
-            ),
+            suffixStyle: context.typo.title.big.copyWith(fontWeight: FontWeight.w500, color: AppTheme.textMuted),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
                 color: AppTheme.primary.withValues(alpha: 0.3),

@@ -14,6 +14,7 @@ import 'package:monikid/features/change_language/change_language_provider.dart';
 import 'package:monikid/features/child/choose_ai_model/choose_ai_model_state.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/models/ai/receipt_scan/receipt_category_option.dart';
+import 'package:monikid/models/ai/receipt_scan/receipt_ocr_result.dart';
 import 'package:monikid/models/ai/transaction_ai_result.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository.dart';
 import 'package:monikid/repositories/ai/prompt_util.dart';
@@ -566,7 +567,7 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
           .toList(growable: false);
 
       final prompt = buildReceiptAnalysisPrompt(
-        ocrText: normalizedPrompt,
+        ocrResult: ReceiptOcrResult(rawText: normalizedPrompt),
         languageCode: languageCode,
         categories: categoryOptions,
       );

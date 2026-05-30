@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class ConfirmDialog extends StatelessWidget {
@@ -39,8 +40,7 @@ class ConfirmDialog extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 17.sp,
+              style: context.typo.subtitle.small.copyWith(
                 fontWeight: FontWeight.w700,
                 color: textColor,
               ),
@@ -48,8 +48,7 @@ class ConfirmDialog extends StatelessWidget {
             SizedBox(height: 12.h),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14.sp,
+              style: context.typo.body.medium.copyWith(
                 height: 1.45,
                 color: mutedColor,
               ),
@@ -68,8 +67,7 @@ class ConfirmDialog extends StatelessWidget {
                     ),
                     child: Text(
                       cancelLabel,
-                      style: TextStyle(
-                        fontSize: 14.sp,
+                      style: context.typo.body.medium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -90,8 +88,7 @@ class ConfirmDialog extends StatelessWidget {
                     ),
                     child: Text(
                       confirmLabel,
-                      style: TextStyle(
-                        fontSize: 14.sp,
+                      style: context.typo.body.medium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),

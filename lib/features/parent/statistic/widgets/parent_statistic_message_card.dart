@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class ParentStatisticMessageCard extends StatelessWidget {
@@ -31,8 +32,7 @@ class ParentStatisticMessageCard extends StatelessWidget {
       child: Text(
         message,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 14.sp,
+        style: context.typo.body.medium.copyWith(
           color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
         ),
       ),

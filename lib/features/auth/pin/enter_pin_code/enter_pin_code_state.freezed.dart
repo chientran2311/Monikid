@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EnterPINCodeState {
 
- String get currentPin; EnterPINCodeStatus get status; bool get isLoading; int get failedCount; DateTime? get lockedUntil; int get remainingLockSeconds; String? get errorMessage;
+ String get currentPin; EnterPINCodeStatus get status; int get failedCount; DateTime? get lockedUntil; int get remainingLockSeconds; String? get errorMessage;
 /// Create a copy of EnterPINCodeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $EnterPINCodeStateCopyWith<EnterPINCodeState> get copyWith => _$EnterPINCodeStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EnterPINCodeState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.failedCount, failedCount) || other.failedCount == failedCount)&&(identical(other.lockedUntil, lockedUntil) || other.lockedUntil == lockedUntil)&&(identical(other.remainingLockSeconds, remainingLockSeconds) || other.remainingLockSeconds == remainingLockSeconds)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EnterPINCodeState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.failedCount, failedCount) || other.failedCount == failedCount)&&(identical(other.lockedUntil, lockedUntil) || other.lockedUntil == lockedUntil)&&(identical(other.remainingLockSeconds, remainingLockSeconds) || other.remainingLockSeconds == remainingLockSeconds)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentPin,status,isLoading,failedCount,lockedUntil,remainingLockSeconds,errorMessage);
+int get hashCode => Object.hash(runtimeType,currentPin,status,failedCount,lockedUntil,remainingLockSeconds,errorMessage);
 
 @override
 String toString() {
-  return 'EnterPINCodeState(currentPin: $currentPin, status: $status, isLoading: $isLoading, failedCount: $failedCount, lockedUntil: $lockedUntil, remainingLockSeconds: $remainingLockSeconds, errorMessage: $errorMessage)';
+  return 'EnterPINCodeState(currentPin: $currentPin, status: $status, failedCount: $failedCount, lockedUntil: $lockedUntil, remainingLockSeconds: $remainingLockSeconds, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $EnterPINCodeStateCopyWith<$Res>  {
   factory $EnterPINCodeStateCopyWith(EnterPINCodeState value, $Res Function(EnterPINCodeState) _then) = _$EnterPINCodeStateCopyWithImpl;
 @useResult
 $Res call({
- String currentPin, EnterPINCodeStatus status, bool isLoading, int failedCount, DateTime? lockedUntil, int remainingLockSeconds, String? errorMessage
+ String currentPin, EnterPINCodeStatus status, int failedCount, DateTime? lockedUntil, int remainingLockSeconds, String? errorMessage
 });
 
 
@@ -63,12 +63,11 @@ class _$EnterPINCodeStateCopyWithImpl<$Res>
 
 /// Create a copy of EnterPINCodeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? failedCount = null,Object? lockedUntil = freezed,Object? remainingLockSeconds = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentPin = null,Object? status = null,Object? failedCount = null,Object? lockedUntil = freezed,Object? remainingLockSeconds = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as EnterPINCodeStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,failedCount: null == failedCount ? _self.failedCount : failedCount // ignore: cast_nullable_to_non_nullable
+as EnterPINCodeStatus,failedCount: null == failedCount ? _self.failedCount : failedCount // ignore: cast_nullable_to_non_nullable
 as int,lockedUntil: freezed == lockedUntil ? _self.lockedUntil : lockedUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,remainingLockSeconds: null == remainingLockSeconds ? _self.remainingLockSeconds : remainingLockSeconds // ignore: cast_nullable_to_non_nullable
 as int,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -83,12 +82,11 @@ as String?,
 
 
 class _EnterPINCodeState extends EnterPINCodeState {
-  const _EnterPINCodeState({this.currentPin = '', this.status = EnterPINCodeStatus.initial, this.isLoading = false, this.failedCount = 0, this.lockedUntil, this.remainingLockSeconds = 0, this.errorMessage}): super._();
+  const _EnterPINCodeState({this.currentPin = '', this.status = EnterPINCodeStatus.initial, this.failedCount = 0, this.lockedUntil, this.remainingLockSeconds = 0, this.errorMessage}): super._();
   
 
 @override@JsonKey() final  String currentPin;
 @override@JsonKey() final  EnterPINCodeStatus status;
-@override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  int failedCount;
 @override final  DateTime? lockedUntil;
 @override@JsonKey() final  int remainingLockSeconds;
@@ -104,16 +102,16 @@ _$EnterPINCodeStateCopyWith<_EnterPINCodeState> get copyWith => __$EnterPINCodeS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EnterPINCodeState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.failedCount, failedCount) || other.failedCount == failedCount)&&(identical(other.lockedUntil, lockedUntil) || other.lockedUntil == lockedUntil)&&(identical(other.remainingLockSeconds, remainingLockSeconds) || other.remainingLockSeconds == remainingLockSeconds)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EnterPINCodeState&&(identical(other.currentPin, currentPin) || other.currentPin == currentPin)&&(identical(other.status, status) || other.status == status)&&(identical(other.failedCount, failedCount) || other.failedCount == failedCount)&&(identical(other.lockedUntil, lockedUntil) || other.lockedUntil == lockedUntil)&&(identical(other.remainingLockSeconds, remainingLockSeconds) || other.remainingLockSeconds == remainingLockSeconds)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentPin,status,isLoading,failedCount,lockedUntil,remainingLockSeconds,errorMessage);
+int get hashCode => Object.hash(runtimeType,currentPin,status,failedCount,lockedUntil,remainingLockSeconds,errorMessage);
 
 @override
 String toString() {
-  return 'EnterPINCodeState(currentPin: $currentPin, status: $status, isLoading: $isLoading, failedCount: $failedCount, lockedUntil: $lockedUntil, remainingLockSeconds: $remainingLockSeconds, errorMessage: $errorMessage)';
+  return 'EnterPINCodeState(currentPin: $currentPin, status: $status, failedCount: $failedCount, lockedUntil: $lockedUntil, remainingLockSeconds: $remainingLockSeconds, errorMessage: $errorMessage)';
 }
 
 
@@ -124,7 +122,7 @@ abstract mixin class _$EnterPINCodeStateCopyWith<$Res> implements $EnterPINCodeS
   factory _$EnterPINCodeStateCopyWith(_EnterPINCodeState value, $Res Function(_EnterPINCodeState) _then) = __$EnterPINCodeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String currentPin, EnterPINCodeStatus status, bool isLoading, int failedCount, DateTime? lockedUntil, int remainingLockSeconds, String? errorMessage
+ String currentPin, EnterPINCodeStatus status, int failedCount, DateTime? lockedUntil, int remainingLockSeconds, String? errorMessage
 });
 
 
@@ -141,12 +139,11 @@ class __$EnterPINCodeStateCopyWithImpl<$Res>
 
 /// Create a copy of EnterPINCodeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentPin = null,Object? status = null,Object? isLoading = null,Object? failedCount = null,Object? lockedUntil = freezed,Object? remainingLockSeconds = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentPin = null,Object? status = null,Object? failedCount = null,Object? lockedUntil = freezed,Object? remainingLockSeconds = null,Object? errorMessage = freezed,}) {
   return _then(_EnterPINCodeState(
 currentPin: null == currentPin ? _self.currentPin : currentPin // ignore: cast_nullable_to_non_nullable
 as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as EnterPINCodeStatus,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
-as bool,failedCount: null == failedCount ? _self.failedCount : failedCount // ignore: cast_nullable_to_non_nullable
+as EnterPINCodeStatus,failedCount: null == failedCount ? _self.failedCount : failedCount // ignore: cast_nullable_to_non_nullable
 as int,lockedUntil: freezed == lockedUntil ? _self.lockedUntil : lockedUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,remainingLockSeconds: null == remainingLockSeconds ? _self.remainingLockSeconds : remainingLockSeconds // ignore: cast_nullable_to_non_nullable
 as int,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable

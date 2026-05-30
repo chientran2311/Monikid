@@ -4,9 +4,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/transaction_history/providers/transaction_summary_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
+import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_skeleton.dart';
+import 'package:monikid/shared/widgets/skeleton_widget/transaction_history_skeleton.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/grouped_transaction_list.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_and_tabs_section.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -52,6 +55,9 @@ class TransactionHistoryBody extends ConsumerWidget {
     final hasMore = ref.watch(
       transactionHistoryProvider.select((v) => v.hasMore),
     );
+    final listLoadingTrigger = ref.watch(
+      transactionHistoryProvider.select((v) => v.listLoadingTrigger),
+    );
 
     final now = DateTime.now();
     final currentMonth = DateTime(now.year, now.month);
@@ -65,7 +71,14 @@ class TransactionHistoryBody extends ConsumerWidget {
     );
 
     if (isLoading) {
-      return Expanded(child: TransactionHistorySkeleton(isDark: isDark));
+      return Expanded(child: TransactionHistorySkeletonNew(isDark: isDark));
+    }
+
+    // Category / date filter change → full-screen skeleton (hides summary card)
+    if (isListLoading &&
+        listLoadingTrigger != TransactionListLoadingTrigger.none &&
+        listLoadingTrigger != TransactionListLoadingTrigger.tabSwitch) {
+      return Expanded(child: TransactionHistorySkeletonNew(isDark: isDark));
     }
 
     if (errorMessage != null) {
@@ -134,12 +147,9 @@ class TransactionHistoryBody extends ConsumerWidget {
                       Text(
                         'Không có giao dịch nào.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDark
+                        style: context.typo.body.medium.copyWith(color: isDark
                               ? AppTheme.textWhite.withValues(alpha: 0.54)
-                              : AppTheme.textMuted,
-                        ),
+                              : AppTheme.textMuted),
                       ),
                     ],
                   ),
@@ -224,10 +234,7 @@ class TransactionHistoryBody extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Text(
                             'Đã hiển thị tất cả giao dịch',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? Colors.white38 : Colors.black26,
-                            ),
+                            style: context.typo.caption.big.copyWith(color: isDark ? Colors.white38 : Colors.black26),
                           ),
                         ),
                       )

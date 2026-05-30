@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
-import 'package:monikid/features/auth/providers/auth_session_state.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_state.dart';
 import 'package:monikid/features/child/statistic/statistic_helpers.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';

@@ -55,8 +55,7 @@ class ChildMemberCard extends StatelessWidget {
                 member.displayName.isNotEmpty
                     ? member.displayName[0].toUpperCase()
                     : '?',
-                style: TextStyle(
-                  fontSize: 14.sp,
+                style: context.typo.body.medium.copyWith(
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -69,8 +68,7 @@ class ChildMemberCard extends StatelessWidget {
                 children: [
                   Text(
                     member.displayName,
-                    style: TextStyle(
-                      fontSize: 15.sp,
+                    style: context.typo.body.big.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textBlack,
                     ),
@@ -149,9 +147,7 @@ class _LimitChip extends StatelessWidget {
         ),
         child: Text(
           CurrencyFormatter.format(limitMinor!),
-          style: TextStyle(
-            fontSize: 11.sp,
-            fontWeight: FontWeight.w500,
+          style: context.typo.caption.medium.copyWith(
             color: AppTheme.primary,
           ),
         ),
@@ -165,9 +161,7 @@ class _LimitChip extends StatelessWidget {
       ),
       child: Text(
         noLimitLabel,
-        style: TextStyle(
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w500,
+        style: context.typo.caption.medium.copyWith(
           color: AppTheme.textMuted,
         ),
       ),
@@ -208,7 +202,7 @@ class _ActionRow extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            textStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
+            textStyle: context.typo.caption.big.copyWith(fontWeight: FontWeight.w600),
           ),
           child: Text(setLimitLabel),
         ),
@@ -221,7 +215,7 @@ class _ActionRow extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              textStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
+              textStyle: context.typo.caption.big.copyWith(fontWeight: FontWeight.w600),
             ),
             child: Text(unlinkLabel),
           ),

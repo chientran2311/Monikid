@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -32,7 +33,13 @@ class MoniKidApp extends ConsumerWidget {
       routerConfig: router,
       builder: (context, child) {
         ScreenUtils.init(context);
-        return child ?? const SizedBox.shrink();
+        return AppTypographyScope(
+          typography: AppTypography(
+            defaultColor: Theme.of(context).textTheme.bodyMedium?.color ??
+                Theme.of(context).colorScheme.onSurface,
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
       },
 
       // Localization

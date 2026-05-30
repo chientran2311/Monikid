@@ -5,6 +5,7 @@ part 'splash_state.freezed.dart';
 enum SplashRouteTarget {
   none,
   login,
+  onboarding,
   pinGateway,
 }
 

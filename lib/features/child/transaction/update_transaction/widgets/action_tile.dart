@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class ActionTile extends StatelessWidget {
   const ActionTile({
@@ -53,7 +55,7 @@ class ActionTile extends StatelessWidget {
               ),
               child: Center(
                 child: iconStr != null && iconStr!.isNotEmpty
-                    ? Text(iconStr!, style: const TextStyle(fontSize: 24))
+                    ? Text(iconStr!, style: context.typo.title.big)
                     : Icon(iconData, color: iconColor),
               ),
             ),
@@ -64,19 +66,11 @@ class ActionTile extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF64748B),
-                    ),
+                    style: context.typo.caption.big.copyWith(fontWeight: FontWeight.w500, color: AppTheme.textGrey),
                   ),
                   Text(
                     value,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
+                    style: context.typo.subtitle.small.copyWith(fontWeight: FontWeight.bold, color: isDark ? Colors.white : AppTheme.surfaceVeryDark),
                   ),
                 ],
               ),
@@ -84,8 +78,8 @@ class ActionTile extends StatelessWidget {
             Icon(
               trailingIcon,
               color: enabled
-                  ? const Color(0xFF94A3B8)
-                  : const Color(0xFFCBD5E1),
+                  ? AppTheme.textMuted
+                  : AppTheme.iconLight,
             ),
           ],
         ),

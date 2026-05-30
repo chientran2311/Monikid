@@ -35,7 +35,6 @@ class ParentCategoryTransactionsScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
@@ -64,9 +63,8 @@ class ParentCategoryTransactionsScreen extends HookConsumerWidget {
         ),
         title: Text(
           args.categoryLabel,
-          style: TextStyle(
+          style: context.typo.subtitle.medium.copyWith(
             color: textColor,
-            fontSize: 18.sp,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -142,7 +140,7 @@ class _TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
 
     return InkWell(
@@ -166,7 +164,7 @@ class _TransactionTile extends StatelessWidget {
               child: Center(
                 child: Text(
                   transaction.categoryIcon ?? '💸',
-                  style: TextStyle(fontSize: 18.sp),
+                  style: context.typo.subtitle.medium,
                 ),
               ),
             ),
@@ -177,25 +175,23 @@ class _TransactionTile extends StatelessWidget {
                 children: [
                   Text(
                     transaction.categoryLabel,
-                    style: TextStyle(
+                    style: context.typo.body.medium.copyWith(
                       color: textColor,
-                      fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
                     DateFormat('dd/MM/yyyy HH:mm').format(transaction.date),
-                    style: TextStyle(color: mutedColor, fontSize: 12.sp),
+                    style: context.typo.caption.big.copyWith(color: mutedColor),
                   ),
                 ],
               ),
             ),
             Text(
               CurrencyFormatter.format(transaction.amountMinor),
-              style: TextStyle(
+              style: context.typo.body.medium.copyWith(
                 color: textColor,
-                fontSize: 14.sp,
                 fontWeight: FontWeight.w700,
               ),
             ),

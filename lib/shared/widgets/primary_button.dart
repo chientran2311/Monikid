@@ -1,61 +1,223 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
+enum _Variant { primary, secondary, danger }
+
+/// Three-variant app button with built-in bounce animation.
+///
+/// ```dart
+/// // Green gradient — main CTA
+/// PrimaryButton(title: 'Tiếp tục', onTap: onContinue)
+///
+/// // Grey outline — dismiss / skip
+/// PrimaryButton.secondary(title: 'Để sau', onTap: onSkip)
+///
+/// // Red border — destructive action
+/// PrimaryButton.danger(title: 'Xoá', onTap: onDelete)
+///
+/// // With leading icon
+/// PrimaryButton(title: 'Gửi', icon: const Icon(Icons.send_rounded), onTap: onSend)
+/// ```
 class PrimaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final bool isLoading;
-  final IconData? icon;
-
   const PrimaryButton({
-    Key? key,
-    required this.text,
-    required this.onPressed,
-    this.isLoading = false,
+    super.key,
+    required this.title,
+    this.onTap,
     this.icon,
-  }) : super(key: key);
+    this.isLoading = false,
+    this.height,
+  }) : _variant = _Variant.primary;
+
+  const PrimaryButton.secondary({
+    super.key,
+    required this.title,
+    this.onTap,
+    this.icon,
+    this.isLoading = false,
+    this.height,
+  }) : _variant = _Variant.secondary;
+
+  const PrimaryButton.danger({
+    super.key,
+    required this.title,
+    this.onTap,
+    this.icon,
+    this.isLoading = false,
+    this.height,
+  }) : _variant = _Variant.danger;
+
+  final String title;
+  final VoidCallback? onTap;
+  final Widget? icon;
+  final bool isLoading;
+
+  /// Defaults to 56.h when null.
+  final double? height;
+
+  final _Variant _variant;
+
+  bool get _tappable => onTap != null && !isLoading;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-          shadowColor: AppTheme.primary.withValues(alpha: 0.25),
+    return BounceTap(
+      onTap: _tappable ? onTap : null,
+      child: SizedBox(
+        width: double.infinity,
+        height: height ?? 56.h,
+        child: switch (_variant) {
+          _Variant.primary   => _PrimaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
+          _Variant.secondary => _SecondaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
+          _Variant.danger    => _DangerBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
+        },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Shared helpers
+// ─────────────────────────────────────────────
+
+Widget _label(String title, Color color) => Text(
+      title,
+      style: AppTextStyleFactory.style(
+        size: AppFontSizes.bodyBig,
+        weight: FontWeight.w900,
+        color: color,
+        letterSpacing: -0.02,
+      ),
+    );
+
+Widget _spinner(Color color) => SizedBox(
+      width: 20.r,
+      height: 20.r,
+      child: CircularProgressIndicator(strokeWidth: 2.r, color: color),
+    );
+
+Widget _content(String title, Widget? icon, bool isLoading, Color fg) {
+  if (isLoading) return _spinner(fg);
+  if (icon == null) return _label(title, fg);
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      IconTheme(data: IconThemeData(color: fg, size: 18.r), child: icon),
+      SizedBox(width: 8.w),
+      _label(title, fg),
+    ],
+  );
+}
+
+// ─────────────────────────────────────────────
+// Primary — green gradient
+// ─────────────────────────────────────────────
+
+class _PrimaryBody extends StatelessWidget {
+  const _PrimaryBody({
+    required this.title,
+    required this.icon,
+    required this.isLoading,
+    required this.enabled,
+  });
+
+  final String title;
+  final Widget? icon;
+  final bool isLoading;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.55,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: AppTheme.primaryButtonGradient,
+          borderRadius: BorderRadius.circular(18.r),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, 16.h),
+              blurRadius: 28.r,
+              color: AppTheme.primary.withValues(alpha: 0.24),
+            ),
+          ],
         ),
-        child: isLoading
-            ? const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, color: Colors.white, size: 20),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    text,
-                    style: context.typo.button.medium.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+        child: Center(
+          child: _content(title, icon, isLoading, AppTheme.textWhite),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Secondary — grey outline (dismiss / skip)
+// ─────────────────────────────────────────────
+
+class _SecondaryBody extends StatelessWidget {
+  const _SecondaryBody({
+    required this.title,
+    required this.icon,
+    required this.isLoading,
+    required this.enabled,
+  });
+
+  final String title;
+  final Widget? icon;
+  final bool isLoading;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    final border = Color.lerp(AppTheme.primary, Colors.white, 0.82)!;
+
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.45,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: border),
+        ),
+        child: Center(
+          child: _content(title, icon, isLoading, AppTheme.textGrey),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Danger — red border + red text
+// ─────────────────────────────────────────────
+
+class _DangerBody extends StatelessWidget {
+  const _DangerBody({
+    required this.title,
+    required this.icon,
+    required this.isLoading,
+    required this.enabled,
+  });
+
+  final String title;
+  final Widget? icon;
+  final bool isLoading;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: enabled ? 1.0 : 0.45,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppTheme.dangerSurface,
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: AppTheme.dangerBorder),
+        ),
+        child: Center(
+          child: _content(title, icon, isLoading, AppTheme.redAlert),
+        ),
       ),
     );
   }

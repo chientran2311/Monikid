@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class ErrorState extends StatelessWidget {
   const ErrorState({super.key, required this.errorMessage});
@@ -24,7 +25,7 @@ class ErrorState extends StatelessWidget {
             Text(
               errorMessage ?? s.transactionLoadError,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+              style: context.typo.subtitle.small.copyWith(color: AppTheme.textGrey),
             ),
           ],
         ),

@@ -1,13 +1,13 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_helpers.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'providers/transaction_filter_provider.dart';
+import 'providers/transaction_filter_state.dart';
 import 'providers/transaction_selection_provider.dart';
 import 'providers/transaction_summary_provider.dart';
 import 'transaction_history_state.dart';
@@ -33,7 +33,10 @@ class TransactionHistory extends _$TransactionHistory {
         if (!next.hasFilter) {
           _syncVisibleTransactionsFromMonthly(resetVisibleLoading: false);
         } else {
-          _loadFilteredTransactions(reset: true);
+          _loadFilteredTransactions(
+            reset: true,
+            trigger: _detectTrigger(previous, next),
+          );
         }
       }
     });
@@ -44,6 +47,19 @@ class TransactionHistory extends _$TransactionHistory {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
+
+  TransactionListLoadingTrigger _detectTrigger(
+    TransactionFilterState? previous,
+    TransactionFilterState next,
+  ) {
+    if (previous?.transactionTypeFilter != next.transactionTypeFilter) {
+      return TransactionListLoadingTrigger.tabSwitch;
+    }
+    if (previous?.selectedCategoryKey != next.selectedCategoryKey) {
+      return TransactionListLoadingTrigger.categoryChange;
+    }
+    return TransactionListLoadingTrigger.dateChange;
+  }
 
   String? get _userId {
     final auth = ref.read(authSessionProvider);
@@ -274,6 +290,7 @@ class TransactionHistory extends _$TransactionHistory {
   Future<void> _loadFilteredTransactions({
     required bool reset,
     bool isRefresh = false,
+    TransactionListLoadingTrigger trigger = TransactionListLoadingTrigger.none,
   }) async {
     final uid = _userId;
     if (uid == null) {
@@ -283,6 +300,7 @@ class TransactionHistory extends _$TransactionHistory {
         isLoading: false,
         isListLoading: false,
         isLoadingMore: false,
+        listLoadingTrigger: TransactionListLoadingTrigger.none,
         errorMessage: null,
       );
       return;
@@ -298,6 +316,7 @@ class TransactionHistory extends _$TransactionHistory {
       isLoading: loadingParams.isLoading,
       isListLoading: loadingParams.isListLoading,
       isLoadingMore: loadingParams.isLoadingMore,
+      listLoadingTrigger: loadingParams.isListLoading ? trigger : TransactionListLoadingTrigger.none,
       transactions: loadingParams.shouldClearTransactions ? [] : state.transactions,
       errorMessage: null,
     );
@@ -328,6 +347,7 @@ class TransactionHistory extends _$TransactionHistory {
         isLoading: false,
         isListLoading: false,
         isLoadingMore: false,
+        listLoadingTrigger: TransactionListLoadingTrigger.none,
         errorMessage: null,
       );
     } catch (error, stackTrace) {
@@ -366,6 +386,7 @@ class TransactionHistory extends _$TransactionHistory {
       state = state.copyWith(
         isLoading: false,
         isListLoading: false,
+        listLoadingTrigger: TransactionListLoadingTrigger.none,
         errorMessage: errorMessage,
         transactions: [],
       );

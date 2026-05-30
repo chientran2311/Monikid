@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:monikid/core/utils/logger.dart';
-import 'package:monikid/features/auth/providers/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/change_profile/change_profile_state.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

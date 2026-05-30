@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class MonthPickerBottomSheet extends StatefulWidget {
   final DateTime? currentDate;
@@ -46,20 +47,18 @@ class _MonthPickerBottomSheetState extends State<MonthPickerBottomSheet> {
                   onPressed: widget.onCancel,
                   child: Text(
                     'Hủy',
-                    style: TextStyle(
+                    style: context.typo.subtitle.small.copyWith(
                       color: widget.isDark ? Colors.white70 : CupertinoColors.systemGrey,
-                      fontSize: 16,
                     ),
                   ),
                 ),
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: () => widget.onDateSelected(tempDate),
-                  child: const Text(
+                  child: Text(
                     'Xong',
-                    style: TextStyle(
+                    style: context.typo.subtitle.small.copyWith(
                       color: AppTheme.primary,
-                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

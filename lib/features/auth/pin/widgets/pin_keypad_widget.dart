@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/font/font.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
 
 class PinKeypadWidget extends StatefulWidget {
   const PinKeypadWidget({
@@ -66,7 +67,7 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: EdgeInsets.only(top: 16.h, bottom: 60.h),
           child: AnimatedBuilder(
             animation: _offsetAnimation,
             builder: (context, child) => Transform.translate(
@@ -84,25 +85,32 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
                       final activeColor = widget.hasError
                           ? AppTheme.redAlert
                           : AppTheme.primary;
-
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
-                        width: 14,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isFilled
-                              ? activeColor
-                              : (isDark
-                                    ? AppTheme.surfaceVariant
-                                    : AppTheme.borderLight),
-                          border: Border.all(
-                            color: isFilled
-                                ? activeColor
-                                : (isDark
-                                      ? AppTheme.borderDark
-                                      : AppTheme.borderLight),
-                            width: 2,
+                      return AnimatedScale(
+                        scale: isFilled ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.fastOutSlowIn,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8.w),
+                          width: 16.r,
+                          height: 16.r,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isFilled ? activeColor : Colors.transparent,
+                            border: Border.all(
+                              color: isFilled
+                                  ? activeColor
+                                  : (isDark ? AppTheme.borderDark : AppTheme.borderLight),
+                              width: 2,
+                            ),
+                            boxShadow: isFilled
+                                ? [
+                                    BoxShadow(
+                                      offset: Offset(0, 4.h),
+                                      blurRadius: 12.r,
+                                      color: AppTheme.primary.withValues(alpha: 0.3),
+                                    ),
+                                  ]
+                                : null,
                           ),
                         ),
                       );
@@ -111,32 +119,32 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             children: [
-              _buildRow(context, ['1', '2', '3'], isDark),
-              const SizedBox(height: 12),
-              _buildRow(context, ['4', '5', '6'], isDark),
-              const SizedBox(height: 12),
-              _buildRow(context, ['7', '8', '9'], isDark),
-              const SizedBox(height: 12),
+              _buildRow(['1', '2', '3'], isDark),
+              SizedBox(height: 20.h),
+              _buildRow(['4', '5', '6'], isDark),
+              SizedBox(height: 20.h),
+              _buildRow(['7', '8', '9'], isDark),
+              SizedBox(height: 20.h),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Expanded(child: SizedBox(height: 64)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildKey(context, '0', isDark)),
-                  const SizedBox(width: 12),
+                  const Expanded(child: SizedBox()),
+                  SizedBox(width: 24.w),
+                  Expanded(child: _KeyButton(value: '0', isDark: isDark, onTap: _canInput ? () => widget.onAddNumber('0') : null)),
+                  SizedBox(width: 24.w),
                   Expanded(
-                    child: _buildKey(
-                      context,
-                      'backspace',
-                      isDark,
+                    child: _KeyButton(
+                      value: 'backspace',
+                      isDark: isDark,
                       icon: Icons.backspace_outlined,
+                      onTap: _canInput ? widget.onRemoveNumber : null,
                     ),
                   ),
                 ],
               ),
+              SizedBox(height: 40.h),
             ],
           ),
         ),
@@ -144,51 +152,101 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
     );
   }
 
-  Widget _buildRow(BuildContext context, List<String> digits, bool isDark) {
+  bool get _canInput => !widget.isDisabled && !widget.isLoading;
+
+  Widget _buildRow(List<String> digits, bool isDark) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _buildKey(context, digits[0], isDark)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildKey(context, digits[1], isDark)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildKey(context, digits[2], isDark)),
+        Expanded(child: _KeyButton(value: digits[0], isDark: isDark, onTap: _canInput ? () => widget.onAddNumber(digits[0]) : null)),
+        SizedBox(width: 24.w),
+        Expanded(child: _KeyButton(value: digits[1], isDark: isDark, onTap: _canInput ? () => widget.onAddNumber(digits[1]) : null)),
+        SizedBox(width: 24.w),
+        Expanded(child: _KeyButton(value: digits[2], isDark: isDark, onTap: _canInput ? () => widget.onAddNumber(digits[2]) : null)),
       ],
     );
   }
+}
 
-  Widget _buildKey(BuildContext context, String value, bool isDark, {IconData? icon}) {
-    final bgColor = isDark
-        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
-        : const Color(0xFFF8FAFC);
-    final textColor =
-        isDark ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B);
+const _kKeyLetters = {
+  '2': 'ABC', '3': 'DEF', '4': 'GHI', '5': 'JKL',
+  '6': 'MNO', '7': 'PQRS', '8': 'TUV', '9': 'WXYZ',
+};
 
-    return Material(
-      color: bgColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () {
-          if (widget.isDisabled || widget.isLoading) {
-            return;
-          }
+class _KeyButton extends StatefulWidget {
+  const _KeyButton({
+    required this.value,
+    required this.isDark,
+    required this.onTap,
+    this.icon,
+  });
 
-          if (value == 'backspace') {
-            widget.onRemoveNumber();
-          } else {
-            widget.onAddNumber(value);
-          }
-        },
-        child: SizedBox(
-          height: 64,
-          child: Center(
-            child: icon != null
-                ? Icon(icon, size: 28, color: textColor)
-                : Text(
-                    value,
-                    style: context.typo.title.large.copyWith(color: textColor),
-                  ),
+  final String value;
+  final bool isDark;
+  final VoidCallback? onTap;
+  final IconData? icon;
+
+  @override
+  State<_KeyButton> createState() => _KeyButtonState();
+}
+
+class _KeyButtonState extends State<_KeyButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final digitColor = widget.isDark ? AppTheme.surfaceLightGrey : AppTheme.textBlack;
+    final letters = _kKeyLetters[widget.value];
+
+    return GestureDetector(
+      onTapDown: widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
+      onTapUp: widget.onTap != null
+          ? (_) {
+              setState(() => _pressed = false);
+              widget.onTap!();
+            }
+          : null,
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1.0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _pressed
+                ? (widget.isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey)
+                : Colors.transparent,
+          ),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Center(
+              child: widget.icon != null
+                  ? Icon(widget.icon, size: 28.r, color: widget.isDark ? AppTheme.textGrey : AppTheme.textBlack)
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          widget.value,
+                          style: AppTextStyleFactory.style(
+                            size: 32,
+                            weight: FontWeight.w500,
+                            color: digitColor,
+                          ),
+                        ),
+                        if (letters != null)
+                          Text(
+                            letters,
+                            style: AppTextStyleFactory.style(
+                              size: AppFontSizes.labelSmall,
+                              weight: FontWeight.w600,
+                              color: AppTheme.textGrey,
+                              letterSpacing: 0.1 * AppFontSizes.labelSmall,
+                            ),
+                          ),
+                      ],
+                    ),
+            ),
           ),
         ),
       ),

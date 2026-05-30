@@ -20,7 +20,6 @@ class ProfileEditScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final state = ref.watch(changeProfileProvider);
     final notifier = ref.read(changeProfileProvider.notifier);
 
@@ -56,10 +55,9 @@ class ProfileEditScreen extends HookConsumerWidget {
         ),
         title: Text(
           s.profileEditTitle,
-          style: TextStyle(
+          style: context.typo.subtitle.medium.copyWith(
+            fontWeight: FontWeight.w700,
             color: textColor,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -87,10 +85,9 @@ class ProfileEditScreen extends HookConsumerWidget {
                           SizedBox(height: 12.h),
                           Text(
                             s.profileEditAvatarLabel,
-                            style: TextStyle(
-                              color: AppTheme.primary,
-                              fontSize: 14.sp,
+                            style: context.typo.body.medium.copyWith(
                               fontWeight: FontWeight.w600,
+                              color: AppTheme.primary,
                             ),
                           ),
                           SizedBox(height: 32.h),
@@ -132,8 +129,7 @@ class ProfileEditScreen extends HookConsumerWidget {
                                   padding: EdgeInsets.only(top: 8.h, left: 4.w),
                                   child: Text(
                                     s.profileEditEmailWarning,
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
+                                    style: context.typo.caption.medium.copyWith(
                                       color: subTextColor,
                                     ),
                                   ),
@@ -192,10 +188,7 @@ class ProfileEditScreen extends HookConsumerWidget {
                               )
                             : Text(
                                 s.actionSaveChanges,
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: context.typo.subtitle.small,
                               ),
                       ),
                     ),

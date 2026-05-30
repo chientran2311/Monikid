@@ -21,7 +21,7 @@ class TransactionDetailEvidenceSection extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final imageUrlFuture = useMemoized(
       () => getIt<TransactionRepository>().getEvidenceDownloadUrl(
         evidenceImage,
@@ -35,11 +35,10 @@ class TransactionDetailEvidenceSection extends HookConsumerWidget {
       children: [
         Text(
           context.l10n.transactionDetailEvidenceLabel,
-          style: TextStyle(
-            color: mutedColor,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-          ),
+          style: context.typo.caption.big.copyWith(
+          color: mutedColor,
+          fontWeight: FontWeight.w500,
+        ),
         ),
         SizedBox(height: 12.h),
         if (imageUrlSnapshot.connectionState == ConnectionState.waiting)
@@ -70,7 +69,7 @@ class TransactionDetailEvidenceSection extends HookConsumerWidget {
                   SizedBox(height: 8.h),
                   Text(
                     context.l10n.transactionEvidenceLoadError,
-                    style: TextStyle(color: mutedColor, fontSize: 12.sp),
+                    style: context.typo.caption.big.copyWith(color: mutedColor),
                   ),
                 ],
               ),

@@ -6,7 +6,7 @@ part of 'enter_pin_code_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$enterPINCodeHash() => r'd9d01dc773ed7a788849a93f1b8f8b804ca17a66';
+String _$enterPINCodeHash() => r'6576d53c6d935ebe81e341ea3c607673cfd3cd04';
 
 /// See also [EnterPINCode].
 @ProviderFor(EnterPINCode)

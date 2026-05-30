@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/auth/auth_field_error.dart';
+import 'package:monikid/features/auth/auth_field_validator.dart';
 import 'package:monikid/features/auth/auth_status.dart';
 import 'package:monikid/models/entities/auth/params/auth_param.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
@@ -26,13 +28,19 @@ class ForgotPassword extends _$ForgotPassword {
     state = state.copyWith(errorMessage: null);
   }
 
+  void validateEmail(String email) {
+    final trimmedEmail = email.trim();
+    final fieldError = AuthFieldValidator.email(trimmedEmail);
+    state = state.copyWith(emailError: fieldError);
+  }
+
   Future<void> submit(String email) async {
     final trimmedEmail = email.trim();
-    final emailError = _validateEmail(trimmedEmail);
-    if (emailError != null) {
+    final fieldError = AuthFieldValidator.email(trimmedEmail);
+    if (fieldError != AuthFieldError.none) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: emailError,
+        emailError: fieldError,
       );
       return;
     }
@@ -40,19 +48,21 @@ class ForgotPassword extends _$ForgotPassword {
     state = state.copyWith(
       status: AuthStatus.isLoading,
       errorMessage: null,
+      emailError: AuthFieldError.none,
     );
 
     try {
-      _logger.i(
-        'Forgot password provider sending reset email for $trimmedEmail',
-      );
+      _logger.i('Sending password reset link for $trimmedEmail');
       await _authRepository.resetPassword(
         ResetPasswordParam(email: trimmedEmail),
       );
-      state = state.copyWith(status: AuthStatus.success);
+      state = state.copyWith(
+        status: AuthStatus.success,
+        step: ForgotPasswordStep.done,
+      );
     } on FirebaseAuthException catch (e, stackTrace) {
       _logger.e(
-        'Forgot password provider Firebase error',
+        'Forgot password Firebase error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -62,7 +72,7 @@ class ForgotPassword extends _$ForgotPassword {
       );
     } catch (e, stackTrace) {
       _logger.e(
-        'Forgot password provider error',
+        'Forgot password error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -71,18 +81,5 @@ class ForgotPassword extends _$ForgotPassword {
         errorMessage: e.toString().replaceAll('Exception: ', ''),
       );
     }
-  }
-
-  String? _validateEmail(String value) {
-    if (value.isEmpty) {
-      return 'Please enter your email address.';
-    }
-
-    final emailRegex = RegExp(r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email address.';
-    }
-
-    return null;
   }
 }

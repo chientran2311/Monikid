@@ -24,7 +24,7 @@ class FamilyMembersSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
 
     return Column(
@@ -38,8 +38,7 @@ class FamilyMembersSection extends StatelessWidget {
               Expanded(
                 child: Text(
                   s.homeParFamilyMembersLabel.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 12.sp,
+                  style: context.typo.caption.big.copyWith(
                     fontWeight: FontWeight.w600,
                     color: mutedColor,
                     letterSpacing: 0.8,
@@ -130,8 +129,7 @@ class _MemberAvatar extends StatelessWidget {
             SizedBox(height: 6.h),
             Text(
               member.displayName,
-              style: TextStyle(
-                fontSize: 13.sp,
+              style: context.typo.body.small.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected ? textColor : mutedColor,
               ),
@@ -157,9 +155,7 @@ class _InitialAvatar extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         name.isNotEmpty ? name[0].toUpperCase() : '?',
-        style: TextStyle(
-          fontSize: 22.sp,
-          fontWeight: FontWeight.w700,
+        style: context.typo.headline.small.copyWith(
           color: AppTheme.primary,
         ),
       ),
@@ -178,7 +174,7 @@ class _AddMemberButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mutedColor = isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final s = context.l10n;
 
     return GestureDetector(
@@ -207,14 +203,13 @@ class _AddMemberButton extends StatelessWidget {
             child: Icon(
               Icons.add_rounded,
               size: 28.r,
-              color: isDark ? const Color(0xFF94A3B8) : AppTheme.textGrey,
+              color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
             ),
           ),
           SizedBox(height: 6.h),
           Text(
             s.homeParAddMember,
-            style: TextStyle(
-              fontSize: 13.sp,
+            style: context.typo.body.small.copyWith(
               fontWeight: FontWeight.w500,
               color: mutedColor,
             ),

@@ -6,7 +6,7 @@ import 'package:monikid/shared/widgets/app_snackbar.dart';
 extension BuildContextX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this)!;
 
-  AppTypography get typo => AppTypography(this);
+  AppTypography get typo => AppTypographyScope.of(this);
 
   void showErrorSnackBar(String message) =>
       AppSnackBar.error(this, message);

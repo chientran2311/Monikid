@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_state.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/evidence_section.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/summary_header.dart';
@@ -18,70 +19,77 @@ class TransactionContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transaction = state.transaction!;
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final borderColor = isDark ? AppTheme.surfaceVariant : AppTheme.borderLight;
+    final note = transaction.note;
+    final hasNote = note != null && note.isNotEmpty;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 120.h),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SummaryHeader(transaction: transaction),
-          const SizedBox(height: 24),
+          SummaryHeader(transaction: transaction, isDark: isDark),
           Container(
-            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: surfaceColor,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isDark
-                    ? AppTheme.surfaceVariant
-                    : AppTheme.surfaceLightGrey,
-              ),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-              ],
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(color: borderColor),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 24.r,
+                        offset: Offset(0, 8.h),
+                      ),
+                    ],
             ),
             child: Column(
               children: [
                 TransactionDetailRow(
-                  iconData: Icons.calendar_today,
-                  label: s.transactionDetailTimeLabel,
-                  value: DateFormat(
-                    'dd/MM/yyyy - HH:mm',
-                  ).format(transaction.date),
+                  icon: transaction.categoryEmoji ?? '📦',
+                  label: s.transactionCategoryLabel,
+                  value: transaction.category,
                   isDark: isDark,
                 ),
-                Divider(
-                  color: isDark
-                      ? AppTheme.surfaceVariant
-                      : AppTheme.surfaceLightGrey,
-                  height: 32,
+                _Divider(color: borderColor),
+                TransactionDetailRow(
+                  icon: '📅',
+                  label: s.transactionDetailTimeLabel,
+                  value: DateFormat('dd/MM/yyyy – HH:mm').format(transaction.date),
+                  isDark: isDark,
                 ),
-                if (transaction.note != null &&
-                    transaction.note!.isNotEmpty) ...[
-                  Divider(
-                    color: isDark
-                        ? AppTheme.surfaceVariant
-                        : AppTheme.surfaceLightGrey,
-                    height: 32,
-                  ),
+                if (hasNote) ...[
+                  _Divider(color: borderColor),
                   TransactionDetailRow(
-                    iconData: Icons.description_outlined,
+                    icon: '📝',
                     label: s.transactionDetailNoteLabel,
-                    value: transaction.note!,
+                    value: note,
                     isDark: isDark,
                   ),
                 ],
+                _Divider(color: borderColor),
+                EvidenceSection(state: state, isDark: isDark),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          EvidenceSection(state: state, isDark: isDark),
         ],
       ),
+    );
+  }
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 0,
+      thickness: 1.r,
+      color: color,
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 
 import 'pin_gateway_provider.dart';
 import 'pin_gateway_state.dart';
@@ -14,8 +13,6 @@ class PinGatewayScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final state = ref.watch(pinGatewayProvider);
     final notifier = ref.read(pinGatewayProvider.notifier);
     final s = context.l10n;

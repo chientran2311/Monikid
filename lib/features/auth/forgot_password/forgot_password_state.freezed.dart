@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ForgotPasswordState {
 
- AuthStatus get status; String? get errorMessage;
+ AuthStatus get status; String? get errorMessage; AuthFieldError get emailError; ForgotPasswordStep get step;
 /// Create a copy of ForgotPasswordState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ForgotPasswordStateCopyWith<ForgotPasswordState> get copyWith => _$ForgotPasswo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForgotPasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ForgotPasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.step, step) || other.step == step));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,step);
 
 @override
 String toString() {
-  return 'ForgotPasswordState(status: $status, errorMessage: $errorMessage)';
+  return 'ForgotPasswordState(status: $status, errorMessage: $errorMessage, emailError: $emailError, step: $step)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ForgotPasswordStateCopyWith<$Res>  {
   factory $ForgotPasswordStateCopyWith(ForgotPasswordState value, $Res Function(ForgotPasswordState) _then) = _$ForgotPasswordStateCopyWithImpl;
 @useResult
 $Res call({
- AuthStatus status, String? errorMessage
+ AuthStatus status, String? errorMessage, AuthFieldError emailError, ForgotPasswordStep step
 });
 
 
@@ -63,11 +63,13 @@ class _$ForgotPasswordStateCopyWithImpl<$Res>
 
 /// Create a copy of ForgotPasswordState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? step = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,emailError: null == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
+as AuthFieldError,step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
+as ForgotPasswordStep,
   ));
 }
 
@@ -78,11 +80,13 @@ as String?,
 
 
 class _ForgotPasswordState extends ForgotPasswordState {
-  const _ForgotPasswordState({this.status = AuthStatus.initial, this.errorMessage}): super._();
+  const _ForgotPasswordState({this.status = AuthStatus.initial, this.errorMessage, this.emailError = AuthFieldError.none, this.step = ForgotPasswordStep.email}): super._();
   
 
 @override@JsonKey() final  AuthStatus status;
 @override final  String? errorMessage;
+@override@JsonKey() final  AuthFieldError emailError;
+@override@JsonKey() final  ForgotPasswordStep step;
 
 /// Create a copy of ForgotPasswordState
 /// with the given fields replaced by the non-null parameter values.
@@ -94,16 +98,16 @@ _$ForgotPasswordStateCopyWith<_ForgotPasswordState> get copyWith => __$ForgotPas
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForgotPasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ForgotPasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.step, step) || other.step == step));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,step);
 
 @override
 String toString() {
-  return 'ForgotPasswordState(status: $status, errorMessage: $errorMessage)';
+  return 'ForgotPasswordState(status: $status, errorMessage: $errorMessage, emailError: $emailError, step: $step)';
 }
 
 
@@ -114,7 +118,7 @@ abstract mixin class _$ForgotPasswordStateCopyWith<$Res> implements $ForgotPassw
   factory _$ForgotPasswordStateCopyWith(_ForgotPasswordState value, $Res Function(_ForgotPasswordState) _then) = __$ForgotPasswordStateCopyWithImpl;
 @override @useResult
 $Res call({
- AuthStatus status, String? errorMessage
+ AuthStatus status, String? errorMessage, AuthFieldError emailError, ForgotPasswordStep step
 });
 
 
@@ -131,11 +135,13 @@ class __$ForgotPasswordStateCopyWithImpl<$Res>
 
 /// Create a copy of ForgotPasswordState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? step = null,}) {
   return _then(_ForgotPasswordState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,emailError: null == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
+as AuthFieldError,step: null == step ? _self.step : step // ignore: cast_nullable_to_non_nullable
+as ForgotPasswordStep,
   ));
 }
 

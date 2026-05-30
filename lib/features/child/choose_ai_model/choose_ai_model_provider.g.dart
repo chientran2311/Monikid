@@ -7,7 +7,7 @@ part of 'choose_ai_model_provider.dart';
 // **************************************************************************
 
 String _$chooseAiModelNotifierHash() =>
-    r'164191a86cb24fe2f7dc9335f349f76877705982';
+    r'e4e6590decd94505098b0ec135e8f388936f7276';
 
 /// See also [ChooseAiModelNotifier].
 @ProviderFor(ChooseAiModelNotifier)

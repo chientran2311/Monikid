@@ -6,7 +6,7 @@ part of 're_enter_pin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reEnterPINHash() => r'283a0f76d1a98789674a5756d124c178734d331b';
+String _$reEnterPINHash() => r'7b8a9f6e4763c5eb3d99daaa73567ac604a89175';
 
 /// See also [ReEnterPIN].
 @ProviderFor(ReEnterPIN)

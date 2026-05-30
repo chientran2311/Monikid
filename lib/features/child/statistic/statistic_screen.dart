@@ -8,6 +8,7 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/screen_page_header.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_dialog.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_budget_overview_card.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_category_change_section.dart';
@@ -16,6 +17,7 @@ import 'package:monikid/features/child/statistic/widgets/statistic_smart_insight
 import 'package:monikid/features/child/statistic/widgets/statistic_spending_allocation_section.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_spending_trend_section.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_state_feedback.dart';
+import 'package:monikid/shared/widgets/skeleton_widget/statistic_skeleton.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_top_categories_section.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
@@ -28,7 +30,6 @@ class StatisticScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(statisticProvider);
     final notifier = ref.read(statisticProvider.notifier);
@@ -83,8 +84,6 @@ class StatisticScreen extends HookConsumerWidget {
       await notifier.refresh();
     }
 
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-
     return Scaffold(
       backgroundColor:
           isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
@@ -97,14 +96,12 @@ class StatisticScreen extends HookConsumerWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 0),
-                  child: Text(
-                    context.l10n.statisticTitle,
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.w700,
-                      color: textColor,
-                    ),
+                  padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
+                  child: ScreenPageHeader(
+                    eyebrow: context.l10n.statisticHeaderEyebrow,
+                    title: context.l10n.statisticTitle,
+                    subtitle: context.l10n.statisticHeaderSubhead,
+                    isDark: isDark,
                   ),
                 ),
               ),
@@ -132,12 +129,7 @@ class StatisticScreen extends HookConsumerWidget {
                         onRetry: () => unawaited(notifier.refresh()),
                       ),
                     ] else if (state.isLoading && !state.hasData) ...[
-                      Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 48.h),
-                          child: const CircularProgressIndicator(),
-                        ),
-                      ),
+                      StatisticSkeleton(isDark: isDark),
                     ] else ...[
                       StatisticSmartInsightCard(
                         message: context.statisticInsightMessage(

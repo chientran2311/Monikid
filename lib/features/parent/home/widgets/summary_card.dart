@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'mini_dashboard_item.dart';
 
@@ -26,11 +27,11 @@ class SummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppTheme.surfaceVeryDark,
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          colors: [AppTheme.surfaceVariant, AppTheme.surfaceVeryDark],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
@@ -80,12 +81,11 @@ class SummaryCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         "Số dư của con",
-                        style: TextStyle(
-                          color: Color(0xFFCBD5E1),
-                          fontSize: 14,
+                        style: context.typo.body.medium.copyWith(
                           fontWeight: FontWeight.w500,
+                          color: AppTheme.iconLight,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -96,8 +96,7 @@ class SummaryCard extends StatelessWidget {
                             isBalanceVisible
                                 ? "${CurrencyFormatter.format(balance)} ₫"
                                 : "******",
-                            style: const TextStyle(
-                              fontSize: 32,
+                            style: context.typo.display.medium.copyWith(
                               fontWeight: FontWeight.w900,
                               color: Colors.white,
                               letterSpacing: -0.5,

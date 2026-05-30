@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_item.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
@@ -28,10 +29,7 @@ class GroupedTransactionList extends StatelessWidget {
             padding: const EdgeInsets.only(top: 32),
             child: Text(
               'Không có giao dịch nào.',
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.white54 : const Color(0xFF94A3B8),
-              ),
+              style: context.typo.body.medium.copyWith(color: isDark ? Colors.white54 : AppTheme.textMuted),
             ),
           ),
         ),
@@ -60,22 +58,13 @@ class GroupedTransactionList extends StatelessWidget {
                 children: [
                   Text(
                     dateKey.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF94A3B8),
-                      letterSpacing: 0.5,
-                    ),
+                    style: context.typo.caption.medium.copyWith(fontWeight: FontWeight.w600, color: AppTheme.textMuted, letterSpacing: 0.5),
                   ),
                   Text(
                     '${isIncome ? '+' : '-'} ${CurrencyFormatter.format(dailyTotal.abs())}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: isIncome
+                    style: context.typo.caption.medium.copyWith(fontWeight: FontWeight.w500, color: isIncome
                           ? const Color(0xFF2563eb)
-                          : AppTheme.redAlert,
-                    ),
+                          : AppTheme.redAlert),
                   ),
                 ],
               ),

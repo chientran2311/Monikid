@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/splash/splash_provider.dart';
 import 'package:monikid/features/splash/splash_state.dart';
 import 'package:monikid/features/splash/widgets/splash_brand_section.dart';
@@ -15,8 +14,6 @@ class SplashScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ScreenUtils.init(context);
-
     final notifier = ref.read(splashNotifierProvider.notifier);
     final splashState = ref.watch(splashNotifierProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -29,6 +26,11 @@ class SplashScreen extends HookConsumerWidget {
     ref.listen<SplashState>(splashNotifierProvider, (previous, next) {
       final targetChanged = previous?.routeTarget != next.routeTarget;
       if (!targetChanged || next.isLoading) {
+        return;
+      }
+
+      if (next.routeTarget == SplashRouteTarget.onboarding) {
+        context.go(AppRoutes.onboard1);
         return;
       }
 

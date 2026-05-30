@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 
 class MonthTab extends StatelessWidget {
   final String title;
@@ -20,11 +21,15 @@ class MonthTab extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: isActive ? 16 : 14,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            color: isActive ? primaryColor : unselectedColor,
-          ),
+          style: (isActive
+              ? context.typo.subtitle.small.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                )
+              : context.typo.body.medium.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: unselectedColor,
+                )),
         ),
         const SizedBox(height: 4),
         Container(

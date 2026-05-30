@@ -130,8 +130,7 @@ class HomeTransactionRow extends StatelessWidget {
                           Flexible(
                             child: Text(
                               tx.categoryLabel,
-                              style: TextStyle(
-                                fontSize: 15.sp,
+                              style: context.typo.body.big.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
@@ -153,7 +152,7 @@ class HomeTransactionRow extends StatelessWidget {
                       SizedBox(height: 2.h),
                       Text(
                         dateText,
-                        style: TextStyle(fontSize: 13.sp, color: mutedColor),
+                        style: context.typo.body.small.copyWith(color: mutedColor),
                       ),
                     ],
                   ),
@@ -161,8 +160,7 @@ class HomeTransactionRow extends StatelessWidget {
                 SizedBox(width: 12.w),
                 Text(
                   amountText,
-                  style: TextStyle(
-                    fontSize: 15.sp,
+                  style: context.typo.body.big.copyWith(
                     fontWeight: FontWeight.w600,
                     color: amountColor,
                   ),
@@ -197,8 +195,7 @@ class _TagBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11.sp,
+        style: context.typo.caption.medium.copyWith(
           fontWeight: FontWeight.w600,
           color: fg,
         ),

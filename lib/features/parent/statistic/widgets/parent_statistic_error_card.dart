@@ -37,8 +37,7 @@ class ParentStatisticErrorCard extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
+            style: context.typo.body.medium.copyWith(
               color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
             ),
           ),

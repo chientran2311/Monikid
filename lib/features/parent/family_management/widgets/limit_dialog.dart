@@ -105,18 +105,16 @@ class LimitDialog extends HookWidget {
                         Text(
                           s.familyManagementLimitDialogTitle,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20.r,
+                          style: context.typo.title.medium.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: const Color(0xFF0F172A),
+                            color: AppTheme.surfaceVeryDark,
                           ),
                         ),
                         SizedBox(height: 4.h),
                         Text(
                           childName,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 14.sp,
+                          style: context.typo.body.medium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppTheme.textGrey,
                           ),
@@ -130,26 +128,22 @@ class LimitDialog extends HookWidget {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
-                          style: TextStyle(
-                            fontSize: 34.r,
+                          style: context.typo.display.medium.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: const Color(0xFF166534),
+                            color: AppTheme.greenDark,
                             letterSpacing: -0.8,
                           ),
                           decoration: InputDecoration(
                             isDense: true,
                             border: InputBorder.none,
                             hintText: '0',
-                            hintStyle: TextStyle(
-                              fontSize: 34.r,
+                            hintStyle: context.typo.display.medium.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: const Color(0xFF86EFAC),
+                              color: AppTheme.successBorder,
                             ),
                             suffixText: 'đ',
-                            suffixStyle: TextStyle(
-                              fontSize: 22.r,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF166534),
+                            suffixStyle: context.typo.headline.small.copyWith(
+                              color: AppTheme.greenDark,
                             ),
                           ),
                         ),
@@ -158,7 +152,7 @@ class LimitDialog extends HookWidget {
                           height: 2.h,
                           margin: EdgeInsets.only(top: 4.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
+                            color: AppTheme.successSurface,
                             borderRadius: BorderRadius.circular(999.r),
                           ),
                         ),
@@ -219,8 +213,7 @@ class LimitDialog extends HookWidget {
                           )
                         : Text(
                             s.familyManagementSave,
-                            style: TextStyle(
-                              fontSize: 16.r,
+                            style: context.typo.subtitle.small.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -251,8 +244,7 @@ class LimitDialog extends HookWidget {
                       style: TextButton.styleFrom(
                         foregroundColor: AppTheme.redAlert,
                         padding: EdgeInsets.symmetric(vertical: 12.h),
-                        textStyle: TextStyle(
-                          fontSize: 14.r,
+                        textStyle: context.typo.body.medium.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -267,8 +259,8 @@ class LimitDialog extends HookWidget {
                     onPressed:
                         isSaving.value ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF475569),
-                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                      foregroundColor: AppTheme.textDark,
+                      side: const BorderSide(color: AppTheme.borderLight),
                       padding: EdgeInsets.symmetric(vertical: 13.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.r),
@@ -276,8 +268,7 @@ class LimitDialog extends HookWidget {
                     ),
                     child: Text(
                       s.familyManagementCancel,
-                      style: TextStyle(
-                        fontSize: 15.r,
+                      style: context.typo.body.big.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -317,16 +308,15 @@ class _QuickAmountChip extends StatelessWidget {
         child: Ink(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppTheme.surfaceVeryLight,
             borderRadius: BorderRadius.circular(999.r),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppTheme.borderLight),
           ),
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 13.r,
+            style: context.typo.body.small.copyWith(
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF475569),
+              color: AppTheme.textDark,
             ),
           ),
         ),

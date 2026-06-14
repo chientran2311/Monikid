@@ -14,10 +14,10 @@ import 'package:monikid/features/change_profile/change_profile_state.dart';
 import 'package:monikid/features/change_profile/widgets/profile_edit_avatar_section.dart';
 import 'package:monikid/features/change_profile/widgets/profile_edit_form_card.dart';
 import 'package:monikid/features/change_profile/widgets/profile_edit_form_row.dart';
-import 'package:monikid/features/change_profile/widgets/profile_edit_text_field.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/app_text_field.dart';
 import 'package:monikid/shared/widgets/glass_app_bar.dart';
 import 'package:monikid/shared/widgets/loading_screen.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
@@ -98,12 +98,12 @@ class ProfileEditScreen extends HookConsumerWidget {
                               icon: Icons.person_outline_rounded,
                               label: s.profileEditFullName.toUpperCase(),
                               isDark: isDark,
-                              child: ProfileEditTextField(
+                              child: AppTextField(
                                 controller: fullNameController,
-                                hint: s.profileEditFullNameHint,
+                                hintText: s.profileEditFullNameHint,
                                 errorText: _fieldErrorText(context, state.fullNameError),
                                 onChanged: notifier.updateFullName,
-                                isDark: isDark,
+                                style: AppTextFieldStyle.borderless,
                               ),
                             ),
                             ProfileEditFormRow(

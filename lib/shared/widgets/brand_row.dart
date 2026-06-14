@@ -27,11 +27,14 @@ class BrandRow extends StatelessWidget {
               ),
             ],
           ),
-          child: Image.asset(
-            'assets/app_icon.png',
-            width: 34.r,
-            height: 34.r,
-            cacheWidth: decodePixelsFor(context, 34.r),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.r),
+            child: Image.asset(
+              'assets/app_icon.png',
+              width: 34.r,
+              height: 34.r,
+              cacheWidth: decodePixelsFor(context, 34.r),
+            ),
           ),
         ),
         SizedBox(width: 10.w),

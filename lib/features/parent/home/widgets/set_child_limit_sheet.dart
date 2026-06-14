@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -7,6 +6,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/home/parent_home_notifier.dart';
+import 'package:monikid/shared/widgets/app_amount_field.dart';
 
 class SetChildLimitSheet extends HookConsumerWidget {
   const SetChildLimitSheet({
@@ -92,21 +92,17 @@ class SetChildLimitSheet extends HookConsumerWidget {
               style: context.typo.body.small.copyWith(color: AppTheme.textGrey),
             ),
             SizedBox(height: 20.h),
-            TextField(
+            AppAmountField(
               controller: controller,
               autofocus: true,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: context.typo.title.medium.copyWith(
+              textAlign: TextAlign.start,
+              bordered: true,
+              labelText: childName,
+              textStyle: context.typo.title.medium.copyWith(
                 color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
               ),
-              decoration: InputDecoration(
-                hintText: '0',
-                suffixText: 'đ',
-                labelText: childName,
-                suffixStyle: context.typo.subtitle.small.copyWith(
-                  color: AppTheme.textGrey,
-                ),
+              suffixStyle: context.typo.subtitle.small.copyWith(
+                color: AppTheme.textGrey,
               ),
             ),
             SizedBox(height: 12.h),

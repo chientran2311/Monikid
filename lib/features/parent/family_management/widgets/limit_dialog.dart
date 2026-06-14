@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/family_management/family_management_notifier.dart';
+import 'package:monikid/shared/widgets/app_amount_field.dart';
 
 class LimitDialog extends HookWidget {
   const LimitDialog({
@@ -123,31 +123,20 @@ class LimitDialog extends HookWidget {
                           ),
                         ),
                         SizedBox(height: 20.h),
-                        TextField(
+                        AppAmountField(
                           controller: controller,
                           autofocus: true,
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          style: context.typo.display.medium.copyWith(
+                          textStyle: context.typo.display.medium.copyWith(
                             fontWeight: FontWeight.w800,
                             color: AppTheme.greenDark,
                             letterSpacing: -0.8,
                           ),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            border: InputBorder.none,
-                            hintText: '0',
-                            hintStyle: context.typo.display.medium.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.successBorder,
-                            ),
-                            suffixText: 'đ',
-                            suffixStyle: context.typo.headline.small.copyWith(
-                              color: AppTheme.greenDark,
-                            ),
+                          hintStyle: context.typo.display.medium.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.successBorder,
+                          ),
+                          suffixStyle: context.typo.headline.small.copyWith(
+                            color: AppTheme.greenDark,
                           ),
                         ),
                         Container(

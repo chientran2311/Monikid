@@ -9,21 +9,30 @@ part of 'transaction_model.dart';
 _TransactionEvidenceImage _$TransactionEvidenceImageFromJson(
   Map<String, dynamic> json,
 ) => _TransactionEvidenceImage(
-  storagePath: json['storagePath'] as String,
+  imageUrl: json['imageUrl'] as String?,
   fileName: json['fileName'] as String?,
   mimeType: json['mimeType'] as String?,
   uploadedAt: const TimestampConverter().fromJson(
     json['uploadedAt'] as Timestamp?,
   ),
+  storageMode:
+      $enumDecodeNullable(_$ImageStorageModeEnumMap, json['storageMode']) ??
+      ImageStorageMode.cloudinary,
 );
 
 Map<String, dynamic> _$TransactionEvidenceImageToJson(
   _TransactionEvidenceImage instance,
 ) => <String, dynamic>{
-  'storagePath': instance.storagePath,
+  'imageUrl': instance.imageUrl,
   'fileName': instance.fileName,
   'mimeType': instance.mimeType,
   'uploadedAt': const TimestampConverter().toJson(instance.uploadedAt),
+  'storageMode': _$ImageStorageModeEnumMap[instance.storageMode]!,
+};
+
+const _$ImageStorageModeEnumMap = {
+  ImageStorageMode.cloudinary: 'cloudinary',
+  ImageStorageMode.local: 'local',
 };
 
 _TransactionModel _$TransactionModelFromJson(Map<String, dynamic> json) =>

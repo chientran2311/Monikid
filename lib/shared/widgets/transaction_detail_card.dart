@@ -8,6 +8,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/app_text_field.dart';
 
 class TransactionDetailCard extends StatelessWidget {
   const TransactionDetailCard({
@@ -222,27 +223,22 @@ class _NoteRow extends StatelessWidget {
                       color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
                     ),
                   ),
-                  child: TextField(
+                  child: AppTextField(
                     controller: controller,
                     enabled: enabled,
+                    style: AppTextFieldStyle.borderless,
                     maxLines: 2,
                     maxLength: maxLength,
-                    style: AppTextStyleFactory.style(
+                    hintText: noteHint ?? s.updateTransactionNoteHint,
+                    textStyle: AppTextStyleFactory.style(
                       size: AppFontSizes.subtitleSmall,
                       weight: FontWeight.w400,
                       color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
                     ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                      hintText: noteHint ?? s.updateTransactionNoteHint,
-                      hintStyle: AppTextStyleFactory.style(
-                        size: AppFontSizes.subtitleSmall,
-                        weight: FontWeight.w400,
-                        color: AppTheme.textMuted,
-                      ),
-                      counterText: '',
+                    hintStyle: AppTextStyleFactory.style(
+                      size: AppFontSizes.subtitleSmall,
+                      weight: FontWeight.w400,
+                      color: AppTheme.textMuted,
                     ),
                   ),
                 ),

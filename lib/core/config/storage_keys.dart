@@ -26,4 +26,7 @@ class StorageKeys {
   // AI readiness result — written by splash on startup, read by AI-dependent features
   // Values: 'none' | 'gemini' | 'local'
   static const String activeAiSource = 'active_ai_source';
+
+  // Evidence image storage mode: 'cloudinary' | 'local'
+  static const String evidenceStorageMode = 'evidence_storage_mode';
 }

@@ -1640,6 +1640,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customCategoryCreated => 'Category created';
 
   @override
+  String get customCategoryCreateFailed =>
+      'Could not create category. Please try again.';
+
+  @override
   String get customCategoryDeleted => 'Category deleted';
 
   @override

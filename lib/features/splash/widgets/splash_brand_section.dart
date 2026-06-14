@@ -124,11 +124,14 @@ class _GlassLogoBox extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: Image.asset(
-              'assets/app_icon.png',
-              width: 80.w,
-              height: 80.w,
-              cacheWidth: decodePixelsFor(context, 80.w),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.r),
+              child: Image.asset(
+                'assets/app_icon.png',
+                width: 80.w,
+                height: 80.w,
+                cacheWidth: decodePixelsFor(context, 80.w),
+              ),
             ),
           ),
         ),

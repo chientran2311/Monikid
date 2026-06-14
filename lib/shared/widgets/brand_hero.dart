@@ -157,11 +157,14 @@ class _MainIcon extends StatelessWidget {
           ),
         ],
       ),
-      child: Image.asset(
-        'assets/app_icon.png',
-        width: 84.r,
-        height: 84.r,
-        cacheWidth: decodePixelsFor(context, 84.r),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.r),
+        child: Image.asset(
+          'assets/app_icon.png',
+          width: 84.r,
+          height: 84.r,
+          cacheWidth: decodePixelsFor(context, 84.r),
+        ),
       ),
     );
   }

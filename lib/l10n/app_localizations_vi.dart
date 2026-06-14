@@ -1638,6 +1638,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customCategoryCreated => 'Đã tạo danh mục';
 
   @override
+  String get customCategoryCreateFailed =>
+      'Không thể tạo danh mục. Vui lòng thử lại.';
+
+  @override
   String get customCategoryDeleted => 'Đã xóa danh mục';
 
   @override

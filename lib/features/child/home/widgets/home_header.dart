@@ -55,11 +55,14 @@ class _BrandSection extends StatelessWidget {
               ),
             ],
           ),
-          child: Image.asset(
-            'assets/app_icon.png',
-            width: 38.r,
-            height: 38.r,
-            cacheWidth: decodePixelsFor(context, 38.r),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9.r),
+            child: Image.asset(
+              'assets/app_icon.png',
+              width: 38.r,
+              height: 38.r,
+              cacheWidth: decodePixelsFor(context, 38.r),
+            ),
           ),
         ),
         SizedBox(width: 10.w),

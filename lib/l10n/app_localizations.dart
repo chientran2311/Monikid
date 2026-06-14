@@ -3066,6 +3066,12 @@ abstract class AppLocalizations {
   /// **'Category created'**
   String get customCategoryCreated;
 
+  /// No description provided for @customCategoryCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create category. Please try again.'**
+  String get customCategoryCreateFailed;
+
   /// No description provided for @customCategoryDeleted.
   ///
   /// In en, this message translates to:

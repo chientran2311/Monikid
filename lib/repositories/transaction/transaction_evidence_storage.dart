@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:monikid/core/config/app_config.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/models/enums/image_storage_mode.dart';
 
 class TransactionEvidenceUploadPayload {
   const TransactionEvidenceUploadPayload({
@@ -102,10 +103,11 @@ class TransactionEvidenceStorageImpl implements TransactionEvidenceStorage {
       }
 
       return TransactionEvidenceImage(
-        storagePath: secureUrl,
+        imageUrl: secureUrl,
         fileName: responseJson['original_filename'] as String? ?? payload.fileName,
         mimeType: payload.mimeType,
         uploadedAt: uploadedAt,
+        storageMode: ImageStorageMode.cloudinary,
       );
     } catch (error, stackTrace) {
       _logger.e(

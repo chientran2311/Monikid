@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:monikid/models/enums/image_storage_mode.dart';
 
 part 'transaction_model.freezed.dart';
 part 'transaction_model.g.dart';
@@ -27,10 +28,11 @@ class TimestampConverter implements JsonConverter<DateTime?, Timestamp?> {
 @freezed
 abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
   const factory TransactionEvidenceImage({
-    required String storagePath,
+    String? imageUrl, // null = local mode or not yet synced to cloud
     String? fileName,
     String? mimeType,
     @TimestampConverter() DateTime? uploadedAt,
+    @Default(ImageStorageMode.cloudinary) ImageStorageMode storageMode,
   }) = _TransactionEvidenceImage;
 
   const TransactionEvidenceImage._();
@@ -39,14 +41,16 @@ abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
       _$TransactionEvidenceImageFromJson(json);
 
   factory TransactionEvidenceImage.fromFirestore(Map<String, dynamic> json) {
+    // Reads new key (image_url) with fallback to legacy (storage_path).
+    // Nullable: null means image is stored locally (not on cloud).
+    final imageUrl = _readNullableString(
+      json,
+      snakeKey: 'image_url',
+      camelKey: 'imageUrl',
+      fallbackKey: 'storage_path',
+    );
     return TransactionEvidenceImage(
-      // Reads new key (image_url) with fallback to legacy (storage_path).
-      storagePath: _readString(
-        json,
-        snakeKey: 'image_url',
-        camelKey: 'imageUrl',
-        fallbackKey: 'storage_path',
-      ),
+      imageUrl: imageUrl,
       fileName: _readNullableString(
         json,
         snakeKey: 'image_name',
@@ -58,12 +62,16 @@ abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
         camelKey: 'imageType',
       ),
       uploadedAt: _parseDate(json['uploaded_at'] ?? json['uploadedAt']),
+      // Derive mode from imageUrl: null = local, non-null = cloudinary.
+      storageMode: imageUrl != null
+          ? ImageStorageMode.cloudinary
+          : ImageStorageMode.local,
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'image_url': storagePath,
+      'image_url': imageUrl, // null for local mode
       'image_name': fileName,
       'image_type': mimeType,
       'uploaded_at': uploadedAt != null
@@ -196,7 +204,9 @@ abstract class TransactionModel with _$TransactionModel {
   DateTime get date => dateTs;
   String? get location => merchantName;
   bool get hasEvidenceImage =>
-      evidenceImage != null && evidenceImage!.storagePath.isNotEmpty;
+      evidenceImage != null &&
+      (evidenceImage!.storageMode == ImageStorageMode.local ||
+          (evidenceImage!.imageUrl?.isNotEmpty ?? false));
 
   TransactionModel copyWithUi({
     double? amount,

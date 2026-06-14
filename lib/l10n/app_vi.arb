@@ -668,6 +668,7 @@
   "customCategoryTypeIncome": "Thu nhập",
   "customCategoryLimitReached": "Bạn chỉ có thể tạo tối đa 5 danh mục tùy chỉnh",
   "customCategoryCreated": "Đã tạo danh mục",
+  "customCategoryCreateFailed": "Không thể tạo danh mục. Vui lòng thử lại.",
   "customCategoryDeleted": "Đã xóa danh mục",
   "customCategoryConfirmDelete": "Xóa danh mục này?",
   "customCategoryConfirmDeleteBody": "Các giao dịch dùng danh mục này vẫn giữ nhãn cũ.",

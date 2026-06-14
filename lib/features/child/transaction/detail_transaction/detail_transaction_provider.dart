@@ -99,8 +99,8 @@ class DetailTransactionNotifier extends _$DetailTransactionNotifier {
       return;
     }
 
-    final storagePath = transaction.evidenceImage?.storagePath;
-    final currentStoragePath = state.transaction?.evidenceImage?.storagePath;
+    final storagePath = transaction.evidenceImage?.imageUrl;
+    final currentStoragePath = state.transaction?.evidenceImage?.imageUrl;
     if (!forceRefresh &&
         storagePath == currentStoragePath &&
         state.evidenceImageUrl != null) {

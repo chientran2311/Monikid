@@ -181,7 +181,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       return transactionToSave;
     } catch (error, stackTrace) {
       if (uploadedEvidenceImage != null) {
-        await _cleanupUploadedEvidence(uploadedEvidenceImage.storagePath);
+        await _cleanupUploadedEvidence(uploadedEvidenceImage.imageUrl ?? '');
       }
       if (error is FirebaseException) {
         _logger.e(
@@ -289,18 +289,18 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
       if (uploadedEvidenceImage != null &&
           previousEvidenceImage != null &&
-          previousEvidenceImage.storagePath !=
-              uploadedEvidenceImage.storagePath) {
-        await _cleanupUploadedEvidence(previousEvidenceImage.storagePath);
+          previousEvidenceImage.imageUrl !=
+              uploadedEvidenceImage.imageUrl) {
+        await _cleanupUploadedEvidence(previousEvidenceImage.imageUrl ?? '');
       }
 
       if (removeExistingEvidence && previousEvidenceImage != null) {
-        await _cleanupUploadedEvidence(previousEvidenceImage.storagePath);
+        await _cleanupUploadedEvidence(previousEvidenceImage.imageUrl ?? '');
       }
       return updatedTransaction;
     } catch (error, stackTrace) {
       if (uploadedEvidenceImage != null) {
-        await _cleanupUploadedEvidence(uploadedEvidenceImage.storagePath);
+        await _cleanupUploadedEvidence(uploadedEvidenceImage.imageUrl ?? '');
       }
       _logger.e(
         'Failed to update transaction.',
@@ -315,13 +315,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<String?> getEvidenceDownloadUrl(
     TransactionEvidenceImage? evidenceImage,
   ) async {
-    if (evidenceImage == null || evidenceImage.storagePath.trim().isEmpty) {
+    if (evidenceImage == null ||
+        (evidenceImage.imageUrl ?? '').trim().isEmpty) {
       return null;
     }
 
     try {
       return await _evidenceStorage.getEvidenceDownloadUrl(
-        evidenceImage.storagePath,
+        evidenceImage.imageUrl ?? '',
       );
     } catch (error, stackTrace) {
       _logger.e(

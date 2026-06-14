@@ -27,7 +27,7 @@ class TransactionDetailEvidenceSection extends HookConsumerWidget {
       () => getIt<TransactionRepository>().getEvidenceDownloadUrl(
         evidenceImage,
       ),
-      [evidenceImage.storagePath],
+      [evidenceImage.imageUrl],
     );
     final imageUrlSnapshot = useFuture(imageUrlFuture);
 

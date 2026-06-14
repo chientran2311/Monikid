@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/models/enums/image_storage_mode.dart';
 
 void main() {
   group('TransactionModel Firestore mapping', () {
@@ -34,9 +35,9 @@ void main() {
       final firestoreData = transaction.toFirestore();
 
       expect(firestoreData['transaction_id'], 'tx-2');
-      expect(firestoreData['amount_minor'], 25000);
-      expect(firestoreData['category_label'], 'Reward');
-      expect(firestoreData['date_ts'], isA<Timestamp>());
+      expect(firestoreData['amount'], 25000);
+      expect(firestoreData['category_id'], 'reward');
+      expect(firestoreData['transaction_date'], isA<Timestamp>());
       expect(firestoreData.containsKey('evidence_image'), isFalse);
     });
 
@@ -56,13 +57,8 @@ void main() {
       );
 
       final firestoreData = transaction.toFirestore();
-      final ocrMeta = firestoreData['ocr_meta'] as Map<String, dynamic>?;
 
-      expect(firestoreData['source'], 'ocr');
-      expect(firestoreData['merchant_name'], 'Circle K');
-      expect(ocrMeta, isNotNull);
-      expect(ocrMeta?['used'], isTrue);
-      expect(ocrMeta?['confidence'], 0.91);
+      // toFirestore does not persist raw OCR inference fields.
       expect(firestoreData.containsKey('ocr_text'), isFalse);
       expect(firestoreData.containsKey('llm_payload'), isFalse);
       expect(firestoreData.containsKey('ai_response'), isFalse);
@@ -79,20 +75,24 @@ void main() {
         'category_label': 'Snacks',
         'date_ts': Timestamp.fromDate(DateTime(2026, 4, 19, 10, 0)),
         'evidence_image': {
-          'storage_path': 'transactions/user-1/tx-3/evidence.jpg',
-          'file_name': 'evidence.jpg',
-          'mime_type': 'image/jpeg',
+          'image_url': 'transactions/user-1/tx-3/evidence.jpg',
+          'image_name': 'evidence.jpg',
+          'image_type': 'image/jpeg',
           'uploaded_at': uploadedAt,
         },
       });
 
       expect(transaction.evidenceImage, isNotNull);
       expect(
-        transaction.evidenceImage?.storagePath,
+        transaction.evidenceImage?.imageUrl,
         'transactions/user-1/tx-3/evidence.jpg',
       );
       expect(transaction.evidenceImage?.fileName, 'evidence.jpg');
       expect(transaction.evidenceImage?.mimeType, 'image/jpeg');
+      expect(
+        transaction.evidenceImage?.storageMode,
+        ImageStorageMode.cloudinary,
+      );
       expect(
         transaction.evidenceImage?.uploadedAt,
         DateTime(2026, 4, 19, 9, 30),
@@ -109,7 +109,7 @@ void main() {
         categoryLabel: 'Books',
         dateTs: DateTime(2026, 4, 19, 14, 30),
         evidenceImage: const TransactionEvidenceImage(
-          storagePath: 'transactions/user-1/tx-4/evidence.png',
+          imageUrl: 'transactions/user-1/tx-4/evidence.png',
           fileName: 'evidence.png',
           mimeType: 'image/png',
         ),
@@ -121,11 +121,12 @@ void main() {
 
       expect(evidenceImage, isNotNull);
       expect(
-        evidenceImage?['storage_path'],
+        evidenceImage?['image_url'],
         'transactions/user-1/tx-4/evidence.png',
       );
-      expect(evidenceImage?['file_name'], 'evidence.png');
-      expect(evidenceImage?['mime_type'], 'image/png');
+      expect(evidenceImage?['image_name'], 'evidence.png');
+      expect(evidenceImage?['image_type'], 'image/png');
+      expect(evidenceImage?.containsKey('storage_mode'), isFalse);
       expect(evidenceImage?.containsKey('download_url'), isFalse);
     });
   });
@@ -179,7 +180,7 @@ void main() {
         type: 'expense',
       );
 
-      expect(transactionCategoryKeyForCategory(category), 'n_u_ng');
+      expect(transactionCategoryKeyForCategory(category), 'expense-an-uong');
     });
   });
 }

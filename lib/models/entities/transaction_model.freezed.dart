@@ -16,7 +16,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TransactionEvidenceImage {
 
- String get storagePath; String? get fileName; String? get mimeType;@TimestampConverter() DateTime? get uploadedAt;
+ String? get imageUrl;// null = local mode or not yet synced to cloud
+ String? get fileName; String? get mimeType;@TimestampConverter() DateTime? get uploadedAt; ImageStorageMode get storageMode;
 /// Create a copy of TransactionEvidenceImage
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +30,16 @@ $TransactionEvidenceImageCopyWith<TransactionEvidenceImage> get copyWith => _$Tr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionEvidenceImage&&(identical(other.storagePath, storagePath) || other.storagePath == storagePath)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.uploadedAt, uploadedAt) || other.uploadedAt == uploadedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionEvidenceImage&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.uploadedAt, uploadedAt) || other.uploadedAt == uploadedAt)&&(identical(other.storageMode, storageMode) || other.storageMode == storageMode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,storagePath,fileName,mimeType,uploadedAt);
+int get hashCode => Object.hash(runtimeType,imageUrl,fileName,mimeType,uploadedAt,storageMode);
 
 @override
 String toString() {
-  return 'TransactionEvidenceImage(storagePath: $storagePath, fileName: $fileName, mimeType: $mimeType, uploadedAt: $uploadedAt)';
+  return 'TransactionEvidenceImage(imageUrl: $imageUrl, fileName: $fileName, mimeType: $mimeType, uploadedAt: $uploadedAt, storageMode: $storageMode)';
 }
 
 
@@ -49,7 +50,7 @@ abstract mixin class $TransactionEvidenceImageCopyWith<$Res>  {
   factory $TransactionEvidenceImageCopyWith(TransactionEvidenceImage value, $Res Function(TransactionEvidenceImage) _then) = _$TransactionEvidenceImageCopyWithImpl;
 @useResult
 $Res call({
- String storagePath, String? fileName, String? mimeType,@TimestampConverter() DateTime? uploadedAt
+ String? imageUrl, String? fileName, String? mimeType,@TimestampConverter() DateTime? uploadedAt, ImageStorageMode storageMode
 });
 
 
@@ -66,13 +67,14 @@ class _$TransactionEvidenceImageCopyWithImpl<$Res>
 
 /// Create a copy of TransactionEvidenceImage
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? storagePath = null,Object? fileName = freezed,Object? mimeType = freezed,Object? uploadedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? imageUrl = freezed,Object? fileName = freezed,Object? mimeType = freezed,Object? uploadedAt = freezed,Object? storageMode = null,}) {
   return _then(_self.copyWith(
-storagePath: null == storagePath ? _self.storagePath : storagePath // ignore: cast_nullable_to_non_nullable
-as String,fileName: freezed == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
+imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,fileName: freezed == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
 as String?,mimeType: freezed == mimeType ? _self.mimeType : mimeType // ignore: cast_nullable_to_non_nullable
 as String?,uploadedAt: freezed == uploadedAt ? _self.uploadedAt : uploadedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,storageMode: null == storageMode ? _self.storageMode : storageMode // ignore: cast_nullable_to_non_nullable
+as ImageStorageMode,
   ));
 }
 
@@ -83,13 +85,15 @@ as DateTime?,
 @JsonSerializable()
 
 class _TransactionEvidenceImage extends TransactionEvidenceImage {
-  const _TransactionEvidenceImage({required this.storagePath, this.fileName, this.mimeType, @TimestampConverter() this.uploadedAt}): super._();
+  const _TransactionEvidenceImage({this.imageUrl, this.fileName, this.mimeType, @TimestampConverter() this.uploadedAt, this.storageMode = ImageStorageMode.cloudinary}): super._();
   factory _TransactionEvidenceImage.fromJson(Map<String, dynamic> json) => _$TransactionEvidenceImageFromJson(json);
 
-@override final  String storagePath;
+@override final  String? imageUrl;
+// null = local mode or not yet synced to cloud
 @override final  String? fileName;
 @override final  String? mimeType;
 @override@TimestampConverter() final  DateTime? uploadedAt;
+@override@JsonKey() final  ImageStorageMode storageMode;
 
 /// Create a copy of TransactionEvidenceImage
 /// with the given fields replaced by the non-null parameter values.
@@ -104,16 +108,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionEvidenceImage&&(identical(other.storagePath, storagePath) || other.storagePath == storagePath)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.uploadedAt, uploadedAt) || other.uploadedAt == uploadedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionEvidenceImage&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.fileName, fileName) || other.fileName == fileName)&&(identical(other.mimeType, mimeType) || other.mimeType == mimeType)&&(identical(other.uploadedAt, uploadedAt) || other.uploadedAt == uploadedAt)&&(identical(other.storageMode, storageMode) || other.storageMode == storageMode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,storagePath,fileName,mimeType,uploadedAt);
+int get hashCode => Object.hash(runtimeType,imageUrl,fileName,mimeType,uploadedAt,storageMode);
 
 @override
 String toString() {
-  return 'TransactionEvidenceImage(storagePath: $storagePath, fileName: $fileName, mimeType: $mimeType, uploadedAt: $uploadedAt)';
+  return 'TransactionEvidenceImage(imageUrl: $imageUrl, fileName: $fileName, mimeType: $mimeType, uploadedAt: $uploadedAt, storageMode: $storageMode)';
 }
 
 
@@ -124,7 +128,7 @@ abstract mixin class _$TransactionEvidenceImageCopyWith<$Res> implements $Transa
   factory _$TransactionEvidenceImageCopyWith(_TransactionEvidenceImage value, $Res Function(_TransactionEvidenceImage) _then) = __$TransactionEvidenceImageCopyWithImpl;
 @override @useResult
 $Res call({
- String storagePath, String? fileName, String? mimeType,@TimestampConverter() DateTime? uploadedAt
+ String? imageUrl, String? fileName, String? mimeType,@TimestampConverter() DateTime? uploadedAt, ImageStorageMode storageMode
 });
 
 
@@ -141,13 +145,14 @@ class __$TransactionEvidenceImageCopyWithImpl<$Res>
 
 /// Create a copy of TransactionEvidenceImage
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? storagePath = null,Object? fileName = freezed,Object? mimeType = freezed,Object? uploadedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? imageUrl = freezed,Object? fileName = freezed,Object? mimeType = freezed,Object? uploadedAt = freezed,Object? storageMode = null,}) {
   return _then(_TransactionEvidenceImage(
-storagePath: null == storagePath ? _self.storagePath : storagePath // ignore: cast_nullable_to_non_nullable
-as String,fileName: freezed == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
+imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,fileName: freezed == fileName ? _self.fileName : fileName // ignore: cast_nullable_to_non_nullable
 as String?,mimeType: freezed == mimeType ? _self.mimeType : mimeType // ignore: cast_nullable_to_non_nullable
 as String?,uploadedAt: freezed == uploadedAt ? _self.uploadedAt : uploadedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,storageMode: null == storageMode ? _self.storageMode : storageMode // ignore: cast_nullable_to_non_nullable
+as ImageStorageMode,
   ));
 }
 

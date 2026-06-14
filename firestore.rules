@@ -136,10 +136,10 @@ service cloud.firestore {
       return img == null
         || (img is map
             && img.keys().hasOnly(['image_url', 'image_name', 'image_type', 'uploaded_at'])
-            && img.keys().hasAll(['image_url'])
-            && img.image_url is string
-            && img.image_url.size() > 0 && img.image_url.size() <= 2048
-            && img.image_url.matches('^https://res\\.cloudinary\\.com/.*$')
+            // image_url null = local mode; non-null = cloudinary public ID or URL (validated in app).
+            && (img.get('image_url', null) == null
+                || (img.image_url is string
+                    && img.image_url.size() > 0 && img.image_url.size() <= 2048))
             && (img.get('image_name', null) == null
                 || (img.image_name is string && img.image_name.size() <= 160))
             && (img.get('image_type', null) == null

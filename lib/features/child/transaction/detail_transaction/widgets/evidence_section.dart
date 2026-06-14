@@ -18,7 +18,7 @@ class EvidenceSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transaction = state.transaction!;
     final hasLegacyEvidencePath = _hasLegacyEvidencePath(
-      transaction.evidenceImage?.storagePath,
+      transaction.evidenceImage?.imageUrl,
     );
     final bgColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey;
     final labelColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;

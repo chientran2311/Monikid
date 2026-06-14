@@ -15,6 +15,7 @@ import 'package:monikid/features/child/transaction/transaction_history/widgets/c
 import 'package:monikid/features/child/transaction/transaction_history/widgets/draggable_category_item.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/category/add_custom_category_repository.dart';
+import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
 
 const _allCategory = CategoryModel(
@@ -280,9 +281,7 @@ Future<void> _showAddCategorySheet(
 }) async {
   final customCount = categories.where((c) => !c.isDefault).length;
   if (customCount >= 5) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.customCategoryLimitReached)),
-    );
+    AppSnackBar.warning(context, context.l10n.customCategoryLimitReached);
     return;
   }
 
@@ -306,9 +305,7 @@ Future<void> _showAddCategorySheet(
           icon: icon,
         );
         if (ctx.mounted) {
-          ScaffoldMessenger.of(ctx).showSnackBar(
-            SnackBar(content: Text(ctx.l10n.customCategoryCreated)),
-          );
+          AppSnackBar.success(ctx, ctx.l10n.customCategoryCreated);
           ctx.pop();
         }
       },
@@ -340,15 +337,11 @@ void _confirmDeleteCategory(
                 categoryId: category.id,
               );
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(s.customCategoryDeleted)),
-            );
+            AppSnackBar.success(context, s.customCategoryDeleted);
           }
         } catch (_) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(s.customCategoryDeleteFailed)),
-            );
+            AppSnackBar.error(context, s.customCategoryDeleteFailed);
           }
         }
       },

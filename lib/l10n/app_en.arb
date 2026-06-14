@@ -668,6 +668,7 @@
   "customCategoryTypeIncome": "Income",
   "customCategoryLimitReached": "You can have at most 5 custom categories",
   "customCategoryCreated": "Category created",
+  "customCategoryCreateFailed": "Could not create category. Please try again.",
   "customCategoryDeleted": "Category deleted",
   "customCategoryConfirmDelete": "Delete this category?",
   "customCategoryConfirmDeleteBody": "Transactions using this category will keep their existing label.",

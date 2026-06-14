@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/app_text_field.dart';
 import 'package:monikid/shared/widgets/switch_two_item.dart';
 
 class AddCustomCategorySheet extends HookWidget {
@@ -53,7 +54,10 @@ class AddCustomCategorySheet extends HookWidget {
         );
         if (context.mounted) context.pop();
       } catch (_) {
-        if (context.mounted) isLoading.value = false;
+        if (context.mounted) {
+          isLoading.value = false;
+          context.showErrorSnackBar(s.customCategoryCreateFailed);
+        }
       }
     }
 
@@ -147,55 +151,17 @@ class AddCustomCategorySheet extends HookWidget {
                     ),
                   ),
                   SizedBox(height: 10.h),
-                  SizedBox(
-                    height: 58.h,
-                    child: TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      maxLength: 40,
-                      textCapitalization: TextCapitalization.sentences,
-                      textAlignVertical: TextAlignVertical.center,
-                      onTap: () => showEmojiPicker.value = false,
-                      style: context.typo.body.big.copyWith(color: textColor),
-                      decoration: InputDecoration(
-                        hintText: s.customCategoryLabelHint,
-                        hintStyle: context.typo.body.big.copyWith(color: AppTheme.textMuted),
-                        counterText: '',
-                        filled: true,
-                        fillColor: isDark ? AppTheme.surfaceDark : AppTheme.backgroundLight,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                          borderSide: BorderSide(
-                            color: error.value != null
-                                ? AppTheme.redAlert
-                                : (isDark ? AppTheme.borderDark : AppTheme.borderLight),
-                            width: error.value != null ? 1.5 : 1,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                          borderSide: const BorderSide(color: AppTheme.redAlert, width: 1.5),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                          borderSide: const BorderSide(color: AppTheme.redAlert, width: 1.5),
-                        ),
-                      ),
-                      onSubmitted: (_) => submit(),
-                    ),
+                  AppTextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    hintText: s.customCategoryLabelHint,
+                    errorText: error.value,
+                    maxLength: 40,
+                    textCapitalization: TextCapitalization.sentences,
+                    textInputAction: TextInputAction.done,
+                    onTap: () => showEmojiPicker.value = false,
+                    onSubmitted: (_) => submit(),
                   ),
-                  if (error.value != null) ...[
-                    SizedBox(height: 6.h),
-                    Text(
-                      error.value!,
-                      style: context.typo.caption.big.copyWith(color: AppTheme.redAlert),
-                    ),
-                  ],
                   SizedBox(height: 24.h),
                   // Icon picker
                   Text(

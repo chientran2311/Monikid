@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
-import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 
 part 'parent_statistic_repository.g.dart';
 
@@ -55,7 +55,7 @@ abstract class ParentStatisticRepository {
   Future<List<TransactionModel>> getChildTransactionsByCategory({
     required String childUid,
     required String categoryKey,
-    required int selectedMonthIndex,
+    required int selectedTabIndex,
     required DateTime anchorDate,
   });
 
@@ -98,11 +98,11 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
   }) async {
     const monthMode = 1;
     final currentRange = statisticGetPeriodRange(
-      selectedMonthIndex: monthMode,
+      selectedTabIndex: monthMode,
       anchorDate: anchorDate,
     );
     final previousRange = statisticGetPreviousPeriodRange(
-      selectedMonthIndex: monthMode,
+      selectedTabIndex: monthMode,
       anchorDate: anchorDate,
     );
     final currentMonthKey = DateFormat('yyyy-MM').format(anchorDate);
@@ -155,29 +155,29 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
   Future<List<TransactionModel>> getChildTransactionsByCategory({
     required String childUid,
     required String categoryKey,
-    required int selectedMonthIndex,
+    required int selectedTabIndex,
     required DateTime anchorDate,
   }) async {
     final range = statisticGetPeriodRange(
-      selectedMonthIndex: selectedMonthIndex,
+      selectedTabIndex: selectedTabIndex,
       anchorDate: anchorDate,
     );
 
     _logger.i(
       'ParentStatisticRepository: loading transactions for child=$childUid '
-      'category=$categoryKey mode=$selectedMonthIndex.',
+      'category=$categoryKey mode=$selectedTabIndex.',
     );
 
     try {
       final snapshot = await _transactionsOfChild(childUid)
           .where('type', isEqualTo: 'expense')
-          .where('category_key', isEqualTo: categoryKey)
+          .where('category_id', isEqualTo: categoryKey)
           .where(
-            'date_ts',
+            'transaction_date',
             isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
           )
-          .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
-          .orderBy('date_ts', descending: true)
+          .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
+          .orderBy('transaction_date', descending: true)
           .get();
 
       return snapshot.docs.map(_mapTransaction).toList(growable: false);
@@ -230,11 +230,11 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
     final snapshot = await _transactionsOfChild(childUid)
         .where('type', isEqualTo: 'expense')
         .where(
-          'date_ts',
+          'transaction_date',
           isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
         )
-        .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
-        .orderBy('date_ts', descending: true)
+        .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
+        .orderBy('transaction_date', descending: true)
         .get();
 
     return snapshot.docs.map(_mapTransaction).toList(growable: false);

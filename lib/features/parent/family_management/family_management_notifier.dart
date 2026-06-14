@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
@@ -15,7 +15,6 @@ part 'family_management_notifier.g.dart';
 class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   late final LinkFamilyRepository _linkFamilyRepo;
   late final ParentDashboardRepository _parentDashboardRepo;
-  late final FirebaseFirestore _firestore;
   late final Logger _logger;
   StreamSubscription<List<FamilyMemberModel>>? _membersSubscription;
 
@@ -23,7 +22,6 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   FamilyManagementState build() {
     _linkFamilyRepo = getIt<LinkFamilyRepository>();
     _parentDashboardRepo = getIt<ParentDashboardRepository>();
-    _firestore = getIt<FirebaseFirestore>();
     _logger = getIt<Logger>();
 
     ref.onDispose(() {
@@ -80,22 +78,21 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   }
 
   Future<void> _loadMonthlyLimitsForChildren() async {
-    final children = state.childMembers;
-    if (children.isEmpty) return;
+    final childUids = state.childMembers.map((m) => m.uid).toList();
+    if (childUids.isEmpty) return;
 
-    final limits = <String, int?>{};
-    for (final child in children) {
-      try {
-        final doc = await _firestore.collection('users').doc(child.uid).get();
-        if (doc.exists) {
-          final data = doc.data();
-          limits[child.uid] = (data?['monthly_limit_minor'] as num?)?.toInt();
-        }
-      } catch (e) {
-        _logger.w('Failed to load limit for child ${child.uid}: $e');
-      }
+    try {
+      final limits = await _parentDashboardRepo.getChildrenMonthlyLimits(
+        childUids: childUids,
+      );
+      state = state.copyWith(monthlyLimits: limits);
+    } catch (e, stackTrace) {
+      _logger.e(
+        'Failed to load monthly limits for children.',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
-    state = state.copyWith(monthlyLimits: limits);
   }
 
   Future<void> unlinkChild(String childUid) async {
@@ -103,7 +100,7 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
     if (familyId == null) return;
     state = state.copyWith(isProcessing: true);
     try {
-      await _linkFamilyRepo.removeChild(familyId: familyId, childId: childUid);
+      await _linkFamilyRepo.removeMember(familyId: familyId, memberUid: childUid);
       state = state.copyWith(isProcessing: false);
     } catch (e, stackTrace) {
       _logger.e('Error unlinking child', error: e, stackTrace: stackTrace);
@@ -120,7 +117,7 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
     if (familyId == null) return;
     state = state.copyWith(isProcessing: true);
     try {
-      await _linkFamilyRepo.removeParentMember(
+      await _linkFamilyRepo.removeMember(
         familyId: familyId,
         memberUid: parentUid,
       );
@@ -179,7 +176,6 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
   }
 
   bool canAddNonHostParent() {
-    final parents = state.parentMembers;
-    return parents.length < 2;
+    return state.parentMembers.length < 2;
   }
 }

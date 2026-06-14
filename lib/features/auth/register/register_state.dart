@@ -12,7 +12,6 @@ abstract class RegisterState with _$RegisterState {
     String? errorMessage,
     @Default(AuthFieldError.none) AuthFieldError emailError,
     @Default(AuthFieldError.none) AuthFieldError usernameError,
-    @Default(AuthFieldError.none) AuthFieldError phoneError,
     @Default(AuthFieldError.none) AuthFieldError passwordError,
     @Default(AuthFieldError.none) AuthFieldError confirmPasswordError,
   }) = _RegisterState;
@@ -24,7 +23,6 @@ abstract class RegisterState with _$RegisterState {
   bool get hasFieldErrors =>
       emailError != AuthFieldError.none ||
       usernameError != AuthFieldError.none ||
-      phoneError != AuthFieldError.none ||
       passwordError != AuthFieldError.none ||
       confirmPasswordError != AuthFieldError.none;
 }

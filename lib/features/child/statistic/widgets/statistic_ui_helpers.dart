@@ -25,19 +25,29 @@ extension StatisticBuildContextX on BuildContext {
     return '$amountMinorđ';
   }
 
-  String statisticPeriodNoun(int selectedMonthIndex) {
-    return selectedMonthIndex == 0 ? l10n.statisticThisWeek : l10n.statisticThisMonth;
+  String _tabPeriodNoun(int selectedTabIndex) {
+    if (selectedTabIndex == 0) return l10n.statisticWeekNoun;
+    if (selectedTabIndex == 2) return l10n.statisticYearNoun;
+    return l10n.statisticMonthNoun;
   }
 
-  String statisticRelativePeriodNoun(int selectedMonthIndex) {
-    return selectedMonthIndex == 0 ? 'tuần' : 'tháng';
+  String statisticPeriodNoun(int selectedTabIndex) {
+    if (selectedTabIndex == 0) return l10n.statisticThisWeek;
+    if (selectedTabIndex == 2) return l10n.statisticThisYear;
+    return l10n.statisticThisMonth;
+  }
+
+  String statisticRelativePeriodNoun(int selectedTabIndex) {
+    if (selectedTabIndex == 0) return l10n.statisticWeekNoun;
+    if (selectedTabIndex == 2) return l10n.statisticYearNoun;
+    return l10n.statisticMonthNoun;
   }
 
   String statisticPeriodLabel({
-    required int selectedMonthIndex,
+    required int selectedTabIndex,
     required DateTime anchorDate,
   }) {
-    if (selectedMonthIndex == 0) {
+    if (selectedTabIndex == 0) {
       final start = _weekStart(anchorDate);
       final nowStart = _weekStart(DateTime.now());
       if (_isSameDay(start, nowStart)) {
@@ -50,6 +60,12 @@ extension StatisticBuildContextX on BuildContext {
       final end = start.add(const Duration(days: 6));
       return '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')} - '
           '${end.day.toString().padLeft(2, '0')}/${end.month.toString().padLeft(2, '0')}';
+    }
+
+    if (selectedTabIndex == 2) {
+      final now = DateTime.now();
+      if (anchorDate.year == now.year) return l10n.statisticThisYear;
+      return anchorDate.year.toString();
     }
 
     final now = DateTime.now();
@@ -66,14 +82,14 @@ extension StatisticBuildContextX on BuildContext {
 
   String statisticInsightMessage({
     required StatisticInsightData? insight,
-    required int selectedMonthIndex,
+    required int selectedTabIndex,
   }) {
     if (insight == null) {
       return l10n.statisticSmartInsightFallback;
     }
 
     return l10n.statisticSmartInsightMessage(
-      selectedMonthIndex == 0 ? l10n.statisticWeekNoun : l10n.statisticMonthNoun,
+      _tabPeriodNoun(selectedTabIndex),
       insight.changePercent.toStringAsFixed(0),
       insight.categoryLabel,
     );
@@ -81,16 +97,13 @@ extension StatisticBuildContextX on BuildContext {
 
   String statisticComparisonMessage({
     required StatisticBudgetOverview? budgetOverview,
-    required int selectedMonthIndex,
+    required int selectedTabIndex,
   }) {
     if (budgetOverview == null) {
-      return l10n.statisticNoPreviousData(
-        selectedMonthIndex == 0 ? l10n.statisticWeekNoun : l10n.statisticMonthNoun,
-      );
+      return l10n.statisticNoPreviousData(_tabPeriodNoun(selectedTabIndex));
     }
 
-    final periodLabel =
-        selectedMonthIndex == 0 ? l10n.statisticWeekNoun : l10n.statisticMonthNoun;
+    final periodLabel = _tabPeriodNoun(selectedTabIndex);
     final percent = budgetOverview.comparisonPercent?.toStringAsFixed(0);
     if (percent == null) {
       return l10n.statisticNoPreviousData(periodLabel);
@@ -148,16 +161,19 @@ Color statisticTrendColor(StatisticTrendDirection direction) {
   }
 }
 
-Color statisticTrendSurfaceColor(StatisticTrendDirection direction) {
+Color statisticTrendSurfaceColor(
+  StatisticTrendDirection direction, {
+  required bool isDark,
+}) {
   switch (direction) {
     case StatisticTrendDirection.up:
-      return AppTheme.dangerSurface;
+      return isDark ? AppTheme.darkDangerSurface : AppTheme.dangerSurface;
     case StatisticTrendDirection.down:
-      return AppTheme.successSurface;
+      return isDark ? AppTheme.darkSuccessSurface : AppTheme.successSurface;
     case StatisticTrendDirection.stable:
-      return AppTheme.infoSurface;
+      return isDark ? AppTheme.darkInfoSurface : AppTheme.infoSurface;
     case StatisticTrendDirection.none:
-      return AppTheme.surfaceLight;
+      return isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
   }
 }
 

@@ -1,29 +1,27 @@
-import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/core/service/local_notification_service.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/notification_settings/notification_settings_state.dart';
+import 'package:monikid/repositories/link_family/link_family_repository.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
+import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
+import 'package:monikid/repositories/transaction/transaction_repository.dart';
 
 part 'notification_settings_provider.g.dart';
 
 @riverpod
 class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   late Logger _logger;
-  late LocalNotificationService _notifService;
+  late NotificationRepository _repo;
 
   @override
   NotificationSettingsState build() {
     _logger = getIt<Logger>();
-    _notifService = getIt<LocalNotificationService>();
-    // Defer _loadSettings() until after build() returns so the provider is
-    // fully initialized before any state write happens. Calling it directly
-    // (without microtask) causes the synchronous `state =` inside _loadSettings
-    // to run before build() completes → "uninitialized provider" crash.
+    _repo = getIt<NotificationRepository>();
     Future.microtask(_loadSettings);
     return const NotificationSettingsState();
   }
@@ -32,9 +30,9 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     state = state.copyWith(status: NotificationSettingsStatus.loading);
     try {
       final prefs = await SharedPreferences.getInstance();
-      final enabled = prefs.getBool('notif_enabled') ?? false;
-      final hour = prefs.getInt('notif_hour') ?? 21;
-      final minute = prefs.getInt('notif_minute') ?? 0;
+      final enabled = prefs.getBool(NotifPrefsKeys.enabled) ?? false;
+      final hour = prefs.getInt(NotifPrefsKeys.hour) ?? 21;
+      final minute = prefs.getInt(NotifPrefsKeys.minute) ?? 0;
       state = state.copyWith(
         status: NotificationSettingsStatus.success,
         enabled: enabled,
@@ -43,36 +41,39 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
       );
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to load notification settings.',
+        'NotificationSettingsNotifier._loadSettings failed.',
         error: error,
         stackTrace: stackTrace,
       );
       state = state.copyWith(
         status: NotificationSettingsStatus.error,
-        errorMessage: 'Không thể tải cài đặt thông báo.',
+        errorMessage: 'Failed to load notification settings.',
       );
     }
   }
 
   Future<void> toggleEnabled(bool value) async {
+    _logger.d('NotificationSettingsNotifier.toggleEnabled: value=$value');
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('notif_enabled', value);
+      await prefs.setBool(NotifPrefsKeys.enabled, value);
       state = state.copyWith(enabled: value, errorMessage: null);
 
       if (!value) {
-        await _notifService.cancelAll();
+        await _repo.cancelAllAndClearData();
         return;
       }
 
-      await _scheduleForRole();
+      state = state.copyWith(status: NotificationSettingsStatus.loading);
+      await _fetchSaveAndSchedule();
+      state = state.copyWith(status: NotificationSettingsStatus.success);
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to toggle notifications.',
+        'NotificationSettingsNotifier.toggleEnabled failed. value=$value',
         error: error,
         stackTrace: stackTrace,
       );
-      // Revert toggle on failure (D-01)
+      // Revert toggle — permission denied or critical failure
       state = state.copyWith(
         enabled: !value,
         status: NotificationSettingsStatus.error,
@@ -82,18 +83,21 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   }
 
   Future<void> updateTime(int hour, int minute) async {
+    _logger.d(
+      'NotificationSettingsNotifier.updateTime: hour=$hour minute=$minute',
+    );
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('notif_hour', hour);
-      await prefs.setInt('notif_minute', minute);
+      await prefs.setInt(NotifPrefsKeys.hour, hour);
+      await prefs.setInt(NotifPrefsKeys.minute, minute);
       state = state.copyWith(hour: hour, minute: minute, errorMessage: null);
 
       if (state.enabled) {
-        await _scheduleForRole();
+        await _scheduleFromSavedData();
       }
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to update notification time.',
+        'NotificationSettingsNotifier.updateTime failed.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -104,99 +108,144 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     }
   }
 
-  Future<void> _scheduleForRole() async {
-    final role = ref.read(authSessionProvider).account?.role;
-    _logger.d('NotificationSettingsNotifier: _scheduleForRole role=$role');
+  /// Called from home screens after fresh data is saved to prefs.
+  /// Reschedules using saved prefs — does NOT re-fetch from Firestore.
+  Future<void> rescheduleIfEnabled() async {
+    _logger.d('NotificationSettingsNotifier.rescheduleIfEnabled: start.');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final enabled = prefs.getBool(NotifPrefsKeys.enabled) ?? false;
+      if (!enabled) {
+        _logger.d('NotificationSettingsNotifier.rescheduleIfEnabled: disabled, skip.');
+        return;
+      }
+      await _scheduleFromSavedData();
+    } catch (error, stackTrace) {
+      _logger.w(
+        'NotificationSettingsNotifier.rescheduleIfEnabled failed.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
 
-    if (role == null) {
-      _logger.w('NotificationSettingsNotifier: role is null — skipping schedule.');
+  // ─── Private ────────────────────────────────────────────────────────────────
+
+  /// Fetches fresh data from Firestore, saves to prefs, then schedules.
+  /// Called only by toggle ON.
+  Future<void> _fetchSaveAndSchedule() async {
+    _logger.d('NotificationSettingsNotifier._fetchSaveAndSchedule: start.');
+    final account = ref.read(authSessionProvider).account;
+
+    if (account == null) {
+      _logger.w('NotificationSettingsNotifier._fetchSaveAndSchedule: account null, skip.');
       return;
     }
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
+    final role = account.role;
+    _logger.d('NotificationSettingsNotifier._fetchSaveAndSchedule: role=$role');
 
-      if (role == 'child') {
-        final expenseMinor = prefs.getInt('notif_child_expense_minor') ?? 0;
-        final limitMinor = prefs.getInt('notif_child_limit_minor') ?? 0;
-        _logger.d(
-          'NotificationSettingsNotifier: scheduling child notification. '
-          'hour=${state.hour} minute=${state.minute} '
-          'expense=$expenseMinor limit=$limitMinor',
-        );
-        await _notifService.scheduleChildDailyNotification(
-          hour: state.hour,
-          minute: state.minute,
-          expenseMinor: expenseMinor,
-          limitMinor: limitMinor,
-          title: 'Báo cáo chi tiêu hôm nay',
-          body:
-              'Bạn đã chi ${_formatMinor(expenseMinor)} trong tháng này (hạn mức: ${_formatMinor(limitMinor)}).',
-        );
-      } else if (role == 'parent') {
-        final childrenJson = prefs.getString('notif_parent_children');
-        _logger.d(
-          'NotificationSettingsNotifier: scheduling parent notifications. '
-          'childrenJson=${childrenJson?.length} chars',
-        );
-        final List<({String name, int expenseMinor})> children;
+    if (role == 'child') {
+      await _fetchChildDataAndSave(
+        uid: account.uid,
+        limitMinor: account.monthlyLimit ?? 0,
+      );
+    } else if (role == 'parent') {
+      await _fetchParentDataAndSave(
+        familyId: account.familyId,
+      );
+    } else {
+      _logger.w('NotificationSettingsNotifier._fetchSaveAndSchedule: unknown role=$role');
+      return;
+    }
 
-        if (childrenJson == null || childrenJson.isEmpty) {
-          children = [];
-        } else {
-          final decoded = jsonDecode(childrenJson) as List<dynamic>;
-          children = decoded.map((e) {
-            final map = e as Map<String, dynamic>;
-            return (
-              name: map['name'] as String,
-              expenseMinor: (map['expenseMinor'] as num).toInt(),
-            );
-          }).toList();
-        }
+    await _scheduleFromSavedData();
+  }
 
-        await _notifService.scheduleParentDailyNotifications(
-          hour: state.hour,
-          minute: state.minute,
-          children: children,
-          title: 'Báo cáo chi tiêu gia đình',
-          genericBody: 'Mở MoniKid để xem báo cáo chi tiêu gia đình hôm nay.',
-          bodyBuilder: (name, expense) => 'Con $name đã chi $expense tháng này.',
+  Future<void> _fetchChildDataAndSave({
+    required String uid,
+    required int limitMinor,
+  }) async {
+    _logger.d(
+      'NotificationSettingsNotifier._fetchChildDataAndSave: uid=$uid limit=$limitMinor',
+    );
+    final transactionRepo = getIt<TransactionRepository>();
+    final summary = await transactionRepo.getSummary(uid, month: DateTime.now());
+    if (summary == null) {
+      _logger.w(
+        'NotificationSettingsNotifier._fetchChildDataAndSave: summary null for uid=$uid',
+      );
+      return;
+    }
+    final expenseMinor = summary.totalExpense.round();
+    await _repo.saveChildData(expenseMinor: expenseMinor, limitMinor: limitMinor);
+  }
+
+  Future<void> _fetchParentDataAndSave({required String? familyId}) async {
+    _logger.d(
+      'NotificationSettingsNotifier._fetchParentDataAndSave: familyId=$familyId',
+    );
+    if (familyId == null || familyId.isEmpty) {
+      _logger.w('NotificationSettingsNotifier._fetchParentDataAndSave: no familyId, skip.');
+      return;
+    }
+
+    final familyRepo = getIt<LinkFamilyRepository>();
+    final dashRepo = getIt<ParentDashboardRepository>();
+    final monthKey = DateFormat('yyyy-MM').format(DateTime.now());
+
+    final allMembers = await familyRepo.getFamilyMembersOnce(familyId);
+    final members = allMembers.where((m) => m.userRole == 'child').toList();
+
+    if (members.isEmpty) {
+      _logger.w('NotificationSettingsNotifier._fetchParentDataAndSave: no child members.');
+      return;
+    }
+
+    final memberUids = members.map((m) => m.uid).toList();
+    final limits = await dashRepo.getChildrenMonthlyLimits(childUids: memberUids);
+
+    final children = <({String name, int expenseMinor, int limitMinor})>[];
+    for (final member in members) {
+      try {
+        final summary = await dashRepo.getChildMonthlySummary(
+          childUid: member.uid,
+          monthKey: monthKey,
+        );
+        children.add((
+          name: member.displayName,
+          expenseMinor: summary.expenseMinor,
+          limitMinor: limits[member.uid] ?? 0,
+        ));
+      } catch (e, s) {
+        _logger.w(
+          'NotificationSettingsNotifier: skip child ${member.uid} — summary fetch failed.',
+          error: e,
+          stackTrace: s,
         );
       }
-    } catch (error, stackTrace) {
-      _logger.e(
-        'NotificationSettingsNotifier: _scheduleForRole failed. role=$role',
-        error: error,
-        stackTrace: stackTrace,
-      );
     }
+
+    await _repo.saveParentChildrenData(children: children);
   }
 
-  Future<void> refreshSchedule() async {
-    try {
-      // Read directly from SharedPreferences to avoid race with _loadSettings()
-      // which runs async from build() and may not have completed yet.
-      final prefs = await SharedPreferences.getInstance();
-      final enabled = prefs.getBool('notif_enabled') ?? false;
-      _logger.d(
-        'NotificationSettingsNotifier: refreshSchedule enabled=$enabled',
-      );
-      if (!enabled) return;
-      await _scheduleForRole();
-    } catch (error, stackTrace) {
-      _logger.e(
-        'NotificationSettingsNotifier: refreshSchedule failed.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
+  /// Reads saved prefs data and schedules. Does NOT fetch from Firestore.
+  Future<void> _scheduleFromSavedData() async {
+    _logger.d('NotificationSettingsNotifier._scheduleFromSavedData: start.');
+    final role = ref.read(authSessionProvider).userRole;
 
-  String _formatMinor(int minor) {
-    final amount = minor.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]}.',
-    );
-    return '$amountđ';
+    if (role == 'child') {
+      await _repo.scheduleChildFromSavedData(
+        hour: state.hour,
+        minute: state.minute,
+      );
+    } else if (role == 'parent') {
+      await _repo.scheduleParentFromSavedData(
+        hour: state.hour,
+        minute: state.minute,
+      );
+    } else {
+      _logger.w('NotificationSettingsNotifier._scheduleFromSavedData: unknown role=$role');
+    }
   }
 }

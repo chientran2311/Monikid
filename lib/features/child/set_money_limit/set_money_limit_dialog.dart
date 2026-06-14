@@ -25,6 +25,7 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final state = ref.watch(setMoneyLimitNotifierProvider);
     final notifier = ref.read(setMoneyLimitNotifierProvider.notifier);
@@ -63,9 +64,11 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
         constraints: BoxConstraints(maxWidth: dialogMaxWidth),
         child: Container(
           decoration: BoxDecoration(
-            color: AppTheme.surfaceLight,
+            color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
             borderRadius: BorderRadius.circular(28.r),
-            border: Border.all(color: AppTheme.borderLight),
+            border: Border.all(
+              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+            ),
             boxShadow: [
               BoxShadow(
                 color: const Color(0x2E111811),
@@ -92,7 +95,7 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      s.setMoneyLimitDescription,
+                      s.setMoneyLimitSubtitle,
                       textAlign: TextAlign.center,
                       style: context.typo.body.small.copyWith(
                         color: AppTheme.textGrey,
@@ -145,7 +148,7 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                         color: AppTheme.textGrey,
                       ),
                     ),
-                    SizedBox(height: 6.h),
+                    SizedBox(height: 8.h),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       curve: Curves.ease,
@@ -154,13 +157,17 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                       decoration: BoxDecoration(
                         color: hasError
                             ? AppTheme.dangerSurface
-                            : AppTheme.surfaceVeryLight,
+                            : isDark
+                                ? AppTheme.darkSurfaceVariant
+                                : AppTheme.surfaceVeryLight,
                         border: Border.all(
                           color: hasError
                               ? AppTheme.redAlert
                               : hasFocus.value
                                   ? AppTheme.primary.withValues(alpha: 0.5)
-                                  : AppTheme.borderLight,
+                                  : isDark
+                                      ? AppTheme.borderDark
+                                      : AppTheme.borderLight,
                           width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(18.r),
@@ -205,9 +212,16 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                               decoration: InputDecoration(
                                 isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
                                 hintText: '0',
                                 hintStyle: context.typo.display.small.copyWith(
-                                  color: AppTheme.borderLight,
+                                  color: isDark
+                                      ? AppTheme.borderDark
+                                      : AppTheme.borderLight,
                                   letterSpacing: -0.8,
                                 ),
                                 contentPadding:
@@ -226,7 +240,7 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: 6.h),
+                    SizedBox(height: 8.h),
                     Text(
                       hasError ? errorText : s.setMoneyLimitDescription,
                       style: context.typo.caption.big.copyWith(

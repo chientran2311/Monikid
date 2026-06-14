@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FamilyModel {
 
- String get familyId; String get parentId; String get parentName; String get inviteCode; DateTime get inviteCodeExpiresAt; int get childCount; String get status; DateTime get createdAt; DateTime? get updatedAt;
+ String get familyId; String get ownerUid; String get inviteCode; DateTime get createdAt; DateTime? get updatedAt;
 /// Create a copy of FamilyModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $FamilyModelCopyWith<FamilyModel> get copyWith => _$FamilyModelCopyWithImpl<Fami
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyModel&&(identical(other.familyId, familyId) || other.familyId == familyId)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.parentName, parentName) || other.parentName == parentName)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.inviteCodeExpiresAt, inviteCodeExpiresAt) || other.inviteCodeExpiresAt == inviteCodeExpiresAt)&&(identical(other.childCount, childCount) || other.childCount == childCount)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyModel&&(identical(other.familyId, familyId) || other.familyId == familyId)&&(identical(other.ownerUid, ownerUid) || other.ownerUid == ownerUid)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,familyId,parentId,parentName,inviteCode,inviteCodeExpiresAt,childCount,status,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,familyId,ownerUid,inviteCode,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FamilyModel(familyId: $familyId, parentId: $parentId, parentName: $parentName, inviteCode: $inviteCode, inviteCodeExpiresAt: $inviteCodeExpiresAt, childCount: $childCount, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FamilyModel(familyId: $familyId, ownerUid: $ownerUid, inviteCode: $inviteCode, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $FamilyModelCopyWith<$Res>  {
   factory $FamilyModelCopyWith(FamilyModel value, $Res Function(FamilyModel) _then) = _$FamilyModelCopyWithImpl;
 @useResult
 $Res call({
- String familyId, String parentId, String parentName, String inviteCode, DateTime inviteCodeExpiresAt, int childCount, String status, DateTime createdAt, DateTime? updatedAt
+ String familyId, String ownerUid, String inviteCode, DateTime createdAt, DateTime? updatedAt
 });
 
 
@@ -66,15 +66,11 @@ class _$FamilyModelCopyWithImpl<$Res>
 
 /// Create a copy of FamilyModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? familyId = null,Object? parentId = null,Object? parentName = null,Object? inviteCode = null,Object? inviteCodeExpiresAt = null,Object? childCount = null,Object? status = null,Object? createdAt = null,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? familyId = null,Object? ownerUid = null,Object? inviteCode = null,Object? createdAt = null,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 familyId: null == familyId ? _self.familyId : familyId // ignore: cast_nullable_to_non_nullable
-as String,parentId: null == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String,parentName: null == parentName ? _self.parentName : parentName // ignore: cast_nullable_to_non_nullable
+as String,ownerUid: null == ownerUid ? _self.ownerUid : ownerUid // ignore: cast_nullable_to_non_nullable
 as String,inviteCode: null == inviteCode ? _self.inviteCode : inviteCode // ignore: cast_nullable_to_non_nullable
-as String,inviteCodeExpiresAt: null == inviteCodeExpiresAt ? _self.inviteCodeExpiresAt : inviteCodeExpiresAt // ignore: cast_nullable_to_non_nullable
-as DateTime,childCount: null == childCount ? _self.childCount : childCount // ignore: cast_nullable_to_non_nullable
-as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -88,16 +84,12 @@ as DateTime?,
 @JsonSerializable()
 
 class _FamilyModel implements FamilyModel {
-  const _FamilyModel({required this.familyId, required this.parentId, required this.parentName, required this.inviteCode, required this.inviteCodeExpiresAt, required this.childCount, required this.status, required this.createdAt, this.updatedAt});
+  const _FamilyModel({required this.familyId, required this.ownerUid, required this.inviteCode, required this.createdAt, this.updatedAt});
   factory _FamilyModel.fromJson(Map<String, dynamic> json) => _$FamilyModelFromJson(json);
 
 @override final  String familyId;
-@override final  String parentId;
-@override final  String parentName;
+@override final  String ownerUid;
 @override final  String inviteCode;
-@override final  DateTime inviteCodeExpiresAt;
-@override final  int childCount;
-@override final  String status;
 @override final  DateTime createdAt;
 @override final  DateTime? updatedAt;
 
@@ -114,16 +106,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyModel&&(identical(other.familyId, familyId) || other.familyId == familyId)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.parentName, parentName) || other.parentName == parentName)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.inviteCodeExpiresAt, inviteCodeExpiresAt) || other.inviteCodeExpiresAt == inviteCodeExpiresAt)&&(identical(other.childCount, childCount) || other.childCount == childCount)&&(identical(other.status, status) || other.status == status)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyModel&&(identical(other.familyId, familyId) || other.familyId == familyId)&&(identical(other.ownerUid, ownerUid) || other.ownerUid == ownerUid)&&(identical(other.inviteCode, inviteCode) || other.inviteCode == inviteCode)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,familyId,parentId,parentName,inviteCode,inviteCodeExpiresAt,childCount,status,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,familyId,ownerUid,inviteCode,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'FamilyModel(familyId: $familyId, parentId: $parentId, parentName: $parentName, inviteCode: $inviteCode, inviteCodeExpiresAt: $inviteCodeExpiresAt, childCount: $childCount, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'FamilyModel(familyId: $familyId, ownerUid: $ownerUid, inviteCode: $inviteCode, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -134,7 +126,7 @@ abstract mixin class _$FamilyModelCopyWith<$Res> implements $FamilyModelCopyWith
   factory _$FamilyModelCopyWith(_FamilyModel value, $Res Function(_FamilyModel) _then) = __$FamilyModelCopyWithImpl;
 @override @useResult
 $Res call({
- String familyId, String parentId, String parentName, String inviteCode, DateTime inviteCodeExpiresAt, int childCount, String status, DateTime createdAt, DateTime? updatedAt
+ String familyId, String ownerUid, String inviteCode, DateTime createdAt, DateTime? updatedAt
 });
 
 
@@ -151,15 +143,11 @@ class __$FamilyModelCopyWithImpl<$Res>
 
 /// Create a copy of FamilyModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? familyId = null,Object? parentId = null,Object? parentName = null,Object? inviteCode = null,Object? inviteCodeExpiresAt = null,Object? childCount = null,Object? status = null,Object? createdAt = null,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? familyId = null,Object? ownerUid = null,Object? inviteCode = null,Object? createdAt = null,Object? updatedAt = freezed,}) {
   return _then(_FamilyModel(
 familyId: null == familyId ? _self.familyId : familyId // ignore: cast_nullable_to_non_nullable
-as String,parentId: null == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
-as String,parentName: null == parentName ? _self.parentName : parentName // ignore: cast_nullable_to_non_nullable
+as String,ownerUid: null == ownerUid ? _self.ownerUid : ownerUid // ignore: cast_nullable_to_non_nullable
 as String,inviteCode: null == inviteCode ? _self.inviteCode : inviteCode // ignore: cast_nullable_to_non_nullable
-as String,inviteCodeExpiresAt: null == inviteCodeExpiresAt ? _self.inviteCodeExpiresAt : inviteCodeExpiresAt // ignore: cast_nullable_to_non_nullable
-as DateTime,childCount: null == childCount ? _self.childCount : childCount // ignore: cast_nullable_to_non_nullable
-as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,

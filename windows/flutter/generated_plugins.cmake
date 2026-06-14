@@ -5,9 +5,11 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   cloud_firestore
+  emoji_picker_flutter
   file_selector_windows
   firebase_auth
   firebase_core
+  flutter_gemma
   flutter_secure_storage_windows
   geolocator_windows
   url_launcher_windows

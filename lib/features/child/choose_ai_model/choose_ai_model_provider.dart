@@ -43,6 +43,8 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     _localGemmaService =
         getIt<AiAnalysisService>(instanceName: 'local') as LocalGemmaAiAnalysisService;
 
+    _logger.d('ChooseAiModelNotifier.build: START');
+
     final storedApiKey =
         await _secureStorage.read(StorageKeys.userGeminiApiKey);
     final hasStoredApiKey =
@@ -58,11 +60,14 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     // Clean up any stale .part file from a previous killed download
     await _modelRepository.reconcileStalePartFile();
 
-    final modelPath = await _modelRepository.getCachedModelPath();
-    _logger.d('ChooseAiModelNotifier.build: modelPath=$modelPath');
-
     final isCached = await _modelRepository.isModelCached();
-    _logger.d('ChooseAiModelNotifier.build: isCached=$isCached | useLocalModel=$useLocalModel');
+    if (isCached) {
+      // Safe to call only when model is confirmed cached — getCachedModelPath throws if no file found.
+      final modelPath = await _modelRepository.getCachedModelPath();
+      _logger.d('ChooseAiModelNotifier.build: modelPath=$modelPath isCached=true | useLocalModel=$useLocalModel');
+    } else {
+      _logger.d('ChooseAiModelNotifier.build: isCached=false | useLocalModel=$useLocalModel');
+    }
 
     final hasKeyInStorage = storedApiKey != null && storedApiKey.isNotEmpty;
 
@@ -78,6 +83,13 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
       await _localStorage.writeBool(key: StorageKeys.useLocalModel, value: false);
       useLocalModel = false;
     }
+
+    _logger.d(
+      'ChooseAiModelNotifier.build: DONE '
+      'hasKeyInStorage=$hasKeyInStorage '
+      'hasSavedApiKey=${hasStoredApiKey && hasKeyInStorage} '
+      'isCached=$isCached useLocalModel=$useLocalModel',
+    );
 
     return ChooseAiModelState(
       status: ChooseAiModelStatus.initial,
@@ -187,21 +199,22 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     if (currentState.selectedModel == modelId) return;
     if (currentState.isSavingApiKey ||
         currentState.isSelectingModel ||
-        currentState.status == ChooseAiModelStatus.error) return;
+        currentState.status == ChooseAiModelStatus.error) {
+      return;
+    }
     final s = context.l10n;
 
-    final confirmed = await showDialog<bool>(
+    if (!context.mounted) return;
+    showDialog<void>(
       context: context,
       builder: (_) => ConfirmDialog(
         title: displayName,
-        message: s.aiModelSelectModelConfirmMessage,
+        subtitle: s.aiModelSelectModelConfirmMessage,
         confirmLabel: s.aiModelUseThisModel,
         cancelLabel: s.actionCancel,
+        onConfirm: () => updateSelectedModel(modelId),
       ),
     );
-
-    if (confirmed != true || !context.mounted) return;
-    await updateSelectedModel(modelId);
   }
 
   Future<void> downloadLocalModel() async {
@@ -303,11 +316,18 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
   }
 
   Future<void> saveApiKey() async {
+    _logger.d('saveApiKey: CALLED — providerState=${state.runtimeType} valueOrNull=${state.valueOrNull != null}');
     final currentState = state.valueOrNull;
-    if (currentState == null) return;
+    if (currentState == null) {
+      _logger.w('saveApiKey: ABORTED — provider not yet loaded (AsyncLoading/AsyncError)');
+      return;
+    }
 
     final normalizedApiKey = currentState.apiKeyInput.trim();
+    _logger.d('saveApiKey: input length=${normalizedApiKey.length}');
+
     if (normalizedApiKey.isEmpty) {
+      _logger.w('saveApiKey: empty API key — aborting.');
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.error,
         error: ChooseAiModelError.emptyApiKey,
@@ -316,6 +336,20 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
       return;
     }
 
+    // Reject keys with non-printable ASCII or control chars (e.g. newlines).
+    // Valid Gemini API keys are printable ASCII only.
+    final validKeyPattern = RegExp(r'^[\x20-\x7E]+$');
+    if (!validKeyPattern.hasMatch(normalizedApiKey)) {
+      _logger.w('saveApiKey: key contains invalid characters (non-ASCII or control chars).');
+      state = AsyncValue.data(currentState.copyWith(
+        status: ChooseAiModelStatus.error,
+        error: ChooseAiModelError.invalidApiKey,
+        hasSavedApiKey: false,
+      ));
+      return;
+    }
+
+    _logger.i('saveApiKey: [1/4] setting loading state...');
     state = AsyncValue.data(currentState.copyWith(
       status: ChooseAiModelStatus.savingApiKey,
       error: null,
@@ -323,17 +357,20 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
     ));
 
     try {
-      // Group 3: validate key with a real test request before saving
+      _logger.i('saveApiKey: [2/4] validating key via Gemini API...');
       await _geminiService.validateApiKey(normalizedApiKey);
+      _logger.i('saveApiKey: [2/4] key is valid.');
 
+      _logger.i('saveApiKey: [3/4] writing to FlutterSecureStorage...');
       await _secureStorage.write(
         key: StorageKeys.userGeminiApiKey,
         value: normalizedApiKey,
       );
       await _localStorage.writeBool(
           key: StorageKeys.hasStoredGeminiApiKey, value: true);
+      _logger.i('saveApiKey: [3/4] key saved. hasStoredGeminiApiKey=true');
 
-      // EC-1: saving key activates Gemini — deactivate local model
+      _logger.i('saveApiKey: [4/4] deactivating local model (EC-1)...');
       await _localStorage.writeBool(
           key: StorageKeys.useLocalModel, value: false);
 
@@ -345,11 +382,9 @@ class ChooseAiModelNotifier extends _$ChooseAiModelNotifier {
         useLocalModel: false,
         error: null,
       ));
-
-      _logger.i('Gemini API key validated and saved.');
+      _logger.i('saveApiKey: [4/4] done. status=apiKeyReady hasSavedApiKey=true');
     } catch (error, stackTrace) {
-      _logger.e('Failed to save Gemini API key.',
-          error: error, stackTrace: stackTrace);
+      _logger.e('saveApiKey: FAILED.', error: error, stackTrace: stackTrace);
       state = AsyncValue.data(currentState.copyWith(
         status: ChooseAiModelStatus.error,
         error: _mapError(error),

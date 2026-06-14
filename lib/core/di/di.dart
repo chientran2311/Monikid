@@ -16,15 +16,16 @@ import 'package:monikid/core/storage/secure_storage.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
 import 'package:monikid/repositories/auth/onboarding_repository.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
-import 'package:monikid/repositories/category/category_repository.dart';
-import 'package:monikid/repositories/category/custom_category_repository.dart';
-import 'package:monikid/repositories/fqa/fqa_repository.dart';
+import 'package:monikid/repositories/category/add_custom_category_repository.dart';
+import 'package:monikid/repositories/dev_tools/dev_tools_repository.dart';
+import 'package:monikid/repositories/faq/faq_repository.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';
 import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/parent_statistic/parent_statistic_repository.dart';
-import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
@@ -49,6 +50,13 @@ Future<void> setupLocator() async {
   // Register notification service
   getIt.registerLazySingleton<LocalNotificationService>(
     () => LocalNotificationService(getIt<Logger>()),
+  );
+
+  getIt.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      logger: getIt<Logger>(),
+      notificationService: getIt<LocalNotificationService>(),
+    ),
   );
 
   // Register AI Service
@@ -109,21 +117,16 @@ getIt.registerLazySingleton<PinCodeRepository>(
       getIt<FirebaseFirestore>(),
       getIt<TransactionEvidenceStorage>(),
       getIt<Logger>(),
-      getIt<MonthlySummaryRepository>(),
       getIt<ReceiptOcrService>(),
     ),
-  );
-
-  getIt.registerLazySingleton<CategoryRepository>(
-    () => CategoryRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
   getIt.registerLazySingleton<CustomCategoryRepository>(
     () => CustomCategoryRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
-  getIt.registerLazySingleton<FQARepository>(
-    () => FQARepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
+  getIt.registerLazySingleton<FAQRepository>(
+    () => FAQRepositoryImpl(getIt<FirebaseFirestore>(), getIt<Logger>()),
   );
 
   getIt.registerLazySingleton<ProfileRepository>(
@@ -155,6 +158,14 @@ getIt.registerLazySingleton<PinCodeRepository>(
     () => ParentStatisticRepositoryImpl(
       getIt<FirebaseFirestore>(),
       getIt<Logger>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<DevToolsRepository>(
+    () => DevToolsRepositoryImpl(
+      firestore: getIt<FirebaseFirestore>(),
+      transactionRepository: getIt<TransactionRepository>(),
+      logger: getIt<Logger>(),
     ),
   );
 

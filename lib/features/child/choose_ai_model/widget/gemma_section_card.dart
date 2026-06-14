@@ -33,34 +33,33 @@ class GemmaSectionCard extends StatelessWidget {
   final VoidCallback onDelete;
   final ValueChanged<bool> onToggleLocalModel;
 
-  Future<void> _handleDownloadTap(BuildContext context) async {
+  void _handleDownloadTap(BuildContext context) {
     final s = context.l10n;
-    final confirmed = await showDialog<bool>(
+    showDialog<void>(
       context: context,
       builder: (_) => ConfirmDialog(
         title: s.aiModelGemmaName,
-        message: s.aiModelGemmaDownloadConfirmMessage,
+        subtitle: s.aiModelGemmaDownloadConfirmMessage,
         confirmLabel: s.aiModelDownload,
         cancelLabel: s.actionCancel,
+        onConfirm: onDownloadConfirmed,
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    onDownloadConfirmed();
   }
 
-  Future<void> _handleDeleteTap(BuildContext context) async {
+  void _handleDeleteTap(BuildContext context) {
     final s = context.l10n;
-    final confirmed = await showDialog<bool>(
+    showDialog<void>(
       context: context,
       builder: (_) => ConfirmDialog(
         title: s.aiModelGemmaName,
-        message: s.aiModelGemmaDeleteConfirmMessage,
+        subtitle: s.aiModelGemmaDeleteConfirmMessage,
         confirmLabel: s.aiModelDeleteModel,
         cancelLabel: s.actionCancel,
+        isDestructive: true,
+        onConfirm: onDelete,
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    onDelete();
   }
 
   @override
@@ -182,7 +181,6 @@ class GemmaSectionCard extends StatelessWidget {
                     AppIosSwitch(
                       value: useLocalModel,
                       onChanged: isBusy ? null : onToggleLocalModel,
-                      scale: 0.6,
                     ),
                   ],
                 ),

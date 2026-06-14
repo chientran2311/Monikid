@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/add_transaction/add_transaction_state.dart';
-import 'package:monikid/features/child/transaction/add_transaction/widgets/add_transaction_app_bar.dart';
 import 'package:monikid/features/child/transaction/add_transaction/widgets/add_transaction_body.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 import 'package:monikid/features/child/transaction/add_transaction/widgets/add_transaction_state_handler.dart';
 import 'package:monikid/features/child/transaction/add_transaction/widgets/transaction_save_helper.dart';
-import 'package:monikid/features/child/transaction/add_transaction/widgets/transaction_submit_button.dart';
+import 'package:monikid/shared/widgets/transaction_submit_action.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/calendar_dialog.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
@@ -31,9 +31,6 @@ class AddTransactionScreen extends HookConsumerWidget {
         ref.watch(categoryStreamProvider).value ?? defaultCategories;
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.surfaceVeryDark;
     final isBusy = actionState.isBusy;
 
     final transactionType = useState(0);
@@ -131,7 +128,6 @@ class AddTransactionScreen extends HookConsumerWidget {
       selectedEmoji.value = category.icon;
     }
 
-
     Future<void> saveTransaction() async {
       await saveTransactionData(
         context: context,
@@ -156,18 +152,11 @@ class AddTransactionScreen extends HookConsumerWidget {
     return PopScope(
       canPop: !isBusy,
       child: Scaffold(
-        backgroundColor: bgColor,
-        appBar: AddTransactionAppBar(
-          title: s.homeStudentAddTransaction,
-          cancelLabel: s.actionCancel,
-          onCancel: () => context.pop(),
-          isDark: isDark,
-          backgroundColor: bgColor,
-          textColor: textColor,
-          enabled: !isBusy,
-        ),
-        body: Stack(
-          children: [
+        backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+        appBar: GlassAppBar(title: s.homeStudentAddTransaction),
+        body: AppBackground(
+          child: Stack(
+            children: [
             AddTransactionBody(
               transactionType: transactionType.value,
               onTypeChanged: (int index) {
@@ -189,7 +178,6 @@ class AddTransactionScreen extends HookConsumerWidget {
               selectedDate: selectedDate.value,
               noteController: noteController,
               evidenceImageBytes: actionState.evidenceImageBytes,
-              evidenceImageFileName: actionState.evidenceImageFileName,
               hasEvidenceImageSelection: actionState.hasEvidenceImageSelection,
               onDateTap: () {
                 if (!context.mounted) return;
@@ -233,18 +221,16 @@ class AddTransactionScreen extends HookConsumerWidget {
               onRemoveImage: () => ref
                   .read(addTransactionNotifierProvider.notifier)
                   .clearEvidenceImage(),
-              isDark: isDark,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
               enabled: !isBusy,
             ),
-            TransactionSubmitButton(
-              onPressed: saveTransaction,
+            TransactionSubmitAction(
               label: s.transactionSaveAction,
+              isSubmitting: actionState.isBusy,
               enabled: !isBusy,
-              backgroundColor: bgColor,
+              onSubmit: saveTransaction,
             ),
           ],
+          ),
         ),
       ),
     );

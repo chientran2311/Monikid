@@ -34,8 +34,6 @@ class LocalNotificationService {
     _logger.i('LocalNotificationService initialized.');
   }
 
-  /// Requests the OS-level notification permission (Android 13+).
-  /// Called explicitly when the user taps Allow in onboarding.
   Future<void> requestPermission() async {
     _logger.d('LocalNotificationService.requestPermission: start.');
     try {
@@ -55,65 +53,17 @@ class LocalNotificationService {
     }
   }
 
-  Future<void> scheduleChildDailyNotification({
-    required int hour,
-    required int minute,
-    required int expenseMinor,
-    required int limitMinor,
+  Future<void> scheduleZoned({
+    required int id,
     required String title,
     required String body,
-  }) async {
-    _logger.d(
-      'LocalNotificationService: scheduleChild start. '
-      'hour=$hour minute=$minute expense=$expenseMinor limit=$limitMinor',
-    );
-    try {
-      await _plugin.cancel(id: 1);
-      final scheduledDate = _nextInstanceOfTime(hour, minute);
-      _logger.d(
-        'LocalNotificationService: scheduledDate=$scheduledDate',
-      );
-      const details = NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        ),
-      );
-      await _scheduleWithFallback(
-        id: 1,
-        title: title,
-        body: body,
-        scheduledDate: scheduledDate,
-        details: details,
-      );
-      _logger.i(
-        'LocalNotificationService: child notification scheduled at $hour:$minute '
-        'scheduledDate=$scheduledDate',
-      );
-    } catch (error, stackTrace) {
-      _logger.e(
-        'LocalNotificationService: scheduleChildDailyNotification failed.',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  Future<void> scheduleParentDailyNotifications({
     required int hour,
     required int minute,
-    required List<({String name, int expenseMinor})> children,
-    required String Function(String name, String expense) bodyBuilder,
-    required String title,
-    required String genericBody,
   }) async {
-    for (var i = 100; i < 200; i++) {
-      await _plugin.cancel(id: i);
-    }
-
+    _logger.d(
+      'LocalNotificationService.scheduleZoned: id=$id hour=$hour minute=$minute',
+    );
+    final scheduledDate = _nextInstanceOfTime(hour, minute);
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
         _channelId,
@@ -123,39 +73,29 @@ class LocalNotificationService {
         icon: '@mipmap/ic_launcher',
       ),
     );
-
-    if (children.isEmpty) {
-      final scheduledDate = _nextInstanceOfTime(hour, minute);
-      await _scheduleWithFallback(
-        id: 100,
-        title: title,
-        body: genericBody,
-        scheduledDate: scheduledDate,
-        details: details,
-      );
-      _logger.i('Parent generic notification scheduled (no children cache).');
-      return;
-    }
-
-    final scheduledDate = _nextInstanceOfTime(hour, minute);
-    for (var i = 0; i < children.length; i++) {
-      final child = children[i];
-      await _scheduleWithFallback(
-        id: 100 + i,
-        title: title,
-        body: bodyBuilder(child.name, _formatMinor(child.expenseMinor)),
-        scheduledDate: scheduledDate,
-        details: details,
-      );
-    }
-    _logger.i(
-      'Parent notifications scheduled for ${children.length} child(ren) at $hour:$minute.',
+    await _scheduleWithFallback(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      details: details,
     );
   }
 
-  Future<void> cancelAll() async {
+  Future<void> cancelById(int id) async {
+    _logger.d('LocalNotificationService.cancelById: id=$id');
+    await _plugin.cancel(id: id);
+  }
+
+  Future<void> cancelAllAndDeregister() async {
     await _plugin.cancelAll();
-    _logger.i('All notifications cancelled.');
+    final androidPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    await androidPlugin?.deleteNotificationChannel(channelId: _channelId);
+    _logger.i(
+      'LocalNotificationService: all notifications cancelled and channel deleted.',
+    );
   }
 
   Future<List<PendingNotificationRequest>> pendingRequests() =>
@@ -172,7 +112,7 @@ class LocalNotificationService {
   }) async {
     try {
       _logger.d(
-        'LocalNotificationService: zonedSchedule exact id=$id '
+        'LocalNotificationService._scheduleWithFallback: exact id=$id '
         'scheduledDate=$scheduledDate',
       );
       await _plugin.zonedSchedule(
@@ -186,7 +126,6 @@ class LocalNotificationService {
       );
       _logger.d('LocalNotificationService: exact schedule success id=$id');
     } catch (exactError, exactStack) {
-      // SCHEDULE_EXACT_ALARM denied — fallback to inexact (D-01)
       _logger.w(
         'LocalNotificationService: exact schedule failed id=$id, '
         'falling back to inexact.',
@@ -216,7 +155,7 @@ class LocalNotificationService {
 
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     _logger.d(
-      'LocalNotificationService: _nextInstanceOfTime hour=$hour minute=$minute',
+      'LocalNotificationService._nextInstanceOfTime: hour=$hour minute=$minute',
     );
     final location = tz.getLocation('Asia/Ho_Chi_Minh');
     final now = tz.TZDateTime.now(location);
@@ -232,16 +171,8 @@ class LocalNotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
     _logger.d(
-      'LocalNotificationService: nextTime now=$now scheduled=$scheduled',
+      'LocalNotificationService._nextInstanceOfTime: now=$now scheduled=$scheduled',
     );
     return scheduled;
-  }
-
-  String _formatMinor(int minor) {
-    final amount = minor.toString().replaceAllMapped(
-      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]}.',
-    );
-    return '$amountđ';
   }
 }

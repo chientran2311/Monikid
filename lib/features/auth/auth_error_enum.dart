@@ -16,6 +16,9 @@ enum AuthErrorEnumRepo {
   /// Failed to read back account after creation
   accountReadbackFailed,
 
+  /// Firebase Auth account exists and Firestore document is complete — must sign in instead
+  accountAlreadyExists,
+
   /// FirebaseAuthException occurred (e.g., wrong-password, user-not-found)
   firebaseAuthException,
 
@@ -31,13 +34,15 @@ enum AuthErrorEnumRepo {
       case AuthErrorEnumRepo.firebaseUserNull:
         return 'Sign in failed. Firebase did not return a user.';
       case AuthErrorEnumRepo.accountNotFound:
-        return 'Account setup is incomplete. Please contact support.';
+        return 'Account not found. Please register to create your profile.';
       case AuthErrorEnumRepo.accountInvalid:
         return 'Account setup is incomplete. Please contact support.';
       case AuthErrorEnumRepo.accountCreationFailed:
         return 'Sign up failed. Could not create account.';
       case AuthErrorEnumRepo.accountReadbackFailed:
         return 'Sign up failed. Could not verify account creation.';
+      case AuthErrorEnumRepo.accountAlreadyExists:
+        return 'Account already registered. Please sign in instead.';
       case AuthErrorEnumRepo.firebaseAuthException:
         return 'Authentication failed. Please check your credentials.';
       case AuthErrorEnumRepo.firestoreException:
@@ -52,7 +57,7 @@ enum AuthErrorEnumRepo {
 class AuthResult {
   const AuthResult({this.response, this.error});
 
-  final dynamic response; // AuthResponse or AccountModel
+  final dynamic response; // AuthResponse or UserModel
   final AuthErrorEnumRepo? error;
 
   bool get isSuccess => error == null && response != null;

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,16 +10,17 @@ import 'package:monikid/models/ai/receipt_scan/receipt_ocr_result.dart';
 import 'package:monikid/models/ai/transaction_ai_result.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/ai/gemma_model_repository.dart';
-import 'package:monikid/repositories/ai/prompt_util.dart';
+import 'package:monikid/repositories/ai/prompt_util.dart'
+    show buildLocalGemmaPrompt, kLocalGemmaSystemInstruction;
 
-/// [AiAnalysisService] backed by an on-device Gemma model via flutter_gemma 0.11.16.
+/// [AiAnalysisService] backed by an on-device Gemma 4 E2B model via flutter_gemma 0.16.5.
 ///
-/// Installation flow (0.11.16 API):
+/// Installation flow (0.16.5 API):
 ///   1. FlutterGemma.initialize()         — called once in main()
 ///   2. FlutterGemma.installModel()
 ///        .fromFile(path).install()        — register local .task file as active model
 ///   3. FlutterGemma.getActiveModel(...)   — load model into memory
-///   4. model.createSession(...)           — one session per inference call
+///   4. model.createChat(...)             — one InferenceChat per inference call
 class LocalGemmaAiAnalysisService implements AiAnalysisService {
   LocalGemmaAiAnalysisService({
     required GemmaModelRepository gemmaRepository,
@@ -29,8 +31,12 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
   final GemmaModelRepository _gemmaRepository;
   final Logger _logger;
 
+  // Single source of truth for the model type — change here to switch models.
+  static const _kModelType = ModelType.gemma4;
+
   bool _isInstalled = false;
   InferenceModel? _model;
+  Completer<void>? _analysisDone;
 
   /// Clears in-memory model state so the next [analyzeReceipt] call
   /// re-installs from disk. Call this after the model file is deleted.
@@ -66,17 +72,8 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
         );
       }
 
-      // Not a ZIP archive (PK\x03\x04) → web/WASM variant incompatible with flutter_gemma.
-      // The *-web.task files use a WASM binary format, not the MediaPipe ZIP bundle.
-      if (bytes.length >= 4 &&
-          !(bytes[0] == 0x50 && bytes[1] == 0x4B && bytes[2] == 0x03 && bytes[3] == 0x04)) {
-        throw StateError(
-          'LocalGemmaAiAnalysisService: model file is not a MediaPipe ZIP bundle '
-          '(expected PK\\x03\\x04, got ${bytes.take(4).map((b) => "0x${b.toRadixString(16).padLeft(2,"0")}").join(" ")}). '
-          'Web/WASM variants (*-web.task) are not supported — '
-          'download the standard .task or .tflite format instead.',
-        );
-      }
+      // .litertlm files use LiteRT-LM format (not ZIP) — no magic-byte check needed.
+      // Only guard against HTML pages (failed downloads) which is done above.
     } catch (e, st) {
       if (e is StateError) rethrow;
       _logger.w('LocalGemmaAiAnalysisService._validateModelFormat: could not read file.', error: e, stackTrace: st);
@@ -85,7 +82,7 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
 
   /// Registers the model file with the LiteRT runtime and loads it into memory.
   ///
-  /// Uses flutter_gemma 0.11.16 API:
+  /// Uses flutter_gemma 0.16.5 API:
   ///   - [FlutterGemma.installModel().fromFile(path).install()] — registers the .task file
   ///   - [FlutterGemma.getActiveModel()] — loads model into memory
   ///
@@ -110,14 +107,12 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
     await _validateModelFormat(path);
 
     // Step 1: Register local .task file with the LiteRT runtime.
-    // ModelType.general is intentional: buildLocalGemmaPrompt already applies
-    // the Gemma IT chat template manually (<start_of_turn>user/model tags).
-    // Using ModelType.gemmaIt here would cause addQueryChunk to double-wrap
-    // the prompt with the same template → malformed input → native crash.
-    _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: calling installModel.fromFile.');
+    // flutter_gemma applies the correct chat template automatically for each
+    // ModelType via addQueryChunk — do NOT manually wrap prompts with template tags.
+    _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: calling installModel.fromFile ($_kModelType).');
     await FlutterGemma.installModel(
-      modelType: ModelType.general,
-      fileType: ModelFileType.task,
+      modelType: _kModelType,
+      fileType: ModelFileType.litertlm,
     ).fromFile(path).install();
     _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: installModel done.');
 
@@ -126,11 +121,17 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
     // bundled LiteRT native library version.
     _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: calling getActiveModel — '
         'if app crashes here the .task format is incompatible with this LiteRT version.');
+    // maxTokens is the TOTAL KV-cache size (input + output). The prompt
+    // (system instruction + full category list + few-shot examples + OCR
+    // context) routinely exceeds 1024 tokens; with a 1024 cache the prefill
+    // slice overflows the compiled KV cache and LiteRT fails with
+    // DYNAMIC_UPDATE_SLICE "update > operand" → "Failed to invoke the compiled
+    // model". 2048 gives headroom for input plus the generated JSON.
     _model = await FlutterGemma.getActiveModel(
-      maxTokens: 1024,
+      maxTokens: 2048,
       preferredBackend: PreferredBackend.cpu,
     );
-    _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: getActiveModel done, model=$_model');
+    _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: getActiveModel done, model=$_model runtimeType=${_model.runtimeType}');
 
     _isInstalled = true;
     _logger.i('LocalGemmaAiAnalysisService._ensureInstalled: model ready.');
@@ -141,7 +142,13 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
     ReceiptOcrResult ocrResult,
     List<CategoryModel> categories,
   ) async {
-    // Entire method wrapped so _ensureInstalled failures are also caught.
+    // LiteRT does not support concurrent sessions on the same model.
+    // Serialize calls so addQueryChunk is never called before PredictDone.
+    while (_analysisDone != null) {
+      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: queued — waiting for previous analysis.');
+      await _analysisDone!.future.catchError((_) {});
+    }
+    _analysisDone = Completer<void>();
     try {
       final isCached = await _gemmaRepository.isModelCached();
       if (!isCached) {
@@ -158,6 +165,8 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
       final prompt = buildLocalGemmaPrompt(
         ocrResult: ocrResult,
         languageCode: 'vi',
+        modelType: _kModelType,
+        categories: categories,
       );
 
       _logger.d(
@@ -168,23 +177,74 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
         '═════════════════════════════════════',
       );
 
-      // Each analyzeReceipt call uses a fresh session to avoid cross-call
-      // context leakage (sessions are not reusable).
-      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: creating session.');
-      final session = await _model!.createSession(
-        temperature: 0.7,
-        topK: 40,
+      // Each analyzeReceipt call uses a fresh InferenceChat (0.16.5 API) to
+      // avoid cross-call KV-cache contamination. Streaming (generateChatResponseAsync)
+      // is used so on-device CPU inference — which can take minutes — does not
+      // hit a hard wall-clock timeout. A 60-second per-token stall timeout closes
+      // the stream if the model freezes mid-generation; partial output is still
+      // passed to _extractJsonObject which handles it gracefully.
+      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: creating chat (timeout 30s).');
+      final chat = await _model!.createChat(
+        temperature: 0.1,
+        topK: 1,
         randomSeed: 1,
+        modelType: _kModelType,
+        systemInstruction: kLocalGemmaSystemInstruction,
+        isThinking: false,
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () => throw TimeoutException(
+          'LocalGemmaAiAnalysisService: createChat timed out after 30s — '
+          'model may be in broken state.',
+        ),
       );
-      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: session created, adding query chunk.');
 
-      await session.addQueryChunk(Message(text: prompt, isUser: true));
-      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: chunk added, awaiting response.');
+      _logger.i(
+        'LocalGemmaAiAnalysisService.analyzeReceipt: chat created, adding query chunk.\n'
+        'prompt snippet (first 200 chars):\n'
+        '${prompt.length > 200 ? prompt.substring(0, 200) : prompt}',
+      );
 
-      final responseText = await session.getResponse();
-      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: response received '
-          '(${responseText.length} chars), closing session.');
-      await session.close();
+      final responseText = await () async {
+        try {
+          await chat.addQueryChunk(Message(text: prompt, isUser: true));
+          _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: chunk added, streaming response.');
+
+          final buffer = StringBuffer();
+          await for (final response in chat.generateChatResponseAsync().timeout(
+            // Per-token stall timeout — fires only if NO new token arrives for 60s.
+            // The total response time is unbounded; slow CPU devices may take minutes.
+            const Duration(seconds: 60),
+            onTimeout: (sink) {
+              _logger.w(
+                'LocalGemmaAiAnalysisService: token stream stalled 60s — closing stream. '
+                'Partial output: ${buffer.length} chars.',
+              );
+              sink.close();
+            },
+          )) {
+            if (response is TextResponse) {
+              buffer.write(response.token);
+            }
+          }
+          return buffer.toString();
+        } finally {
+          // Swallow PlatformException if native inference is still running
+          // (happens when stream timeout fires before MediaPipe emits done=true).
+          // The native session will complete and free itself; don't reset model.
+          try {
+            await chat.close();
+          } catch (e) {
+            _logger.w(
+              'LocalGemmaAiAnalysisService: chat.close() failed — '
+              'native inference still running, session will self-release.',
+              error: e,
+            );
+          }
+        }
+      }();
+      _logger.i('LocalGemmaAiAnalysisService.analyzeReceipt: stream done '
+          '(${responseText.length} chars).');
 
       _logger.d(
         'LocalGemmaAiAnalysisService.analyzeReceipt: raw Gemma response:\n'
@@ -205,17 +265,11 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
       _logger.d('LocalGemmaAiAnalysisService: extracted JSON:\n$jsonText');
 
       final decoded = jsonDecode(jsonText) as Map<String, dynamic>;
-      // Gemma may use wrong key names (e.g. "amount" instead of "amount_minor",
-      // "date" instead of "transaction_date") — accept both and fall back to
-      // safe defaults so the generated fromJson never sees a null num cast.
-      // Also translate Gemma's fixed semantic category key to the app's actual
-      // default category ID so the notifier validation step finds a match.
-      final gemmaCategory = decoded['category'] as String? ?? 'other_expense';
       final safe = <String, dynamic>{
         'amount_minor': (decoded['amount_minor'] as num?)?.toInt()
             ?? (decoded['amount'] as num?)?.toInt()
             ?? 0,
-        'category': _mapGemmaCategory(gemmaCategory),
+        'category': _resolveCategoryIndex(decoded['category'], categories, ocrResult),
         'description': decoded['description'] as String? ?? '',
         'transaction_date': decoded['transaction_date'] as String?
             ?? decoded['date'] as String?
@@ -232,37 +286,102 @@ class LocalGemmaAiAnalysisService implements AiAnalysisService {
       return result;
     } catch (error, stackTrace) {
       _logger.e(
-        'LocalGemmaAiAnalysisService.analyzeReceipt failed.',
+        'LocalGemmaAiAnalysisService.analyzeReceipt failed — resetting model state.',
         error: error,
         stackTrace: stackTrace,
       );
+      // Reset so next call re-initializes the native model from scratch.
+      // A failed chat (IllegalStateException, timeout) leaves the LiteRT
+      // engine in an unusable state; subsequent createChat calls will hang.
+      _isInstalled = false;
+      _model = null;
       return null;
+    } finally {
+      final done = _analysisDone;
+      _analysisDone = null;
+      done?.complete();
     }
   }
 
-  /// Maps Gemma's fixed 9-category semantic keys to the app's default category
-  /// IDs. Custom-category UUIDs are never in this map — the notifier falls back
-  /// to the default expense category for those anyway.
-  static const _kGemmaCategoryMap = <String, String>{
-    'food_drink': 'expense-an-uong',
-    'transport': 'expense-di-chuyen',
-    'shopping': 'expense-mua-sam',
-    'education': 'expense-hoc-tap',
-    'health': 'expense-suc-khoe',
-    'entertainment': 'expense-giai-tri',
-    'personal_care': 'expense-sinh-hoat',
-    'bills_utilities': 'expense-sinh-hoat',
-    'other_expense': 'expense-khac',
-  };
+  /// Resolves the model's `category` output (a 1-based index into [categories])
+  /// to a real category ID.
+  ///
+  /// Priority:
+  ///   1. Valid index — the model returned the position of an item in the list.
+  ///   2. Keyword fallback — index missing/out of range; classify from the OCR
+  ///      text via [_keywordFallback].
+  String _resolveCategoryIndex(
+    dynamic raw,
+    List<CategoryModel> categories,
+    ReceiptOcrResult ocrResult,
+  ) {
+    if (categories.isEmpty) return 'expense-khac';
+    final index = raw is int ? raw : int.tryParse(raw?.toString().trim() ?? '');
+    if (index != null && index >= 1 && index <= categories.length) {
+      return categories[index - 1].id;
+    }
+    _logger.w(
+      'LocalGemmaAiAnalysisService: category index "$raw" invalid '
+      '(list size ${categories.length}) — using keyword fallback.',
+    );
+    return _keywordFallback(ocrResult, categories);
+  }
 
-  String _mapGemmaCategory(String gemmaKey) =>
-      _kGemmaCategoryMap[gemmaKey] ?? 'expense-khac';
+  /// Deterministic category classification from the OCR text. Used when the
+  /// model fails to return a usable index. Scans description + raw text for
+  /// known keywords and maps to a default category ID (only if it exists in
+  /// the passed list); otherwise falls back to "expense-khac" / first item.
+  String _keywordFallback(
+    ReceiptOcrResult ocrResult,
+    List<CategoryModel> categories,
+  ) {
+    final text = <String?>[
+      ocrResult.conventionHint?.purpose,
+      ocrResult.description,
+      ocrResult.rawText,
+    ].whereType<String>().join(' ').toLowerCase();
 
-  /// Extracts the first `{...}` JSON object from [text].
+    for (final (keywords, id) in _kKeywordRules) {
+      if (keywords.any(text.contains) && categories.any((c) => c.id == id)) {
+        return id;
+      }
+    }
+    final fallback = categories.firstWhere(
+      (c) => c.id == 'expense-khac',
+      orElse: () => categories.first,
+    );
+    return fallback.id;
+  }
+
+  /// Keyword → default category ID rules for the deterministic fallback.
+  /// First matching rule wins; income rules are checked first so an income
+  /// keyword is not shadowed by a generic expense match.
+  static const List<(List<String>, String)> _kKeywordRules = [
+    (['lương', 'salary', 'thưởng', 'nhận lương'], 'income-luong'),
+    (['ăn', 'cơm', 'phở', 'café', 'cafe', 'quán', 'nhà hàng', 'baemin', 'shopeefood', 'food'], 'expense-an-uong'),
+    (['grab', 'gojek', 'xăng', 'taxi', 'xe', 'bus', 'vé'], 'expense-di-chuyen'),
+    (['shopee', 'lazada', 'tiki', 'mua', 'order', 'cửa hàng'], 'expense-mua-sam'),
+    (['học phí', 'sách', 'vở', 'trường', 'khóa học'], 'expense-hoc-tap'),
+    (['thuốc', 'bệnh viện', 'phòng khám', 'nhà thuốc'], 'expense-suc-khoe'),
+    (['game', 'cinema', 'rạp', 'karaoke', 'netflix', 'spotify', 'phim'], 'expense-giai-tri'),
+    (['điện', 'nước', 'internet', 'wifi', 'tiền nhà', 'gas'], 'expense-sinh-hoat'),
+  ];
+
+  /// Extracts the first balanced `{...}` JSON object from [text].
+  ///
+  /// Uses a depth counter so nested objects don't confuse the end boundary,
+  /// and preamble text before the first `{` is ignored.
   String? _extractJsonObject(String text) {
-    final start = text.indexOf('{');
-    final end = text.lastIndexOf('}');
-    if (start == -1 || end == -1 || end <= start) return null;
-    return text.substring(start, end + 1);
+    int depth = 0, start = -1;
+    for (int i = 0; i < text.length; i++) {
+      if (text[i] == '{') {
+        if (depth == 0) start = i;
+        depth++;
+      } else if (text[i] == '}') {
+        depth--;
+        if (depth == 0 && start != -1) return text.substring(start, i + 1);
+      }
+    }
+    return null;
   }
 }

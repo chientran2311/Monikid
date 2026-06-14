@@ -6,7 +6,6 @@ import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/child/transaction/transaction_history/providers/transaction_summary_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
-import 'package:monikid/features/child/transaction/transaction_history/transaction_history_skeleton.dart';
 import 'package:monikid/shared/widgets/skeleton_widget/transaction_history_skeleton.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/grouped_transaction_list.dart';
 import 'package:monikid/features/parent/transaction_par/widgets/empty_transaction_state.dart';
@@ -69,7 +68,7 @@ class TransactionHistoryParBody extends ConsumerWidget {
     );
 
     if (isLoading) {
-      return Expanded(child: TransactionHistorySkeletonNew(isDark: isDark));
+      return const Expanded(child: TransactionHistorySkeleton());
     }
 
     if (errorMessage != null) {

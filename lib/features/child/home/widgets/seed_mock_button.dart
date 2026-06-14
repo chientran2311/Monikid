@@ -49,7 +49,7 @@ class SeedMockButton extends HookConsumerWidget {
           resultMessage.value = '❌ Lỗi seed: $e';
         }
       } finally {
-        isSeeding.value = false;
+        if (context.mounted) isSeeding.value = false;
       }
     }
 

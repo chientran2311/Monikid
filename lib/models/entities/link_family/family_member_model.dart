@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'family_member_model.freezed.dart';
@@ -8,29 +7,32 @@ part 'family_member_model.g.dart';
 abstract class FamilyMemberModel with _$FamilyMemberModel {
   const factory FamilyMemberModel({
     required String uid,
-    required String familyId,
-    required String role,
-    required String displayName,
+    @Default('member') String role,
+    @Default('child') String userRole,
+    @Default('') String displayName,
     String? avatarUrl,
-    required DateTime joinedAt,
-    required String status,
   }) = _FamilyMemberModel;
+
+  const FamilyMemberModel._();
 
   factory FamilyMemberModel.fromJson(Map<String, dynamic> json) =>
       _$FamilyMemberModelFromJson(json);
 
-  factory FamilyMemberModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory FamilyMemberModel.fromMap(Map<String, dynamic> map) {
     return FamilyMemberModel(
-      uid: data['uid'] as String? ?? doc.id,
-      familyId: data['family_id'] as String? ?? '',
-      role: data['role'] as String? ?? 'child',
-      displayName: data['display_name'] as String? ?? '',
-      avatarUrl: data['avatar_url'] as String?,
-      joinedAt: data['joined_at'] != null
-          ? (data['joined_at'] as Timestamp).toDate()
-          : DateTime.now(),
-      status: data['status'] as String? ?? 'active',
+      uid: map['user_id'] as String? ?? '',
+      role: map['role'] as String? ?? 'member',
+      userRole: map['user_role'] as String? ?? 'child',
+      displayName: map['display_name'] as String? ?? '',
+      avatarUrl: map['avatar_url'] as String?,
     );
   }
+
+  Map<String, dynamic> toFirestoreMap() => {
+        'user_id': uid,
+        'role': role,
+        'user_role': userRole,
+        'display_name': displayName,
+        'avatar_url': avatarUrl,
+      };
 }

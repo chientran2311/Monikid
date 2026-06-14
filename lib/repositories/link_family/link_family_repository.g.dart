@@ -7,7 +7,7 @@ part of 'link_family_repository.dart';
 // **************************************************************************
 
 String _$linkFamilyRepositoryHash() =>
-    r'85f7e6eb2ddf77a720e69fe1e2050fee0f76cbc0';
+    r'1cc359d1e60931f54f21a388003a7ca0ed333348';
 
 /// See also [linkFamilyRepository].
 @ProviderFor(linkFamilyRepository)

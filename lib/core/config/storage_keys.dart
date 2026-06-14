@@ -22,4 +22,8 @@ class StorageKeys {
   // AI model selection
   static const String selectedAiModel = 'selected_ai_model';
   static const String useLocalModel = 'useLocalModel';
+
+  // AI readiness result — written by splash on startup, read by AI-dependent features
+  // Values: 'none' | 'gemini' | 'local'
+  static const String activeAiSource = 'active_ai_source';
 }

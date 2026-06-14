@@ -12,6 +12,7 @@ import 'package:monikid/features/child/transaction/update_transaction/widgets/lo
 import 'package:monikid/features/child/transaction/update_transaction/widgets/missing_transaction_scaffold.dart';
 import 'package:monikid/features/child/transaction/update_transaction/widgets/update_transaction_view.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 
 class UpdateTransactionScreen extends HookConsumerWidget {
@@ -95,16 +96,12 @@ class UpdateTransactionScreen extends HookConsumerWidget {
 
       switch (next.status) {
         case TransactionStatus.success:
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(s.msgUpdateSuccess)));
+          context.showSuccessSnackBar(s.msgUpdateSuccess);
           context.pop();
           return;
         case TransactionStatus.error:
           if (next.errorMessage != null) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+            context.showErrorSnackBar(next.errorMessage!);
           }
           return;
         case TransactionStatus.initial:
@@ -209,7 +206,8 @@ class UpdateTransactionScreen extends HookConsumerWidget {
             notifier.updateTransactionType(TransactionType.expense),
         onSelectIncome: () =>
             notifier.updateTransactionType(TransactionType.income),
-        onSelectCategory: showCategoryDialog,
+        onCategorySelected: notifier.updateCategory,
+        onViewAllCategories: showCategoryDialog,
         onSelectDate: () => selectDate(state.effectiveSelectedDate),
         onPickEvidenceImage: pickEvidenceImage,
         onRemoveEvidenceImage: () {

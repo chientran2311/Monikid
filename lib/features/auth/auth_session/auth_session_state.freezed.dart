@@ -15,7 +15,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthSessionState {
 
- AuthStatus get status; User? get firebaseUser; AccountModel? get account; PinVerificationStatus get pinVerificationStatus; String? get errorMessage;
+ AuthStatus get status; User? get firebaseUser; UserModel? get account; PinVerificationStatus get pinVerificationStatus; String? get errorMessage;// Whether a PIN hash exists in secure storage for this user.
+// Populated when auth resolves; used by the router to route correctly
+// if the user ends up on an auth screen while already authenticated.
+ bool get hasPinCode;
 /// Create a copy of AuthSessionState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +29,16 @@ $AuthSessionStateCopyWith<AuthSessionState> get copyWith => _$AuthSessionStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthSessionState&&(identical(other.status, status) || other.status == status)&&(identical(other.firebaseUser, firebaseUser) || other.firebaseUser == firebaseUser)&&(identical(other.account, account) || other.account == account)&&(identical(other.pinVerificationStatus, pinVerificationStatus) || other.pinVerificationStatus == pinVerificationStatus)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthSessionState&&(identical(other.status, status) || other.status == status)&&(identical(other.firebaseUser, firebaseUser) || other.firebaseUser == firebaseUser)&&(identical(other.account, account) || other.account == account)&&(identical(other.pinVerificationStatus, pinVerificationStatus) || other.pinVerificationStatus == pinVerificationStatus)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.hasPinCode, hasPinCode) || other.hasPinCode == hasPinCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,firebaseUser,account,pinVerificationStatus,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,firebaseUser,account,pinVerificationStatus,errorMessage,hasPinCode);
 
 @override
 String toString() {
-  return 'AuthSessionState(status: $status, firebaseUser: $firebaseUser, account: $account, pinVerificationStatus: $pinVerificationStatus, errorMessage: $errorMessage)';
+  return 'AuthSessionState(status: $status, firebaseUser: $firebaseUser, account: $account, pinVerificationStatus: $pinVerificationStatus, errorMessage: $errorMessage, hasPinCode: $hasPinCode)';
 }
 
 
@@ -46,11 +49,11 @@ abstract mixin class $AuthSessionStateCopyWith<$Res>  {
   factory $AuthSessionStateCopyWith(AuthSessionState value, $Res Function(AuthSessionState) _then) = _$AuthSessionStateCopyWithImpl;
 @useResult
 $Res call({
- AuthStatus status, User? firebaseUser, AccountModel? account, PinVerificationStatus pinVerificationStatus, String? errorMessage
+ AuthStatus status, User? firebaseUser, UserModel? account, PinVerificationStatus pinVerificationStatus, String? errorMessage, bool hasPinCode
 });
 
 
-$AccountModelCopyWith<$Res>? get account;
+$UserModelCopyWith<$Res>? get account;
 
 }
 /// @nodoc
@@ -63,26 +66,27 @@ class _$AuthSessionStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthSessionState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? firebaseUser = freezed,Object? account = freezed,Object? pinVerificationStatus = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? firebaseUser = freezed,Object? account = freezed,Object? pinVerificationStatus = null,Object? errorMessage = freezed,Object? hasPinCode = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,firebaseUser: freezed == firebaseUser ? _self.firebaseUser : firebaseUser // ignore: cast_nullable_to_non_nullable
 as User?,account: freezed == account ? _self.account : account // ignore: cast_nullable_to_non_nullable
-as AccountModel?,pinVerificationStatus: null == pinVerificationStatus ? _self.pinVerificationStatus : pinVerificationStatus // ignore: cast_nullable_to_non_nullable
+as UserModel?,pinVerificationStatus: null == pinVerificationStatus ? _self.pinVerificationStatus : pinVerificationStatus // ignore: cast_nullable_to_non_nullable
 as PinVerificationStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasPinCode: null == hasPinCode ? _self.hasPinCode : hasPinCode // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of AuthSessionState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$AccountModelCopyWith<$Res>? get account {
+$UserModelCopyWith<$Res>? get account {
     if (_self.account == null) {
     return null;
   }
 
-  return $AccountModelCopyWith<$Res>(_self.account!, (value) {
+  return $UserModelCopyWith<$Res>(_self.account!, (value) {
     return _then(_self.copyWith(account: value));
   });
 }
@@ -93,14 +97,18 @@ $AccountModelCopyWith<$Res>? get account {
 
 
 class _AuthSessionState extends AuthSessionState {
-  const _AuthSessionState({this.status = AuthStatus.initial, this.firebaseUser, this.account, this.pinVerificationStatus = PinVerificationStatus.unknown, this.errorMessage}): super._();
+  const _AuthSessionState({this.status = AuthStatus.initial, this.firebaseUser, this.account, this.pinVerificationStatus = PinVerificationStatus.unknown, this.errorMessage, this.hasPinCode = false}): super._();
   
 
 @override@JsonKey() final  AuthStatus status;
 @override final  User? firebaseUser;
-@override final  AccountModel? account;
+@override final  UserModel? account;
 @override@JsonKey() final  PinVerificationStatus pinVerificationStatus;
 @override final  String? errorMessage;
+// Whether a PIN hash exists in secure storage for this user.
+// Populated when auth resolves; used by the router to route correctly
+// if the user ends up on an auth screen while already authenticated.
+@override@JsonKey() final  bool hasPinCode;
 
 /// Create a copy of AuthSessionState
 /// with the given fields replaced by the non-null parameter values.
@@ -112,16 +120,16 @@ _$AuthSessionStateCopyWith<_AuthSessionState> get copyWith => __$AuthSessionStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthSessionState&&(identical(other.status, status) || other.status == status)&&(identical(other.firebaseUser, firebaseUser) || other.firebaseUser == firebaseUser)&&(identical(other.account, account) || other.account == account)&&(identical(other.pinVerificationStatus, pinVerificationStatus) || other.pinVerificationStatus == pinVerificationStatus)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthSessionState&&(identical(other.status, status) || other.status == status)&&(identical(other.firebaseUser, firebaseUser) || other.firebaseUser == firebaseUser)&&(identical(other.account, account) || other.account == account)&&(identical(other.pinVerificationStatus, pinVerificationStatus) || other.pinVerificationStatus == pinVerificationStatus)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.hasPinCode, hasPinCode) || other.hasPinCode == hasPinCode));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,firebaseUser,account,pinVerificationStatus,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,firebaseUser,account,pinVerificationStatus,errorMessage,hasPinCode);
 
 @override
 String toString() {
-  return 'AuthSessionState(status: $status, firebaseUser: $firebaseUser, account: $account, pinVerificationStatus: $pinVerificationStatus, errorMessage: $errorMessage)';
+  return 'AuthSessionState(status: $status, firebaseUser: $firebaseUser, account: $account, pinVerificationStatus: $pinVerificationStatus, errorMessage: $errorMessage, hasPinCode: $hasPinCode)';
 }
 
 
@@ -132,11 +140,11 @@ abstract mixin class _$AuthSessionStateCopyWith<$Res> implements $AuthSessionSta
   factory _$AuthSessionStateCopyWith(_AuthSessionState value, $Res Function(_AuthSessionState) _then) = __$AuthSessionStateCopyWithImpl;
 @override @useResult
 $Res call({
- AuthStatus status, User? firebaseUser, AccountModel? account, PinVerificationStatus pinVerificationStatus, String? errorMessage
+ AuthStatus status, User? firebaseUser, UserModel? account, PinVerificationStatus pinVerificationStatus, String? errorMessage, bool hasPinCode
 });
 
 
-@override $AccountModelCopyWith<$Res>? get account;
+@override $UserModelCopyWith<$Res>? get account;
 
 }
 /// @nodoc
@@ -149,14 +157,15 @@ class __$AuthSessionStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthSessionState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? firebaseUser = freezed,Object? account = freezed,Object? pinVerificationStatus = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? firebaseUser = freezed,Object? account = freezed,Object? pinVerificationStatus = null,Object? errorMessage = freezed,Object? hasPinCode = null,}) {
   return _then(_AuthSessionState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,firebaseUser: freezed == firebaseUser ? _self.firebaseUser : firebaseUser // ignore: cast_nullable_to_non_nullable
 as User?,account: freezed == account ? _self.account : account // ignore: cast_nullable_to_non_nullable
-as AccountModel?,pinVerificationStatus: null == pinVerificationStatus ? _self.pinVerificationStatus : pinVerificationStatus // ignore: cast_nullable_to_non_nullable
+as UserModel?,pinVerificationStatus: null == pinVerificationStatus ? _self.pinVerificationStatus : pinVerificationStatus // ignore: cast_nullable_to_non_nullable
 as PinVerificationStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,hasPinCode: null == hasPinCode ? _self.hasPinCode : hasPinCode // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -164,12 +173,12 @@ as String?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$AccountModelCopyWith<$Res>? get account {
+$UserModelCopyWith<$Res>? get account {
     if (_self.account == null) {
     return null;
   }
 
-  return $AccountModelCopyWith<$Res>(_self.account!, (value) {
+  return $UserModelCopyWith<$Res>(_self.account!, (value) {
     return _then(_self.copyWith(account: value));
   });
 }

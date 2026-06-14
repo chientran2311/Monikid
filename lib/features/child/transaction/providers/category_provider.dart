@@ -1,124 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:monikid/core/constants/app_constants.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/models/entities/category_model.dart';
-import 'package:monikid/repositories/category/custom_category_repository.dart';
+import 'package:monikid/repositories/category/add_custom_category_repository.dart';
 
 part 'category_provider.g.dart';
 
-const defaultCategories = [
-  CategoryModel(
-    id: 'expense-an-uong',
-    label: 'Ăn uống',
-    icon: '🍜',
-    type: 'expense',
-    colorHex: '0xFF4ADE80',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-di-chuyen',
-    label: 'Di chuyển',
-    icon: '🚌',
-    type: 'expense',
-    colorHex: '0xFF60A5FA',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-hoc-tap',
-    label: 'Học tập',
-    icon: '📚',
-    type: 'expense',
-    colorHex: '0xFFA78BFA',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-giai-tri',
-    label: 'Giải trí',
-    icon: '🎮',
-    type: 'expense',
-    colorHex: '0xFFF472B6',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-mua-sam',
-    label: 'Mua sắm',
-    icon: '🛍️',
-    type: 'expense',
-    colorHex: '0xFFFBBF24',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-suc-khoe',
-    label: 'Sức khỏe',
-    icon: '💊',
-    type: 'expense',
-    colorHex: '0xFFF87171',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-sinh-hoat',
-    label: 'Sinh hoạt',
-    icon: '🏠',
-    type: 'expense',
-    colorHex: '0xFFFB923C',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'expense-khac',
-    label: 'Khác',
-    icon: '📦',
-    type: 'expense',
-    colorHex: '0xFF94A3B8',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'income-tien-tieu-vat',
-    label: 'Tiền tiêu vặt',
-    icon: '💵',
-    type: 'income',
-    colorHex: '0xFF22C55E',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'income-thuong',
-    label: 'Thưởng',
-    icon: '🏆',
-    type: 'income',
-    colorHex: '0xFFF59E0B',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'income-li-xi',
-    label: 'Lì xì',
-    icon: '🧧',
-    type: 'income',
-    colorHex: '0xFFEF4444',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'income-ban-keo-do',
-    label: 'Bán kẹo/đồ',
-    icon: '🍡',
-    type: 'income',
-    colorHex: '0xFF8B5CF6',
-    isDefault: true,
-  ),
-  CategoryModel(
-    id: 'income-khac',
-    label: 'Khác',
-    icon: '✨',
-    type: 'income',
-    colorHex: '0xFF64748B',
-    isDefault: true,
-  ),
-];
+// Alias kept for backward compatibility with all existing callers.
+// Source of truth: AppConstants.defaultTransactionCategories.
+const defaultCategories = AppConstants.defaultTransactionCategories;
 
 @riverpod
 Stream<List<CategoryModel>> categoryStream(Ref ref) {
   final authState = ref.watch(authSessionProvider);
   final userId = authState.user?.uid;
 
-  if (userId == null) {
+  if (!authState.isAuthenticated || userId == null) {
     return Stream.value(defaultCategories);
   }
 

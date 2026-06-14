@@ -3,8 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/utils/logger.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_card.dart';
-import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_card_skeleton.dart';
-import 'package:monikid/features/child/transaction/transaction_history/widgets/type_filter_tab.dart';
+import 'package:monikid/shared/widgets/switchtab_three_item.dart';
 
 class SummaryAndTabsSection extends ConsumerWidget {
   const SummaryAndTabsSection({
@@ -13,6 +12,8 @@ class SummaryAndTabsSection extends ConsumerWidget {
     required this.typeFilter,
     required this.notifier,
     required this.isDark,
+    this.monthlyLimitMinor,
+    this.monthlyTotalExpense,
     super.key,
   });
 
@@ -21,9 +22,15 @@ class SummaryAndTabsSection extends ConsumerWidget {
   final String? typeFilter;
   final TransactionHistory notifier;
   final bool isDark;
+  final int? monthlyLimitMinor;
+  final double? monthlyTotalExpense;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Map filter string to index for SwitchTabThreeItem
+    final filterValues = ['all', 'income', 'expense'];
+    final selectedIndex = filterValues.indexOf(typeFilter ?? 'all').clamp(0, 2);
+
     return SliverToBoxAdapter(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -40,9 +47,18 @@ class SummaryAndTabsSection extends ConsumerWidget {
                     totalExpense: summaryAsyncValue.value!.totalExpense,
                     selectedDate: selectedDate,
                     displayMonth: selectedDate ?? DateTime.now(),
+                    monthlyLimitMinor: monthlyLimitMinor,
+                    monthlyTotalExpense: monthlyTotalExpense,
                   );
                 }
-                return const SummaryCardSkeleton();
+                return SummaryCard(
+                  totalIncome: 0,
+                  totalExpense: 0,
+                  selectedDate: selectedDate,
+                  displayMonth: selectedDate ?? DateTime.now(),
+                  monthlyLimitMinor: monthlyLimitMinor,
+                  monthlyTotalExpense: monthlyTotalExpense,
+                );
               },
               error: (error, StackTrace? stack) {
                 logger.e(
@@ -55,6 +71,8 @@ class SummaryAndTabsSection extends ConsumerWidget {
                   totalExpense: 0,
                   selectedDate: selectedDate,
                   displayMonth: selectedDate ?? DateTime.now(),
+                  monthlyLimitMinor: monthlyLimitMinor,
+                  monthlyTotalExpense: monthlyTotalExpense,
                 );
               },
               data: (summary) => SummaryCard(
@@ -62,15 +80,19 @@ class SummaryAndTabsSection extends ConsumerWidget {
                 totalExpense: summary.totalExpense,
                 selectedDate: selectedDate,
                 displayMonth: selectedDate ?? DateTime.now(),
+                monthlyLimitMinor: monthlyLimitMinor,
+                monthlyTotalExpense: monthlyTotalExpense,
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: TypeFilterTab(
-              selected: typeFilter ?? 'all',
-              isDark: isDark,
-              onChanged: notifier.setTypeFilter,
+            child: SwitchTabThreeItem(
+              title1: 'Tất cả',
+              title2: 'Thu tiền',
+              title3: 'Chi tiền',
+              selectedIndex: selectedIndex,
+              onChanged: (index) => notifier.setTypeFilter(filterValues[index]),
             ),
           ),
         ],

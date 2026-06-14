@@ -7,6 +7,7 @@ import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 class UploadPicDialog extends HookConsumerWidget {
   const UploadPicDialog({
@@ -146,30 +147,9 @@ class UploadPicDialog extends HookConsumerWidget {
               SizedBox(height: 24.h),
               
               // Cancel Button
-              SizedBox(
-                width: double.infinity,
-                height: 58.h,
-                child: ElevatedButton(
-                  onPressed: isPicking.value ? null : () => context.pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? AppTheme.surfaceLightGrey.withValues(alpha: 0.15)
-                        : AppTheme.surfaceLightGrey,
-                    foregroundColor: isDark
-                        ? AppTheme.textWhite
-                        : AppTheme.textBlack,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.r),
-                    ),
-                  ),
-                  child: Text(
-                    s.actionCancel,
-                    style: context.typo.button.medium.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
+              PrimaryButton.secondary(
+                title: s.actionCancel,
+                onTap: isPicking.value ? null : context.pop,
               ),
             ],
           ),

@@ -1,125 +1,134 @@
-import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
-class SplashBrandSection extends StatelessWidget {
+class SplashBrandSection extends HookWidget {
   const SplashBrandSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Float: 4s visual cycle (2s forward + 2s reverse) — drives logo + ghost
+    final floatCtrl = useAnimationController(duration: const Duration(seconds: 2));
+    // Reveal: one-shot on mount for brand name
+    final revealCtrl = useAnimationController(duration: const Duration(milliseconds: 1200));
+
+    useEffect(() {
+      floatCtrl.repeat(reverse: true);
+      revealCtrl.forward();
+      return null;
+    }, const []);
+
+    final floatCurve = CurvedAnimation(parent: floatCtrl, curve: Curves.easeInOut);
+    final revealCurve = CurvedAnimation(
+      parent: revealCtrl,
+      curve: const Cubic(0.16, 1, 0.3, 1),
+    );
+
     return Center(
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 800),
-        tween: Tween<double>(begin: 0, end: 1),
-        builder: (context, value, child) {
-          return Opacity(
-            opacity: value,
-            child: Transform.translate(
-              offset: Offset(0, 20 * (1 - value)),
-              child: child,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Floating glass logo with ghost glitch
+          AnimatedBuilder(
+            animation: floatCurve,
+            builder: (context, child) => Transform.translate(
+              offset: Offset(0, floatCurve.value * -15.h),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  child!, // glass logo box
+                ],
+              ),
             ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _SplashLogo(isDark: isDark),
-              Text(
-                'SmartSpending',
-                textAlign: TextAlign.center,
-                style: context.typo.bigTitle.medium.copyWith(
-                  letterSpacing: -0.5,
-                  color: isDark ? AppTheme.primaryLight : AppTheme.primary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Quáº£n lÃ½ thÃ´ng minh, tÆ°Æ¡ng lai vá»¯ng bá»n',
-                textAlign: TextAlign.center,
-                style: context.typo.label.large.copyWith(
-                  letterSpacing: 0.25,
-                  color:
-                      isDark ? AppTheme.textMuted : AppTheme.textGrey,
-                ),
-              ),
-            ],
+            child: _GlassLogoBox(isDark: isDark),
           ),
-        ),
+          SizedBox(height: 24.h),
+          // Brand name with blur-reveal animation
+          AnimatedBuilder(
+            animation: revealCurve,
+            builder: (context, child) {
+              final blur = (1.0 - revealCurve.value) * 10.0;
+              Widget w = Opacity(
+                opacity: revealCurve.value,
+                child: Transform.translate(
+                  offset: Offset(0, (1.0 - revealCurve.value) * 10.h),
+                  child: child,
+                ),
+              );
+              if (blur > 0.1) {
+                w = ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                  child: w,
+                );
+              }
+              return w;
+            },
+            child: ShaderMask(
+              shaderCallback: (bounds) => LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [Colors.white, AppTheme.textMuted]
+                    : [AppTheme.primaryDark, AppTheme.textDark],
+              ).createShader(bounds),
+              child: Text(
+                'MoniKid',
+                style: context.typo.display.big.copyWith(
+                  fontSize: 42.sp,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 42 * -0.06,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _SplashLogo extends StatelessWidget {
-  const _SplashLogo({required this.isDark});
+class _GlassLogoBox extends StatelessWidget {
+  const _GlassLogoBox({required this.isDark});
 
   final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    const rotationAngle = 3 * math.pi / 180;
-
-    return Container(
-      width: 112,
-      height: 112,
-      margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: AppTheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AppTheme.primary.withValues(alpha: 0.2),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, 1),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          width: 110.w,
+          height: 110.w,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: isDark ? 0.1 : 0.4),
+            borderRadius: BorderRadius.circular(30.r),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                offset: Offset(0, 20.h),
+                blurRadius: 40.r,
+                color: Colors.black.withValues(alpha: 0.05),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Transform.rotate(
-        angle: rotationAngle,
-        child: Center(
-          child: Transform.rotate(
-            angle: -rotationAngle,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                const Icon(
-                  Icons.account_balance_wallet,
-                  size: 64,
-                  color: AppTheme.primary,
-                ),
-                Positioned(
-                  top: -8,
-                  right: -8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.eco,
-                      size: 34,
-                      color: AppTheme.primary,
-                    ),
-                  ),
-                ),
-              ],
+          child: Center(
+            child: Image.asset(
+              'assets/app_icon.png',
+              width: 80.w,
+              height: 80.w,
+              cacheWidth: decodePixelsFor(context, 80.w),
             ),
           ),
         ),

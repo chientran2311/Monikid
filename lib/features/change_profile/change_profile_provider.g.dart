@@ -6,7 +6,7 @@ part of 'change_profile_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$changeProfileHash() => r'6d185c766ee8b5be1a4bf7ec4d3e4b5210fc0cf3';
+String _$changeProfileHash() => r'95d7b1d48d4d41aafe55d1330026a6d5d9d2fcdf';
 
 /// See also [ChangeProfile].
 @ProviderFor(ChangeProfile)

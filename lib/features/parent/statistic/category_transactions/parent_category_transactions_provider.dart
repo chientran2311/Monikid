@@ -42,7 +42,7 @@ class ParentCategoryTransactionsNotifier
       final transactions = await _repository.getChildTransactionsByCategory(
         childUid: childUid,
         categoryKey: categoryKey,
-        selectedMonthIndex: period == ParentStatisticPeriod.week ? 0 : 1,
+        selectedTabIndex: period == ParentStatisticPeriod.week ? 0 : 1,
         anchorDate: DateTime.now(),
       );
 

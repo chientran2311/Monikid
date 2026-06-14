@@ -27,18 +27,15 @@ abstract class FamilyManagementState with _$FamilyManagementState {
 
   bool get isLoading => status == FamilyManagementStatus.loading;
 
-  List<FamilyMemberModel> get activeMembers =>
-      members.where((m) => m.status == 'active').toList();
-
   List<FamilyMemberModel> get childMembers =>
-      activeMembers.where((m) => m.role == 'child').toList();
+      members.where((m) => m.userRole == 'child').toList();
 
   List<FamilyMemberModel> get parentMembers =>
-      activeMembers.where((m) => m.role == 'parent').toList();
+      members.where((m) => m.userRole == 'parent').toList();
 
   FamilyMemberModel? get nonHostParent {
     if (family == null) return null;
-    final hostId = family!.parentId;
+    final hostId = family!.ownerUid;
     return parentMembers.where((p) => p.uid != hostId).firstOrNull;
   }
 }

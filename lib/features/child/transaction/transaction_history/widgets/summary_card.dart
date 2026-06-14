@@ -13,6 +13,8 @@ class SummaryCard extends StatelessWidget {
   final double totalExpense;
   final DateTime? selectedDate;
   final DateTime? displayMonth;
+  final int? monthlyLimitMinor;
+  final double? monthlyTotalExpense;
 
   const SummaryCard({
     super.key,
@@ -20,13 +22,16 @@ class SummaryCard extends StatelessWidget {
     required this.totalExpense,
     this.selectedDate,
     this.displayMonth,
+    this.monthlyLimitMinor,
+    this.monthlyTotalExpense,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final month = displayMonth ?? DateTime.now();
-    final monthLabel = selectedDate != null
+    final isDayView = selectedDate != null;
+    final monthLabel = isDayView
         ? 'Ngày ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
         : 'Tháng ${month.month} / ${month.year}';
 
@@ -35,6 +40,8 @@ class SummaryCard extends StatelessWidget {
         totalIncome: totalIncome,
         totalExpense: totalExpense,
         monthLabel: monthLabel,
+        monthlyLimitMinor: monthlyLimitMinor,
+        monthlyTotalExpense: monthlyTotalExpense,
       );
     }
 
@@ -42,6 +49,9 @@ class SummaryCard extends StatelessWidget {
       totalIncome: totalIncome,
       totalExpense: totalExpense,
       monthLabel: monthLabel,
+      isDayView: isDayView,
+      monthlyLimitMinor: monthlyLimitMinor,
+      monthlyTotalExpense: monthlyTotalExpense,
     );
   }
 }
@@ -53,11 +63,17 @@ class _LightSummaryCard extends StatelessWidget {
     required this.totalIncome,
     required this.totalExpense,
     required this.monthLabel,
+    required this.isDayView,
+    this.monthlyLimitMinor,
+    this.monthlyTotalExpense,
   });
 
   final double totalIncome;
   final double totalExpense;
   final String monthLabel;
+  final bool isDayView;
+  final int? monthlyLimitMinor;
+  final double? monthlyTotalExpense;
 
   @override
   Widget build(BuildContext context) {
@@ -113,13 +129,15 @@ class _LightSummaryCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SummaryHeader(monthLabel: monthLabel),
+                  _SummaryHeader(monthLabel: monthLabel, isDayView: isDayView),
                   SizedBox(height: 14.h),
-                  _SummaryMainAmount(totalExpense: totalExpense),
+                  _SummaryMainAmount(amount: totalExpense),
                   SizedBox(height: 14.h),
                   _SummaryStats(
                     totalIncome: totalIncome,
                     totalExpense: totalExpense,
+                    monthlyLimitMinor: monthlyLimitMinor,
+                    monthlyTotalExpense: monthlyTotalExpense,
                   ),
                 ],
               ),
@@ -132,11 +150,13 @@ class _LightSummaryCard extends StatelessWidget {
 }
 
 class _SummaryHeader extends StatelessWidget {
-  const _SummaryHeader({required this.monthLabel});
+  const _SummaryHeader({required this.monthLabel, required this.isDayView});
   final String monthLabel;
+  final bool isDayView;
 
   @override
   Widget build(BuildContext context) {
+    final badgeText = isDayView ? 'Đã chi ngày này' : 'Đã chi tháng này';
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,14 +184,29 @@ class _SummaryHeader extends StatelessWidget {
             ),
           ],
         ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+          decoration: BoxDecoration(
+            color: AppTheme.primary.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+          child: Text(
+            badgeText,
+            style: AppTextStyleFactory.style(
+              size: AppFontSizes.captionBig,
+              weight: FontWeight.w800,
+              color: AppTheme.primary,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
 
 class _SummaryMainAmount extends StatelessWidget {
-  const _SummaryMainAmount({required this.totalExpense});
-  final double totalExpense;
+  const _SummaryMainAmount({required this.amount});
+  final double amount;
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +215,7 @@ class _SummaryMainAmount extends StatelessWidget {
       children: [
         Flexible(
           child: Text(
-            CurrencyFormatter.format(totalExpense),
+            CurrencyFormatter.format(amount),
             style: AppTextStyleFactory.style(
               size: 34,
               weight: FontWeight.w900,
@@ -188,25 +223,6 @@ class _SummaryMainAmount extends StatelessWidget {
               color: AppTheme.textBlack,
             ),
             overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        SizedBox(width: 10.w),
-        Padding(
-          padding: EdgeInsets.only(bottom: 3.h),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(999.r),
-            ),
-            child: Text(
-              'Đã chi tháng này',
-              style: AppTextStyleFactory.style(
-                size: AppFontSizes.captionBig,
-                weight: FontWeight.w800,
-                color: AppTheme.primary,
-              ),
-            ),
           ),
         ),
       ],
@@ -218,15 +234,22 @@ class _SummaryStats extends StatelessWidget {
   const _SummaryStats({
     required this.totalIncome,
     required this.totalExpense,
+    this.monthlyLimitMinor,
+    this.monthlyTotalExpense,
   });
 
   final double totalIncome;
   final double totalExpense;
+  final int? monthlyLimitMinor;
+  final double? monthlyTotalExpense;
 
   @override
   Widget build(BuildContext context) {
-    final netBalance = totalIncome - totalExpense;
-    final isNet = netBalance >= 0;
+    final monthlyLimit = monthlyLimitMinor?.toDouble() ?? 0;
+    // Always use full-month expense for remaining limit, regardless of date/category filter.
+    final expenseForLimit = monthlyTotalExpense ?? totalExpense;
+    final remainingLimit = monthlyLimit - expenseForLimit;
+    final isPositive = remainingLimit >= 0;
     return Row(
       children: [
         Expanded(
@@ -247,9 +270,9 @@ class _SummaryStats extends StatelessWidget {
         SizedBox(width: 10.w),
         Expanded(
           child: _StatBox(
-            label: 'Số dư',
-            value: '${isNet ? '+' : ''}${CurrencyFormatter.formatCompact(netBalance)}',
-            valueColor: isNet ? AppTheme.primary : AppTheme.redAlert,
+            label: 'Hạn mức còn lại',
+            value: CurrencyFormatter.formatCompact(remainingLimit),
+            valueColor: isPositive ? AppTheme.primary : AppTheme.redAlert,
           ),
         ),
       ],
@@ -317,16 +340,23 @@ class _DarkSummaryCard extends StatelessWidget {
     required this.totalIncome,
     required this.totalExpense,
     required this.monthLabel,
+    this.monthlyLimitMinor,
+    this.monthlyTotalExpense,
   });
 
   final double totalIncome;
   final double totalExpense;
   final String monthLabel;
+  final int? monthlyLimitMinor;
+  final double? monthlyTotalExpense;
 
   @override
   Widget build(BuildContext context) {
     final double netBalance = totalIncome - totalExpense;
     final bool isPositive = netBalance >= 0;
+    final String mainAmountText =
+        '${isPositive ? '+' : '-'} ${CurrencyFormatter.format(netBalance.abs())}';
+    final Color mainAmountColor = isPositive ? Colors.white : AppTheme.redAlert;
 
     return Container(
       decoration: BoxDecoration(
@@ -368,11 +398,11 @@ class _DarkSummaryCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            '${isPositive ? '+' : '-'} ${CurrencyFormatter.format(netBalance.abs())}',
+            mainAmountText,
             style: context.typo.headline.medium.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
-              color: isPositive ? Colors.white : AppTheme.redAlert,
+              color: mainAmountColor,
             ),
           ),
           SizedBox(height: 14.h),

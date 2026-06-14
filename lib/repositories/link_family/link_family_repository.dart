@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/utils/family_code_util.dart';
@@ -8,10 +9,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'link_family_repository.g.dart';
 
+// Invite codes are valid for 7 days from creation.
+const _inviteCodeTtlDays = 7;
+
 abstract class LinkFamilyRepository {
   Future<FamilyModel?> createFamily({
-    required String parentId,
-    required String parentName,
+    required String ownerUid,
   });
 
   Future<FamilyModel?> getFamilyByInviteCode(String inviteCode);
@@ -20,29 +23,22 @@ abstract class LinkFamilyRepository {
 
   Stream<List<FamilyMemberModel>> watchFamilyMembers(String familyId);
 
+  Future<List<FamilyMemberModel>> getFamilyMembersOnce(String familyId);
+
   Future<void> joinFamily({
     required String familyId,
     required String userId,
-    required String userName,
-    required String role,
-    String? avatarUrl,
   });
 
   Future<void> refreshInviteCode(String familyId);
 
   Future<bool> isUserAlreadyInFamily(String uid);
 
-  Future<void> removeChild({
-    required String familyId,
-    required String childId,
-  });
-
-  Future<void> removeParentMember({
+  Future<void> removeMember({
     required String familyId,
     required String memberUid,
   });
 }
-
 
 class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   LinkFamilyRepositoryImpl(this._firestore, this._logger);
@@ -50,39 +46,59 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   final FirebaseFirestore _firestore;
   final Logger _logger;
 
+  static const _maxRetries = 3;
+  static const _maxMembers = 5;
+
   @override
   Future<FamilyModel?> getFamilyByInviteCode(String inviteCode) async {
-    final code = inviteCode.trim();
-    final inviteCodeRegex = RegExp(r'^\d{6}$');
-    if (!inviteCodeRegex.hasMatch(code)) {
-      _logger.w('Invalid invite code length: $code');
+    final code = inviteCode.trim().toUpperCase();
+    if (!RegExp(r'^[A-Z0-9]{6}$').hasMatch(code)) {
+      _logger.w('getFamilyByInviteCode: invalid format code=$code');
       return null;
     }
 
     try {
-      final snapshot = await _firestore
-          .collection('families')
-          .where('invite_code', isEqualTo: code)
-          .where('status', isEqualTo: 'active')
-          .limit(1)
-          .get();
-
-      if (snapshot.docs.isEmpty) {
-        _logger.w('No active family found with invite code: $code');
+      _logger.d('getFamilyByInviteCode: code=$code');
+      // Use invite_codes index for O(1) lookup + expiry check — no Firestore index needed.
+      final codeDoc =
+          await _firestore.collection('invite_codes').doc(code).get();
+      if (!codeDoc.exists) {
+        _logger.w('getFamilyByInviteCode: code not found. code=$code');
         return null;
       }
 
-      final family = FamilyModel.fromFirestore(snapshot.docs.first);
-      if (family.inviteCodeExpiresAt.isBefore(DateTime.now())) {
-        _logger.w('Invite code expired for family: ${family.familyId}');
+      final expiredAtRaw = codeDoc.data()?['expired_at'];
+      if (expiredAtRaw != null) {
+        final expiredAt = (expiredAtRaw as Timestamp).toDate();
+        if (DateTime.now().isAfter(expiredAt)) {
+          _logger.w(
+            'getFamilyByInviteCode: code expired. code=$code expiredAt=$expiredAt',
+          );
+          return null;
+        }
+      }
+
+      final familyId = codeDoc.data()?['family_id'] as String?;
+      if (familyId == null || familyId.isEmpty) {
+        _logger.w('getFamilyByInviteCode: missing family_id. code=$code');
         return null;
       }
 
-      return family;
-    } catch (e, stackTrace) {
+      final familyDoc =
+          await _firestore.collection('families').doc(familyId).get();
+      if (!familyDoc.exists) {
+        _logger.w(
+          'getFamilyByInviteCode: family not found. familyId=$familyId',
+        );
+        return null;
+      }
+
+      _logger.i('getFamilyByInviteCode: found family=$familyId');
+      return FamilyModel.fromFirestore(familyDoc);
+    } catch (error, stackTrace) {
       _logger.e(
-        'Error getting family by invite code',
-        error: e,
+        'getFamilyByInviteCode failed. code=$code',
+        error: error,
         stackTrace: stackTrace,
       );
       rethrow;
@@ -94,17 +110,15 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
       if (!doc.exists) {
-        _logger.w('User not found while checking family status: $uid');
+        _logger.w('isUserAlreadyInFamily: user not found. uid=$uid');
         return false;
       }
-
-      final data = doc.data();
-      final familyId = data?['family_id'] as String?;
+      final familyId = doc.data()?['family_id'] as String?;
       return familyId != null && familyId.isNotEmpty;
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       _logger.e(
-        'Error checking whether user already belongs to a family',
-        error: e,
+        'isUserAlreadyInFamily failed. uid=$uid',
+        error: error,
         stackTrace: stackTrace,
       );
       rethrow;
@@ -115,68 +129,74 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   Future<void> joinFamily({
     required String familyId,
     required String userId,
-    required String userName,
-    required String role,
-    String? avatarUrl,
   }) async {
+    _logger.d('joinFamily: familyId=$familyId userId=$userId');
     try {
       final familyRef = _firestore.collection('families').doc(familyId);
       final userRef = _firestore.collection('users').doc(userId);
-      final memberRef = familyRef.collection('members').doc(userId);
 
-      await _firestore.runTransaction((transaction) async {
-        final familyDoc = await transaction.get(familyRef);
-        final userDoc = await transaction.get(userRef);
-        final memberDoc = await transaction.get(memberRef);
+      await _firestore.runTransaction((tx) async {
+        // All reads before all writes — Firestore transaction requirement.
+        final familyDoc = await tx.get(familyRef);
+        final userDoc = await tx.get(userRef);
 
         if (!familyDoc.exists) {
-          throw Exception('Family does not exist');
+          throw Exception('Family does not exist. familyId=$familyId');
         }
-
         if (!userDoc.exists) {
-          throw Exception('User does not exist');
+          throw Exception('User does not exist. userId=$userId');
         }
 
-        final userData = userDoc.data();
-        final currentFamilyId = userData?['family_id'] as String?;
+        final currentFamilyId =
+            userDoc.data()?['family_id'] as String?;
         if (currentFamilyId != null && currentFamilyId.isNotEmpty) {
-          throw Exception('User already belongs to a family');
+          throw Exception(
+            'User already belongs to a family. userId=$userId',
+          );
         }
 
-        if (memberDoc.exists) {
+        // Atomic member count check against embedded array — no race condition.
+        final members =
+            (familyDoc.data()!['members'] as List<dynamic>? ?? [])
+                .cast<Map<String, dynamic>>();
+        if (members.length >= _maxMembers) {
+          throw Exception(
+            'Family is full (max $_maxMembers members). familyId=$familyId',
+          );
+        }
+
+        final alreadyMember = members.any((m) => m['user_id'] == userId);
+        if (alreadyMember) {
+          // Edge case: member doc exists but user.family_id was cleared — restore.
+          tx.update(userRef, {'family_id': familyId});
           return;
         }
 
-        transaction.update(userRef, {
-          'family_id': familyId,
-          'family_role': role,
-        });
+        final displayName =
+            userDoc.data()?['display_name'] as String? ?? '';
+        final avatarUrl = userDoc.data()?['avatar_url'] as String?;
+        final userRole = userDoc.data()?['role'] as String? ?? 'child';
 
-        transaction.set(memberRef, {
-          'uid': userId,
-          'family_id': familyId,
-          'role': role,
-          'display_name': userName,
-          'avatar_url': avatarUrl,
-          'joined_at': FieldValue.serverTimestamp(),
-          'status': 'active',
+        tx.update(familyRef, {
+          'members': FieldValue.arrayUnion([
+            {
+              'user_id': userId,
+              'role': 'member',
+              'user_role': userRole,
+              'display_name': displayName,
+              'avatar_url': avatarUrl,
+            }
+          ]),
+          'updated_at': FieldValue.serverTimestamp(),
         });
-
-        if (role == 'child') {
-          transaction.update(familyRef, {
-            'child_count': FieldValue.increment(1),
-            'updated_at': FieldValue.serverTimestamp(),
-          });
-        } else {
-          transaction.update(familyRef, {
-            'updated_at': FieldValue.serverTimestamp(),
-          });
-        }
+        tx.update(userRef, {'family_id': familyId});
       });
-    } catch (e, stackTrace) {
+
+      _logger.i('joinFamily: success. familyId=$familyId userId=$userId');
+    } catch (error, stackTrace) {
       _logger.e(
-        'Error joining family',
-        error: e,
+        'joinFamily failed. familyId=$familyId userId=$userId',
+        error: error,
         stackTrace: stackTrace,
       );
       rethrow;
@@ -184,68 +204,82 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   }
 
   @override
-  Future<FamilyModel?> createFamily({
-    required String parentId,
-    required String parentName,
-  }) async {
+  Future<FamilyModel?> createFamily({required String ownerUid}) async {
+    _logger.d('createFamily: ownerUid=$ownerUid');
     try {
-      // Pre-flight: verify user doc shape before attempting the transaction.
       final userSnap =
-          await _firestore.collection('users').doc(parentId).get();
+          await _firestore.collection('users').doc(ownerUid).get();
       if (!userSnap.exists) {
-        throw Exception('createFamily: user doc not found for uid=$parentId');
+        throw Exception('createFamily: user not found. uid=$ownerUid');
       }
+
       final userData = userSnap.data()!;
-      _logger.d(
-        'createFamily pre-flight '
-        'role=${userData['role']} '
-        'member_status=${userData['member_status']} '
-        'family_id=${userData['family_id']}',
-      );
       if (userData['role'] != 'parent') {
         throw Exception(
-          'createFamily: user role is "${userData['role']}", expected "parent"',
-        );
-      }
-      if (userData['member_status'] != 'active') {
-        throw Exception(
-          'createFamily: member_status is "${userData['member_status']}", expected "active"',
+          'createFamily: user role=${userData['role']}, expected parent',
         );
       }
       final existingFamilyId = userData['family_id'];
-      if (existingFamilyId != null &&
-          existingFamilyId is String &&
-          existingFamilyId.isNotEmpty) {
+      if (existingFamilyId is String && existingFamilyId.isNotEmpty) {
         throw Exception(
-          'createFamily: user already belongs to family $existingFamilyId',
+          'createFamily: user already in family=$existingFamilyId',
         );
       }
 
-      final familyRef = _firestore.collection('families').doc();
-      final userRef = _firestore.collection('users').doc(parentId);
-      final inviteCode = FamilyCodeUtil.generate();
-      final expiresAt = DateTime.now().add(const Duration(days: 365));
+      final displayName = userData['display_name'] as String? ?? '';
+      final avatarUrl = userData['avatar_url'] as String?;
 
-      _logger.d('createFamily writing family=${familyRef.id} invite=$inviteCode');
+      final familyRef = _firestore.collection('families').doc();
+      final userRef = _firestore.collection('users').doc(ownerUid);
+      final inviteCode = await _generateUniqueCode();
+
+      _logger.d(
+        'createFamily: writing family=${familyRef.id} code=$inviteCode',
+      );
 
       await _firestore.runTransaction((tx) async {
+        final codeRef =
+            _firestore.collection('invite_codes').doc(inviteCode);
+        // set() with merge:false — fails atomically if code already exists.
+        tx.set(
+          codeRef,
+          {
+            'family_id': familyRef.id,
+            'expired_at': Timestamp.fromDate(
+              DateTime.now().add(const Duration(days: _inviteCodeTtlDays)),
+            ),
+          },
+          SetOptions(merge: false),
+        );
+
         tx.set(familyRef, {
-          'parent_id': parentId,
-          'parent_name': parentName,
+          'family_id': familyRef.id,
           'invite_code': inviteCode,
-          'invite_code_expires_at': Timestamp.fromDate(expiresAt),
-          'child_count': 0,
-          'status': 'active',
           'created_at': FieldValue.serverTimestamp(),
           'updated_at': FieldValue.serverTimestamp(),
+          'members': [
+            {
+              'user_id': ownerUid,
+              'role': 'owner',
+              'user_role': 'parent',
+              'display_name': displayName,
+              'avatar_url': avatarUrl,
+            }
+          ],
         });
+
         tx.update(userRef, {'family_id': familyRef.id});
       });
 
+      _logger.i('createFamily: success. family=${familyRef.id}');
       final doc = await familyRef.get();
       return FamilyModel.fromFirestore(doc);
-    } catch (e, stackTrace) {
-      _logger.e('createFamily failed', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'createFamily failed. ownerUid=$ownerUid',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
@@ -253,98 +287,174 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
   @override
   Future<FamilyModel?> getFamilyById(String familyId) async {
     try {
+      _logger.d('getFamilyById: familyId=$familyId');
       final doc =
           await _firestore.collection('families').doc(familyId).get();
       if (!doc.exists) return null;
       return FamilyModel.fromFirestore(doc);
-    } catch (e, stackTrace) {
-      _logger.e('Error fetching family by ID', error: e, stackTrace: stackTrace);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'getFamilyById failed. familyId=$familyId',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
 
   @override
   Stream<List<FamilyMemberModel>> watchFamilyMembers(String familyId) {
+    // Stream the family document — members are embedded, so 0 extra reads per update.
     return _firestore
         .collection('families')
         .doc(familyId)
-        .collection('members')
-        .where('status', isEqualTo: 'active')
         .snapshots()
-        .map(
-          (snap) => snap.docs
-              .map((d) => FamilyMemberModel.fromFirestore(d))
-              .toList(growable: false),
-        );
+        .map((doc) => _extractMembers(doc.data(), familyId));
+  }
+
+  @override
+  Future<List<FamilyMemberModel>> getFamilyMembersOnce(
+    String familyId,
+  ) async {
+    try {
+      final doc =
+          await _firestore.collection('families').doc(familyId).get();
+      return _extractMembers(doc.data(), familyId);
+    } catch (error, stackTrace) {
+      _logger.e(
+        'getFamilyMembersOnce failed. familyId=$familyId',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  List<FamilyMemberModel> _extractMembers(
+    Map<String, dynamic>? data,
+    String familyId,
+  ) {
+    if (data == null) return [];
+    final raw = (data['members'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
+    return raw.map(FamilyMemberModel.fromMap).toList();
   }
 
   @override
   Future<void> refreshInviteCode(String familyId) async {
+    _logger.d('refreshInviteCode: familyId=$familyId');
     try {
-      final newCode = FamilyCodeUtil.generate();
-      final expiresAt = DateTime.now().add(const Duration(days: 365));
-      await _firestore.collection('families').doc(familyId).update({
-        'invite_code': newCode,
-        'invite_code_expires_at': Timestamp.fromDate(expiresAt),
-        'updated_at': FieldValue.serverTimestamp(),
-      });
-    } catch (e, stackTrace) {
-      _logger.e('Error refreshing invite code', error: e, stackTrace: stackTrace);
-      rethrow;
-    }
-  }
-
-  @override
-  Future<void> removeChild({
-    required String familyId,
-    required String childId,
-  }) async {
-    try {
+      final newCode = await _generateUniqueCode();
       final familyRef = _firestore.collection('families').doc(familyId);
-      final memberRef = familyRef.collection('members').doc(childId);
-      final userRef = _firestore.collection('users').doc(childId);
+      final codeRef =
+          _firestore.collection('invite_codes').doc(newCode);
 
       await _firestore.runTransaction((tx) async {
-        tx.update(memberRef, {'status': 'removed'});
-        tx.update(userRef, {'family_id': FieldValue.delete()});
+        final familyDoc = await tx.get(familyRef);
+        if (!familyDoc.exists) {
+          throw Exception('Family not found. familyId=$familyId');
+        }
+
+        final oldCode =
+            familyDoc.data()?['invite_code'] as String?;
+        if (oldCode != null && oldCode.isNotEmpty) {
+          tx.delete(_firestore.collection('invite_codes').doc(oldCode));
+        }
+
+        tx.set(
+          codeRef,
+          {
+            'family_id': familyId,
+            'expired_at': Timestamp.fromDate(
+              DateTime.now().add(const Duration(days: _inviteCodeTtlDays)),
+            ),
+          },
+          SetOptions(merge: false),
+        );
         tx.update(familyRef, {
-          'child_count': FieldValue.increment(-1),
+          'invite_code': newCode,
           'updated_at': FieldValue.serverTimestamp(),
         });
       });
-    } catch (e, stackTrace) {
-      _logger.e('Error removing child from family', error: e, stackTrace: stackTrace);
+
+      _logger.i(
+        'refreshInviteCode: success. familyId=$familyId newCode=$newCode',
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'refreshInviteCode failed. familyId=$familyId',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
 
   @override
-  Future<void> removeParentMember({
+  Future<void> removeMember({
     required String familyId,
     required String memberUid,
   }) async {
+    _logger.d('removeMember: familyId=$familyId memberUid=$memberUid');
     try {
       final familyRef = _firestore.collection('families').doc(familyId);
-      final memberRef = familyRef.collection('members').doc(memberUid);
       final userRef = _firestore.collection('users').doc(memberUid);
 
       await _firestore.runTransaction((tx) async {
-        tx.update(memberRef, {'status': 'removed'});
-        tx.update(userRef, {'family_id': FieldValue.delete()});
+        final familyDoc = await tx.get(familyRef);
+        if (!familyDoc.exists) {
+          throw Exception('Family not found. familyId=$familyId');
+        }
+
+        final members =
+            (familyDoc.data()!['members'] as List<dynamic>? ?? [])
+                .cast<Map<String, dynamic>>();
+        // Find the exact map stored in Firestore for arrayRemove deep-equality match.
+        final memberMap = members.firstWhere(
+          (m) => m['user_id'] == memberUid,
+          orElse: () => throw Exception(
+            'Member not found. memberUid=$memberUid familyId=$familyId',
+          ),
+        );
+
         tx.update(familyRef, {
+          'members': FieldValue.arrayRemove([memberMap]),
           'updated_at': FieldValue.serverTimestamp(),
         });
+        tx.update(userRef, {'family_id': FieldValue.delete()});
       });
-    } catch (e, stackTrace) {
-      _logger.e('Error removing parent member from family', error: e, stackTrace: stackTrace);
+
+      _logger.i(
+        'removeMember: success. familyId=$familyId memberUid=$memberUid',
+      );
+    } catch (error, stackTrace) {
+      _logger.e(
+        'removeMember failed. familyId=$familyId memberUid=$memberUid',
+        error: error,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
 
+  /// Generates a unique 6-char alphanumeric invite code.
+  /// Pre-checks [_maxRetries] times; relies on the transaction's set(merge:false)
+  /// as the final atomicity guarantee.
+  Future<String> _generateUniqueCode() async {
+    for (var i = 0; i < _maxRetries; i++) {
+      final code = FamilyCodeUtil.generate();
+      final existing =
+          await _firestore.collection('invite_codes').doc(code).get();
+      if (!existing.exists) return code;
+      _logger.w(
+        '_generateUniqueCode: collision on attempt ${i + 1}. code=$code',
+      );
+    }
+    return FamilyCodeUtil.generate();
+  }
 }
 
 @riverpod
-LinkFamilyRepository linkFamilyRepository(LinkFamilyRepositoryRef ref) {
+LinkFamilyRepository linkFamilyRepository(Ref ref) {
   return getIt<LinkFamilyRepository>();
 }
-

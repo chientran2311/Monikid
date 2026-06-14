@@ -29,8 +29,9 @@ class LeaveFamilyFormBody extends ConsumerWidget {
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
+    final members = ref.watch(familyMembersProvider).valueOrNull ?? [];
     final familyName =
-        ref.watch(linkedFamilyProvider).valueOrNull?.parentName ?? '';
+        members.where((m) => m.role == 'owner').firstOrNull?.displayName ?? '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,19 +98,18 @@ class LeaveFamilyFormBody extends ConsumerWidget {
         PrimaryButton.danger(
           title: s.unlinkFamilyButton,
           isLoading: state.isBusy,
-          onTap: () async {
-            final confirmed = await showDialog<bool>(
+          onTap: () {
+            showDialog<void>(
               context: context,
               builder: (_) => ConfirmDialog(
                 title: s.unlinkFamilyConfirmTitle,
-                message: s.unlinkFamilyConfirmBody,
+                subtitle: s.unlinkFamilyConfirmBody,
                 confirmLabel: s.unlinkFamilyButton,
                 cancelLabel: s.customCategoryCancel,
-                confirmColor: AppTheme.redAlert,
+                isDestructive: true,
+                onConfirm: notifier.leaveFamily,
               ),
             );
-            if (confirmed != true || !context.mounted) return;
-            notifier.leaveFamily();
           },
         ),
         SizedBox(height: 32.h),

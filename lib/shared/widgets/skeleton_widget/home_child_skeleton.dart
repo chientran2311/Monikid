@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/mock_up_data/home_mock_data.dart';
@@ -71,23 +72,11 @@ class _MockHeader extends StatelessWidget {
     return Row(
       children: [
         // Brand section
-        Container(
+        Image.asset(
+          'assets/app_icon.png',
           width: 38.r,
           height: 38.r,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14.r),
-            color: AppTheme.primaryLight,
-          ),
-          child: Center(
-            child: Text(
-              'M',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: 16.sp,
-              ),
-            ),
-          ),
+          cacheWidth: decodePixelsFor(context, 38.r),
         ),
         SizedBox(width: 10.w),
         Text(

@@ -25,20 +25,22 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
       return _NoLimitCard(onSetupLimit: onSetupLimit);
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final overview = budgetOverview!;
     final limitMinor = overview.limitMinor ?? 0;
     final remainingMinor = (overview.remainingMinor ?? 0).clamp(0, limitMinor);
     final usagePercent = (overview.usageRatio * 100).clamp(0.0, 100.0);
     final statusLabel = context.statisticBudgetStatusLabel(overview.status);
     final statusColor = _statusColor(overview.status);
-    final statusSurface = _statusSurface(overview.status);
+    final statusSurface = _statusSurface(overview.status, isDark);
+    final progressBarBg = isDark ? const Color(0xFF1C3322) : const Color(0xFFEAF1EA);
 
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(26.r),
-        border: Border.all(color: AppTheme.borderLight),
+        border: Border.all(color: isDark ? AppTheme.borderDark : AppTheme.borderLight),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0F111811),
@@ -75,20 +77,26 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        Text(
-                          context.formatStatisticCompactCurrency(overview.spentMinor),
-                          style: context.typo.display.small.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textBlack,
-                            letterSpacing: -1.2,
+                        Flexible(
+                          child: Text(
+                            context.formatStatisticCompactCurrency(overview.spentMinor),
+                            overflow: TextOverflow.ellipsis,
+                            style: context.typo.display.small.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+                              letterSpacing: -1.2,
+                            ),
                           ),
                         ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          '/ ${context.formatStatisticCurrency(limitMinor)}',
-                          style: context.typo.body.small.copyWith(
-                            color: AppTheme.textGrey,
-                            fontWeight: FontWeight.w600,
+                        SizedBox(width: 4.w),
+                        Flexible(
+                          child: Text(
+                            '/ ${context.formatStatisticCurrency(limitMinor)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: context.typo.body.small.copyWith(
+                              color: AppTheme.textGrey,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -96,20 +104,23 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: statusSurface,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: statusColor.withValues(alpha: 0.08),
+              Padding(
+                padding: EdgeInsets.only(left: 8.w),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: statusSurface,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                      color: statusColor.withValues(alpha: 0.08),
+                    ),
                   ),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: context.typo.caption.small.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: statusColor,
+                  child: Text(
+                    statusLabel,
+                    style: context.typo.caption.small.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: statusColor,
+                    ),
                   ),
                 ),
               ),
@@ -140,7 +151,7 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(999.r),
             child: Container(
               height: 12.h,
-              color: const Color(0xFFEAF1EA),
+              color: progressBarBg,
               child: FractionallySizedBox(
                 widthFactor: overview.usageRatio.clamp(0.0, 1.0),
                 alignment: Alignment.centerLeft,
@@ -206,16 +217,16 @@ class StatisticBudgetOverviewCard extends StatelessWidget {
     }
   }
 
-  Color _statusSurface(StatisticBudgetStatus status) {
+  Color _statusSurface(StatisticBudgetStatus status, bool isDark) {
     switch (status) {
       case StatisticBudgetStatus.onTrack:
-        return AppTheme.successSurface;
+        return isDark ? AppTheme.darkSuccessSurface : AppTheme.successSurface;
       case StatisticBudgetStatus.warning:
-        return AppTheme.amberSurface;
+        return isDark ? AppTheme.darkWarningSurface : AppTheme.amberSurface;
       case StatisticBudgetStatus.exceeded:
-        return AppTheme.dangerSurface;
+        return isDark ? AppTheme.darkDangerSurface : AppTheme.dangerSurface;
       case StatisticBudgetStatus.noLimit:
-        return AppTheme.primaryLight;
+        return isDark ? AppTheme.darkPrimaryContainer : AppTheme.primaryLight;
     }
   }
 }
@@ -227,12 +238,17 @@ class _NoLimitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppTheme.darkPrimaryContainer : AppTheme.primaryLight;
+    final textColor = isDark ? AppTheme.darkPrimaryAccent : AppTheme.primaryDark;
+    final borderColor = isDark ? AppTheme.darkSuccessBorder : AppTheme.successBorder;
+
     return Container(
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: AppTheme.primaryLight,
+        color: bgColor,
         borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(color: AppTheme.successBorder),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +257,7 @@ class _NoLimitCard extends StatelessWidget {
             context.l10n.statisticBudgetNoLimitTitle,
             style: context.typo.title.medium.copyWith(
               fontWeight: FontWeight.w800,
-              color: AppTheme.primaryDark,
+              color: textColor,
             ),
           ),
           SizedBox(height: 8.h),
@@ -249,7 +265,7 @@ class _NoLimitCard extends StatelessWidget {
             context.l10n.statisticBudgetNoLimitDescription,
             style: context.typo.body.small.copyWith(
               height: 1.5,
-              color: AppTheme.primaryDark,
+              color: textColor,
             ),
           ),
           SizedBox(height: 18.h),

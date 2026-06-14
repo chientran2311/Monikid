@@ -27,13 +27,14 @@ class ChildMemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final hasLimit = limitMinor != null && limitMinor! > 0;
 
     final card = Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: const [
           BoxShadow(
@@ -70,7 +71,7 @@ class ChildMemberCard extends StatelessWidget {
                     member.displayName,
                     style: context.typo.body.big.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textBlack,
+                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -138,6 +139,7 @@ class _LimitChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     if (hasLimit) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
@@ -156,7 +158,7 @@ class _LimitChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceLightGrey,
+        color: isDark ? AppTheme.darkSurfaceVariant : AppTheme.surfaceLightGrey,
         borderRadius: BorderRadius.circular(6.r),
       ),
       child: Text(

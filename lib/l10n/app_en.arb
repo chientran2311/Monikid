@@ -51,10 +51,15 @@
   "navChildStatistic": "Statistics",
   "navChildSettings": "Settings",
   "homeParFamilyMembersLabel": "Family Members",
-  "homeParNoFamilyTitle": "No family members yet",
-  "homeParNoFamilySubtitle": "Create a family to start tracking your child's spending",
+  "homeParNoFamilyTitle": "Start your journey",
+  "homeParNoFamilySubtitle": "Welcome to MoniKid. Add your first member to start managing family spending.",
   "homeParCreateFamilyBtn": "Create Family",
-  "homeParInviteTitle": "Add New Member",
+  "homeParNoFamilyHintSafe": "Safe management for your kids",
+  "homeParNoFamilyHintChart": "Track spending charts",
+  "homeParErrorTitle": "Something went wrong",
+  "homeParErrorDesc": "Couldn't load your home. Please try again.",
+  "homeParInviteTitle": "Invite Member",
+  "homeParInviteDesc": "Share this code with your child or family member to join your MoniKid family.",
   "homeParInviteCodeLabel": "Link Code",
   "homeParCopyCode": "Copy Code",
   "homeParCodeCopied": "Copied!",
@@ -86,6 +91,22 @@
       "percent": { "type": "String" }
     }
   },
+  "homeParTotalMonthlySpending": "Total spending this month",
+  "homeParLimitLabel": "Limit:",
+  "homeParUsedPercent": "Used {percent}%",
+  "@homeParUsedPercent": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "homeParLowBalanceTitle": "Low balance",
+  "homeParLowBalanceDesc": "{name}'s account is below 100,000₫.",
+  "@homeParLowBalanceDesc": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "homeParTransactionSuccess": "Success",
   "noTransactionsYet": "No transactions yet.",
   "errorGeneric": "Error: {error}",
   "@errorGeneric": {
@@ -95,7 +116,7 @@
       }
     }
   },
-  "settingFQA": "Frequently Asked Questions",
+  "settingFAQ": "Frequently Asked Questions",
   "msgNoData": "No data found",
   "helpStillNeedHelp": "Still need help?",
   "helpContactSupportDesc": "If you cannot find the answer, contact our support team 24/7.",
@@ -117,6 +138,13 @@
   "transactionCategoryLoadError": "Unable to load categories. Please try again.",
   "transactionUserNotAuthenticated": "User is not authenticated.",
   "transactionAmountLabel": "Amount",
+  "transactionAmountInputLabel": "Enter amount",
+  "transactionDetailSectionLabel": "Details",
+  "transactionDateRowLabel": "Transaction date",
+  "transactionExpenseTab": "Expense",
+  "transactionIncomeTab": "Income",
+  "transactionCategoryViewAll": "View all",
+  "transactionEvidenceRowLabel": "Receipt photo",
   "transactionCategoryLabel": "Category",
   "transactionDateLabel": "Date",
   "transactionHistorySelectDateTitle": "Select date",
@@ -163,7 +191,7 @@
   "transactionScanFailed": "Unable to analyze this receipt. You can try again or enter the transaction manually.",
   "transactionScanNoTextFound": "No readable text was found in this receipt image.",
   "transactionScanNoSuggestion": "No usable autofill suggestion was found. Please review the form manually.",
-  "profileEditTitle": "Edit Profile",
+  "profileEditTitle": "Personal Profile",
   "profileEditAvatarLabel": "Change Avatar",
   "profileEditAvatarDesc": "Take a new photo or choose from gallery",
   "profileEditFullName": "Full Name",
@@ -174,6 +202,8 @@
   "profileEditEmailWarning": "Email cannot be changed for security reasons.",
   "profileEditDob": "Date of Birth",
   "profileEditDobHint": "DD/MM/YYYY",
+  "profileEditDobPickerTitle": "Select Date of Birth",
+  "profileEditDobPickerDone": "Done",
   "actionSaveChanges": "Save Changes",
   "profileEditSaveSuccess": "Profile updated successfully",
   "profileEditErrorNameRequired": "Full name is required",
@@ -286,6 +316,12 @@
       "count": { "type": "int" }
     }
   },
+  "parentStatisticTotalExpenseLabel": "TOTAL SPENT",
+  "parentStatisticTxCountLabel": "TX COUNT",
+  "parentStatisticPrevPeriodLabel": "PREV PERIOD",
+  "parentStatisticTrendGood": "Good",
+  "parentStatisticTrendBad": "Bad",
+  "parentStatisticEditedBadge": "Edited",
   "settingParTitle": "Settings",
   "settingParEditProfile": "Edit profile",
   "settingParFamilyTitle": "Family management",
@@ -296,6 +332,8 @@
   "settingParSpendingLimitSubtitle": "Set weekly/monthly limits",
   "settingParAppearanceTitle": "Appearance",
   "settingParThemeLabel": "Light/Dark mode",
+  "settingThemeDarkLabel": "Dark mode",
+  "settingThemeDarkSubtitle": "Switch to a dark interface",
   "settingParNotificationsTitle": "Notifications",
   "settingParPushLabel": "Push notifications",
   "settingParPushSubtitle": "When child makes a transaction",
@@ -451,7 +489,8 @@
   "homeStudentUsedLabel": "Used",
   "setMoneyLimitTitle": "Set monthly limit",
   "setMoneyLimitFieldLabel": "Limit",
-  "setMoneyLimitDescription": "This limit helps you stay in control of your spending every month.",
+  "setMoneyLimitSubtitle": "Enter the maximum amount your child can spend this month. Changes will apply immediately to the current month.",
+  "setMoneyLimitDescription": "Check that the limit fits your child's plan for the month.",
   "setMoneyLimitSkipAction": "Skip",
   "setMoneyLimitUnauthenticated": "Please sign in again to set a monthly limit.",
   "setMoneyLimitSaveFailed": "Unable to save the monthly limit. Please try again.",
@@ -478,10 +517,14 @@
   "statisticChartComparisonTitle": "Compare Over Time",
   "statisticWeekNoun": "week",
   "statisticMonthNoun": "month",
+  "statisticYearNoun": "year",
+  "statisticLoadError": "Unable to load statistic data. Please try again.",
   "statisticThisWeek": "This week",
   "statisticLastWeek": "Last week",
   "statisticThisMonth": "This month",
   "statisticLastMonth": "Last month",
+  "statisticThisYear": "This year",
+  "statisticLastYear": "Last year",
   "statisticSmartInsightFallback": "No standout spending insight yet for this period.",
   "statisticSmartInsightMessage": "This {periodLabel}, you spent {percent}% more on {categoryLabel} than the previous {periodLabel}. This category increased the most.",
   "@statisticSmartInsightMessage": {
@@ -556,6 +599,8 @@
   "statisticLower": "Lower",
   "statisticStable": "Stable",
   "statisticTopCategoriesTitle": "Top spending categories",
+  "statisticTopIncomeCategoriesTitle": "Top income categories",
+  "statisticCategoryTransactionListTitle": "Transaction List",
   "statisticStrongestIncrease": "Strongest increase",
   "statisticStrongestDecrease": "Biggest decrease",
   "statisticNoCategoryChange": "No category change yet",
@@ -633,6 +678,10 @@
   "customCategorySelectTitle": "Select category",
   "customCategoryConfirmSelection": "Done",
   "customCategoryAddNew": "Add new",
+  "customCategoryDelete": "Delete",
+  "customCategoryIconHint": "Pick an icon",
+  "customCategoryDropToDelete": "Drop here to delete",
+  "customCategoryDeleteFailed": "Could not delete category",
   "setMoneyLimitManagedByParent": "Spending limit is managed by parent",
   "parentSetLimitTitle": "Set monthly spending limit",
   "parentSetLimitDescription": "This limit helps your child stay in control of their spending each month",
@@ -804,5 +853,36 @@
 
   "transactionHistoryEyebrow": "Spending management",
   "transactionHistoryTitle": "Transaction history",
-  "transactionHistorySubhead": "All your income and expenses over time."
+  "transactionHistorySubhead": "All your income and expenses over time.",
+
+  "splashStatusLoading": "Setting up wallet...",
+
+  "notifChildDailyTitle": "Spending report today",
+  "@notifChildDailyTitle": {},
+  "notifChildDailyBody": "You have {pct}% of your limit left, you spent {expense} in {month}",
+  "@notifChildDailyBody": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "expense": { "type": "String" },
+      "month": { "type": "String" }
+    }
+  },
+  "notifChildNoLimitBody": "You spent {expense} in {month}",
+  "@notifChildNoLimitBody": {
+    "placeholders": {
+      "expense": { "type": "String" },
+      "month": { "type": "String" }
+    }
+  },
+  "notifParentDailyTitle": "Family spending report",
+  "@notifParentDailyTitle": {},
+  "notifParentChildBody": "Your child {name} has {pct}% of limit left, spent {expense}",
+  "@notifParentChildBody": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "pct": { "type": "int" },
+      "expense": { "type": "String" }
+    }
+  },
+  "notifScheduleError": "Cannot schedule notification. Please try again."
 }

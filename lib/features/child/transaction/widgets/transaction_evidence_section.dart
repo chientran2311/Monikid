@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 
 class TransactionEvidenceSection extends StatelessWidget {
   const TransactionEvidenceSection({
@@ -162,6 +163,7 @@ class _PreviewImage extends StatelessWidget {
         height: 180,
         width: double.infinity,
         fit: BoxFit.cover,
+        cacheWidth: decodePixelsFor(context, MediaQuery.sizeOf(context).width),
       ),
     );
   }

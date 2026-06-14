@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
-import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 
 void main() {
   group('StatisticRepository helpers', () {
     test('statisticGetPeriodRange returns Monday to Sunday for week mode', () {
       final range = statisticGetPeriodRange(
-        selectedMonthIndex: 0,
+        selectedTabIndex: 0,
         anchorDate: DateTime(2026, 4, 16),
       );
 
@@ -17,7 +17,7 @@ void main() {
 
     test('statisticGetPreviousPeriodRange returns previous month', () {
       final range = statisticGetPreviousPeriodRange(
-        selectedMonthIndex: 1,
+        selectedTabIndex: 1,
         anchorDate: DateTime(2026, 4, 16),
       );
 

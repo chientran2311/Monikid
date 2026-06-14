@@ -22,9 +22,7 @@ Future<void> saveTransactionData({
 
   // Validate amount not empty
   if (amountController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(s.validationEnterAmount)),
-    );
+    context.showErrorSnackBar(s.validationEnterAmount);
     return;
   }
 
@@ -33,9 +31,7 @@ Future<void> saveTransactionData({
   final amount = double.tryParse(amountStr) ?? 0.0;
 
   if (amount <= 0) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(s.validationAmountGreaterThanZero)),
-    );
+    context.showErrorSnackBar(s.validationAmountGreaterThanZero);
     return;
   }
 
@@ -43,9 +39,7 @@ Future<void> saveTransactionData({
   final authState = ref.read(authSessionProvider);
   final user = authState.user;
   if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(s.transactionUserNotAuthenticated)),
-    );
+    context.showErrorSnackBar(s.transactionUserNotAuthenticated);
     return;
   }
 

@@ -12,13 +12,11 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
   const HomeRecentTransactionsSection({
     super.key,
     required this.title,
-    required this.viewAllLabel,
     required this.transactions,
     required this.emptyLabel,
   });
 
   final String title;
-  final String viewAllLabel;
   final List<TransactionModel> transactions;
   final String emptyLabel;
 
@@ -31,27 +29,12 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: context.typo.subtitle.medium.copyWith(
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            GestureDetector(
-              onTap: () => context.push(AppRoutes.transactionHistory),
-              child: Text(
-                viewAllLabel,
-                style: context.typo.body.medium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primary,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          title,
+          style: context.typo.subtitle.medium.copyWith(
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
         ),
         const SizedBox(height: 16),
         if (transactions.isEmpty)
@@ -60,6 +43,7 @@ class HomeRecentTransactionsSection extends ConsumerWidget {
           ...transactions.map(
             (transaction) => TransactionItem(
               transaction: transaction,
+              showBadge: false,
               onTap: () {
                 ref
                     .read(transactionHistoryProvider.notifier)

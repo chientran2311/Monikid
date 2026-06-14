@@ -1,8 +1,17 @@
+// MoniKid — Firestore Security Rules
+// Schema source of truth: docs/firebase_document_design.md
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() {
-      return request.auth != null;
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    function isSignedIn() { return request.auth != null; }
+
+    function isSelf(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    function requesterDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
     function requesterExists() {
@@ -10,581 +19,332 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
-    function targetUserExists(uid) {
-      return exists(/databases/$(database)/documents/users/$(uid));
-    }
-
-    function requesterDoc() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid));
-    }
-
     function targetUserDoc(uid) {
-      return get(/databases/$(database)/documents/users/$(uid));
-    }
-
-    function isSelf(uid) {
-      return isSignedIn() && request.auth.uid == uid;
-    }
-
-    function validRole(role) {
-      return role == 'parent' || role == 'child';
-    }
-
-    function validMemberStatus(status) {
-      return status == 'active' || status == 'inactive';
-    }
-
-    function validTransactionType(type) {
-      return type == 'expense' || type == 'income';
-    }
-
-    function validTransactionSource(source) {
-      return source == 'manual' || source == 'ocr';
+      return get(/databases/$(database)/documents/users/$(uid)).data;
     }
 
     function isParent() {
-      return requesterExists()
-        && requesterDoc().data.role == 'parent'
-        && requesterDoc().data.member_status == 'active';
+      return requesterExists() && requesterDoc().role == 'parent';
     }
 
     function isFamilyMember(familyId) {
-      return requesterExists()
-        && requesterDoc().data.family_id == familyId
-        && requesterDoc().data.member_status == 'active';
+      return requesterExists() && requesterDoc().family_id == familyId;
     }
 
     function isFamilyParent(familyId) {
-      return isParent()
-        && requesterDoc().data.family_id == familyId;
+      return isParent() && requesterDoc().family_id == familyId;
     }
 
-    function isChildWithoutFamily() {
-      return isSignedIn()
-        && requesterExists()
-        && requesterDoc().data.role == 'child'
-        && requesterDoc().data.member_status == 'active'
-        && (!requesterDoc().data.keys().hasAny(['family_id'])
-            || requesterDoc().data.family_id == null);
-    }
-
-    function isSameFamilyWithUser(uid) {
+    function hasNoFamily() {
       return requesterExists()
-        && targetUserExists(uid)
-        && requesterDoc().data.family_id != null
-        && requesterDoc().data.family_id == targetUserDoc(uid).data.family_id;
+        && (!requesterDoc().keys().hasAny(['family_id'])
+            || requesterDoc().family_id == null);
     }
 
+    // family_id equality check already implies non-null on requester side.
     function isParentViewingChild(uid) {
       return isParent()
-        && isSameFamilyWithUser(uid)
-        && targetUserDoc(uid).data.role == 'child';
+        && requesterDoc().family_id == targetUserDoc(uid).family_id
+        && targetUserDoc(uid).role == 'child';
     }
 
-    function isValidPreferences(preferences) {
-      return preferences.keys().hasOnly(['currency', 'language'])
-        && (!preferences.keys().hasAny(['currency']) || preferences.currency == 'VND')
-        && (!preferences.keys().hasAny(['language']) || preferences.language is string);
-    }
+    // ─── User ─────────────────────────────────────────────────────────────────
 
     function isValidUserCreate(uid) {
       let data = request.resource.data;
       return data.keys().hasOnly([
-          'uid',
-          'email',
-          'display_name',
-          'photo_url',
-          'role',
-          'family_id',
-          'member_status',
-          'created_at',
-          'updated_at',
-          'preferences'
+          'user_id', 'email', 'display_name', 'avatar_url', 'role',
+          'monthly_limit', 'family_id', 'custom_categories',
+          'created_at', 'updated_at'
         ])
-        && data.keys().hasAll([
-          'uid',
-          'email',
-          'display_name',
-          'role',
-          'member_status',
-          'created_at',
-          'updated_at'
-        ])
-        && data.uid == uid
+        && data.keys().hasAll(['user_id', 'email', 'role', 'created_at'])
+        && data.user_id == uid
         && data.email is string
-        && data.display_name is string
-        && data.display_name.size() > 0
-        && data.display_name.size() <= 80
-        && validRole(data.role)
-        && validMemberStatus(data.member_status)
-        && data.created_at is timestamp
-        && data.updated_at is timestamp
-        && (!data.keys().hasAny(['photo_url']) || data.photo_url == null || data.photo_url is string)
-        && (!data.keys().hasAny(['family_id']) || data.family_id == null || data.family_id is string)
-        && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)));
+     
+      
+        && (data.role == 'parent' || data.role == 'child')
+        && data.created_at is timestamp && data.updated_at is timestamp
+      
+  
+        && (data.get('monthly_limit', null) == null
+            || (data.monthly_limit is int && data.monthly_limit >= 0))
+        && data.get('family_id', null) == null;
     }
 
-    function isValidUserSelfUpdate(uid) {
+    function isValidUserProfileUpdate(uid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
       let data = request.resource.data;
+      return isSelf(uid)
+        && diff.hasOnly(['display_name', 'avatar_url', 'monthly_limit', 'updated_at'])
+        && data.updated_at is timestamp
+        && (!diff.hasAny(['display_name'])
+            || (data.display_name is string
+                && data.display_name.size() > 0 && data.display_name.size() <= 80))
+        && (!diff.hasAny(['avatar_url'])
+            || data.avatar_url == null
+            || (data.avatar_url is string && data.avatar_url.size() <= 2048))
+        && (!diff.hasAny(['monthly_limit'])
+            || data.monthly_limit == null
+            || (data.monthly_limit is int && data.monthly_limit >= 0));
+    }
+
+    // custom_categories subcollection doc — fields: category_id, label, icon, type, created_at.
+    function isValidCustomCategoryDoc(categoryId) {
+      let data = request.resource.data;
+      return data.keys().hasOnly(['category_id', 'label', 'icon', 'type', 'created_at'])
+        && data.keys().hasAll(['category_id', 'label', 'icon', 'type', 'created_at'])
+        && data.category_id == categoryId
+        && data.label is string && data.label.size() > 0 && data.label.size() <= 40
+        && data.icon is string && data.icon.size() > 0 && data.icon.size() <= 16
+        && (data.type == 'expense' || data.type == 'income')
+        && data.created_at is timestamp;
+    }
+
+    function isValidFamilyJoin(uid) {
       let diff = request.resource.data.diff(resource.data).affectedKeys();
       return isSelf(uid)
-        && diff.hasOnly([
-          'display_name',
-          'full_name',
-          'photo_url',
-          'avatar_url',
-          'phone',
-          'dob',
-          'gender',
-          'updated_at',
-          'preferences',
-          'monthly_limit_minor'
-        ])
-        && data.uid == resource.data.uid
-        && data.email == resource.data.email
-        && data.role == resource.data.role
-        && data.family_id == resource.data.family_id
-        && data.member_status == resource.data.member_status
-        && data.created_at == resource.data.created_at
-        && (
-          (data.keys().hasAny(['display_name'])
-            && data.display_name is string
-            && data.display_name.size() > 0
-            && data.display_name.size() <= 80)
-          || (data.keys().hasAny(['full_name'])
-            && data.full_name is string
-            && data.full_name.size() > 0
-            && data.full_name.size() <= 80)
-        )
-        && (!data.keys().hasAny(['display_name']) || (data.display_name is string && data.display_name.size() > 0 && data.display_name.size() <= 80))
-        && (!data.keys().hasAny(['full_name']) || (data.full_name is string && data.full_name.size() > 0 && data.full_name.size() <= 80))
-        && (!data.keys().hasAny(['photo_url']) || data.photo_url == null || data.photo_url is string)
-        && (!data.keys().hasAny(['avatar_url']) || data.avatar_url == null || (data.avatar_url is string && data.avatar_url.size() <= 2048))
-        && (!data.keys().hasAny(['phone']) || data.phone == null || (data.phone is string && data.phone.size() <= 32))
-        && (!data.keys().hasAny(['dob']) || data.dob == null || (data.dob is string && data.dob.size() <= 32))
-        && (!data.keys().hasAny(['gender']) || data.gender == null || (data.gender is string && data.gender.size() <= 32))
-        && data.updated_at is timestamp
-        && (!data.keys().hasAny(['preferences']) || (data.preferences is map && isValidPreferences(data.preferences)))
-        && (!data.keys().hasAny(['monthly_limit_minor'])
-            || data.monthly_limit_minor == null
-            || (data.monthly_limit_minor is int && data.monthly_limit_minor >= 0));
+        && hasNoFamily()
+        && diff.hasOnly(['family_id', 'updated_at'])
+        && request.resource.data.family_id is string
+        && request.resource.data.family_id.size() > 0
+        && request.resource.data.updated_at is timestamp;
     }
 
-    // Allows a parent to write monthly_limit_minor to their child's user doc.
-    // Requires the child to be an active member of the parent's family.
+    // Clears family_id — covers self-leave and parent removing a child.
+    function isValidFamilyClearMembership(uid) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      return diff.hasOnly(['family_id', 'updated_at'])
+        && request.resource.data.get('family_id', null) == null
+        && request.resource.data.updated_at is timestamp
+        && (isSelf(uid) || isParentViewingChild(uid));
+    }
+
     function isValidParentSetChildLimit(childUid) {
       let diff = request.resource.data.diff(resource.data).affectedKeys();
-      return isParent()
-        && diff.hasOnly(['monthly_limit_minor'])
-        && isParentViewingChild(childUid)
-        && (request.resource.data.monthly_limit_minor == null
-            || (request.resource.data.monthly_limit_minor is int
-                && request.resource.data.monthly_limit_minor >= 0));
+      return isParentViewingChild(childUid)
+        && diff.hasOnly(['monthly_limit', 'updated_at'])
+        && request.resource.data.updated_at is timestamp
+        && (request.resource.data.monthly_limit == null
+            || (request.resource.data.monthly_limit is int
+                && request.resource.data.monthly_limit >= 0));
     }
 
-    // Allows a parent to set their own family_id when createFamily transaction runs.
-    // Caller must not already belong to a family.
-    function isValidParentFamilyJoin(uid) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      let data = request.resource.data;
-      return isSelf(uid)
-        && requesterDoc().data.role == 'parent'
-        && diff.hasOnly(['family_id'])
-        && (!resource.data.keys().hasAny(['family_id'])
-            || resource.data.family_id == null)
-        && data.family_id is string
-        && data.family_id.size() > 0;
-    }
+    // ─── Transaction ──────────────────────────────────────────────────────────
 
-    // Allows a child to set their family_id (and optional family_role) when joinFamily runs.
-    // Caller must not already belong to a family.
-    function isValidChildFamilyJoin(uid) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      let data = request.resource.data;
-      return isSelf(uid)
-        && requesterDoc().data.role == 'child'
-        && diff.hasOnly(['family_id', 'family_role'])
-        && (!resource.data.keys().hasAny(['family_id'])
-            || resource.data.family_id == null)
-        && data.family_id is string
-        && data.family_id.size() > 0
-        && (!data.keys().hasAny(['family_role']) || data.family_role == 'child');
-    }
-
-    // Allows a child to delete their own family_id field (self-leave).
-    function isValidChildFamilyLeave(uid) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      return isSelf(uid)
-        && requesterDoc().data.role == 'child'
-        && requesterDoc().data.member_status == 'active'
-        && diff.hasOnly(['family_id'])
-        && !request.resource.data.keys().hasAny(['family_id'])
-        && resource.data.keys().hasAny(['family_id'])
-        && resource.data.family_id != null;
-    }
-
-    // Allows a child to set their own member status to 'removed' (self-leave).
-    function isValidChildMemberLeave(familyId, memberUid) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      return isSelf(memberUid)
-        && isFamilyMember(familyId)
-        && diff.hasOnly(['status'])
-        && request.resource.data.status == 'removed'
-        && resource.data.uid == memberUid
-        && resource.data.status == 'active';
-    }
-
-    // Restricts family update for child self-leave: only child_count + updated_at.
-    function isValidFamilyLeaveUpdate() {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      let data = request.resource.data;
-      return diff.hasOnly(['child_count', 'updated_at'])
-        && data.parent_id == resource.data.parent_id
-        && data.status == resource.data.status
-        && data.updated_at is timestamp;
-    }
-
-    // Allows a family parent to delete the family_id field from a child's user doc (removeChild).
-    function isValidParentRemoveChild(uid) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      return isParent()
-        && diff.hasOnly(['family_id'])
-        && !request.resource.data.keys().hasAny(['family_id'])
-        && targetUserDoc(uid).data.role == 'child'
-        && resource.data.family_id == requesterDoc().data.family_id;
-    }
-
-    function isValidOcrMeta(data) {
-      return !data.keys().hasAny(['ocr_meta'])
-        || data.ocr_meta == null
-        || (
-          data.ocr_meta is map
-          && data.ocr_meta.keys().hasOnly(['used', 'confidence'])
-          && (!data.ocr_meta.keys().hasAny(['used']) || data.ocr_meta.used is bool)
-          && (!data.ocr_meta.keys().hasAny(['confidence'])
-            || data.ocr_meta.confidence == null
-            || data.ocr_meta.confidence is int
-            || data.ocr_meta.confidence is float)
-        );
-    }
-
-    function validEvidenceMimeType(mimeType) {
-      return mimeType == 'image/jpeg' || mimeType == 'image/png';
-    }
-
-    function isValidCloudinaryEvidenceUrl(url) {
-      return url is string
-        && url.size() > 0
-        && url.size() <= 2048
-        && url.matches('^https://res\\.cloudinary\\.com/[^/]+/image/upload/.*$');
-    }
-
-    function isValidEvidenceImagePayload(image) {
-      return image is map
-        && image.keys().hasOnly([
-          'storage_path',
-          'file_name',
-          'mime_type',
-          'uploaded_at'
-        ])
-        && image.keys().hasAll(['storage_path', 'mime_type'])
-        && isValidCloudinaryEvidenceUrl(image.storage_path)
-        && (!image.keys().hasAny(['file_name'])
-          || image.file_name == null
-          || (image.file_name is string
-            && image.file_name.size() > 0
-            && image.file_name.size() <= 160))
-        && (!image.keys().hasAny(['mime_type'])
-          || image.mime_type == null
-          || (image.mime_type is string
-            && validEvidenceMimeType(image.mime_type)))
-        && (!image.keys().hasAny(['uploaded_at'])
-          || image.uploaded_at == null
-          || image.uploaded_at is timestamp);
-    }
-
-    function isValidEvidenceImageCreate(data) {
-      return !data.keys().hasAny(['evidence_image'])
-        || data.evidence_image == null
-        || isValidEvidenceImagePayload(data.evidence_image);
-    }
-
-    function isValidEvidenceImageUpdate(data) {
-      return !data.keys().hasAny(['evidence_image'])
-        || data.evidence_image == null
-        || (
-          resource.data.keys().hasAny(['evidence_image'])
-          && data.evidence_image == resource.data.evidence_image
-        )
-        || isValidEvidenceImagePayload(data.evidence_image);
+    function isValidEvidenceImage(data) {
+      let img = data.get('evidence_image', null);
+      return img == null
+        || (img is map
+            && img.keys().hasOnly(['image_url', 'image_name', 'image_type', 'uploaded_at'])
+            && img.keys().hasAll(['image_url'])
+            && img.image_url is string
+            && img.image_url.size() > 0 && img.image_url.size() <= 2048
+            && img.image_url.matches('^https://res\\.cloudinary\\.com/.*$')
+            && (img.get('image_name', null) == null
+                || (img.image_name is string && img.image_name.size() <= 160))
+            && (img.get('image_type', null) == null
+                || img.image_type == 'image/jpeg' || img.image_type == 'image/png')
+            && (img.get('uploaded_at', null) == null || img.uploaded_at is timestamp));
     }
 
     function isValidTransactionCreate(uid) {
       let data = request.resource.data;
       return isSelf(uid)
-        && requesterExists()
         && data.keys().hasOnly([
-          'transaction_id',
-          'user_id',
-          'family_id',
-          'type',
-          'amount_minor',
-          'currency',
-          'category_key',
-          'category_label',
-          'category_icon',
-          'note',
-          'source',
-          'merchant_name',
-          'date_ts',
-          'created_at',
-          'updated_at',
-          'ocr_meta',
-          'evidence_image'
-        ])
+            'transaction_id', 'type', 'amount', 'category_id',
+            'note', 'receipt_name', 'transaction_date',
+            'created_at', 'updated_at', 'evidence_image'
+          ])
         && data.keys().hasAll([
-          'transaction_id',
-          'user_id',
-          'family_id',
-          'type',
-          'amount_minor',
-          'currency',
-          'category_key',
-          'category_label',
-          'date_ts',
-          'created_at',
-          'updated_at'
-        ])
-        && data.transaction_id is string
-        && data.transaction_id.size() > 0
-        && data.user_id == uid
-        && data.family_id == requesterDoc().data.family_id
-        && validTransactionType(data.type)
-        && data.amount_minor is int
-        && data.amount_minor > 0
-        && data.currency == 'VND'
-        && data.category_key is string
-        && data.category_key.size() > 0
-        && data.category_key.size() <= 40
-        && data.category_label is string
-        && data.category_label.size() > 0
-        && data.category_label.size() <= 50
-        && (!data.keys().hasAny(['category_icon']) || data.category_icon == null || data.category_icon is string)
-        && (!data.keys().hasAny(['note']) || data.note == null || (data.note is string && data.note.size() <= 300))
-        && (!data.keys().hasAny(['source']) || (data.source is string && validTransactionSource(data.source)))
-        && (!data.keys().hasAny(['merchant_name']) || data.merchant_name == null || (data.merchant_name is string && data.merchant_name.size() <= 120))
-        && data.date_ts is timestamp
-        && data.created_at is timestamp
-        && data.updated_at is timestamp
-        && isValidOcrMeta(data)
-        && isValidEvidenceImageCreate(data);
+            'transaction_id', 'type', 'amount', 'category_id',
+            'transaction_date', 'created_at', 'updated_at'
+          ])
+        && data.transaction_id is string && data.transaction_id.size() > 0
+        && (data.type == 'expense' || data.type == 'income')
+        && data.amount is int && data.amount > 0
+        && data.category_id is string && data.category_id.size() > 0
+        && (data.get('note', null) == null
+            || (data.note is string && data.note.size() <= 300))
+        && (data.get('receipt_name', null) == null
+            || (data.receipt_name is string && data.receipt_name.size() <= 120))
+        && data.transaction_date is timestamp
+        && data.created_at is timestamp && data.updated_at is timestamp
+        && isValidEvidenceImage(data);
     }
 
+    // diff.hasOnly guarantees transaction_id and created_at are unchanged — no need to re-check.
     function isValidTransactionUpdate(uid) {
       let data = request.resource.data;
       let diff = request.resource.data.diff(resource.data).affectedKeys();
       return isSelf(uid)
         && diff.hasOnly([
-          'type',
-          'amount_minor',
-          'currency',
-          'category_key',
-          'category_label',
-          'category_icon',
-          'note',
-          'source',
-          'merchant_name',
-          'date_ts',
-          'updated_at',
-          'ocr_meta',
-          'evidence_image'
-        ])
-        && data.transaction_id == resource.data.transaction_id
-        && data.user_id == resource.data.user_id
-        && data.family_id == resource.data.family_id
-        && data.created_at == resource.data.created_at
-        && validTransactionType(data.type)
-        && data.amount_minor is int
-        && data.amount_minor > 0
-        && data.currency == 'VND'
-        && data.category_key is string
-        && data.category_key.size() > 0
-        && data.category_key.size() <= 40
-        && data.category_label is string
-        && data.category_label.size() > 0
-        && data.category_label.size() <= 50
-        && (!data.keys().hasAny(['category_icon']) || data.category_icon == null || data.category_icon is string)
-        && (!data.keys().hasAny(['note']) || data.note == null || (data.note is string && data.note.size() <= 300))
-        && (!data.keys().hasAny(['source']) || (data.source is string && validTransactionSource(data.source)))
-        && (!data.keys().hasAny(['merchant_name']) || data.merchant_name == null || (data.merchant_name is string && data.merchant_name.size() <= 120))
-        && data.date_ts is timestamp
-        && data.updated_at is timestamp
-        && isValidOcrMeta(data)
-        && isValidEvidenceImageUpdate(data);
+            'type', 'amount', 'category_id', 'note',
+            'receipt_name', 'transaction_date', 'updated_at', 'evidence_image'
+          ])
+        && (data.type == 'expense' || data.type == 'income')
+        && data.amount is int && data.amount > 0
+        && data.category_id is string && data.category_id.size() > 0
+        && (data.get('note', null) == null
+            || (data.note is string && data.note.size() <= 300))
+        && (data.get('receipt_name', null) == null
+            || (data.receipt_name is string && data.receipt_name.size() <= 120))
+        && data.transaction_date is timestamp && data.updated_at is timestamp
+        && isValidEvidenceImage(data);
     }
 
-    function isValidCustomCategory(data, categoryId) {
-      return data.keys().hasOnly([
-          'category_id',
-          'category_key',
-          'label',
-          'icon',
-          'type',
-          'is_active',
-          'created_at'
-        ])
-        && data.keys().hasAll([
-          'category_id',
-          'category_key',
-          'label',
-          'type',
-          'is_active',
-          'created_at'
-        ])
-        && data.category_id == categoryId
-        && data.category_key is string
-        && data.category_key.size() > 0
-        && data.category_key.size() <= 40
-        && data.label is string
-        && data.label.size() > 0
-        && data.label.size() <= 40
-        && (!data.keys().hasAny(['icon']) || data.icon == null || (data.icon is string && data.icon.size() <= 8))
-        && validTransactionType(data.type)
-        && data.is_active is bool
-        && data.created_at is timestamp;
-    }
+    // ─── Monthly summary ──────────────────────────────────────────────────────
 
     function isValidMonthlySummaryWrite(uid, monthKey) {
       let data = request.resource.data;
       return monthKey.matches('^[0-9]{4}-[0-9]{2}$')
-        && data.keys().hasAll([
-          'month_key',
-          'user_id',
-          'total_expense_minor',
-          'total_income_minor',
-          'transaction_count',
-          'updated_at'
-        ])
+        && data.keys().hasOnly(['month_key', 'user_id', 'total_expense', 'total_income', 'updated_at'])
+        && data.keys().hasAll(['month_key', 'user_id', 'total_expense', 'total_income', 'updated_at'])
         && data.month_key == monthKey
         && data.user_id == uid
-        && data.total_expense_minor is int
-        && data.total_income_minor is int
-        && data.transaction_count is int
+        && data.total_expense is int && data.total_income is int
         && data.updated_at is timestamp;
     }
 
-    // Validates the families document shape on create.
-    // invite_code must be exactly 6 digits. parent must have no existing family.
-    function isValidFamilyCreate() {
+    // ─── FAQ item ─────────────────────────────────────────────────────────────
+
+    function isValidFaqItemCreate(faqId) {
       let data = request.resource.data;
-      return isParent()
-        && (!requesterDoc().data.keys().hasAny(['family_id'])
-            || requesterDoc().data.family_id == null)
-        && data.keys().hasOnly([
-            'parent_id', 'parent_name', 'invite_code',
-            'invite_code_expires_at', 'child_count', 'status',
-            'created_at', 'updated_at'
-          ])
-        && data.keys().hasAll([
-            'parent_id', 'parent_name', 'invite_code',
-            'invite_code_expires_at', 'child_count', 'status',
-            'created_at', 'updated_at'
-          ])
-        && data.parent_id == request.auth.uid
-        && data.parent_name is string
-        && data.parent_name.size() > 0
-        && data.invite_code is string
-        && data.invite_code.matches('^[0-9]{6}$')
-        && data.invite_code_expires_at is timestamp
-        && data.child_count == 0
-        && data.status == 'active'
-        && data.created_at is timestamp
-        && data.updated_at is timestamp;
+      return data.keys().hasOnly(['faq_id', 'question', 'answer', 'created_at'])
+        && data.keys().hasAll(['faq_id', 'question', 'answer', 'created_at'])
+        && data.faq_id == faqId
+        && data.question is string && data.question.size() > 0
+        && data.answer is string && data.answer.size() > 0
+        && data.created_at is timestamp;
     }
 
-    // Allows updating invite_code/invite_code_expires_at (refresh) and child_count (join/remove).
-    // Immutable fields (parent_id, status) must not change.
-    function isValidFamilyUpdate() {
+    // diff.hasOnly guarantees faq_id and created_at are unchanged — no need to re-check.
+    function isValidFaqItemUpdate() {
       let diff = request.resource.data.diff(resource.data).affectedKeys();
       let data = request.resource.data;
-      return diff.hasOnly([
-          'invite_code', 'invite_code_expires_at',
-          'child_count', 'updated_at'
-        ])
-        && data.parent_id == resource.data.parent_id
-        && data.status == resource.data.status
-        && data.updated_at is timestamp
-        && (!diff.hasAny(['invite_code'])
-            || (data.invite_code is string
-                && data.invite_code.matches('^[0-9]{6}$')
-                && data.invite_code_expires_at is timestamp));
+      return diff.hasOnly(['question', 'answer'])
+        && data.question is string && data.question.size() > 0
+        && data.answer is string && data.answer.size() > 0;
     }
 
-    // Validates the member sub-document when a child joins a family.
-    function isValidMemberCreate(memberUid, familyId) {
-      let data = request.resource.data;
-      return isChildWithoutFamily()
-        && isSelf(memberUid)
-        && data.keys().hasOnly([
-            'uid', 'family_id', 'role', 'display_name',
-            'avatar_url', 'joined_at', 'status'
-          ])
-        && data.keys().hasAll([
-            'uid', 'family_id', 'role', 'display_name',
-            'joined_at', 'status'
-          ])
-        && data.uid == memberUid
-        && data.family_id == familyId
-        && data.role == 'child'
-        && data.display_name is string
-        && data.display_name.size() > 0
-        && data.status == 'active'
-        && data.joined_at is timestamp;
-    }
+    // ─── Family ───────────────────────────────────────────────────────────────
 
-    function isValidParentMemberCreate(memberUid, familyId) {
+    // members may include creator as initial owner (optional). Absent or [] also valid.
+    function isValidFamilyCreate(familyId) {
       let data = request.resource.data;
+      let members = data.get('members', []);
       return isParent()
-        && isSelf(memberUid)
-        && (!requesterDoc().data.keys().hasAny(['family_id'])
-            || requesterDoc().data.family_id == null)
-        && data.keys().hasOnly([
-            'uid', 'family_id', 'role', 'display_name',
-            'avatar_url', 'joined_at', 'status'
-          ])
-        && data.keys().hasAll([
-            'uid', 'family_id', 'role', 'display_name',
-            'joined_at', 'status'
-          ])
-        && data.uid == memberUid
+        && hasNoFamily()
+        && data.keys().hasOnly(['family_id', 'invite_code', 'created_at', 'updated_at', 'members'])
+        && data.keys().hasAll(['family_id', 'created_at', 'updated_at'])
         && data.family_id == familyId
-        && data.role == 'parent'
-        && data.display_name is string
-        && data.display_name.size() > 0
-        && data.display_name.size() <= 80
-        && data.status == 'active'
-        && data.joined_at is timestamp;
+        && data.created_at is timestamp && data.updated_at is timestamp
+        && (data.get('invite_code', null) == null
+            || (data.invite_code is string && data.invite_code.matches('^[A-Z0-9]{6}$')))
+        && (members == []
+            || (members.size() == 1
+                && members[0].user_id == request.auth.uid
+                && members[0].role == 'owner'
+                && isValidMemberEntry(members[0])));
     }
 
-    // Allows the family parent to mark a member as removed.
-    function isValidMemberRemove(familyId, memberUid) {
+    // diff.hasOnly guarantees family_id and created_at are unchanged — no need to re-check.
+    function isValidFamilyInviteCodeUpdate(familyId) {
       let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let data = request.resource.data;
       return isFamilyParent(familyId)
-        && diff.hasOnly(['status'])
-        && request.resource.data.status == 'removed'
-        && resource.data.uid == memberUid;
+        && diff.hasOnly(['invite_code', 'updated_at'])
+        && data.updated_at is timestamp
+        && (data.invite_code == null
+            || (data.invite_code is string && data.invite_code.matches('^[A-Z0-9]{6}$')));
     }
+
+    function isValidMemberEntry(entry) {
+      return entry is map
+        && entry.keys().hasOnly(['user_id', 'role', 'user_role', 'display_name', 'avatar_url'])
+        && entry.keys().hasAll(['user_id', 'role', 'user_role', 'display_name'])
+        && entry.user_id is string && entry.user_id.size() > 0
+        && (entry.role == 'owner' || entry.role == 'member')
+        && (entry.user_role == 'parent' || entry.user_role == 'child')
+        && entry.display_name is string
+        && entry.display_name.size() > 0 && entry.display_name.size() <= 80
+        && (entry.get('avatar_url', null) == null
+            || (entry.avatar_url is string && entry.avatar_url.size() <= 2048));
+    }
+
+    // Grows by exactly 1. New entry appended last, must be requester. Existing entries frozen.
+    function isValidMemberJoin(familyId) {
+      let newMembers = request.resource.data.get('members', []);
+      let oldMembers = resource.data.get('members', []);
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let newEntry = newMembers[newMembers.size() - 1];
+      return hasNoFamily()
+        && diff.hasOnly(['members', 'updated_at'])
+        && request.resource.data.updated_at is timestamp
+        && newMembers is list
+        && newMembers.size() == oldMembers.size() + 1
+        && newMembers.size() <= 5
+        && newEntry.user_id == request.auth.uid
+        && newEntry.role == 'member'
+        && isValidMemberEntry(newEntry)
+        && (oldMembers.size() < 1 || newMembers[0] == oldMembers[0])
+        && (oldMembers.size() < 2 || newMembers[1] == oldMembers[1])
+        && (oldMembers.size() < 3 || newMembers[2] == oldMembers[2])
+        && (oldMembers.size() < 4 || newMembers[3] == oldMembers[3]);
+    }
+
+    // Shrinks by exactly 1. Any family member may remove (parent or self — enforced by app).
+    function isValidMemberRemove(familyId) {
+      let newMembers = request.resource.data.get('members', []);
+      let oldMembers = resource.data.get('members', []);
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      return isFamilyMember(familyId)
+        && diff.hasOnly(['members', 'updated_at'])
+        && request.resource.data.updated_at is timestamp
+        && newMembers is list
+        && newMembers.size() == oldMembers.size() - 1;
+    }
+
+    // Same size — a member syncs their display_name / avatar_url after profile update.
+    function isValidMembersSync(familyId) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      return isFamilyMember(familyId)
+        && diff.hasOnly(['members', 'updated_at'])
+        && request.resource.data.updated_at is timestamp
+        && request.resource.data.get('members', []).size()
+            == resource.data.get('members', []).size();
+    }
+
+    // ─── Invite code ──────────────────────────────────────────────────────────
+
+    function isValidInviteCodeCreate(code) {
+      let data = request.resource.data;
+      return isParent()
+        && requesterDoc().family_id != null
+        && data.keys().hasOnly(['code', 'family_id', 'expired_at'])
+        && data.keys().hasAll(['code', 'family_id', 'expired_at'])
+        && data.code == code
+        && data.code.matches('^[A-Z0-9]{6}$')
+        && data.family_id == requesterDoc().family_id
+        && data.expired_at is timestamp;
+    }
+
+    // ─── Match blocks ─────────────────────────────────────────────────────────
 
     match /users/{uid} {
       allow read: if isSelf(uid) || isParentViewingChild(uid);
       allow create: if isSelf(uid) && isValidUserCreate(uid);
-      allow update: if isValidUserSelfUpdate(uid)
-        || isValidParentFamilyJoin(uid)
-        || isValidChildFamilyJoin(uid)
-        || isValidParentRemoveChild(uid)
-        || isValidChildFamilyLeave(uid)
+      allow update: if isValidUserProfileUpdate(uid)
+        || isValidFamilyJoin(uid)
+        || isValidFamilyClearMembership(uid)
         || isValidParentSetChildLimit(uid);
       allow delete: if false;
+
+      match /custom_categories/{categoryId} {
+        allow read: if isSelf(uid) || isParentViewingChild(uid);
+        allow create: if isSelf(uid) && isValidCustomCategoryDoc(categoryId);
+        allow update: if false;          // add-only, no edit
+        allow delete: if isSelf(uid);    // owner-only delete
+      }
 
       match /transactions/{transactionId} {
         allow read: if isSelf(uid) || isParentViewingChild(uid);
@@ -600,58 +360,36 @@ service cloud.firestore {
         allow delete: if false;
       }
 
-      match /custom_categories/{categoryId} {
+      match /faq_items/{faqId} {
         allow read: if isSelf(uid);
-        allow create: if isSelf(uid) && isValidCustomCategory(request.resource.data, categoryId);
-        allow update: if isSelf(uid)
-          && isValidCustomCategory(request.resource.data, resource.data.category_id)
-          && request.resource.data.category_id == resource.data.category_id
-          && request.resource.data.created_at == resource.data.created_at;
-        allow delete: if isSelf(uid);
-      }
-
-      match /notifications/{notificationId} {
-        allow read, delete: if isSelf(uid);
-        allow update: if isSelf(uid)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_read'])
-          && request.resource.data.is_read is bool;
-        allow create: if request.auth != null && (
-          isSelf(uid)
-          || isSameFamilyWithUser(uid)
-        );
-      }
-
-      match /notification_dedup/{key} {
-        allow read, write: if isSelf(uid) || isSameFamilyWithUser(uid);
-      }
-    }
-
-    match /families/{familyId} {
-      allow read: if isFamilyMember(familyId) || isChildWithoutFamily();
-      allow create: if isValidFamilyCreate();
-      allow update: if (isFamilyParent(familyId) && isValidFamilyUpdate())
-        || (isChildWithoutFamily() && isValidFamilyUpdate())
-        || (isFamilyMember(familyId) && isValidFamilyLeaveUpdate());
-      allow delete: if false;
-
-      match /members/{memberUid} {
-        allow read: if isFamilyMember(familyId) || isChildWithoutFamily();
-        allow create: if isValidMemberCreate(memberUid, familyId)
-          || isValidParentMemberCreate(memberUid, familyId);
-        allow update: if isValidMemberRemove(familyId, memberUid)
-          || isValidChildMemberLeave(familyId, memberUid);
+        allow create: if isSelf(uid) && isValidFaqItemCreate(faqId);
+        allow update: if isSelf(uid) && isValidFaqItemUpdate();
         allow delete: if false;
       }
     }
 
-    match /app_public/faqs/items/{faqId} {
-      allow read: if true;
-      allow create, update, delete: if false;
+    match /families/{familyId} {
+      allow read: if isFamilyMember(familyId) || hasNoFamily();
+      allow create: if isValidFamilyCreate(familyId);
+      allow update: if isValidFamilyInviteCodeUpdate(familyId)
+        || isValidMemberJoin(familyId)
+        || isValidMemberRemove(familyId)
+        || isValidMembersSync(familyId);
+      allow delete: if false;
     }
 
-    match /app_public/config/{docId} {
-      allow read: if true;
-      allow create, update, delete: if false;
+    match /invite_codes/{code} {
+      allow read: if isSignedIn();
+      allow create: if isValidInviteCodeCreate(code);
+      allow delete: if isFamilyParent(
+          get(/databases/$(database)/documents/invite_codes/$(code)).data.family_id
+        );
+      allow update: if false;
+    }
+    match /faqs/{language}/items/{faqId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if false;
     }
 
     match /{document=**} {

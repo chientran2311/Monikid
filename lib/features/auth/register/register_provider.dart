@@ -50,13 +50,6 @@ class Register extends _$Register {
     );
   }
 
-  void validatePhone(String value) {
-    state = state.copyWith(
-      phoneError: AuthFieldValidator.phone(value),
-      errorMessage: null,
-    );
-  }
-
   void validatePassword(String value) {
     state = state.copyWith(
       passwordError: AuthFieldValidator.password(value),
@@ -75,14 +68,12 @@ class Register extends _$Register {
     required String email,
     required String password,
     required String fullName,
-    required String phone,
     required String role,
   }) async {
     if (state.hasFieldErrors) return;
 
     final trimmedEmail = email.trim();
     final trimmedFullName = fullName.trim();
-    final trimmedPhone = phone.trim();
 
     state = state.copyWith(status: AuthStatus.isLoading, errorMessage: null);
 
@@ -92,7 +83,6 @@ class Register extends _$Register {
         email: trimmedEmail,
         password: password,
         fullName: trimmedFullName,
-        phone: trimmedPhone,
         role: role,
       ),
     );

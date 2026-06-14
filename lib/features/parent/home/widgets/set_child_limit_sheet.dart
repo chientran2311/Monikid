@@ -22,6 +22,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final controller = useTextEditingController();
     final isLoading = useState(false);
@@ -61,7 +62,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
       child: Container(
         padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 32.h),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? AppTheme.surfaceDark : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
         ),
         child: Column(
@@ -73,7 +74,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
                 width: 36.w,
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: AppTheme.borderLight,
+                  color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
                   borderRadius: BorderRadius.circular(2.r),
                 ),
               ),
@@ -82,7 +83,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
             Text(
               s.parentSetLimitTitle,
               style: context.typo.subtitle.small.copyWith(
-              color: AppTheme.textBlack,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
             ),
             ),
             SizedBox(height: 4.h),
@@ -97,7 +98,7 @@ class SetChildLimitSheet extends HookConsumerWidget {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               style: context.typo.title.medium.copyWith(
-                color: AppTheme.textBlack,
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
               ),
               decoration: InputDecoration(
                 hintText: '0',
@@ -127,7 +128,9 @@ class SetChildLimitSheet extends HookConsumerWidget {
                         isLoading.value ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.textDark,
-                      side: const BorderSide(color: AppTheme.borderLight),
+                      side: BorderSide(
+                        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+                      ),
                       padding: EdgeInsets.symmetric(vertical: 13.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.r),

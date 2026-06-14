@@ -44,6 +44,7 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final state = ref.watch(homeScanBillNotifierProvider);
 
@@ -67,7 +68,7 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
             width: 300.w,
             padding: EdgeInsets.fromLTRB(24.w, 36.h, 24.w, 24.h),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceLight,
+              color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
               borderRadius: BorderRadius.circular(34.r),
               boxShadow: [
                 BoxShadow(
@@ -80,78 +81,50 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icon Container with Loading Spinner
-                SizedBox(
-                  width: 88.w,
-                  height: 88.h,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Background Circle
-                      Container(
-                        width: 88.w,
-                        height: 88.h,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryLight,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppTheme.backgroundLight,
-                            width: 4,
-                          ),
-                        ),
+                // Icon in circle + circular spinner ring
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Spinner — CircularProgressIndicator tự animate, bao quanh icon
+                    SizedBox(
+                      width: 88.w,
+                      height: 88.w,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 4,
+                        valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                        backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
                       ),
+                    ),
 
-                      // Rotating Spinner
-                      RotationTransition(
-                        turns: Tween(begin: 0.0, end: 1.0).animate(
-                          CurvedAnimation(
-                            parent: _spinnerController,
-                            curve: Curves.easeInOut,
-                          ),
+                    // Icon trong container hình tròn
+                    Container(
+                      width: 80.w,
+                      height: 80.w,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryLight,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.backgroundLight,
+                          width: 3,
                         ),
-                        child: Container(
-                          width: 96.w,
-                          height: 96.h,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border(
-                              top: BorderSide(
-                                color: AppTheme.primary,
-                                width: 4,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '📄',
+                          style: TextStyle(
+                            fontSize: 36.sp,
+                            shadows: [
+                              Shadow(
+                                offset: const Offset(0, 2),
+                                blurRadius: 6,
+                                color: AppTheme.primary.withValues(alpha: 0.15),
                               ),
-                              right: BorderSide(
-                                color: AppTheme.primary.withValues(alpha: 0.1),
-                                width: 4,
-                              ),
-                              bottom: BorderSide(
-                                color: Colors.transparent,
-                                width: 4,
-                              ),
-                              left: BorderSide(
-                                color: Colors.transparent,
-                                width: 4,
-                              ),
-                            ),
+                            ],
                           ),
                         ),
                       ),
-
-                      // Document Icon
-                      Text(
-                        '📄',
-                        style: TextStyle(
-                          fontSize: 40.sp,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(0, 4.h),
-                              blurRadius: 6.r,
-                              color: AppTheme.primary.withValues(alpha: 0.1),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
 
                 SizedBox(height: 28.h),
@@ -162,7 +135,7 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
                   style: context.typo.title.large.copyWith(
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.02,
-                    color: AppTheme.textBlack,
+                    color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -187,18 +160,22 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
                 // Cancel Button
                 SizedBox(
                   width: double.infinity,
-                  height: 54.h,
+                  height: 65.h,
                   child: ElevatedButton(
                     onPressed: () =>
                         ref.read(homeScanBillNotifierProvider.notifier).cancel(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.surfaceLight,
-                      foregroundColor: AppTheme.textBlack,
+                      backgroundColor:
+                          isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
+                      foregroundColor:
+                          isDark ? AppTheme.textWhite : AppTheme.textBlack,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.r),
                         side: BorderSide(
-                          color: AppTheme.borderLight,
+                          color: isDark
+                              ? AppTheme.borderDark
+                              : AppTheme.borderLight,
                           width: 1,
                         ),
                       ),

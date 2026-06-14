@@ -6,7 +6,7 @@ part of 'auth_session_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authSessionHash() => r'b47d9f4cf8403f7f88dfff87f96061c992cd7701';
+String _$authSessionHash() => r'4deee2f951528dc44a88efa8951cfb3d4ce3012e';
 
 /// See also [AuthSession].
 @ProviderFor(AuthSession)

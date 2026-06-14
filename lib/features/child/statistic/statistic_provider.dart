@@ -7,7 +7,7 @@ import 'package:monikid/features/auth/auth_session/auth_session_state.dart';
 import 'package:monikid/features/child/statistic/statistic_helpers.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/repositories/set_money_limit/set_money_limit_repository.dart';
-import 'package:monikid/repositories/statistic/statistic_repository.dart';
+import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'statistic_state.dart';
@@ -87,7 +87,7 @@ class Statistic extends _$Statistic {
 
     final anchorDate = state.selectedDate ?? DateTime.now();
     final range = statisticGetPeriodRange(
-      selectedMonthIndex: state.selectedMonthIndex,
+      selectedTabIndex: state.selectedTabIndex,
       anchorDate: anchorDate,
     );
 
@@ -101,7 +101,7 @@ class Statistic extends _$Statistic {
     try {
       final overviewFuture = _repository.getOverview(
         userId: uid,
-        selectedMonthIndex: state.selectedMonthIndex,
+        selectedTabIndex: state.selectedTabIndex,
         anchorDate: anchorDate,
       );
       final pageFuture = _repository.getExpenseTransactionsPage(
@@ -173,7 +173,7 @@ class Statistic extends _$Statistic {
 
     final anchorDate = state.selectedDate ?? DateTime.now();
     final range = statisticGetPeriodRange(
-      selectedMonthIndex: state.selectedMonthIndex,
+      selectedTabIndex: state.selectedTabIndex,
       anchorDate: anchorDate,
     );
     final lastVisibleTransaction = state.visibleTransactions.isNotEmpty
@@ -222,13 +222,13 @@ class Statistic extends _$Statistic {
     state = state.copyWith(isRefreshing: false);
   }
 
-  Future<void> setMonthIndex(int index) async {
-    if (state.selectedMonthIndex == index) {
+  Future<void> setTabIndex(int index) async {
+    if (state.selectedTabIndex == index) {
       return;
     }
 
     state = state.copyWith(
-      selectedMonthIndex: index,
+      selectedTabIndex: index,
       selectedDate: DateTime.now(),
     );
     await loadFirstPage();

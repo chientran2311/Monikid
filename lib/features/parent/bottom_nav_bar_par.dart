@@ -42,6 +42,7 @@ class ParentBottomNavBar extends HookConsumerWidget {
     return Scaffold(
       // Body extends behind floating pill so BackdropFilter has content to blur
       extendBody: true,
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(index: currentIndex.value, children: tabs),
       bottomNavigationBar: SafeArea(
         child: Padding(

@@ -3,7 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 
 import 'pin_gateway_provider.dart';
 import 'pin_gateway_state.dart';
@@ -16,6 +18,8 @@ class PinGatewayScreen extends HookConsumerWidget {
     final state = ref.watch(pinGatewayProvider);
     final notifier = ref.read(pinGatewayProvider.notifier);
     final s = context.l10n;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
     ref.listen<PinGatewayState>(pinGatewayProvider, (previous, next) {
       final statusChanged = previous?.status != next.status;
@@ -38,30 +42,39 @@ class PinGatewayScreen extends HookConsumerWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: Center(
-          child: state.status == PinGatewayStatus.error
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(s.pinGatewayError),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        notifier.reset();
-                        notifier.onInit();
-                      },
-                      child: Text(s.actionRetry),
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
-                    Text(s.pinGatewayLoading),
-                  ],
-                ),
+        backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+        body: AppBackground(
+          child: Center(
+            child: state.status == PinGatewayStatus.error
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        s.pinGatewayError,
+                        style: TextStyle(color: textColor),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          notifier.reset();
+                          notifier.onInit();
+                        },
+                        child: Text(s.actionRetry),
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      Text(
+                        s.pinGatewayLoading,
+                        style: TextStyle(color: textColor),
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

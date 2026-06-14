@@ -16,7 +16,6 @@ class RegisterFormCard extends StatelessWidget {
     super.key,
     required this.emailController,
     required this.usernameController,
-    required this.phoneController,
     required this.passwordController,
     required this.confirmPasswordController,
     required this.isLoading,
@@ -26,8 +25,6 @@ class RegisterFormCard extends StatelessWidget {
     required this.emailPlaceholder,
     required this.usernameLabel,
     required this.usernamePlaceholder,
-    required this.phoneLabel,
-    required this.phonePlaceholder,
     required this.passwordLabel,
     required this.passwordPlaceholder,
     required this.confirmPasswordLabel,
@@ -42,33 +39,28 @@ class RegisterFormCard extends StatelessWidget {
     this.errorMessage,
     this.emailErrorText,
     this.usernameErrorText,
-    this.phoneErrorText,
     this.passwordErrorText,
     this.confirmPasswordErrorText,
     this.onSubmit,
     this.onEmailChanged,
     this.onUsernameChanged,
-    this.onPhoneChanged,
     this.onPasswordChanged,
     this.onConfirmPasswordChanged,
   });
 
   final TextEditingController emailController;
   final TextEditingController usernameController;
-  final TextEditingController phoneController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
   final bool isLoading;
   final String? errorMessage;
   final String? emailErrorText;
   final String? usernameErrorText;
-  final String? phoneErrorText;
   final String? passwordErrorText;
   final String? confirmPasswordErrorText;
   final Future<void> Function()? onSubmit;
   final ValueChanged<String>? onEmailChanged;
   final ValueChanged<String>? onUsernameChanged;
-  final ValueChanged<String>? onPhoneChanged;
   final ValueChanged<String>? onPasswordChanged;
   final ValueChanged<String>? onConfirmPasswordChanged;
 
@@ -78,8 +70,6 @@ class RegisterFormCard extends StatelessWidget {
   final String emailPlaceholder;
   final String usernameLabel;
   final String usernamePlaceholder;
-  final String phoneLabel;
-  final String phonePlaceholder;
   final String passwordLabel;
   final String passwordPlaceholder;
   final String confirmPasswordLabel;
@@ -146,18 +136,6 @@ class RegisterFormCard extends StatelessWidget {
                 textInputAction: TextInputAction.next,
                 onChanged: onUsernameChanged,
                 errorText: usernameErrorText,
-              ),
-              SizedBox(height: 11.h),
-              _FieldLabel(text: phoneLabel),
-              SizedBox(height: 7.h),
-              AuthInputField(
-                controller: phoneController,
-                prefixIcon: Icons.phone_outlined,
-                placeholder: phonePlaceholder,
-                keyboardType: TextInputType.phone,
-                textInputAction: TextInputAction.next,
-                onChanged: onPhoneChanged,
-                errorText: phoneErrorText,
               ),
               SizedBox(height: 11.h),
               _FieldLabel(text: passwordLabel),

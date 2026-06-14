@@ -3,8 +3,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/utils/logger.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_card.dart';
-import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_card_skeleton.dart';
-import 'package:monikid/features/child/transaction/transaction_history/widgets/type_filter_tab.dart';
+import 'package:monikid/shared/widgets/skeleton_widget/transaction_history_skeleton.dart';
+import 'package:monikid/shared/widgets/switchtab_three_item.dart';
 
 class SummaryAndTabsSection extends ConsumerWidget {
   final AsyncValue<({double totalExpense, double totalIncome})> summaryAsyncValue;
@@ -24,6 +24,10 @@ class SummaryAndTabsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Map filter string to index for SwitchTabThreeItem
+    final filterValues = ['all', 'income', 'expense'];
+    final selectedIndex = filterValues.indexOf(typeFilter ?? 'all').clamp(0, 2);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -41,7 +45,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
                   displayMonth: selectedDate ?? DateTime.now(),
                 );
               }
-              return const SummaryCardSkeleton();
+              return SummaryCardSkeleton(isDark: isDark);
             },
             error: (error, StackTrace? stack) {
               logger.e(
@@ -66,10 +70,12 @@ class SummaryAndTabsSection extends ConsumerWidget {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: TypeFilterTab(
-            selected: typeFilter ?? 'all',
-            isDark: isDark,
-            onChanged: notifier.setTypeFilter,
+          child: SwitchTabThreeItem(
+            title1: 'Tất cả',
+            title2: 'Thu tiền',
+            title3: 'Chi tiền',
+            selectedIndex: selectedIndex,
+            onChanged: (index) => notifier.setTypeFilter(filterValues[index]),
           ),
         ),
       ],

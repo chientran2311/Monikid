@@ -13,17 +13,26 @@ class StatisticSmartInsightCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final gradientColors = isDark
+        ? [AppTheme.darkSuccessSurface, AppTheme.darkPrimaryContainer]
+        : [const Color(0xFFF7FBF7), AppTheme.primaryLight];
+    final badgeBg = isDark
+        ? AppTheme.darkPrimaryContainer
+        : Colors.white.withValues(alpha: 0.8);
+    final badgeTextColor = isDark ? AppTheme.darkPrimaryAccent : AppTheme.primaryDark;
+
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFF7FBF7), AppTheme.primaryLight],
+          colors: gradientColors,
         ),
         borderRadius: BorderRadius.circular(22.r),
         border: Border.all(
-          color: AppTheme.primary.withValues(alpha: 0.12),
+          color: isDark ? AppTheme.darkSuccessBorder : AppTheme.primary.withValues(alpha: 0.12),
         ),
         boxShadow: [
           BoxShadow(
@@ -40,7 +49,7 @@ class StatisticSmartInsightCard extends StatelessWidget {
             width: 40.w,
             height: 40.w,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? AppTheme.surfaceDark : Colors.white,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
                 color: AppTheme.primary.withValues(alpha: 0.10),
@@ -64,14 +73,14 @@ class StatisticSmartInsightCard extends StatelessWidget {
                   context.l10n.statisticAlertTitle,
                   style: context.typo.body.medium.copyWith(
                     fontWeight: FontWeight.w800,
-                    color: AppTheme.textBlack,
+                    color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
                   message,
                   style: context.typo.caption.big.copyWith(
-                    color: AppTheme.textGrey,
+                    color: isDark ? AppTheme.darkTextSecondary : AppTheme.textGrey,
                     height: 1.45,
                   ),
                 ),
@@ -82,7 +91,7 @@ class StatisticSmartInsightCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: badgeBg,
               borderRadius: BorderRadius.circular(999.r),
               border: Border.all(
                 color: AppTheme.primary.withValues(alpha: 0.10),
@@ -92,7 +101,7 @@ class StatisticSmartInsightCard extends StatelessWidget {
               context.l10n.statisticAlertPriority,
               style: context.typo.caption.small.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppTheme.primaryDark,
+                color: badgeTextColor,
               ),
             ),
           ),

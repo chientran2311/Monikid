@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
-class TransactionAmountHeader extends StatelessWidget {
+class TransactionAmountHeader extends ConsumerWidget {
   const TransactionAmountHeader({
     super.key,
     required this.transaction,
@@ -16,7 +18,11 @@ class TransactionAmountHeader extends StatelessWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final categoryLabel =
+        findCategoryByTransactionKey(categories, transaction.categoryKey)?.label ??
+        transaction.category;
     final isIncome = transaction.type == 'income';
     return Column(
       children: [
@@ -27,7 +33,7 @@ class TransactionAmountHeader extends StatelessWidget {
         SizedBox(height: 24.h),
         _CategoryChip(
           emoji: transaction.categoryEmoji ?? (isIncome ? '💰' : '💸'),
-          name: transaction.category,
+          name: categoryLabel,
         ),
         SizedBox(height: 24.h),
       ],

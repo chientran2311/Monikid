@@ -40,20 +40,22 @@ abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
 
   factory TransactionEvidenceImage.fromFirestore(Map<String, dynamic> json) {
     return TransactionEvidenceImage(
+      // Reads new key (image_url) with fallback to legacy (storage_path).
       storagePath: _readString(
         json,
-        snakeKey: 'storage_path',
-        camelKey: 'storagePath',
+        snakeKey: 'image_url',
+        camelKey: 'imageUrl',
+        fallbackKey: 'storage_path',
       ),
       fileName: _readNullableString(
         json,
-        snakeKey: 'file_name',
-        camelKey: 'fileName',
+        snakeKey: 'image_name',
+        camelKey: 'imageName',
       ),
       mimeType: _readNullableString(
         json,
-        snakeKey: 'mime_type',
-        camelKey: 'mimeType',
+        snakeKey: 'image_type',
+        camelKey: 'imageType',
       ),
       uploadedAt: _parseDate(json['uploaded_at'] ?? json['uploadedAt']),
     );
@@ -61,9 +63,9 @@ abstract class TransactionEvidenceImage with _$TransactionEvidenceImage {
 
   Map<String, dynamic> toFirestore() {
     return {
-      'storage_path': storagePath,
-      'file_name': fileName,
-      'mime_type': mimeType,
+      'image_url': storagePath,
+      'image_name': fileName,
+      'image_type': mimeType,
       'uploaded_at': uploadedAt != null
           ? Timestamp.fromDate(uploadedAt!)
           : null,
@@ -124,19 +126,14 @@ abstract class TransactionModel with _$TransactionModel {
         camelKey: 'familyId',
       ),
       amountMinor: amountMinor,
-      currency:
-          _readNullableString(
-            json,
-            snakeKey: 'currency',
-            camelKey: 'currency',
-          ) ??
-          'VND',
+      currency: 'VND',
       type: _readString(json, snakeKey: 'type', camelKey: 'type'),
+      // Reads both new key (category_id) and legacy key (category_key).
       categoryKey: _readString(
         json,
-        snakeKey: 'category_key',
-        camelKey: 'categoryKey',
-        fallbackKey: 'category',
+        snakeKey: 'category_id',
+        camelKey: 'categoryId',
+        fallbackKey: 'category_key',
       ),
       categoryLabel: _readString(
         json,
@@ -144,6 +141,7 @@ abstract class TransactionModel with _$TransactionModel {
         camelKey: 'categoryLabel',
         fallbackKey: 'category',
       ),
+      // category_icon removed from writes; kept in reads for legacy data.
       categoryIcon: _readNullableString(
         json,
         snakeKey: 'category_icon',
@@ -152,13 +150,16 @@ abstract class TransactionModel with _$TransactionModel {
       ),
       note: _readNullableString(json, snakeKey: 'note', camelKey: 'note'),
       source: _readNullableString(json, snakeKey: 'source', camelKey: 'source'),
+      // Reads both new key (merchant) and legacy key (merchant_name).
       merchantName: _readNullableString(
         json,
-        snakeKey: 'merchant_name',
-        camelKey: 'merchantName',
+        snakeKey: 'merchant',
+        camelKey: 'merchant',
+        fallbackKey: 'merchant_name',
       ),
+      // Reads both new key (transaction_date) and legacy key (date_ts).
       dateTs:
-          _parseDate(json['date_ts'] ?? json['dateTs'] ?? json['date']) ??
+          _parseDate(json['transaction_date'] ?? json['date_ts'] ?? json['dateTs'] ?? json['date']) ??
           DateTime.now(),
       createdAt: _parseDate(json['created_at'] ?? json['createdAt']),
       updatedAt: _parseDate(json['updated_at'] ?? json['updatedAt']),
@@ -173,21 +174,13 @@ abstract class TransactionModel with _$TransactionModel {
   Map<String, dynamic> toFirestore() {
     final data = <String, dynamic>{
       'transaction_id': transactionId,
-      'user_id': userId,
-      'family_id': familyId,
       'type': type,
-      'amount_minor': amountMinor,
-      'currency': currency,
-      'category_key': categoryKey,
-      'category_label': categoryLabel,
-      'category_icon': categoryIcon,
+      'amount': amountMinor,
+      'category_id': categoryKey,
       'note': note,
-      'source': source,
-      'merchant_name': merchantName ?? '',
-      'date_ts': Timestamp.fromDate(dateTs),
+      'transaction_date': Timestamp.fromDate(dateTs),
       'created_at': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
       'updated_at': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
-      'ocr_meta': {'used': ocrUsed ?? false, 'confidence': ocrConfidence},
     };
 
     if (evidenceImage != null) {
@@ -208,6 +201,7 @@ abstract class TransactionModel with _$TransactionModel {
   TransactionModel copyWithUi({
     double? amount,
     String? type,
+    String? categoryId,
     String? categoryLabel,
     String? categoryIcon,
     DateTime? date,
@@ -216,10 +210,10 @@ abstract class TransactionModel with _$TransactionModel {
     return copyWith(
       amountMinor: amount != null ? amount.round() : amountMinor,
       type: type ?? this.type,
+      // categoryKey (stored as category_id in Firestore) must be set explicitly;
+      // it is never derived from the label to preserve FK stability.
+      categoryKey: categoryId ?? categoryKey,
       categoryLabel: categoryLabel ?? this.categoryLabel,
-      categoryKey: categoryLabel != null && categoryLabel != this.categoryLabel
-          ? _slugifyCategory(categoryLabel)
-          : categoryKey,
       categoryIcon: categoryIcon ?? this.categoryIcon,
       dateTs: date ?? dateTs,
       note: note,
@@ -261,12 +255,8 @@ String? _readNullableString(
 }
 
 int _readAmountMinor(Map<String, dynamic> json) {
-  final amountMinor = json['amount_minor'];
-  if (amountMinor is num) {
-    return amountMinor.round();
-  }
-
-  final amount = json['amount'];
+  // Reads new key (amount) first, falls back to legacy (amount_minor).
+  final amount = json['amount'] ?? json['amount_minor'];
   if (amount is num) {
     return amount.round();
   }
@@ -306,10 +296,3 @@ double? _parseDouble(Object? value) {
   return null;
 }
 
-String _slugifyCategory(String value) {
-  return value
-      .trim()
-      .toLowerCase()
-      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
-      .replaceAll(RegExp(r'^_+|_+$'), '');
-}

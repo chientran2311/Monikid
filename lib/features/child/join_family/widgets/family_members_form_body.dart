@@ -46,6 +46,7 @@ class FamilyMembersFormBody extends ConsumerWidget {
         _HeroCard(
           isDark: isDark,
           family: family,
+          ownerDisplayName: members.where((m) => m.role == 'owner').firstOrNull?.displayName ?? '',
           textColor: textColor,
           mutedColor: mutedColor,
         ),
@@ -104,7 +105,7 @@ class FamilyMembersFormBody extends ConsumerWidget {
                             final member = members[index];
                             final isOwner =
                                 family != null &&
-                                member.uid == family.parentId;
+                                member.uid == family.ownerUid;
                             final isCurrentUser = member.uid == currentUid;
                             return _MemberItem(
                               isDark: isDark,
@@ -122,19 +123,18 @@ class FamilyMembersFormBody extends ConsumerWidget {
                   child: PrimaryButton.danger(
                     title: s.unlinkFamilyButtonFull,
                     isLoading: state.isBusy,
-                    onTap: () async {
-                      final confirmed = await showDialog<bool>(
+                    onTap: () {
+                      showDialog<void>(
                         context: context,
                         builder: (_) => ConfirmDialog(
                           title: s.unlinkFamilyConfirmTitle,
-                          message: s.unlinkFamilyConfirmBody,
+                          subtitle: s.unlinkFamilyConfirmBody,
                           confirmLabel: s.unlinkFamilyButton,
                           cancelLabel: s.customCategoryCancel,
-                          confirmColor: AppTheme.redAlert,
+                          isDestructive: true,
+                          onConfirm: notifier.leaveFamily,
                         ),
                       );
-                      if (confirmed != true || !context.mounted) return;
-                      notifier.leaveFamily();
                     },
                   ),
                 ),
@@ -152,12 +152,14 @@ class _HeroCard extends StatelessWidget {
   const _HeroCard({
     required this.isDark,
     required this.family,
+    required this.ownerDisplayName,
     required this.textColor,
     required this.mutedColor,
   });
 
   final bool isDark;
   final FamilyModel? family;
+  final String ownerDisplayName;
   final Color textColor;
   final Color mutedColor;
 
@@ -207,7 +209,7 @@ class _HeroCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            family?.parentName ?? '',
+            ownerDisplayName,
             style: context.typo.title.big.copyWith(
               color: textColor,
               fontWeight: FontWeight.w800,

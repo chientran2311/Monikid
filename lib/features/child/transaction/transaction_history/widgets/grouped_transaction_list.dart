@@ -9,12 +9,14 @@ class GroupedTransactionList extends StatelessWidget {
   final Map<String, List<TransactionModel>> grouped;
   final bool isDark;
   final void Function(TransactionModel) onTap;
+  final bool showBadge;
 
   const GroupedTransactionList({
     super.key,
     required this.grouped,
     required this.isDark,
     required this.onTap,
+    this.showBadge = true,
   });
 
   @override
@@ -71,7 +73,7 @@ class GroupedTransactionList extends StatelessWidget {
               const SizedBox(height: 8),
               ...dateTxs.map(
                 (tx) =>
-                    TransactionItem(transaction: tx, onTap: () => onTap(tx)),
+                    TransactionItem(transaction: tx, onTap: () => onTap(tx), showBadge: showBadge),
               ),
             ],
           ),

@@ -13,6 +13,12 @@ class AppTheme {
   static const Color primary = Color(0xFF2F7F33);
   static const Color primaryDark = Color(0xFF1B4D1F);
   static const Color primaryLight = Color(0xFFE8F5E9);
+  static const Color primaryBright = Color(0xFF4EA653); // splash accent-bright blob
+  static const Color accentVibrant = Color(0xFF34C759);  // iOS green — dark-mode glass accent
+  static const Color primaryPale = Color(0xFFB2D8B4);   // splash ambient blob
+
+  // Splash
+  static const Color splashBackground = Color(0xFFF0F4F0); // mesh background light
 
   // Background and Surface (Dark Mode)
   static const Color backgroundDark = Color(0xFF141E15);
@@ -45,8 +51,8 @@ class AppTheme {
 
   // Additional colors used in UI
   static const Color iconLight = Color(0xFFCBD5E1); // slate-300 for icons
-  static const Color surfaceVariant = Color(0xFF1E293B); // Dark surface variant
-  static const Color borderDark = Color(0xFF334155); // Dark border
+  static const Color surfaceVariant = Color(0xFF22302A); // Dark surface variant (green-tinted)
+  static const Color borderDark = Color(0xFF33453A); // Dark border (green-tinted)
   static const Color borderLight = Color(0xFFE2E8F0); // Light border
   static const Color amberSurface = Color(0xFFFFFBEB);
   static const Color amberBorder = Color(0xFFFDE68A);
@@ -68,6 +74,11 @@ class AppTheme {
   // ==========================================================================
   // EXTENDED COLOR PALETTE (Added for hardcoded color replacement)
   // ==========================================================================
+
+  // Parent home screen background (exact values from HTML --bg1/--bg2/--fg)
+  static const Color homeParBg1 = Color(0xFFF2FBF2); // --bg1 gradient start (light mint)
+  static const Color homeParBg2 = Color(0xFFEEF6EF); // --bg2 gradient end
+  static const Color homeParFg = Color(0xFF153416);  // --fg dark green for AppBar title
 
   // Light green variants (custom surfaces)
   static const Color surfaceLightGreen = Color(0xFFEAF2EB); // custom light green surface
@@ -159,6 +170,39 @@ class AppTheme {
   static const Color notifCardShadow = Color(0x0D000000); // rgba(0,0,0,0.05)
 
   // ==========================================================================
+  // DARK PALETTE (green-tinted, iOS 26) — cohesive dark counterparts.
+  // Page bg = backgroundDark #141E15, card = surfaceDark #1C2B1E (kept).
+  // ==========================================================================
+  static const Color darkSurfaceElevated = Color(0xFF26352A); // dialogs/sheets (lighter than card)
+  static const Color darkSurfaceVariant = Color(0xFF22302A); // alt surface
+  static const Color darkPrimaryContainer = Color(0xFF1C3322); // primary tint surface
+  static const Color darkPrimaryAccent = Color(0xFF5CC061); // primary-colored TEXT/ICON on dark (AA)
+  static const Color darkTextPrimary = Color(0xFFE8EFE9); // off-white, replaces pure white
+  static const Color darkTextSecondary = Color(0xFFA6B5AA);
+  static const Color darkTextTertiary = Color(0xFF7E8E83); // hints
+  static const Color darkIcon = Color(0xFFC2CFC6);
+  static const Color darkBorder = Color(0xFF33453A); // ≈ white@0.10 over base
+  static const Color darkBorderStrong = Color(0xFF415447);
+  static const Color darkErrorAlert = Color(0xFFFF6B6B);
+
+  // Light-mode near-black text — split out from the overloaded surfaceVeryDark.
+  static const Color textNearBlack = Color(0xFF0F172A); // slate-900, light-mode text
+
+  // Semantic dark surfaces (the light ones are near-white, unusable on dark)
+  static const Color darkSuccessSurface = Color(0xFF15281C);
+  static const Color darkSuccessBorder = Color(0xFF1F4A2E);
+  static const Color darkSuccessText = Color(0xFF5FD08A);
+  static const Color darkWarningSurface = Color(0xFF2A2310);
+  static const Color darkWarningBorder = Color(0xFF4A3C17);
+  static const Color darkWarningText = Color(0xFFF0B45A);
+  static const Color darkDangerSurface = Color(0xFF2C1719);
+  static const Color darkDangerBorder = Color(0xFF4A2629);
+  static const Color darkDangerText = Color(0xFFFF7A7A);
+  static const Color darkInfoSurface = Color(0xFF142436);
+  static const Color darkInfoBorder = Color(0xFF244A6E);
+  static const Color darkInfoText = Color(0xFF6FA8FF);
+
+  // ==========================================================================
   // DARK THEME
   // ==========================================================================
   static ThemeData get darkTheme {
@@ -171,27 +215,29 @@ class AppTheme {
       // Cấu hình màu sắc cốt lõi
       colorScheme: const ColorScheme.dark(
         primary: primary,
-        secondary: primaryLight,
+        secondary: darkPrimaryContainer,
         surface: surfaceDark,
-        error: redAlert,
+        error: darkErrorAlert,
         onPrimary: Colors.white,
-        onSurface: textWhite,
+        onSurface: darkTextPrimary,
       ),
 
       // Font chữ mặc định
-      textTheme: ThemeData.dark().textTheme
-          .apply(fontFamily: 'Inter', bodyColor: textWhite, displayColor: textWhite),
+      textTheme: ThemeData.dark().textTheme.apply(
+          fontFamily: 'Inter',
+          bodyColor: darkTextPrimary,
+          displayColor: darkTextPrimary),
 
       // Style cho AppBar
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: textWhite),
+        iconTheme: const IconThemeData(color: darkTextPrimary),
         titleTextStyle: AppTextStyleFactory.style(
           size: AppFontSizes.titleMedium,
           weight: FontWeight.w700,
-          color: textWhite,
+          color: darkTextPrimary,
           scaled: false,
         ),
       ),
@@ -203,22 +249,22 @@ class AppTheme {
         hintStyle: AppTextStyleFactory.style(
           size: AppFontSizes.bodyMedium,
           weight: FontWeight.w400,
-          color: textGrey,
+          color: darkTextTertiary,
           scaled: false,
         ),
-        prefixIconColor: textGrey,
-        suffixIconColor: textGrey,
+        prefixIconColor: darkTextTertiary,
+        suffixIconColor: darkTextTertiary,
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
           horizontal: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12), // rounded-xl (12px)
-          borderSide: const BorderSide(color: Color(0xFF334155)), // slate-700
+          borderSide: const BorderSide(color: darkBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF334155)),
+          borderSide: const BorderSide(color: darkBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

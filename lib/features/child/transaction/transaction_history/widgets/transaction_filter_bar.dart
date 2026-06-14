@@ -7,6 +7,7 @@ import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
+import 'package:monikid/features/child/transaction/transaction_history/providers/transaction_filter_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/calendar_dialog.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/category_dialog.dart';
@@ -24,13 +25,13 @@ class TransactionFilterBar extends ConsumerWidget {
     final notifier = ref.read(transactionHistoryProvider.notifier);
 
     final selectedDate = ref.watch(
-      transactionHistoryProvider.select((v) => v.selectedDate),
+      transactionFilterNotifierProvider.select((v) => v.selectedDate),
     );
     final selectedCategory = ref.watch(
-      transactionHistoryProvider.select((v) => v.selectedCategoryKey),
+      transactionFilterNotifierProvider.select((v) => v.selectedCategoryKey),
     );
     final transactionTypeFilter = ref.watch(
-      transactionHistoryProvider.select((v) => v.transactionTypeFilter),
+      transactionFilterNotifierProvider.select((v) => v.transactionTypeFilter),
     );
 
     final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
@@ -176,7 +177,7 @@ class _FilterButtonState extends State<_FilterButton> {
     final mutedColor = widget.isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: isActive ? null : widget.onTap,
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),

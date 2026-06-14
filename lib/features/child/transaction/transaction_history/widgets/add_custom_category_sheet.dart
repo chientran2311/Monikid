@@ -1,17 +1,22 @@
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/switch_two_item.dart';
 
 class AddCustomCategorySheet extends HookWidget {
   const AddCustomCategorySheet({
     super.key,
     required this.onAdded,
+    this.initialType = 'expense',
   });
 
-  final Future<void> Function(String label) onAdded;
+  /// Returns (label, icon, type) — type is 'expense' or 'income'.
+  final Future<void> Function(String label, String icon, String type) onAdded;
+  final String initialType;
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +28,13 @@ class AddCustomCategorySheet extends HookWidget {
     final focusNode = useFocusNode();
     final isLoading = useState(false);
     final error = useState<String?>(null);
-    final hasFocus = useState(false);
+    final selectedIcon = useState<String>('📦');
+    final typeIndex = useState<int>(initialType == 'income' ? 1 : 0); // 0=expense,1=income
+    final showEmojiPicker = useState<bool>(false);
 
     useEffect(() {
       Future.microtask(() => focusNode.requestFocus());
-      void listener() => hasFocus.value = focusNode.hasFocus;
-      focusNode.addListener(listener);
-      return () => focusNode.removeListener(listener);
+      return null;
     }, const []);
 
     Future<void> submit() async {
@@ -41,15 +46,19 @@ class AddCustomCategorySheet extends HookWidget {
       isLoading.value = true;
       error.value = null;
       try {
-        await onAdded(label);
+        await onAdded(
+          label,
+          selectedIcon.value,
+          typeIndex.value == 0 ? 'expense' : 'income',
+        );
         if (context.mounted) context.pop();
       } catch (_) {
         if (context.mounted) isLoading.value = false;
       }
     }
 
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-    final safeBottom = MediaQuery.of(context).padding.bottom;
+    final viewInsets = MediaQuery.viewInsetsOf(context).bottom;
+    final safeBottom = MediaQuery.paddingOf(context).bottom;
     final bottomPadding = viewInsets + (viewInsets > 0 ? 16.h : safeBottom + 16.h);
 
     return Container(
@@ -112,127 +121,200 @@ class AddCustomCategorySheet extends HookWidget {
             color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
           ),
           // Form body
-          Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 32.h, 20.w, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  s.customCategoryLabelHint,
-                  style: context.typo.body.small.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textGrey,
+          Flexible(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Type switch (expense / income)
+                  SwitchTwoItem(
+                    title1: s.transactionExpenseTab,
+                    title2: s.transactionIncomeTab,
+                    selectedIndex: typeIndex.value,
+                    onChanged: (i) {
+                      typeIndex.value = i;
+                      showEmojiPicker.value = false;
+                    },
                   ),
-                ),
-                SizedBox(height: 10.h),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: 58.h,
-                  decoration: BoxDecoration(
-                    color: hasFocus.value
-                        ? (isDark ? AppTheme.surfaceDark : Colors.white)
-                        : (isDark ? AppTheme.surfaceDark : AppTheme.backgroundLight),
-                    borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(
-                      color: hasFocus.value
-                          ? AppTheme.primary
-                          : (error.value != null
-                              ? AppTheme.redAlert
-                              : (isDark ? AppTheme.borderDark : AppTheme.borderLight)),
-                      width: hasFocus.value || error.value != null ? 1.5 : 1,
-                    ),
-                    boxShadow: hasFocus.value
-                        ? [
-                            BoxShadow(
-                              color: AppTheme.primary.withValues(alpha: 0.1),
-                              blurRadius: 0,
-                              spreadRadius: 4.r,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    maxLength: 40,
-                    textCapitalization: TextCapitalization.sentences,
-                    style: context.typo.body.big.copyWith(color: textColor),
-                    decoration: InputDecoration(
-                      hintText: s.customCategoryLabelHint,
-                      hintStyle: context.typo.body.big.copyWith(color: AppTheme.textMuted),
-                      counterText: '',
-                      filled: false,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                    ),
-                    onSubmitted: (_) => submit(),
-                  ),
-                ),
-                if (error.value != null) ...[
-                  SizedBox(height: 6.h),
+                  SizedBox(height: 24.h),
+                  // Label field
                   Text(
-                    error.value!,
-                    style: context.typo.caption.big.copyWith(color: AppTheme.redAlert),
-                  ),
-                ],
-                SizedBox(height: 32.h),
-                Container(
-                  height: 56.h,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color.lerp(AppTheme.primary, Colors.white, 0.02)!,
-                        Color.lerp(AppTheme.primary, Colors.black, 0.18)!,
-                      ],
+                    s.customCategoryLabelHint,
+                    style: context.typo.body.small.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textGrey,
                     ),
-                    borderRadius: BorderRadius.circular(18.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primary.withValues(alpha: 0.24),
-                        blurRadius: 28.r,
-                        offset: const Offset(0, 16),
-                      ),
-                    ],
                   ),
-                  child: ElevatedButton(
-                    onPressed: isLoading.value ? null : submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      disabledBackgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.r),
+                  SizedBox(height: 10.h),
+                  SizedBox(
+                    height: 58.h,
+                    child: TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      maxLength: 40,
+                      textCapitalization: TextCapitalization.sentences,
+                      textAlignVertical: TextAlignVertical.center,
+                      onTap: () => showEmojiPicker.value = false,
+                      style: context.typo.body.big.copyWith(color: textColor),
+                      decoration: InputDecoration(
+                        hintText: s.customCategoryLabelHint,
+                        hintStyle: context.typo.body.big.copyWith(color: AppTheme.textMuted),
+                        counterText: '',
+                        filled: true,
+                        fillColor: isDark ? AppTheme.surfaceDark : AppTheme.backgroundLight,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                          borderSide: BorderSide(
+                            color: error.value != null
+                                ? AppTheme.redAlert
+                                : (isDark ? AppTheme.borderDark : AppTheme.borderLight),
+                            width: error.value != null ? 1.5 : 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                          borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                          borderSide: const BorderSide(color: AppTheme.redAlert, width: 1.5),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                          borderSide: const BorderSide(color: AppTheme.redAlert, width: 1.5),
+                        ),
                       ),
-                      minimumSize: Size(double.infinity, 56.h),
-                      padding: EdgeInsets.zero,
+                      onSubmitted: (_) => submit(),
                     ),
-                    child: isLoading.value
+                  ),
+                  if (error.value != null) ...[
+                    SizedBox(height: 6.h),
+                    Text(
+                      error.value!,
+                      style: context.typo.caption.big.copyWith(color: AppTheme.redAlert),
+                    ),
+                  ],
+                  SizedBox(height: 24.h),
+                  // Icon picker
+                  Text(
+                    s.customCategoryIconHint,
+                    style: context.typo.body.small.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textGrey,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        focusNode.unfocus();
+                        showEmojiPicker.value = !showEmojiPicker.value;
+                      },
+                      child: Container(
+                        width: 64.w,
+                        height: 64.w,
+                        decoration: BoxDecoration(
+                          color: isDark ? AppTheme.surfaceDark : AppTheme.backgroundLight,
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: showEmojiPicker.value
+                                ? AppTheme.primary
+                                : (isDark ? AppTheme.borderDark : AppTheme.borderLight),
+                            width: showEmojiPicker.value ? 1.5 : 1,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(selectedIcon.value, style: context.typo.title.big),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    child: showEmojiPicker.value
                         ? SizedBox(
-                            width: 22.r,
-                            height: 22.r,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.white,
+                            height: 260.h,
+                            child: EmojiPicker(
+                              onEmojiSelected: (category, emoji) {
+                                selectedIcon.value = emoji.emoji;
+                                showEmojiPicker.value = false;
+                              },
+                              config: Config(
+                                height: 260,
+                                emojiViewConfig: EmojiViewConfig(
+                                  backgroundColor: isDark ? AppTheme.surfaceDark : Colors.white,
+                                  columns: 8,
+                                  emojiSizeMax: 28,
+                                ),
+                                categoryViewConfig: const CategoryViewConfig(
+                                  indicatorColor: AppTheme.primary,
+                                ),
+                                bottomActionBarConfig: const BottomActionBarConfig(enabled: false),
+                                searchViewConfig: const SearchViewConfig(),
+                              ),
                             ),
                           )
-                        : Text(
-                            s.customCategoryConfirm,
-                            style: context.typo.subtitle.small.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
+                        : const SizedBox.shrink(),
                   ),
-                ),
-              ],
+                  SizedBox(height: 8.h),
+                  // Submit button
+                  Container(
+                    height: 56.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color.lerp(AppTheme.primary, Colors.white, 0.02)!,
+                          Color.lerp(AppTheme.primary, Colors.black, 0.18)!,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(18.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primary.withValues(alpha: 0.24),
+                          blurRadius: 28.r,
+                          offset: const Offset(0, 16),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: isLoading.value ? null : submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        disabledBackgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.r),
+                        ),
+                        minimumSize: Size(double.infinity, 56.h),
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: isLoading.value
+                          ? SizedBox(
+                              width: 22.r,
+                              height: 22.r,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              s.customCategoryConfirm,
+                              style: context.typo.subtitle.small.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(height: bottomPadding),

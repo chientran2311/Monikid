@@ -56,17 +56,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;
         _logger.i('Profile loaded successfully for uid: $uid');
-        final fullName = (data['full_name'] as String? ?? data['display_name'] as String?)?.trim() ?? '';
+        final fullName = (data['display_name'] as String? ?? data['full_name'] as String?)?.trim() ?? '';
         final avatarUrl = _readProfileImageUrl(data);
         return ProfileModel(
           id: doc.id,
           fullName: fullName,
           email: (data['email'] as String?)?.trim() ?? '',
           avatarUrl: avatarUrl,
-          phone: (data['phone'] as String?) ?? '',
-          dob: (data['dob'] as String?) ?? '',
-          gender: (data['gender'] as String?) ?? '',
           role: (data['role'] as String?)?.trim() ?? '',
+          familyId: data['family_id'] as String?,
         );
       }
       _logger.w('Profile not found for uid: $uid');
@@ -82,13 +80,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       _logger.i('Getting profile image for uid: $uid');
       final doc = await _firestore.collection('users').doc(uid).get();
+      _logger.i('Profile image doc fetched for uid: $uid (exists=${doc.exists})');
       final data = doc.data();
       if (!doc.exists || data == null) {
         _logger.w('Profile image not found because profile is missing for uid: $uid');
         return null;
       }
 
-      return _readProfileImageUrl(data);
+      final url = _readProfileImageUrl(data);
+      _logger.i('Profile image resolved for uid: $uid (hasUrl=${url != null})');
+      return url;
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to get profile image.',
@@ -104,16 +105,51 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       _logger.i('Updating profile for uid: ${profile.id}');
       await _firestore.collection('users').doc(profile.id).update({
-        'full_name': profile.fullName,
-        'phone': profile.phone.isEmpty ? null : profile.phone,
-        'dob': profile.dob.isEmpty ? null : profile.dob,
-        'gender': profile.gender.isEmpty ? null : profile.gender,
+        'display_name': profile.fullName,
         'updated_at': FieldValue.serverTimestamp(),
       });
       _logger.i('Profile updated successfully for uid: ${profile.id}');
+      await _syncFamilyMemberProfile(
+        userId: profile.id,
+        familyId: profile.familyId,
+        displayName: profile.fullName,
+      );
     } catch (e, stackTrace) {
       _logger.e('Error updating profile', error: e, stackTrace: stackTrace);
       rethrow;
+    }
+  }
+
+  Future<void> _syncFamilyMemberProfile({
+    required String userId,
+    required String? familyId,
+    String? displayName,
+    String? avatarUrl,
+  }) async {
+    if (familyId == null || familyId.isEmpty) return;
+    try {
+      _logger.i('Syncing family member profile for user $userId in family $familyId.');
+      final familyDoc = await _firestore.collection('families').doc(familyId).get();
+      if (!familyDoc.exists) return;
+
+      final members = List<Map<String, dynamic>>.from(
+        (familyDoc.data()?['members'] as List<dynamic>?) ?? [],
+      );
+      final idx = members.indexWhere((m) => m['user_id'] == userId);
+      if (idx == -1) return;
+
+      final updated = Map<String, dynamic>.from(members[idx]);
+      if (displayName != null) updated['display_name'] = displayName;
+      if (avatarUrl != null) updated['avatar_url'] = avatarUrl;
+      members[idx] = updated;
+
+      await _firestore.collection('families').doc(familyId).update({
+        'members': members,
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+      _logger.i('Family member profile synced for user $userId.');
+    } catch (error, stackTrace) {
+      _logger.e('Failed to sync family member profile.', error: error, stackTrace: stackTrace);
     }
   }
 
@@ -164,6 +200,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
         'updated_at': FieldValue.serverTimestamp(),
       });
       _logger.i('Avatar URL updated in Firestore for user $userId.');
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final familyId = userDoc.data()?['family_id'] as String?;
+      await _syncFamilyMemberProfile(
+        userId: userId,
+        familyId: familyId,
+        avatarUrl: secureUrl,
+      );
     } catch (error, stackTrace) {
       _logger.e('Failed to upload and update avatar.', error: error, stackTrace: stackTrace);
       rethrow;

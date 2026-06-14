@@ -8,6 +8,7 @@ import 'package:monikid/features/child/transaction/detail_transaction/detail_tra
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/evidence_section.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/summary_header.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/widgets/transaction_detail_row.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 
 class TransactionContent extends ConsumerWidget {
   const TransactionContent({super.key, required this.state, required this.isDark});
@@ -18,13 +19,22 @@ class TransactionContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transaction = state.transaction!;
+    final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final categoryLabel =
+        findCategoryByTransactionKey(categories, transaction.categoryKey)?.label ??
+        transaction.category;
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.surfaceVariant : AppTheme.borderLight;
     final note = transaction.note;
     final hasNote = note != null && note.isNotEmpty;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 120.h),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + kToolbarHeight,
+        left: 20.w,
+        right: 20.w,
+        bottom: 120.h,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -49,7 +59,7 @@ class TransactionContent extends ConsumerWidget {
                 TransactionDetailRow(
                   icon: transaction.categoryEmoji ?? '📦',
                   label: s.transactionCategoryLabel,
-                  value: transaction.category,
+                  value: categoryLabel,
                   isDark: isDark,
                 ),
                 _Divider(color: borderColor),

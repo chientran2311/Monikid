@@ -63,11 +63,15 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenH = MediaQuery.sizeOf(context).height;
+    final dotsVertPad = (screenH * 0.036).clamp(12.0, 52.0);
+    final rowGap = (screenH * 0.016).clamp(8.0, 20.0);
+    final bottomPad = (screenH * 0.028).clamp(12.0, 40.0);
 
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 16.h, bottom: 60.h),
+          padding: EdgeInsets.symmetric(vertical: dotsVertPad),
           child: AnimatedBuilder(
             animation: _offsetAnimation,
             builder: (context, child) => Transform.translate(
@@ -123,11 +127,11 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
           child: Column(
             children: [
               _buildRow(['1', '2', '3'], isDark),
-              SizedBox(height: 20.h),
+              SizedBox(height: rowGap),
               _buildRow(['4', '5', '6'], isDark),
-              SizedBox(height: 20.h),
+              SizedBox(height: rowGap),
               _buildRow(['7', '8', '9'], isDark),
-              SizedBox(height: 20.h),
+              SizedBox(height: rowGap),
               Row(
                 children: [
                   const Expanded(child: SizedBox()),
@@ -144,7 +148,7 @@ class _PinKeypadWidgetState extends State<PinKeypadWidget>
                   ),
                 ],
               ),
-              SizedBox(height: 40.h),
+              SizedBox(height: bottomPad),
             ],
           ),
         ),
@@ -196,6 +200,7 @@ class _KeyButtonState extends State<_KeyButton> {
   Widget build(BuildContext context) {
     final digitColor = widget.isDark ? AppTheme.surfaceLightGrey : AppTheme.textBlack;
     final letters = _kKeyLetters[widget.value];
+    final keyH = (MediaQuery.sizeOf(context).height * 0.09).clamp(48.0, 88.0);
 
     return GestureDetector(
       onTapDown: widget.onTap != null ? (_) => setState(() => _pressed = true) : null,
@@ -212,41 +217,39 @@ class _KeyButtonState extends State<_KeyButton> {
         curve: Curves.easeOut,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
+          height: keyH,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: _pressed
                 ? (widget.isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey)
                 : Colors.transparent,
           ),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Center(
-              child: widget.icon != null
-                  ? Icon(widget.icon, size: 28.r, color: widget.isDark ? AppTheme.textGrey : AppTheme.textBlack)
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+          child: Center(
+            child: widget.icon != null
+                ? Icon(widget.icon, size: keyH * 0.46, color: widget.isDark ? AppTheme.textGrey : AppTheme.textBlack)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.value,
+                        style: AppTextStyleFactory.style(
+                          size: (keyH * 0.46).clamp(22.0, 32.0),
+                          weight: FontWeight.w500,
+                          color: digitColor,
+                        ),
+                      ),
+                      if (letters != null)
                         Text(
-                          widget.value,
+                          letters,
                           style: AppTextStyleFactory.style(
-                            size: 32,
-                            weight: FontWeight.w500,
-                            color: digitColor,
+                            size: AppFontSizes.labelSmall,
+                            weight: FontWeight.w600,
+                            color: AppTheme.textGrey,
+                            letterSpacing: 0.1 * AppFontSizes.labelSmall,
                           ),
                         ),
-                        if (letters != null)
-                          Text(
-                            letters,
-                            style: AppTextStyleFactory.style(
-                              size: AppFontSizes.labelSmall,
-                              weight: FontWeight.w600,
-                              color: AppTheme.textGrey,
-                              letterSpacing: 0.1 * AppFontSizes.labelSmall,
-                            ),
-                          ),
-                      ],
-                    ),
-            ),
+                    ],
+                  ),
           ),
         ),
       ),

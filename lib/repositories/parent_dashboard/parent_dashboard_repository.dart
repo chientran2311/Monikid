@@ -24,6 +24,10 @@ abstract class ParentDashboardRepository {
   });
 
   Future<void> removeChildMonthlyLimit({required String childUid});
+
+  Future<Map<String, int?>> getChildrenMonthlyLimits({
+    required List<String> childUids,
+  });
 }
 
 class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
@@ -42,7 +46,7 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
           .collection('users')
           .doc(childUid)
           .collection('transactions')
-          .orderBy('date_ts', descending: true)
+          .orderBy('transaction_date', descending: true)
           .limit(limit)
           .get();
       return snap.docs
@@ -82,8 +86,8 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
       if (!doc.exists) return (expenseMinor: 0, incomeMinor: 0);
       final data = doc.data()!;
       return (
-        expenseMinor: (data['total_expense_minor'] as num?)?.toInt() ?? 0,
-        incomeMinor: (data['total_income_minor'] as num?)?.toInt() ?? 0,
+        expenseMinor: (data['total_expense'] as num?)?.toInt() ?? 0,
+        incomeMinor: (data['total_income'] as num?)?.toInt() ?? 0,
       );
     } catch (error, stackTrace) {
       _logger.e(
@@ -104,8 +108,11 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
       await _firestore
           .collection('users')
           .doc(childUid)
-          .update({'monthly_limit_minor': amountMinor});
-      _logger.i('Set monthly_limit_minor=$amountMinor for child=$childUid.');
+          .update({
+            'monthly_limit': amountMinor,
+            'updated_at': FieldValue.serverTimestamp(),
+          });
+      _logger.i('Set monthly_limit=$amountMinor for child=$childUid.');
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to set child monthly limit for child=$childUid.',
@@ -122,11 +129,41 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
       await _firestore
           .collection('users')
           .doc(childUid)
-          .update({'monthly_limit_minor': FieldValue.delete()});
-      _logger.i('Removed monthly_limit_minor for child=$childUid.');
+          .update({
+            'monthly_limit': FieldValue.delete(),
+            'updated_at': FieldValue.serverTimestamp(),
+          });
+      _logger.i('Removed monthly_limit for child=$childUid.');
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to remove child monthly limit for child=$childUid.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, int?>> getChildrenMonthlyLimits({
+    required List<String> childUids,
+  }) async {
+    if (childUids.isEmpty) return {};
+    try {
+      final docs = await Future.wait(
+        childUids.map(
+          (uid) => _firestore.collection('users').doc(uid).get(),
+        ),
+      );
+      final limits = <String, int?>{};
+      for (var i = 0; i < childUids.length; i++) {
+        final data = docs[i].data();
+        limits[childUids[i]] = (data?['monthly_limit'] as num?)?.toInt();
+      }
+      return limits;
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to fetch monthly limits for children=$childUids.',
         error: error,
         stackTrace: stackTrace,
       );

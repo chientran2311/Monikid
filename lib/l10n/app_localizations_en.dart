@@ -163,17 +163,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeParFamilyMembersLabel => 'Family Members';
 
   @override
-  String get homeParNoFamilyTitle => 'No family members yet';
+  String get homeParNoFamilyTitle => 'Start your journey';
 
   @override
   String get homeParNoFamilySubtitle =>
-      'Create a family to start tracking your child\'s spending';
+      'Welcome to MoniKid. Add your first member to start managing family spending.';
 
   @override
   String get homeParCreateFamilyBtn => 'Create Family';
 
   @override
-  String get homeParInviteTitle => 'Add New Member';
+  String get homeParNoFamilyHintSafe => 'Safe management for your kids';
+
+  @override
+  String get homeParNoFamilyHintChart => 'Track spending charts';
+
+  @override
+  String get homeParErrorTitle => 'Something went wrong';
+
+  @override
+  String get homeParErrorDesc => 'Couldn\'t load your home. Please try again.';
+
+  @override
+  String get homeParInviteTitle => 'Invite Member';
+
+  @override
+  String get homeParInviteDesc =>
+      'Share this code with your child or family member to join your MoniKid family.';
 
   @override
   String get homeParInviteCodeLabel => 'Link Code';
@@ -244,6 +260,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeParTotalMonthlySpending => 'Total spending this month';
+
+  @override
+  String get homeParLimitLabel => 'Limit:';
+
+  @override
+  String homeParUsedPercent(String percent) {
+    return 'Used $percent%';
+  }
+
+  @override
+  String get homeParLowBalanceTitle => 'Low balance';
+
+  @override
+  String homeParLowBalanceDesc(String name) {
+    return '$name\'s account is below 100,000₫.';
+  }
+
+  @override
+  String get homeParTransactionSuccess => 'Success';
+
+  @override
   String get noTransactionsYet => 'No transactions yet.';
 
   @override
@@ -252,7 +290,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get settingFQA => 'Frequently Asked Questions';
+  String get settingFAQ => 'Frequently Asked Questions';
 
   @override
   String get msgNoData => 'No data found';
@@ -320,6 +358,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transactionAmountLabel => 'Amount';
+
+  @override
+  String get transactionAmountInputLabel => 'Enter amount';
+
+  @override
+  String get transactionDetailSectionLabel => 'Details';
+
+  @override
+  String get transactionDateRowLabel => 'Transaction date';
+
+  @override
+  String get transactionExpenseTab => 'Expense';
+
+  @override
+  String get transactionIncomeTab => 'Income';
+
+  @override
+  String get transactionCategoryViewAll => 'View all';
+
+  @override
+  String get transactionEvidenceRowLabel => 'Receipt photo';
 
   @override
   String get transactionCategoryLabel => 'Category';
@@ -477,7 +536,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'No usable autofill suggestion was found. Please review the form manually.';
 
   @override
-  String get profileEditTitle => 'Edit Profile';
+  String get profileEditTitle => 'Personal Profile';
 
   @override
   String get profileEditAvatarLabel => 'Change Avatar';
@@ -509,6 +568,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileEditDobHint => 'DD/MM/YYYY';
+
+  @override
+  String get profileEditDobPickerTitle => 'Select Date of Birth';
+
+  @override
+  String get profileEditDobPickerDone => 'Done';
 
   @override
   String get actionSaveChanges => 'Save Changes';
@@ -833,6 +898,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get parentStatisticTotalExpenseLabel => 'TOTAL SPENT';
+
+  @override
+  String get parentStatisticTxCountLabel => 'TX COUNT';
+
+  @override
+  String get parentStatisticPrevPeriodLabel => 'PREV PERIOD';
+
+  @override
+  String get parentStatisticTrendGood => 'Good';
+
+  @override
+  String get parentStatisticTrendBad => 'Bad';
+
+  @override
+  String get parentStatisticEditedBadge => 'Edited';
+
+  @override
   String get settingParTitle => 'Settings';
 
   @override
@@ -861,6 +944,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingParThemeLabel => 'Light/Dark mode';
+
+  @override
+  String get settingThemeDarkLabel => 'Dark mode';
+
+  @override
+  String get settingThemeDarkSubtitle => 'Switch to a dark interface';
 
   @override
   String get settingParNotificationsTitle => 'Notifications';
@@ -1181,8 +1270,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setMoneyLimitFieldLabel => 'Limit';
 
   @override
+  String get setMoneyLimitSubtitle =>
+      'Enter the maximum amount your child can spend this month. Changes will apply immediately to the current month.';
+
+  @override
   String get setMoneyLimitDescription =>
-      'This limit helps you stay in control of your spending every month.';
+      'Check that the limit fits your child\'s plan for the month.';
 
   @override
   String get setMoneyLimitSkipAction => 'Skip';
@@ -1245,6 +1338,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticMonthNoun => 'month';
 
   @override
+  String get statisticYearNoun => 'year';
+
+  @override
+  String get statisticLoadError =>
+      'Unable to load statistic data. Please try again.';
+
+  @override
   String get statisticThisWeek => 'This week';
 
   @override
@@ -1255,6 +1355,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statisticLastMonth => 'Last month';
+
+  @override
+  String get statisticThisYear => 'This year';
+
+  @override
+  String get statisticLastYear => 'Last year';
 
   @override
   String get statisticSmartInsightFallback =>
@@ -1333,6 +1439,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statisticTopCategoriesTitle => 'Top spending categories';
+
+  @override
+  String get statisticTopIncomeCategoriesTitle => 'Top income categories';
+
+  @override
+  String get statisticCategoryTransactionListTitle => 'Transaction List';
 
   @override
   String get statisticStrongestIncrease => 'Strongest increase';
@@ -1557,6 +1669,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customCategoryAddNew => 'Add new';
+
+  @override
+  String get customCategoryDelete => 'Delete';
+
+  @override
+  String get customCategoryIconHint => 'Pick an icon';
+
+  @override
+  String get customCategoryDropToDelete => 'Drop here to delete';
+
+  @override
+  String get customCategoryDeleteFailed => 'Could not delete category';
 
   @override
   String get setMoneyLimitManagedByParent =>
@@ -1993,4 +2117,32 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get transactionHistorySubhead =>
       'All your income and expenses over time.';
+
+  @override
+  String get splashStatusLoading => 'Setting up wallet...';
+
+  @override
+  String get notifChildDailyTitle => 'Spending report today';
+
+  @override
+  String notifChildDailyBody(int pct, String expense, String month) {
+    return 'You have $pct% of your limit left, you spent $expense in $month';
+  }
+
+  @override
+  String notifChildNoLimitBody(String expense, String month) {
+    return 'You spent $expense in $month';
+  }
+
+  @override
+  String get notifParentDailyTitle => 'Family spending report';
+
+  @override
+  String notifParentChildBody(String name, int pct, String expense) {
+    return 'Your child $name has $pct% of limit left, spent $expense';
+  }
+
+  @override
+  String get notifScheduleError =>
+      'Cannot schedule notification. Please try again.';
 }

@@ -365,13 +365,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeParNoFamilyTitle.
   ///
   /// In en, this message translates to:
-  /// **'No family members yet'**
+  /// **'Start your journey'**
   String get homeParNoFamilyTitle;
 
   /// No description provided for @homeParNoFamilySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Create a family to start tracking your child\'s spending'**
+  /// **'Welcome to MoniKid. Add your first member to start managing family spending.'**
   String get homeParNoFamilySubtitle;
 
   /// No description provided for @homeParCreateFamilyBtn.
@@ -380,11 +380,41 @@ abstract class AppLocalizations {
   /// **'Create Family'**
   String get homeParCreateFamilyBtn;
 
+  /// No description provided for @homeParNoFamilyHintSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe management for your kids'**
+  String get homeParNoFamilyHintSafe;
+
+  /// No description provided for @homeParNoFamilyHintChart.
+  ///
+  /// In en, this message translates to:
+  /// **'Track spending charts'**
+  String get homeParNoFamilyHintChart;
+
+  /// No description provided for @homeParErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get homeParErrorTitle;
+
+  /// No description provided for @homeParErrorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your home. Please try again.'**
+  String get homeParErrorDesc;
+
   /// No description provided for @homeParInviteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Add New Member'**
+  /// **'Invite Member'**
   String get homeParInviteTitle;
+
+  /// No description provided for @homeParInviteDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this code with your child or family member to join your MoniKid family.'**
+  String get homeParInviteDesc;
 
   /// No description provided for @homeParInviteCodeLabel.
   ///
@@ -512,6 +542,42 @@ abstract class AppLocalizations {
   /// **'Spent {percent}% of income'**
   String homeParSpentPercent(String percent);
 
+  /// No description provided for @homeParTotalMonthlySpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Total spending this month'**
+  String get homeParTotalMonthlySpending;
+
+  /// No description provided for @homeParLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit:'**
+  String get homeParLimitLabel;
+
+  /// No description provided for @homeParUsedPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'Used {percent}%'**
+  String homeParUsedPercent(String percent);
+
+  /// No description provided for @homeParLowBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Low balance'**
+  String get homeParLowBalanceTitle;
+
+  /// No description provided for @homeParLowBalanceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s account is below 100,000₫.'**
+  String homeParLowBalanceDesc(String name);
+
+  /// No description provided for @homeParTransactionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get homeParTransactionSuccess;
+
   /// No description provided for @noTransactionsYet.
   ///
   /// In en, this message translates to:
@@ -524,11 +590,11 @@ abstract class AppLocalizations {
   /// **'Error: {error}'**
   String errorGeneric(String error);
 
-  /// No description provided for @settingFQA.
+  /// No description provided for @settingFAQ.
   ///
   /// In en, this message translates to:
   /// **'Frequently Asked Questions'**
-  String get settingFQA;
+  String get settingFAQ;
 
   /// No description provided for @msgNoData.
   ///
@@ -655,6 +721,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amount'**
   String get transactionAmountLabel;
+
+  /// No description provided for @transactionAmountInputLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get transactionAmountInputLabel;
+
+  /// No description provided for @transactionDetailSectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get transactionDetailSectionLabel;
+
+  /// No description provided for @transactionDateRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction date'**
+  String get transactionDateRowLabel;
+
+  /// No description provided for @transactionExpenseTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get transactionExpenseTab;
+
+  /// No description provided for @transactionIncomeTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get transactionIncomeTab;
+
+  /// No description provided for @transactionCategoryViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get transactionCategoryViewAll;
+
+  /// No description provided for @transactionEvidenceRowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt photo'**
+  String get transactionEvidenceRowLabel;
 
   /// No description provided for @transactionCategoryLabel.
   ///
@@ -935,7 +1043,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileEditTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit Profile'**
+  /// **'Personal Profile'**
   String get profileEditTitle;
 
   /// No description provided for @profileEditAvatarLabel.
@@ -997,6 +1105,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'DD/MM/YYYY'**
   String get profileEditDobHint;
+
+  /// No description provided for @profileEditDobPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date of Birth'**
+  String get profileEditDobPickerTitle;
+
+  /// No description provided for @profileEditDobPickerDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get profileEditDobPickerDone;
 
   /// No description provided for @actionSaveChanges.
   ///
@@ -1580,6 +1700,42 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No transactions} =1{1 transaction} other{{count} transactions}}'**
   String parentStatisticTransactionCount(int count);
 
+  /// No description provided for @parentStatisticTotalExpenseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL SPENT'**
+  String get parentStatisticTotalExpenseLabel;
+
+  /// No description provided for @parentStatisticTxCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TX COUNT'**
+  String get parentStatisticTxCountLabel;
+
+  /// No description provided for @parentStatisticPrevPeriodLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PREV PERIOD'**
+  String get parentStatisticPrevPeriodLabel;
+
+  /// No description provided for @parentStatisticTrendGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get parentStatisticTrendGood;
+
+  /// No description provided for @parentStatisticTrendBad.
+  ///
+  /// In en, this message translates to:
+  /// **'Bad'**
+  String get parentStatisticTrendBad;
+
+  /// No description provided for @parentStatisticEditedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get parentStatisticEditedBadge;
+
   /// No description provided for @settingParTitle.
   ///
   /// In en, this message translates to:
@@ -1639,6 +1795,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Light/Dark mode'**
   String get settingParThemeLabel;
+
+  /// No description provided for @settingThemeDarkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode'**
+  String get settingThemeDarkLabel;
+
+  /// No description provided for @settingThemeDarkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to a dark interface'**
+  String get settingThemeDarkSubtitle;
 
   /// No description provided for @settingParNotificationsTitle.
   ///
@@ -2234,10 +2402,16 @@ abstract class AppLocalizations {
   /// **'Limit'**
   String get setMoneyLimitFieldLabel;
 
+  /// No description provided for @setMoneyLimitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the maximum amount your child can spend this month. Changes will apply immediately to the current month.'**
+  String get setMoneyLimitSubtitle;
+
   /// No description provided for @setMoneyLimitDescription.
   ///
   /// In en, this message translates to:
-  /// **'This limit helps you stay in control of your spending every month.'**
+  /// **'Check that the limit fits your child\'s plan for the month.'**
   String get setMoneyLimitDescription;
 
   /// No description provided for @setMoneyLimitSkipAction.
@@ -2348,6 +2522,18 @@ abstract class AppLocalizations {
   /// **'month'**
   String get statisticMonthNoun;
 
+  /// No description provided for @statisticYearNoun.
+  ///
+  /// In en, this message translates to:
+  /// **'year'**
+  String get statisticYearNoun;
+
+  /// No description provided for @statisticLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load statistic data. Please try again.'**
+  String get statisticLoadError;
+
   /// No description provided for @statisticThisWeek.
   ///
   /// In en, this message translates to:
@@ -2371,6 +2557,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last month'**
   String get statisticLastMonth;
+
+  /// No description provided for @statisticThisYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get statisticThisYear;
+
+  /// No description provided for @statisticLastYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Last year'**
+  String get statisticLastYear;
 
   /// No description provided for @statisticSmartInsightFallback.
   ///
@@ -2495,6 +2693,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Top spending categories'**
   String get statisticTopCategoriesTitle;
+
+  /// No description provided for @statisticTopIncomeCategoriesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top income categories'**
+  String get statisticTopIncomeCategoriesTitle;
+
+  /// No description provided for @statisticCategoryTransactionListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction List'**
+  String get statisticCategoryTransactionListTitle;
 
   /// No description provided for @statisticStrongestIncrease.
   ///
@@ -2915,6 +3125,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add new'**
   String get customCategoryAddNew;
+
+  /// No description provided for @customCategoryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get customCategoryDelete;
+
+  /// No description provided for @customCategoryIconHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an icon'**
+  String get customCategoryIconHint;
+
+  /// No description provided for @customCategoryDropToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop here to delete'**
+  String get customCategoryDropToDelete;
+
+  /// No description provided for @customCategoryDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete category'**
+  String get customCategoryDeleteFailed;
 
   /// No description provided for @setMoneyLimitManagedByParent.
   ///
@@ -3701,6 +3935,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All your income and expenses over time.'**
   String get transactionHistorySubhead;
+
+  /// No description provided for @splashStatusLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting up wallet...'**
+  String get splashStatusLoading;
+
+  /// No description provided for @notifChildDailyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending report today'**
+  String get notifChildDailyTitle;
+
+  /// No description provided for @notifChildDailyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {pct}% of your limit left, you spent {expense} in {month}'**
+  String notifChildDailyBody(int pct, String expense, String month);
+
+  /// No description provided for @notifChildNoLimitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You spent {expense} in {month}'**
+  String notifChildNoLimitBody(String expense, String month);
+
+  /// No description provided for @notifParentDailyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family spending report'**
+  String get notifParentDailyTitle;
+
+  /// No description provided for @notifParentChildBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your child {name} has {pct}% of limit left, spent {expense}'**
+  String notifParentChildBody(String name, int pct, String expense);
+
+  /// No description provided for @notifScheduleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot schedule notification. Please try again.'**
+  String get notifScheduleError;
 }
 
 class _AppLocalizationsDelegate

@@ -6,7 +6,7 @@ part of 'join_family_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$linkedFamilyHash() => r'c6823ad46fa848292f347c8b8edab6d8f376cd27';
+String _$linkedFamilyHash() => r'6221c04f45999ccef88d4f29b98483730dd3ca0a';
 
 /// See also [linkedFamily].
 @ProviderFor(linkedFamily)
@@ -23,7 +23,7 @@ final linkedFamilyProvider = AutoDisposeFutureProvider<FamilyModel?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LinkedFamilyRef = AutoDisposeFutureProviderRef<FamilyModel?>;
-String _$familyMembersHash() => r'ef7acef4a93bd55385852031e036741d2561ba86';
+String _$familyMembersHash() => r'95efcb75475809e41403b67b79df21b76f7645ce';
 
 /// See also [familyMembers].
 @ProviderFor(familyMembers)
@@ -43,7 +43,7 @@ final familyMembersProvider =
 typedef FamilyMembersRef =
     AutoDisposeStreamProviderRef<List<FamilyMemberModel>>;
 String _$joinFamilyNotifierHash() =>
-    r'a2f08985424487fbafc4d0f54199638fd6a4bb78';
+    r'14246195f756a4c39734c45b5359c2ce3fc39a32';
 
 /// See also [JoinFamilyNotifier].
 @ProviderFor(JoinFamilyNotifier)

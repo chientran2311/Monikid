@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -8,9 +9,13 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/change_language/change_language_dialog.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
+import 'package:monikid/features/change_theme/change_theme_provider.dart';
 import 'package:monikid/features/child/setting/widgets/setting_group.dart';
 import 'package:monikid/features/child/setting/widgets/setting_item.dart';
-import 'package:monikid/shared/widgets/confirm_dialog.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/logout_dialog.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
+import 'package:monikid/shared/widgets/theme_toggle_switch.dart';
 
 class SettingTabStudent extends ConsumerWidget {
   const SettingTabStudent({super.key});
@@ -24,7 +29,8 @@ class SettingTabStudent extends ConsumerWidget {
     Future<void> handleSignOut() async {
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (_) => ConfirmDialog(
+        barrierColor: Colors.black.withValues(alpha: 0.4),
+        builder: (_) => LogoutDialog(
           title: s.settingParLogoutLabel,
           message: s.settingSignOutConfirm,
           confirmLabel: s.settingParLogoutLabel,
@@ -43,28 +49,30 @@ class SettingTabStudent extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          children: [
-            SizedBox(height: 24.h),
-            _SettingHeader(
-              eyebrowLabel: s.settingStuEyebrow,
-              title: s.settingStuTitle,
-              subtitle: s.settingStuSubtitle,
-              isDark: isDark,
-            ),
-            SizedBox(height: 24.h),
-            _SettingsList(langCode: langCode, isDark: isDark),
-            SizedBox(height: 20.h),
-            _SignOutCard(
-              isDark: isDark,
-              label: s.settingParLogoutLabel,
-              onTap: handleSignOut,
-            ),
-            SizedBox(height: 100.h),
-          ],
+          isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight,
+      body: AppBackground(
+        whiteBackground: true,
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            children: [
+              SizedBox(height: 24.h),
+              _SettingHeader(
+                eyebrowLabel: s.settingStuEyebrow,
+                title: s.settingStuTitle,
+                subtitle: s.settingStuSubtitle,
+                isDark: isDark,
+              ),
+              SizedBox(height: 24.h),
+              _SettingsList(langCode: langCode, isDark: isDark),
+              SizedBox(height: 20.h),
+              PrimaryButton.danger(
+                title: s.settingParLogoutLabel,
+                onTap: handleSignOut,
+              ),
+              SizedBox(height: 100.h),
+            ],
+          ),
         ),
       ),
     );
@@ -211,61 +219,43 @@ class _SettingsList extends StatelessWidget {
           icon: Icons.help_outline_rounded,
           iconColor: AppTheme.primary,
           iconBgColor: AppTheme.primaryLight,
-          title: s.settingFQA,
+          title: s.settingFAQ,
           subtitle: s.settingStuFaqSubtitle,
-          showBorder: false,
-          onTap: () => context.push(AppRoutes.fqa),
+          showBorder: true,
+          onTap: () => context.push(AppRoutes.faq),
         ),
-      ],
-    );
-  }
-}
-
-class _SignOutCard extends StatelessWidget {
-  const _SignOutCard({
-    required this.isDark,
-    required this.label,
-    required this.onTap,
-  });
-
-  final bool isDark;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final errorColor = isDark ? AppTheme.redVeryLight : AppTheme.redDark;
-    final bgColor =
-        isDark ? AppTheme.redVeryLight.withValues(alpha: 0.1) : AppTheme.dangerSurface;
-    final borderColor =
-        isDark ? AppTheme.redVeryLight.withValues(alpha: 0.2) : AppTheme.dangerBorder;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: borderColor),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18.r),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(18.r),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 18.h),
-            child: Center(
-              child: Text(
-                label,
-                style: context.typo.subtitle.small.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: errorColor,
-                ),
+        Consumer(
+          builder: (context, ref, _) {
+            final isDark = ref.watch(changeThemeProvider).isDark;
+            return SettingItem(
+              icon: Icons.dark_mode_outlined,
+              iconColor: AppTheme.primary,
+              iconBgColor: AppTheme.primaryLight,
+              title: s.settingThemeDarkLabel,
+              subtitle: s.settingThemeDarkSubtitle,
+              showChevron: false,
+              showBorder: kDebugMode,
+              trailing: ThemeToggleSwitch(
+                value: isDark,
+                onChanged: (value) =>
+                    ref.read(changeThemeProvider.notifier).setDark(value),
               ),
-            ),
-          ),
+              onTap: () =>
+                  ref.read(changeThemeProvider.notifier).setDark(!isDark),
+            );
+          },
         ),
-      ),
+        if (kDebugMode)
+          SettingItem(
+            icon: Icons.developer_mode_rounded,
+            iconColor: AppTheme.primary,
+            iconBgColor: AppTheme.primaryLight,
+            title: 'Dev Tools',
+            subtitle: 'Mock data & testing utilities',
+            showBorder: false,
+            onTap: () => context.push(AppRoutes.devTools),
+          ),
+      ],
     );
   }
 }

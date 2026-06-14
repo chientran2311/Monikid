@@ -9,10 +9,13 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_provider.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_state.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_state.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class ParentCategoryTransactionsArgs {
   const ParentCategoryTransactionsArgs({
@@ -36,8 +39,6 @@ class ParentCategoryTransactionsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
     useEffect(() {
       Future.microtask(
@@ -53,27 +54,15 @@ class ParentCategoryTransactionsScreen extends HookConsumerWidget {
     final state = ref.watch(parentCategoryTransactionsNotifierProvider);
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-          onPressed: () => context.pop(),
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: args.categoryLabel),
+      body: AppBackground(
+        child: _Body(
+          state: state,
+          isDark: isDark,
+          childUid: args.childUid,
         ),
-        title: Text(
-          args.categoryLabel,
-          style: context.typo.subtitle.medium.copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: _Body(
-        state: state,
-        isDark: isDark,
-        childUid: args.childUid,
       ),
     );
   }
@@ -106,7 +95,12 @@ class _Body extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: EdgeInsets.all(20.r),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + kToolbarHeight + 20.h,
+        left: 20.w,
+        right: 20.w,
+        bottom: 20.h,
+      ),
       itemCount: state.transactions.length,
       separatorBuilder: (_, __) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {
@@ -126,7 +120,7 @@ class _Body extends StatelessWidget {
   }
 }
 
-class _TransactionTile extends StatelessWidget {
+class _TransactionTile extends ConsumerWidget {
   const _TransactionTile({
     required this.transaction,
     required this.isDark,
@@ -137,8 +131,17 @@ class _TransactionTile extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
 
+  static bool _isEdited(TransactionModel t) =>
+      t.updatedAt != null &&
+      t.createdAt != null &&
+      t.updatedAt!.isAfter(t.createdAt!);
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final categoryLabel =
+        findCategoryByTransactionKey(categories, transaction.categoryKey)?.label ??
+        transaction.categoryLabel;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
@@ -173,12 +176,24 @@ class _TransactionTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    transaction.categoryLabel,
-                    style: context.typo.body.medium.copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          categoryLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.typo.body.medium.copyWith(
+                            color: textColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (_isEdited(transaction)) ...[
+                        SizedBox(width: 6.w),
+                        _EditedBadge(isDark: isDark),
+                      ],
+                    ],
                   ),
                   SizedBox(height: 4.h),
                   Text(
@@ -198,6 +213,30 @@ class _TransactionTile extends StatelessWidget {
             SizedBox(width: 8.w),
             Icon(Icons.chevron_right_rounded, color: mutedColor, size: 20.r),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EditedBadge extends StatelessWidget {
+  const _EditedBadge({required this.isDark});
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: AppTheme.amberFill,
+        borderRadius: BorderRadius.circular(4.r),
+      ),
+      child: Text(
+        context.l10n.parentStatisticEditedBadge,
+        style: context.typo.caption.small.copyWith(
+          color: AppTheme.amberText,
+          fontWeight: FontWeight.w600,
+          fontSize: 9.sp,
         ),
       ),
     );

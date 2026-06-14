@@ -15,7 +15,6 @@ enum ChangeProfileStatus {
 enum ChangeProfileFieldError {
   requiredField,
   fullNameTooShort,
-  invalidPhoneFormat,
 }
 
 @freezed
@@ -24,11 +23,7 @@ abstract class ChangeProfileState with _$ChangeProfileState {
     ProfileModel? profile,
     @Default(ChangeProfileStatus.initial) ChangeProfileStatus status,
     @Default('') String fullName,
-    @Default('') String phone,
-    @Default('') String dob,
-    @Default('') String gender,
     ChangeProfileFieldError? fullNameError,
-    ChangeProfileFieldError? phoneError,
     @Default(false) bool isFormValid,
     @Default(false) bool isSaving,
     String? errorMessage,

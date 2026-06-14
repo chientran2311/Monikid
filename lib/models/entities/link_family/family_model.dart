@@ -8,12 +8,8 @@ part 'family_model.g.dart';
 abstract class FamilyModel with _$FamilyModel {
   const factory FamilyModel({
     required String familyId,
-    required String parentId,
-    required String parentName,
+    required String ownerUid,
     required String inviteCode,
-    required DateTime inviteCodeExpiresAt,
-    required int childCount,
-    required String status,
     required DateTime createdAt,
     DateTime? updatedAt,
   }) = _FamilyModel;
@@ -25,16 +21,18 @@ abstract class FamilyModel with _$FamilyModel {
     final data = doc.data() as Map<String, dynamic>;
     final now = DateTime.now();
 
+    // ownerUid derived from embedded members array — no longer stored as top-level field
+    final members = (data['members'] as List<dynamic>? ?? [])
+        .cast<Map<String, dynamic>>();
+    final ownerMember = members.firstWhere(
+      (m) => m['role'] == 'owner',
+      orElse: () => <String, dynamic>{},
+    );
+
     return FamilyModel(
       familyId: doc.id,
-      parentId: data['parent_id'] as String? ?? '',
-      parentName: data['parent_name'] as String? ?? '',
+      ownerUid: ownerMember['user_id'] as String? ?? '',
       inviteCode: data['invite_code'] as String? ?? '',
-      inviteCodeExpiresAt: data['invite_code_expires_at'] != null
-          ? (data['invite_code_expires_at'] as Timestamp).toDate()
-          : now.add(const Duration(days: 365)),
-      childCount: (data['child_count'] as num?)?.toInt() ?? 0,
-      status: data['status'] as String? ?? 'active',
       createdAt: data['created_at'] != null
           ? (data['created_at'] as Timestamp).toDate()
           : now,

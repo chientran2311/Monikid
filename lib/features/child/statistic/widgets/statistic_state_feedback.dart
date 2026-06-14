@@ -15,11 +15,12 @@ class StatisticErrorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: AppTheme.dangerSurface,
+        color: isDark ? AppTheme.darkDangerSurface : AppTheme.dangerSurface,
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: AppTheme.dangerBorder),
       ),
@@ -46,13 +47,14 @@ class StatisticEmptyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(22.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(24.r),
-        border: Border.all(color: AppTheme.surfaceGrey),
+        border: Border.all(color: isDark ? AppTheme.darkBorder : AppTheme.surfaceGrey),
       ),
       child: Column(
         children: [
@@ -65,7 +67,7 @@ class StatisticEmptyCard extends StatelessWidget {
           Text(
             context.l10n.statisticNoDataTitle,
             textAlign: TextAlign.center,
-            style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.w800, color: AppTheme.textBlack),
+            style: context.typo.subtitle.medium.copyWith(fontWeight: FontWeight.w800, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack),
           ),
           SizedBox(height: 8.h),
           Text(

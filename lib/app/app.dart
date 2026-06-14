@@ -6,6 +6,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/change_language/change_language_provider.dart';
+import 'package:monikid/features/change_theme/change_theme_provider.dart';
 import 'package:monikid/l10n/app_localizations.dart';
 
 /// Global localization accessor for legacy non-widget call sites.
@@ -19,6 +20,7 @@ class MoniKidApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final localeState = ref.watch(changeLanguageProvider);
+    final themeMode = ref.watch(changeThemeProvider).themeMode;
 
     return MaterialApp.router(
       title: 'MoniKid',
@@ -27,7 +29,9 @@ class MoniKidApp extends ConsumerWidget {
       // Theme
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
+      themeAnimationDuration: const Duration(milliseconds: 700),
+      themeAnimationCurve: Curves.easeInOut,
 
       // Router
       routerConfig: router,

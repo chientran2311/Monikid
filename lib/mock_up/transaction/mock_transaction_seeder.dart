@@ -60,8 +60,6 @@ class MockTransactionSeeder {
           .doc(realTx.transactionId);
 
       try {
-        final payload = _toFirestoreMap(realTx);
-
         final existing = await ref.get();
         if (existing.exists) {
           if (!forceOverwrite) {
@@ -69,16 +67,20 @@ class MockTransactionSeeder {
             skipped++;
             continue;
           } else {
-            // Rule: Khong duoc doi created_at trong update
-            // Do đó phải giữ nguyên created_at cũ để bypass security rules
-            final oldData = existing.data();
-            if (oldData != null && oldData.containsKey('created_at')) {
-              payload['created_at'] = oldData['created_at'];
-            }
+            // set() on existing doc → evaluated as UPDATE by Firestore rules.
+            // isValidTransactionUpdate forbids touching transaction_id/user_id/
+            // family_id/created_at (diff.hasOnly check).
+            // Use update() with only the mutable fields instead.
+            await ref.update(_toFirestoreUpdateMap(realTx));
+            logger.d(
+              'Updated mock transaction ${realTx.transactionId}.',
+            );
+            success++;
+            continue;
           }
         }
 
-        await ref.set(payload); // set() overwrites
+        await ref.set(_toFirestoreMap(realTx)); // new doc → create path
         logger.d(
           'Seeded mock transaction ${realTx.transactionId}. '
           'type=${realTx.type} amountMinor=${realTx.amountMinor} '
@@ -131,6 +133,30 @@ class MockTransactionSeeder {
     if (tx.merchantName != null) map['merchant_name'] = tx.merchantName;
     // evidence_image bị bỏ qua theo yêu cầu
 
+    return map;
+  }
+
+  // Only mutable fields allowed by isValidTransactionUpdate diff check.
+  // Excludes: transaction_id, user_id, family_id, created_at.
+  // source must be non-null (rule: validTransactionSource); skip if null.
+  static Map<String, dynamic> _toFirestoreUpdateMap(TransactionModel tx) {
+    final map = <String, dynamic>{
+      'type': tx.type,
+      'amount_minor': tx.amountMinor,
+      'currency': tx.currency,
+      'category_key': tx.categoryKey,
+      'category_label': tx.categoryLabel,
+      'category_icon': tx.categoryIcon,
+      'note': tx.note,
+      'merchant_name': tx.merchantName,
+      'date_ts': Timestamp.fromDate(tx.dateTs),
+      'updated_at': Timestamp.fromDate(tx.updatedAt ?? tx.dateTs),
+      'ocr_meta': {
+        'used': tx.ocrUsed ?? false,
+        'confidence': tx.ocrConfidence,
+      },
+    };
+    if (tx.source != null) map['source'] = tx.source;
     return map;
   }
 

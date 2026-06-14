@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_provider.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_state.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/widgets/parent_transaction_detail_card.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class ParentTransactionDetailScreen extends HookConsumerWidget {
   const ParentTransactionDetailScreen({
@@ -22,8 +24,6 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
 
     useEffect(() {
       Future.microtask(
@@ -50,7 +50,12 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
         body = Center(child: Text(context.l10n.transactionDetailNoData));
       } else {
         body = SingleChildScrollView(
-          padding: EdgeInsets.all(20.r),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + kToolbarHeight + 20.h,
+            left: 20.w,
+            right: 20.w,
+            bottom: 20.h,
+          ),
           child: ParentTransactionDetailCard(
             transaction: transaction,
             isDark: isDark,
@@ -60,24 +65,10 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          context.l10n.transactionDetailTitle,
-          style: context.typo.subtitle.medium.copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: body,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: context.l10n.transactionDetailTitle),
+      body: AppBackground(child: body),
     );
   }
 }

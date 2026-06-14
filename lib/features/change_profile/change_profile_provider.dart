@@ -10,8 +10,6 @@ part 'change_profile_provider.g.dart';
 
 @riverpod
 class ChangeProfile extends _$ChangeProfile {
-  static final _phoneRegex = RegExp(r'^(0[0-9]{9})$');
-
   @override
   ChangeProfileState build() {
     Future.microtask(_loadProfile);
@@ -30,9 +28,6 @@ class ChangeProfile extends _$ChangeProfile {
             status: ChangeProfileStatus.ready,
             profile: profile,
             fullName: profile.fullName,
-            phone: profile.phone,
-            dob: profile.dob,
-            gender: profile.gender,
           );
           _updateFormValidity();
         } else {
@@ -67,27 +62,9 @@ class ChangeProfile extends _$ChangeProfile {
     _updateFormValidity();
   }
 
-  void updatePhone(String value) {
-    ChangeProfileFieldError? error;
-    if (value.isNotEmpty && !_phoneRegex.hasMatch(value)) {
-      error = ChangeProfileFieldError.invalidPhoneFormat;
-    }
-    state = state.copyWith(phone: value, phoneError: error);
-    _updateFormValidity();
-  }
-
-  void updateDob(String value) {
-    state = state.copyWith(dob: value);
-  }
-
-  void updateGender(String value) {
-    state = state.copyWith(gender: value);
-  }
-
   void _updateFormValidity() {
-    final noErrors = state.fullNameError == null && state.phoneError == null;
     final hasRequiredFields = state.fullName.trim().isNotEmpty;
-    state = state.copyWith(isFormValid: noErrors && hasRequiredFields);
+    state = state.copyWith(isFormValid: state.fullNameError == null && hasRequiredFields);
   }
 
   Future<void> saveProfile() async {
@@ -97,9 +74,6 @@ class ChangeProfile extends _$ChangeProfile {
       final repository = ref.read(profileRepositoryProvider);
       final updatedProfile = state.profile!.copyWith(
         fullName: state.fullName.trim(),
-        phone: state.phone,
-        dob: state.dob,
-        gender: state.gender,
       );
       await repository.updateProfile(updatedProfile);
       state = state.copyWith(
@@ -139,9 +113,6 @@ class ChangeProfile extends _$ChangeProfile {
         status: ChangeProfileStatus.ready,
         profile: updated ?? state.profile,
         fullName: updated?.fullName ?? state.fullName,
-        phone: updated?.phone ?? state.phone,
-        dob: updated?.dob ?? state.dob,
-        gender: updated?.gender ?? state.gender,
       );
       _updateFormValidity();
       ref.invalidate(profileImageProvider(userId));
@@ -154,5 +125,4 @@ class ChangeProfile extends _$ChangeProfile {
       );
     }
   }
-
 }

@@ -52,9 +52,10 @@ class _SnackBarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final cfg = _configFor(type);
-    final textColor = AppTheme.textBlack;
-    final closeColor = AppTheme.textGrey;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final closeColor = isDark ? AppTheme.darkTextTertiary : AppTheme.textGrey;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14.r),
@@ -63,10 +64,14 @@ class _SnackBarContent extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(16.r),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.88),
+            color: isDark
+                ? AppTheme.surfaceDark.withValues(alpha: 0.92)
+                : Colors.white.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.4),
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.10)
+                  : Colors.white.withValues(alpha: 0.4),
             ),
             boxShadow: [
               BoxShadow(

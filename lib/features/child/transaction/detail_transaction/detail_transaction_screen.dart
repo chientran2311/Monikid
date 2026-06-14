@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:monikid/app/app.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
@@ -14,6 +15,8 @@ import 'package:monikid/features/child/transaction/detail_transaction/widgets/tr
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_status.dart';
 import 'package:monikid/features/child/transaction/widgets/transaction_loading_skeleton.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
 
 class DetailTransactionScreen extends HookConsumerWidget {
@@ -44,8 +47,6 @@ class DetailTransactionScreen extends HookConsumerWidget {
 
     final state = ref.watch(detailTransactionNotifierProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
 
     final showActions = state.transaction != null &&
         state.status != TransactionStatus.initial &&
@@ -53,44 +54,34 @@ class DetailTransactionScreen extends HookConsumerWidget {
         state.status != TransactionStatus.error;
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor.withValues(alpha: 0.95),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: textColor),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          s.transactionDetailTitle,
-          style: context.typo.subtitle.medium
-              .copyWith(fontWeight: FontWeight.bold, color: textColor),
-        ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          _buildBody(state, isDark),
-          if (showActions)
-            Positioned(
-              bottom: 32.h,
-              left: 20.w,
-              right: 20.w,
-              child: PrimaryButton(
-                title: s.transactionEditAction,
-                onTap: () async {
-                  ref
-                      .read(transactionHistoryProvider.notifier)
-                      .selectTransaction(state.transaction!);
-                  await context.push(
-                    AppRoutes.updateTransactionPath(
-                      state.transaction!.transactionId,
-                    ),
-                  );
-                },
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: s.transactionDetailTitle),
+      body: AppBackground(
+        child: Stack(
+          children: [
+            _buildBody(state, isDark),
+            if (showActions)
+              Positioned(
+                bottom: 32.h,
+                left: 20.w,
+                right: 20.w,
+                child: PrimaryButton(
+                  title: s.transactionEditAction,
+                  onTap: () async {
+                    ref
+                        .read(transactionHistoryProvider.notifier)
+                        .selectTransaction(state.transaction!);
+                    await context.push(
+                      AppRoutes.updateTransactionPath(
+                        state.transaction!.transactionId,
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -104,12 +95,11 @@ class DetailTransactionScreen extends HookConsumerWidget {
         return ErrorState(errorMessage: state.errorMessage);
       case TransactionStatus.ready:
       case TransactionStatus.submitting:
+      case TransactionStatus.success:
         if (state.transaction == null) {
           return Center(child: Text(s.transactionDetailNoData));
         }
         return TransactionContent(state: state, isDark: isDark);
-      case TransactionStatus.success:
-        return const SizedBox.shrink();
     }
   }
 }

@@ -17,17 +17,12 @@ void handleAddTransactionStateChange(
   switch (next.status) {
     case TransactionStatus.success:
       final s = context.l10n;
-      final messenger = ScaffoldMessenger.of(context);
       context.pop();
-      messenger.showSnackBar(
-        SnackBar(content: Text(s.msgAddTransactionSuccess)),
-      );
+      context.showSuccessSnackBar(s.msgAddTransactionSuccess);
       return;
     case TransactionStatus.error:
       if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.errorMessage!)),
-        );
+        context.showErrorSnackBar(next.errorMessage!);
       }
       return;
     case TransactionStatus.initial:

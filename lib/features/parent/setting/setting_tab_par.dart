@@ -6,8 +6,10 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
-import 'package:monikid/shared/widgets/confirm_dialog.dart';
-import 'package:monikid/shared/widgets/app_ios_switch.dart';
+import 'package:monikid/features/change_theme/change_theme_provider.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/logout_dialog.dart';
+import 'package:monikid/shared/widgets/theme_toggle_switch.dart';
 import 'widgets/setting_group.dart';
 import 'widgets/setting_item.dart';
 
@@ -22,12 +24,12 @@ class SettingTabParent extends ConsumerWidget {
     Future<void> handleSignOut() async {
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (_) => ConfirmDialog(
+        barrierColor: Colors.black.withValues(alpha: 0.4),
+        builder: (_) => LogoutDialog(
           title: s.settingParLogoutLabel,
           message: s.settingSignOutConfirm,
           confirmLabel: s.settingParLogoutLabel,
           cancelLabel: s.actionCancel,
-          confirmColor: AppTheme.redAlert,
         ),
       );
       if (confirmed != true || !context.mounted) return;
@@ -47,8 +49,9 @@ class SettingTabParent extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor:
-          isDark ? AppTheme.backgroundDark : AppTheme.surfaceGrey,
-      body: SafeArea(
+          isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      body: AppBackground(
+        child: SafeArea(
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           children: [
@@ -130,18 +133,8 @@ class SettingTabParent extends ConsumerWidget {
               isDark: isDark,
               children: [
                 _ThemeSettingItem(
-                  isDark: isDark,
                   textColor: textColor,
                   borderColor: borderColor,
-                  onChanged: (value) {
-                    // TODO: Implement theme switching logic with provider
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Theme switching coming soon!'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
@@ -155,6 +148,7 @@ class SettingTabParent extends ConsumerWidget {
             SizedBox(height: 32.h),
           ],
         ),
+      ),
       ),
     );
   }
@@ -201,23 +195,20 @@ class _SignOutButton extends StatelessWidget {
   }
 }
 
-class _ThemeSettingItem extends StatelessWidget {
+class _ThemeSettingItem extends ConsumerWidget {
   const _ThemeSettingItem({
-    required this.isDark,
     required this.textColor,
     required this.borderColor,
-    required this.onChanged,
   });
 
-  final bool isDark;
   final Color textColor;
   final Color borderColor;
-  final ValueChanged<bool> onChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
-    
+    final isDark = ref.watch(changeThemeProvider).isDark;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       child: Row(
@@ -230,7 +221,7 @@ class _ThemeSettingItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
-              Icons.palette_outlined,
+              Icons.dark_mode_outlined,
               color: AppTheme.primary,
               size: 18.r,
             ),
@@ -238,14 +229,18 @@ class _ThemeSettingItem extends StatelessWidget {
           SizedBox(width: 12.w),
           Expanded(
             child: Text(
-              s.settingParThemeLabel,
+              s.settingThemeDarkLabel,
               style: context.typo.subtitle.small.copyWith(
-              fontWeight: FontWeight.w500,
-              color: textColor,
-            ),
+                fontWeight: FontWeight.w500,
+                color: textColor,
+              ),
             ),
           ),
-          AppIosSwitch(value: isDark, onChanged: onChanged),
+          ThemeToggleSwitch(
+            value: isDark,
+            onChanged: (value) =>
+                ref.read(changeThemeProvider.notifier).setDark(value),
+          ),
         ],
       ),
     );

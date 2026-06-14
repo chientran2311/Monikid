@@ -7,7 +7,7 @@ part of 'parent_statistic_provider.dart';
 // **************************************************************************
 
 String _$parentStatisticNotifierHash() =>
-    r'08cbf962ad490c8d27f25d5ef0063c148443089c';
+    r'36bde01ba350c46a3f291b605e1b348e12bc4563';
 
 /// See also [ParentStatisticNotifier].
 @ProviderFor(ParentStatisticNotifier)

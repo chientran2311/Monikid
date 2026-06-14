@@ -108,7 +108,12 @@ class TransactionDetailLoadingSkeleton extends StatelessWidget {
     return Container(
       color: bgColor,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top + kToolbarHeight + 24,
+          left: 20,
+          right: 20,
+          bottom: 24,
+        ),
         child: Column(
           children: [
             // Avatar circle

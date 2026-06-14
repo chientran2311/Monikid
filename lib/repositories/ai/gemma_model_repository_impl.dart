@@ -11,7 +11,7 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
   final Logger _logger;
 
   // Download target name — only used when the app itself downloads the model.
-  // Discovery is filename-agnostic: any .task file >= _minModelBytes is valid.
+  // Discovery is filename-agnostic: any .task or .litertlm file >= _minModelBytes is valid.
   static const String _downloadFileName = 'model.task';
   static const String _downloadUrl =
       'https://drive.usercontent.google.com/download?id=1YpSyathqytl74bFD0o7cqSBzcsPYJVtp&export=download&authuser=0&confirm=t';
@@ -42,29 +42,28 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
     try {
       await for (final entity in dir.list()) {
         if (entity is! File) continue;
-        if (!entity.path.endsWith('.task')) continue;
+        final isTask = entity.path.endsWith('.task');
+        final isLitertlm = entity.path.endsWith('.litertlm');
+        if (!isTask && !isLitertlm) continue;
         try {
           final size = await entity.length();
           if (size < _minModelBytes) continue;
 
-          // Skip non-ZIP files early — they are incompatible with flutter_gemma.
-          // Deletes them so they never block a valid model on subsequent calls.
-          final raf = await entity.open();
-          final header = await raf.read(4);
-          await raf.close();
-          final isZip = header.length >= 4 &&
-              header[0] == _zipMagic[0] &&
-              header[1] == _zipMagic[1] &&
-              header[2] == _zipMagic[2] &&
-              header[3] == _zipMagic[3];
-          if (!isZip) {
-            _logger.w(
-              'GemmaRepo._discoverModelFile: skipping non-ZIP file '
-              '${entity.uri.pathSegments.last} '
-              '(magic=${header.map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}) — deleting.',
-            );
-            try { await entity.delete(); } catch (_) {}
-            continue;
+          // .litertlm files use LiteRT-LM binary format (not ZIP) — skip ZIP check.
+          // For .task files: skip if no ZIP magic (web/WASM variants or corrupted).
+          if (isTask) {
+            final raf = await entity.open();
+            final header = await raf.read(8);
+            await raf.close();
+            if (!_hasZipMagic(header)) {
+              _logger.w(
+                'GemmaRepo._discoverModelFile: skipping non-ZIP .task file '
+                '${entity.uri.pathSegments.last} '
+                '(magic=${header.map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}) — deleting.',
+              );
+              try { await entity.delete(); } catch (_) {}
+              continue;
+            }
           }
 
           if (size > bestSize) {
@@ -94,46 +93,48 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
   // GemmaModelRepository
   // ---------------------------------------------------------------------------
 
-  /// MediaPipe `.task` files are ZIP archives — first 4 bytes are `PK\x03\x04`.
-  /// Web/WASM `.task` variants use a different binary format and will crash
-  /// flutter_gemma with "Unable to open zip archive". Reject them early.
+  /// MediaPipe `.task` files are ZIP archives — `PK\x03\x04` at offset 0 or 4.
+  /// Some models (e.g. Qwen2.5 LiteRT) prepend a 4-byte prefix before the ZIP.
+  /// Web/WASM `.task` variants use a different binary format — reject those.
   static const List<int> _zipMagic = [0x50, 0x4B, 0x03, 0x04]; // PK\x03\x04
+
+  /// Returns true if [header] contains the ZIP magic bytes at offset 0 or 4.
+  /// Qwen2.5 and some other LiteRT models have a 4-byte prefix before the ZIP.
+  static bool _hasZipMagic(List<int> header) {
+    bool at(int offset) =>
+        header.length >= offset + 4 &&
+        header[offset] == _zipMagic[0] &&
+        header[offset + 1] == _zipMagic[1] &&
+        header[offset + 2] == _zipMagic[2] &&
+        header[offset + 3] == _zipMagic[3];
+    return at(0) || at(4);
+  }
 
   @override
   Future<bool> isModelCached() async {
     final file = await _discoverModelFile();
     if (file == null) return false;
 
-    try {
-      final raf = await file.open();
-      final header = await raf.read(_magicBytesLength);
-      await raf.close();
+    // .litertlm files use LiteRT-LM binary format (not ZIP) — skip ZIP magic check.
+    if (file.path.endsWith('.task')) {
+      try {
+        final raf = await file.open();
+        final header = await raf.read(_magicBytesLength);
+        await raf.close();
 
-      // All-zero bytes → zeroed / corrupt file
-      if (header.every((b) => b == 0)) {
-        _logger.w('GemmaRepo.isModelCached: all-zero header, deleting ${file.path}');
-        await file.delete();
+        // No ZIP magic at offset 0 or 4 → web/WASM variant or corrupt file
+        if (!_hasZipMagic(header)) {
+          _logger.w(
+            'GemmaRepo.isModelCached: no ZIP magic '
+            '(bytes=${header.take(8).map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}) — '
+            'web/WASM variant or corrupt. Use standard MediaPipe .task format.',
+          );
+          return false;
+        }
+      } catch (e, st) {
+        _logger.w('GemmaRepo.isModelCached: could not read header.', error: e, stackTrace: st);
         return false;
       }
-
-      // Not a ZIP archive → web/WASM variant, incompatible with flutter_gemma
-      final isZip = header.length >= 4 &&
-          header[0] == _zipMagic[0] &&
-          header[1] == _zipMagic[1] &&
-          header[2] == _zipMagic[2] &&
-          header[3] == _zipMagic[3];
-      if (!isZip) {
-        _logger.w(
-          'GemmaRepo.isModelCached: NOT a ZIP archive '
-          '(magic=${header.take(4).map((b) => b.toRadixString(16).padLeft(2, "0")).join(" ")}) — '
-          'likely a web/WASM variant, incompatible with flutter_gemma. '
-          'Use the standard MediaPipe .task format, not the -web.task variant.',
-        );
-        return false;
-      }
-    } catch (e, st) {
-      _logger.w('GemmaRepo.isModelCached: could not read header.', error: e, stackTrace: st);
-      return false;
     }
 
     final size = await file.length();
@@ -216,7 +217,7 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
     int deleted = 0;
     await for (final entity in dir.list()) {
       if (entity is! File) continue;
-      if (!entity.path.endsWith('.task')) continue;
+      if (!entity.path.endsWith('.task') && !entity.path.endsWith('.litertlm')) continue;
       try {
         final size = await entity.length();
         if (size >= _minModelBytes) {
@@ -237,7 +238,7 @@ class GemmaModelRepositoryImpl implements GemmaModelRepository {
 
     // Remove any stale .part files from interrupted downloads
     await for (final entity in dir.list()) {
-      if (entity is File && entity.path.endsWith('.task.part')) {
+      if (entity is File && (entity.path.endsWith('.task.part') || entity.path.endsWith('.litertlm.part'))) {
         await entity.delete();
         _logger.i('GemmaRepo: stale .part file removed — ${entity.uri.pathSegments.last}');
       }

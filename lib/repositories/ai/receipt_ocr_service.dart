@@ -37,8 +37,26 @@ class ReceiptOcrServiceImpl implements ReceiptOcrService {
     'nội dung',
     'nội dung giao dịch',
     'nội dung chuyển khoản',
+    'tin nhắn',
     'mô tả',
   ];
+
+  // Patterns that signal end of a multi-line description value.
+  // A line matching any of these belongs to a different field.
+  static final _fieldLabelTerminator = RegExp(
+    r'^(người gửi|tài khoản|người nhận|thụ hưởng|số tiền|tổng tiền|'
+    r'tổng cộng|ngày|thời gian|phí|mã giao dịch|số tham chiếu|'
+    r'trạng thái|số dư|biến động|nội dung|tin nhắn|mô tả)',
+    caseSensitive: false,
+  );
+  // Pure-amount lines: "150.000đ", "1,500,000 VND", etc.
+  static final _pureAmountLine = RegExp(
+    r'^\+?-?\d{1,3}([.,]\d{3})+\s*(đ|vnd|vnđ)?$',
+    caseSensitive: false,
+  );
+
+  bool _isTerminatorLine(String line) =>
+      _fieldLabelTerminator.hasMatch(line) || _pureAmountLine.hasMatch(line);
   static const _amountLabels = [
     'số tiền',
     'tổng tiền',
@@ -196,7 +214,10 @@ class ReceiptOcrServiceImpl implements ReceiptOcrService {
 
       sender ??= valueFor(senderPattern);
       recipient ??= valueFor(recipientPattern);
-      description ??= valueFor(descriptionPattern);
+      // Description may span multiple lines — use dedicated extractor.
+      if (description == null && descriptionPattern.hasMatch(line)) {
+        description = _extractDescriptionValue(lines, i);
+      }
 
       if (sender != null && recipient != null && description != null) break;
     }
@@ -206,6 +227,34 @@ class ReceiptOcrServiceImpl implements ReceiptOcrService {
       'recipient': recipient,
       'description': description,
     };
+  }
+
+  /// Extracts the description value starting from [labelIdx].
+  ///
+  /// Handles three layouts common in Vietnamese bank transfer screenshots:
+  ///   1. `Nội dung: value on same line`
+  ///   2. `Nội dung:\n value line 1\n value line 2`
+  ///   3. `Nội dung\n value line 1\n value line 2`
+  ///
+  /// Reads up to 5 continuation lines and stops at any terminator line
+  /// (another field label, pure-amount line, or blank line).
+  String? _extractDescriptionValue(List<String> lines, int labelIdx) {
+    final line = lines[labelIdx];
+    final parts = <String>[];
+
+    final colonIdx = line.indexOf(':');
+    if (colonIdx != -1) {
+      final inline = line.substring(colonIdx + 1).trim();
+      if (inline.isNotEmpty) parts.add(inline);
+    }
+
+    for (int j = labelIdx + 1; j <= labelIdx + 5 && j < lines.length; j++) {
+      final next = lines[j];
+      if (_isTerminatorLine(next)) break;
+      parts.add(next);
+    }
+
+    return parts.isEmpty ? null : parts.join(' ');
   }
 
   // ---------------------------------------------------------------------------

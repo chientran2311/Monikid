@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/shared/widgets/app_ios_switch.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/notification_settings/notification_settings_provider.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/app_ios_switch.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
-class NotificationSettingsScreen extends ConsumerWidget {
+class NotificationSettingsScreen extends HookConsumerWidget {
   const NotificationSettingsScreen({super.key});
 
   @override
@@ -17,7 +19,6 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final state = ref.watch(notificationSettingsNotifierProvider);
     final notifier = ref.read(notificationSettingsNotifierProvider.notifier);
 
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
     final cardColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
@@ -33,65 +34,61 @@ class NotificationSettingsScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: textColor, size: 20.r),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          s.notificationSettingsTitle,
-          style: context.typo.subtitle.medium.copyWith(color: textColor),
-        ),
-      ),
-      body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        children: [
-          _SectionLabel(label: s.notificationSettingsDailySection, color: mutedColor),
-          SizedBox(height: 8.h),
-          _Card(
-            cardColor: cardColor,
-            borderColor: borderColor,
-            isDark: isDark,
-            children: [
-              _ToggleRow(
-                icon: Icons.notifications_outlined,
-                label: s.notificationSettingsEnableLabel,
-                textColor: textColor,
-                value: state.enabled,
-                onChanged: (v) => notifier.toggleEnabled(v),
-              ),
-              Divider(height: 1, thickness: 1, color: dividerColor),
-              _TimeRow(
-                icon: Icons.access_time_rounded,
-                label: s.notificationSettingsTimeLabel,
-                textColor: textColor,
-                timeText: state.formattedTime,
-                onTap: () => _pickTime(context, ref, state.hour, state.minute),
-              ),
-            ],
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: s.notificationSettingsTitle),
+      body: AppBackground(
+        child: ListView(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + kToolbarHeight + 16.h,
+            left: 16.w,
+            right: 16.w,
+            bottom: 16.h,
           ),
-          SizedBox(height: 24.h),
-          _SectionLabel(label: s.notificationSettingsAboutSection, color: mutedColor),
-          SizedBox(height: 8.h),
-          _Card(
-            cardColor: cardColor,
-            borderColor: borderColor,
-            isDark: isDark,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                child: Text(
-                  s.notificationSettingsDescription,
-                  style: context.typo.body.medium.copyWith(color: mutedColor, height: 1.5),
+          children: [
+            _SectionLabel(label: s.notificationSettingsDailySection, color: mutedColor),
+            SizedBox(height: 8.h),
+            _Card(
+              cardColor: cardColor,
+              borderColor: borderColor,
+              isDark: isDark,
+              children: [
+                _ToggleRow(
+                  icon: Icons.notifications_outlined,
+                  label: s.notificationSettingsEnableLabel,
+                  textColor: textColor,
+                  value: state.enabled,
+                  onChanged: (v) => notifier.toggleEnabled(v),
                 ),
-              ),
-            ],
-          ),
-        ],
+                Divider(height: 1, thickness: 1, color: dividerColor),
+                _TimeRow(
+                  icon: Icons.access_time_rounded,
+                  label: s.notificationSettingsTimeLabel,
+                  textColor: textColor,
+                  timeText: state.formattedTime,
+                  onTap: () => _pickTime(context, ref, state.hour, state.minute),
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            _SectionLabel(label: s.notificationSettingsAboutSection, color: mutedColor),
+            SizedBox(height: 8.h),
+            _Card(
+              cardColor: cardColor,
+              borderColor: borderColor,
+              isDark: isDark,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  child: Text(
+                    s.notificationSettingsDescription,
+                    style: context.typo.body.medium.copyWith(color: mutedColor, height: 1.5),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

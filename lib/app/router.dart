@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monikid/core/config/dev_config.dart';
 import 'package:monikid/core/utils/app_transitions.dart';
 import 'package:monikid/features/auth/forgot_password/forgot_password_screen.dart';
 import 'package:monikid/features/auth/login/login_screen.dart';
 import 'package:monikid/features/auth/onboard/onboarding_screen.dart';
 import 'package:monikid/features/auth/pin/create_new_pin/create_new_pin_screen.dart';
 import 'package:monikid/features/auth/pin/enter_pin_code/enter_pin_code_screen.dart';
-import 'package:monikid/features/auth/pin/pin_gateway/pin_gateway_screen.dart';
 import 'package:monikid/features/auth/pin/re_enter_pin/re_enter_pin_screen.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/auth/register/register_screen.dart';
 import 'package:monikid/features/change_profile/profile_edit_screen.dart';
-import 'package:monikid/features/fqa/fqa_screen.dart';
+import 'package:monikid/features/faq/faq_screen.dart';
 import 'package:monikid/features/parent/bottom_nav_bar_par.dart';
 import 'package:monikid/features/parent/family_management/family_management_screen.dart';
+import 'package:monikid/features/child/statistic/category_transactions/category_transaction_list_screen.dart';
+import 'package:monikid/features/child/statistic/category_transactions/category_transactions_args.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_screen.dart';
 import 'package:monikid/features/parent/transaction_par/transaction_history_par_screen.dart';
@@ -27,6 +27,7 @@ import 'package:monikid/features/child/transaction/detail_transaction/detail_tra
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_screen.dart';
 import 'package:monikid/features/child/join_family/join_family_screen.dart';
 import 'package:monikid/features/child/transaction/update_transaction/update_transaction_screen.dart';
+import 'package:monikid/features/dev_tools/dev_tools_screen.dart';
 import 'package:monikid/features/notification_settings/notification_settings_screen.dart';
 import 'package:monikid/features/notification_settings/schedule_notification_screen.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
@@ -35,39 +36,44 @@ import 'package:monikid/models/ai/transaction_ai_result.dart';
 class AppRoutes {
   AppRoutes._();
 
+  // --- Splash ---
   static const String splash = '/';
-  static const String welcome = '/welcome';
+
+  // --- Onboarding Flow ---
+  static const String onboard1 = '/onboard-1';
+
+  // --- Auth Flow ---
   static const String login = '/login';
   static const String register = '/register';
-  static const String onboard1 = '/onboard-1';
-  static const String createFamily = '/create-family';
-  static const String joinFamily = '/join-family';
   static const String forgotPassword = '/forgot-password';
-  static const String updatePassword = '/update-password';
-  static const String fqa = '/fqa';
-  static const String profileEdit = '/profile-edit';
 
-  static const String pinGateway = '/pin-gateway';
+  // --- Pin Flow ---
+  // PIN creation: entered after successful login/register (new session)
   static const String createNewPin = '/create-new-pin';
   static const String reEnterPin = '/re-enter-pin';
+  // PIN entry: entered on app restart for returning authenticated users
   static const String enterPinCode = '/enter-pin-code';
 
+  // --- App Routes ---
+  static const String parent = '/parent';
+  static const String studentMain = '/student-main';
+  static const String joinFamily = '/join-family';
+  static const String manageFamily = '/manage-family';
   static const String notificationSettings = '/notification-settings';
   static const String scheduleNotification = '/schedule-notification';
-  static const String parent = '/parent';
-  static const String manageFamily = '/manage-family';
-  static const String parentCategoryTransactions = '/parent/category-transactions';
-  static const String parentTransactionHistory = '/parent/transaction-history';
-  static const String parentTransactionDetail =
-      '/parent/children/:childUid/transactions/:transactionId';
-  static const String studentMain = '/student-main';
+  static const String profileEdit = '/profile-edit';
+  static const String faq = '/faq';
+  static const String devTools = '/dev-tools';
   static const String chooseAiModel = '/choose-ai-model';
-
   static const String addTransaction = '/add-transaction';
   static const String transactionHistory = '/transaction-history';
   static const String updateTransaction = '/update-transaction/:transactionId';
   static const String detailTransaction = '/detail-transaction/:transactionId';
-
+  static const String childCategoryTransactions = '/child/category-transactions';
+  static const String parentCategoryTransactions = '/parent/category-transactions';
+  static const String parentTransactionHistory = '/parent/transaction-history';
+  static const String parentTransactionDetail =
+      '/parent/children/:childUid/transactions/:transactionId';
 
   static String updateTransactionPath(String transactionId) {
     return '/update-transaction/$transactionId';
@@ -87,50 +93,47 @@ class AppRoutes {
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-const authRoutes = [
+// Flow membership sets used in redirect logic.
+const _onboardingFlowPaths = {AppRoutes.onboard1};
+
+const _authFlowPaths = {
   AppRoutes.login,
   AppRoutes.register,
   AppRoutes.forgotPassword,
-  AppRoutes.updatePassword,
-];
+};
 
-const pinRoutes = [
-  AppRoutes.pinGateway,
+// PIN creation flow: create-new-pin → re-enter-pin (after every new login).
+const _pinCreationPaths = {
   AppRoutes.createNewPin,
   AppRoutes.reEnterPin,
-  AppRoutes.enterPinCode,
-];
+};
+
+// PIN entry flow: enter-pin-code (returning authenticated user).
+const _pinEntryPaths = {AppRoutes.enterPinCode};
+
+const _pinFlowPaths = {..._pinCreationPaths, ..._pinEntryPaths};
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: kDevAuthMode ? AppRoutes.login : AppRoutes.splash,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     refreshListenable: GoRouterRefreshStream(ref),
     routes: [
+      // ── Splash ────────────────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.splash,
         pageBuilder: (context, state) => fadePage(state, const SplashScreen()),
       ),
-      GoRoute(
-        path: AppRoutes.fqa,
-        pageBuilder: (context, state) => slidePage(state, const FQAScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.profileEdit,
-        pageBuilder: (context, state) =>
-            slidePage(state, const ProfileEditScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.joinFamily,
-        pageBuilder: (context, state) =>
-            slidePage(state, const JoinFamilyScreen()),
-      ),
+
+      // ── Onboarding Flow ───────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.onboard1,
         pageBuilder: (context, state) =>
             fadePage(state, const OnboardingScreen()),
       ),
+
+      // ── Auth Flow ─────────────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => fadePage(state, const LoginScreen()),
@@ -145,11 +148,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             slidePage(state, const ForgotPasswordScreen()),
       ),
-      GoRoute(
-        path: AppRoutes.pinGateway,
-        pageBuilder: (context, state) =>
-            fadePage(state, const PinGatewayScreen()),
-      ),
+
+      // ── Pin Flow ──────────────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.createNewPin,
         pageBuilder: (context, state) =>
@@ -165,6 +165,25 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             fadePage(state, const EnterPinCodeScreen()),
       ),
+
+      // ── App Routes ────────────────────────────────────────────────────────
+      GoRoute(
+        path: AppRoutes.parent,
+        builder: (context, state) => const ParentBottomNavBar(),
+      ),
+      GoRoute(
+        path: AppRoutes.studentMain,
+        builder: (context, state) => const StudentBottomNavBar(),
+      ),
+      GoRoute(
+        path: AppRoutes.joinFamily,
+        pageBuilder: (context, state) =>
+            slidePage(state, const JoinFamilyScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.manageFamily,
+        builder: (context, state) => const FamilyManagementScreen(),
+      ),
       GoRoute(
         path: AppRoutes.notificationSettings,
         builder: (context, state) => const NotificationSettingsScreen(),
@@ -174,41 +193,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ScheduleNotificationScreen(),
       ),
       GoRoute(
-        path: AppRoutes.parent,
-        builder: (context, state) => const ParentBottomNavBar(),
+        path: AppRoutes.profileEdit,
+        pageBuilder: (context, state) =>
+            slidePage(state, const ProfileEditScreen()),
       ),
       GoRoute(
-        path: AppRoutes.manageFamily,
-        builder: (context, state) => const FamilyManagementScreen(),
+        path: AppRoutes.faq,
+        pageBuilder: (context, state) => slidePage(state, const FAQScreen()),
       ),
       GoRoute(
-        path: AppRoutes.parentCategoryTransactions,
-        builder: (context, state) {
-          final extra = state.extra;
-          if (extra is ParentCategoryTransactionsArgs) {
-            return ParentCategoryTransactionsScreen(args: extra);
-          }
-          return const ParentBottomNavBar();
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.parentTransactionHistory,
-        builder: (context, state) => const TransactionHistoryParScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.parentTransactionDetail,
-        builder: (context, state) {
-          final childUid = state.pathParameters['childUid'] ?? '';
-          final transactionId = state.pathParameters['transactionId'] ?? '';
-          return ParentTransactionDetailScreen(
-            childUid: childUid,
-            transactionId: transactionId,
-          );
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.studentMain,
-        builder: (context, state) => const StudentBottomNavBar(),
+        path: AppRoutes.devTools,
+        pageBuilder: (context, state) =>
+            slidePage(state, const DevToolsScreen()),
       ),
       GoRoute(
         path: AppRoutes.chooseAiModel,
@@ -245,91 +241,94 @@ final routerProvider = Provider<GoRouter>((ref) {
           return DetailTransactionScreen(transactionId: transactionId);
         },
       ),
+      GoRoute(
+        path: AppRoutes.childCategoryTransactions,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is CategoryTransactionsArgs) {
+            return CategoryTransactionListScreen(args: extra);
+          }
+          return const StudentBottomNavBar();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.parentCategoryTransactions,
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is ParentCategoryTransactionsArgs) {
+            return ParentCategoryTransactionsScreen(args: extra);
+          }
+          return const ParentBottomNavBar();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.parentTransactionHistory,
+        builder: (context, state) => const TransactionHistoryParScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.parentTransactionDetail,
+        builder: (context, state) {
+          final childUid = state.pathParameters['childUid'] ?? '';
+          final transactionId = state.pathParameters['transactionId'] ?? '';
+          return ParentTransactionDetailScreen(
+            childUid: childUid,
+            transactionId: transactionId,
+          );
+        },
+      ),
     ],
     redirect: (context, state) {
-      // ─── DEV MODE: only login / register / forgot-password are accessible ───
-      // See lib/features/auth/DEV_MODE.md for what to restore when done.
-      if (kDevAuthMode) {
-        final path = state.uri.path;
-        const devAllowed = {
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.forgotPassword,
-        };
-        if (devAllowed.contains(path)) return null;
-        return AppRoutes.login;
-      }
-      // ────────────────────────────────────────────────────────────────────────
-
-      // ── PRODUCTION REDIRECT LOGIC (restore when kDevAuthMode = false) ──────
       final authState = ref.read(authSessionProvider);
-      final currentPath = state.uri.path;
+      final path = state.uri.path;
       final isAuthenticated = authState.isAuthenticated;
-      final isInitial = authState.isInitial;
-      final accountRole = authState.account?.role;
-      final requiresPinVerification = authState.requiresPinVerification;
-      final isAuthRoute = authRoutes.contains(currentPath);
-      final isPinRoute = pinRoutes.contains(currentPath);
-      final homeRoute = _resolveHomeRoute(accountRole);
+      final homeRoute = _resolveHomeRoute(authState.account?.role);
 
-      if (isInitial) {
-        return null;
-      }
+      // 1. Wait for Firebase auth to resolve — splash handles routing during this window.
+      if (authState.isInitial || authState.isLoading) return null;
 
-      if (authState.isLoading) {
-        return null;
-      }
+      // 2. Splash manages its own navigation entirely.
+      if (path == AppRoutes.splash) return null;
 
+      // 3. Incomplete account — force back to auth flow.
       if (authState.isAccountIncomplete) {
-        return AppRoutes.login;
+        return _authFlowPaths.contains(path) ? null : AppRoutes.login;
       }
 
-      if (currentPath == AppRoutes.splash) {
-        return null;
+      // 4. Onboarding flow — only accessible before authentication.
+      if (_onboardingFlowPaths.contains(path)) {
+        return isAuthenticated ? homeRoute : null;
       }
 
-      if (currentPath == AppRoutes.onboard1) {
-        if (isAuthenticated) {
-          return requiresPinVerification ? AppRoutes.pinGateway : homeRoute;
-        }
-        return null;
-      }
-
+      // 5. Unauthenticated — only the auth flow is open.
       if (!isAuthenticated) {
-        if (isAuthRoute) {
-          return null;
-        }
-
-        return AppRoutes.login;
+        return _authFlowPaths.contains(path) ? null : AppRoutes.login;
       }
 
-      if (requiresPinVerification) {
-        if (isPinRoute) {
-          return null;
-        }
+      // ── Authenticated from here ──────────────────────────────────────────
 
-        return AppRoutes.pinGateway;
+      // 6. Pin flow — block exit until PIN is verified.
+      if (_pinFlowPaths.contains(path)) {
+        return authState.isPinVerified ? homeRoute : null;
       }
 
-      if (isAuthRoute || isPinRoute) {
-        return homeRoute;
+      // 7. Auth routes while authenticated — route to next required step.
+      //    Use hasPinCode to distinguish a returning user (who ended up here due
+      //    to an auth race condition) from a fresh login (no PIN stored yet).
+      if (_authFlowPaths.contains(path)) {
+        if (authState.isPinVerified) return homeRoute;
+        return authState.hasPinCode
+            ? AppRoutes.enterPinCode
+            : AppRoutes.createNewPin;
       }
 
       return null;
-      // ────────────────────────────────────────────────────────────────────────
     },
   );
 });
 
 String _resolveHomeRoute(String? accountRole) {
-  if (accountRole == 'parent') {
-    return AppRoutes.parent;
-  }
-
-  if (accountRole == 'child') {
-    return AppRoutes.studentMain;
-  }
-
+  if (accountRole == 'parent') return AppRoutes.parent;
+  if (accountRole == 'child') return AppRoutes.studentMain;
   return AppRoutes.login;
 }
 

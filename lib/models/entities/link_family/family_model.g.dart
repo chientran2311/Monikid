@@ -8,12 +8,8 @@ part of 'family_model.dart';
 
 _FamilyModel _$FamilyModelFromJson(Map<String, dynamic> json) => _FamilyModel(
   familyId: json['familyId'] as String,
-  parentId: json['parentId'] as String,
-  parentName: json['parentName'] as String,
+  ownerUid: json['ownerUid'] as String,
   inviteCode: json['inviteCode'] as String,
-  inviteCodeExpiresAt: DateTime.parse(json['inviteCodeExpiresAt'] as String),
-  childCount: (json['childCount'] as num).toInt(),
-  status: json['status'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: json['updatedAt'] == null
       ? null
@@ -23,12 +19,8 @@ _FamilyModel _$FamilyModelFromJson(Map<String, dynamic> json) => _FamilyModel(
 Map<String, dynamic> _$FamilyModelToJson(_FamilyModel instance) =>
     <String, dynamic>{
       'familyId': instance.familyId,
-      'parentId': instance.parentId,
-      'parentName': instance.parentName,
+      'ownerUid': instance.ownerUid,
       'inviteCode': instance.inviteCode,
-      'inviteCodeExpiresAt': instance.inviteCodeExpiresAt.toIso8601String(),
-      'childCount': instance.childCount,
-      'status': instance.status,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

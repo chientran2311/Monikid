@@ -152,7 +152,7 @@ as String,
 /// @nodoc
 mixin _$SignUpParam {
 
- String get email; String get password; String get fullName; String get phone; String get role;
+ String get email; String get password; String get fullName; String get role;
 /// Create a copy of SignUpParam
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -165,16 +165,16 @@ $SignUpParamCopyWith<SignUpParam> get copyWith => _$SignUpParamCopyWithImpl<Sign
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignUpParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignUpParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.role, role) || other.role == role));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,email,password,fullName,phone,role);
+int get hashCode => Object.hash(runtimeType,email,password,fullName,role);
 
 @override
 String toString() {
-  return 'SignUpParam(email: $email, password: $password, fullName: $fullName, phone: $phone, role: $role)';
+  return 'SignUpParam(email: $email, password: $password, fullName: $fullName, role: $role)';
 }
 
 
@@ -185,7 +185,7 @@ abstract mixin class $SignUpParamCopyWith<$Res>  {
   factory $SignUpParamCopyWith(SignUpParam value, $Res Function(SignUpParam) _then) = _$SignUpParamCopyWithImpl;
 @useResult
 $Res call({
- String email, String password, String fullName, String phone, String role
+ String email, String password, String fullName, String role
 });
 
 
@@ -202,12 +202,11 @@ class _$SignUpParamCopyWithImpl<$Res>
 
 /// Create a copy of SignUpParam
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,Object? fullName = null,Object? phone = null,Object? role = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,Object? fullName = null,Object? role = null,}) {
   return _then(_self.copyWith(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
-as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -220,13 +219,12 @@ as String,
 @JsonSerializable()
 
 class _SignUpParam implements SignUpParam {
-  const _SignUpParam({required this.email, required this.password, required this.fullName, required this.phone, required this.role});
+  const _SignUpParam({required this.email, required this.password, required this.fullName, required this.role});
   factory _SignUpParam.fromJson(Map<String, dynamic> json) => _$SignUpParamFromJson(json);
 
 @override final  String email;
 @override final  String password;
 @override final  String fullName;
-@override final  String phone;
 @override final  String role;
 
 /// Create a copy of SignUpParam
@@ -242,16 +240,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignUpParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.role, role) || other.role == role));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignUpParam&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.role, role) || other.role == role));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,email,password,fullName,phone,role);
+int get hashCode => Object.hash(runtimeType,email,password,fullName,role);
 
 @override
 String toString() {
-  return 'SignUpParam(email: $email, password: $password, fullName: $fullName, phone: $phone, role: $role)';
+  return 'SignUpParam(email: $email, password: $password, fullName: $fullName, role: $role)';
 }
 
 
@@ -262,7 +260,7 @@ abstract mixin class _$SignUpParamCopyWith<$Res> implements $SignUpParamCopyWith
   factory _$SignUpParamCopyWith(_SignUpParam value, $Res Function(_SignUpParam) _then) = __$SignUpParamCopyWithImpl;
 @override @useResult
 $Res call({
- String email, String password, String fullName, String phone, String role
+ String email, String password, String fullName, String role
 });
 
 
@@ -279,12 +277,11 @@ class __$SignUpParamCopyWithImpl<$Res>
 
 /// Create a copy of SignUpParam
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,Object? fullName = null,Object? phone = null,Object? role = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,Object? fullName = null,Object? role = null,}) {
   return _then(_SignUpParam(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
-as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,
   ));

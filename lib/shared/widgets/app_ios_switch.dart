@@ -7,7 +7,7 @@ class AppIosSwitch extends StatelessWidget {
     required this.value,
     this.onChanged,
     this.activeColor = AppTheme.primary,
-    this.scale = 0.85,
+    this.scale = 1.0,
   });
 
   final bool value;

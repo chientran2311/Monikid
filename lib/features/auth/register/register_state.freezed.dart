@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RegisterState {
 
- AuthStatus get status; String? get errorMessage; AuthFieldError get emailError; AuthFieldError get usernameError; AuthFieldError get phoneError; AuthFieldError get passwordError; AuthFieldError get confirmPasswordError;
+ AuthStatus get status; String? get errorMessage; AuthFieldError get emailError; AuthFieldError get usernameError; AuthFieldError get passwordError; AuthFieldError get confirmPasswordError;
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $RegisterStateCopyWith<RegisterState> get copyWith => _$RegisterStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.usernameError, usernameError) || other.usernameError == usernameError)&&(identical(other.phoneError, phoneError) || other.phoneError == phoneError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.usernameError, usernameError) || other.usernameError == usernameError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,usernameError,phoneError,passwordError,confirmPasswordError);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,usernameError,passwordError,confirmPasswordError);
 
 @override
 String toString() {
-  return 'RegisterState(status: $status, errorMessage: $errorMessage, emailError: $emailError, usernameError: $usernameError, phoneError: $phoneError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError)';
+  return 'RegisterState(status: $status, errorMessage: $errorMessage, emailError: $emailError, usernameError: $usernameError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $RegisterStateCopyWith<$Res>  {
   factory $RegisterStateCopyWith(RegisterState value, $Res Function(RegisterState) _then) = _$RegisterStateCopyWithImpl;
 @useResult
 $Res call({
- AuthStatus status, String? errorMessage, AuthFieldError emailError, AuthFieldError usernameError, AuthFieldError phoneError, AuthFieldError passwordError, AuthFieldError confirmPasswordError
+ AuthStatus status, String? errorMessage, AuthFieldError emailError, AuthFieldError usernameError, AuthFieldError passwordError, AuthFieldError confirmPasswordError
 });
 
 
@@ -63,13 +63,12 @@ class _$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? usernameError = null,Object? phoneError = null,Object? passwordError = null,Object? confirmPasswordError = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? usernameError = null,Object? passwordError = null,Object? confirmPasswordError = null,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,emailError: null == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,usernameError: null == usernameError ? _self.usernameError : usernameError // ignore: cast_nullable_to_non_nullable
-as AuthFieldError,phoneError: null == phoneError ? _self.phoneError : phoneError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,passwordError: null == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,confirmPasswordError: null == confirmPasswordError ? _self.confirmPasswordError : confirmPasswordError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,
@@ -83,14 +82,13 @@ as AuthFieldError,
 
 
 class _RegisterState extends RegisterState {
-  const _RegisterState({this.status = AuthStatus.initial, this.errorMessage, this.emailError = AuthFieldError.none, this.usernameError = AuthFieldError.none, this.phoneError = AuthFieldError.none, this.passwordError = AuthFieldError.none, this.confirmPasswordError = AuthFieldError.none}): super._();
+  const _RegisterState({this.status = AuthStatus.initial, this.errorMessage, this.emailError = AuthFieldError.none, this.usernameError = AuthFieldError.none, this.passwordError = AuthFieldError.none, this.confirmPasswordError = AuthFieldError.none}): super._();
   
 
 @override@JsonKey() final  AuthStatus status;
 @override final  String? errorMessage;
 @override@JsonKey() final  AuthFieldError emailError;
 @override@JsonKey() final  AuthFieldError usernameError;
-@override@JsonKey() final  AuthFieldError phoneError;
 @override@JsonKey() final  AuthFieldError passwordError;
 @override@JsonKey() final  AuthFieldError confirmPasswordError;
 
@@ -104,16 +102,16 @@ _$RegisterStateCopyWith<_RegisterState> get copyWith => __$RegisterStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.usernameError, usernameError) || other.usernameError == usernameError)&&(identical(other.phoneError, phoneError) || other.phoneError == phoneError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.usernameError, usernameError) || other.usernameError == usernameError)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.confirmPasswordError, confirmPasswordError) || other.confirmPasswordError == confirmPasswordError));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,usernameError,phoneError,passwordError,confirmPasswordError);
+int get hashCode => Object.hash(runtimeType,status,errorMessage,emailError,usernameError,passwordError,confirmPasswordError);
 
 @override
 String toString() {
-  return 'RegisterState(status: $status, errorMessage: $errorMessage, emailError: $emailError, usernameError: $usernameError, phoneError: $phoneError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError)';
+  return 'RegisterState(status: $status, errorMessage: $errorMessage, emailError: $emailError, usernameError: $usernameError, passwordError: $passwordError, confirmPasswordError: $confirmPasswordError)';
 }
 
 
@@ -124,7 +122,7 @@ abstract mixin class _$RegisterStateCopyWith<$Res> implements $RegisterStateCopy
   factory _$RegisterStateCopyWith(_RegisterState value, $Res Function(_RegisterState) _then) = __$RegisterStateCopyWithImpl;
 @override @useResult
 $Res call({
- AuthStatus status, String? errorMessage, AuthFieldError emailError, AuthFieldError usernameError, AuthFieldError phoneError, AuthFieldError passwordError, AuthFieldError confirmPasswordError
+ AuthStatus status, String? errorMessage, AuthFieldError emailError, AuthFieldError usernameError, AuthFieldError passwordError, AuthFieldError confirmPasswordError
 });
 
 
@@ -141,13 +139,12 @@ class __$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? usernameError = null,Object? phoneError = null,Object? passwordError = null,Object? confirmPasswordError = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? errorMessage = freezed,Object? emailError = null,Object? usernameError = null,Object? passwordError = null,Object? confirmPasswordError = null,}) {
   return _then(_RegisterState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as AuthStatus,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,emailError: null == emailError ? _self.emailError : emailError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,usernameError: null == usernameError ? _self.usernameError : usernameError // ignore: cast_nullable_to_non_nullable
-as AuthFieldError,phoneError: null == phoneError ? _self.phoneError : phoneError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,passwordError: null == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,confirmPasswordError: null == confirmPasswordError ? _self.confirmPasswordError : confirmPasswordError // ignore: cast_nullable_to_non_nullable
 as AuthFieldError,

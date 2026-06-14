@@ -6,6 +6,9 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 
+// HTML: --border token
+Color get _borderColor => AppTheme.primary.withValues(alpha: 0.16);
+
 class ParentTopCategoriesSection extends StatelessWidget {
   const ParentTopCategoriesSection({
     super.key,
@@ -21,51 +24,41 @@ class ParentTopCategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
-          child: Text(
-            s.parentStatisticTopCategoriesTitle.toUpperCase(),
-            style: context.typo.body.small.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-              color: mutedColor,
+        // HTML .section-title
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              s.parentStatisticTrendTitle,
+              style: context.typo.title.medium.copyWith(
+                fontWeight: FontWeight.w800,
+                color: isDark ? Colors.white : AppTheme.textBlack,
+              ),
             ),
-          ),
+          ],
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: 16.h),
         if (categories.isEmpty)
           _EmptyState(isDark: isDark)
         else
-          Container(
-            decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(25.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.0 : 0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
+          // HTML .trend-list { gap: 10px } — each item is a separate card
+          Column(
+            children: List.generate(categories.length, (i) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: i < categories.length - 1 ? 10.h : 0,
                 ),
-              ],
-            ),
-            child: Column(
-              children: List.generate(categories.length, (i) {
-                final item = categories[i];
-                final isLast = i == categories.length - 1;
-                return _CategoryRow(
-                  item: item,
+                child: _CategoryCard(
+                  item: categories[i],
                   isDark: isDark,
-                  showDivider: !isLast,
-                  onTap: onItemTap != null ? () => onItemTap!(item) : null,
-                );
-              }),
-            ),
+                  onTap: onItemTap != null ? () => onItemTap!(categories[i]) : null,
+                ),
+              );
+            }),
           ),
       ],
     );
@@ -79,17 +72,15 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textBlack.withValues(alpha: 0.45);
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 32.h),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: borderColor, width: 0.5),
+        color: isDark ? AppTheme.surfaceDark : Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(color: _borderColor),
       ),
       child: Text(
         s.parentStatisticNoData,
@@ -100,92 +91,119 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
     required this.item,
     required this.isDark,
-    required this.showDivider,
     this.onTap,
   });
 
   final StatisticCategoryData item;
   final bool isDark;
-  final bool showDivider;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
+    // HTML .trend-item tokens:
+    // bg: rgba(white,.94)  border: mix(accent 16%, white)
+    // radius: 24px  padding: 16px
+    // shadow: 0 12px 28px rgba(47,127,51,.06)
+    final bgColor =
+        isDark ? AppTheme.surfaceDark : Colors.white.withValues(alpha: 0.94);
+    final borderColor =
+        isDark ? AppTheme.borderDark : _borderColor;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    final mutedColor = isDark
+        ? AppTheme.textMuted
+        : AppTheme.textBlack.withValues(alpha: 0.45);
 
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: EdgeInsets.all(16.r),
-            child: Row(
-              children: [
-                Container(
-                  width: 40.r,
-                  height: 40.r,
-                  decoration: BoxDecoration(
-                    color: _categoryColor(item).withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      item.categoryIcon ?? '💸',
-                      style: context.typo.subtitle.medium,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.categoryLabel,
-                        style: context.typo.body.medium.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                      ),
-                      SizedBox(height: 2.h),
-                      Text(
-                        context.l10n.parentStatisticTransactionCount(
-                          item.transactionCount,
-                        ),
-                        style: context.typo.caption.big.copyWith(
-                          color: mutedColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  context.formatStatisticCurrency(item.amountMinor),
-                  style: context.typo.body.medium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24.r),
+      child: Container(
+        padding: EdgeInsets.all(16.r),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(24.r),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: isDark ? 0.0 : 0.06),
+              blurRadius: 28,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // HTML .trend-icon { width:40, height:40, border-radius:14px }
+            Container(
+              width: 40.r,
+              height: 40.r,
+              decoration: BoxDecoration(
+                color: _categoryBgColor(item),
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Center(
+                child: Text(
+                  item.categoryIcon ?? '💸',
+                  style: TextStyle(fontSize: 18.sp),
                 ),
               ),
-              SizedBox(width: 8.w),
-                Icon(Icons.chevron_right_rounded,
-                    size: 20.r, color: mutedColor),
-              ],
             ),
-          ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.categoryLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.typo.body.medium.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: textColor,
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    context.l10n.parentStatisticTransactionCount(
+                      item.transactionCount,
+                    ),
+                    style: context.typo.caption.small.copyWith(
+                      color: mutedColor,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // HTML .trend-amount { font-size:15, weight:900 }
+            Text(
+              context.formatStatisticCompactCurrency(item.amountMinor),
+              style: context.typo.body.medium.copyWith(
+                fontWeight: FontWeight.w900,
+                color: textColor,
+                fontSize: 15.sp,
+              ),
+            ),
+            SizedBox(width: 4.w),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18.r,
+              color: mutedColor,
+            ),
+          ],
         ),
-        if (showDivider) Divider(height: 1, thickness: 0.5, color: borderColor),
-      ],
+      ),
     );
   }
 
-  Color _categoryColor(StatisticCategoryData item) {
+  Color _categoryBgColor(StatisticCategoryData item) {
+    // Each category gets a colored icon bg matching HTML's inline styles
     final colors = statisticAllocationColors;
-    return colors[item.categoryKey.hashCode.abs() % colors.length];
+    final base = colors[item.categoryKey.hashCode.abs() % colors.length];
+    return base.withValues(alpha: 0.15);
   }
 }

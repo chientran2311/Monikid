@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/parent/home/widgets/empty_state_cta_card.dart';
+import 'package:monikid/features/parent/home/widgets/empty_state_glass_illustration.dart';
+import 'package:monikid/features/parent/home/widgets/empty_state_hint_grid.dart';
 
-class NoFamilyEmptyState extends StatelessWidget {
+/// iOS-26 glass empty state shown on the parent home tab when no family exists.
+/// Reuses the create-family action via [onCreateTap]; [isLoading] mirrors
+/// `state.isCreatingFamily`.
+class NoFamilyEmptyState extends HookWidget {
   const NoFamilyEmptyState({
     super.key,
     required this.isDark,
@@ -17,81 +24,104 @@ class NoFamilyEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.l10n;
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor =
-        isDark ? AppTheme.textMuted : AppTheme.textGrey;
+    debugPrint('[NoFamilyEmptyState] build() start — isDark=$isDark isLoading=$isLoading');
 
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80.r,
-              height: 80.r,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryLight,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.family_restroom_rounded,
-                size: 40.r,
-                color: AppTheme.primary,
-              ),
-            ),
-            SizedBox(height: 20.h),
+    final s = context.l10n;
+    final titleColor = isDark ? AppTheme.textWhite : AppTheme.homeParFg;
+    final mutedColor = isDark
+        ? AppTheme.textMuted
+        : AppTheme.homeParFg.withValues(alpha: 0.6);
+
+    final heroCtrl = useAnimationController(
+      duration: const Duration(milliseconds: 800),
+    );
+    useEffect(() {
+      debugPrint('[NoFamilyEmptyState] useEffect → heroCtrl.forward()');
+      heroCtrl.forward();
+      return null;
+    }, const []);
+
+    debugPrint('[NoFamilyEmptyState] heroCtrl.value=${heroCtrl.value} building tree...');
+
+    try {
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(24.w, 40.h, 24.w, 120.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _fade(EmptyStateGlassIllustration(isDark: isDark), 0.0, heroCtrl),
+          SizedBox(height: 32.h),
+          _fade(
             Text(
               s.homeParNoFamilyTitle,
-              style: context.typo.subtitle.medium.copyWith(
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
               textAlign: TextAlign.center,
+              style: context.typo.title.big.copyWith(
+                fontWeight: FontWeight.w800,
+                color: titleColor,
+              ),
             ),
-            SizedBox(height: 8.h),
-            Text(
-              s.homeParNoFamilySubtitle,
-              style: context.typo.body.medium.copyWith(
-              color: mutedColor,
-              height: 1.5,
-            ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 28.h),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : onCreateTap,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 0,
+            0.15,
+            heroCtrl,
+          ),
+          SizedBox(height: 12.h),
+          _fade(
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 280.w),
+              child: Text(
+                s.homeParNoFamilySubtitle,
+                textAlign: TextAlign.center,
+                style: context.typo.body.big.copyWith(
+                  color: mutedColor,
+                  height: 1.5,
                 ),
-                child: isLoading
-                    ? SizedBox(
-                        width: 20.r,
-                        height: 20.r,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        s.homeParCreateFamilyBtn,
-                        style: context.typo.body.big.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                ),
+              ),
             ),
-          ],
+            0.25,
+            heroCtrl,
+          ),
+          SizedBox(height: 40.h),
+          _fade(
+            EmptyStateCtaCard(
+              isDark: isDark,
+              isLoading: isLoading,
+              onTap: onCreateTap,
+            ),
+            0.35,
+            heroCtrl,
+          ),
+          SizedBox(height: 32.h),
+          _fade(EmptyStateHintGrid(isDark: isDark), 0.45, heroCtrl),
+        ],
+      ),
+    );
+    } catch (e, st) {
+      debugPrint('[NoFamilyEmptyState] BUILD ERROR: $e\n$st');
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'NoFamilyEmptyState error:\n$e',
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
         ),
+      );
+    }
+  }
+
+  /// HTML `.empty-hero { animation: fadeIn 0.8s ease-out }` — opacity 0→1 +
+  /// translateY 30px→0, staggered per block via [startFraction].
+  Widget _fade(Widget child, double startFraction, AnimationController ctrl) {
+    final end = (startFraction + 0.4).clamp(0.0, 1.0);
+    final anim = CurvedAnimation(
+      parent: ctrl,
+      curve: Interval(startFraction, end, curve: Curves.easeOut),
+    );
+    return FadeTransition(
+      opacity: anim,
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero)
+            .animate(anim),
+        child: child,
       ),
     );
   }

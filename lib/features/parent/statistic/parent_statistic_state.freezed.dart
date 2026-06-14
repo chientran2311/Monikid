@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ParentStatisticState {
 
- ParentStatisticPeriod get period; ParentStatisticStatus get status; String get selectedChildId; int get totalExpenseMinor; int get prevTotalExpenseMinor; List<StatisticDailyExpenseData> get dailyData; List<StatisticCategoryData> get topCategories; String? get errorMessage;
+ ParentStatisticPeriod get period; ParentStatisticStatus get status; String get selectedChildId; int get totalExpenseMinor; int get prevTotalExpenseMinor; List<StatisticDailyExpenseData> get dailyData; List<StatisticCategoryData> get topCategories; DateTime? get selectedDate; String? get errorMessage;
 /// Create a copy of ParentStatisticState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ParentStatisticStateCopyWith<ParentStatisticState> get copyWith => _$ParentStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ParentStatisticState&&(identical(other.period, period) || other.period == period)&&(identical(other.status, status) || other.status == status)&&(identical(other.selectedChildId, selectedChildId) || other.selectedChildId == selectedChildId)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.prevTotalExpenseMinor, prevTotalExpenseMinor) || other.prevTotalExpenseMinor == prevTotalExpenseMinor)&&const DeepCollectionEquality().equals(other.dailyData, dailyData)&&const DeepCollectionEquality().equals(other.topCategories, topCategories)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ParentStatisticState&&(identical(other.period, period) || other.period == period)&&(identical(other.status, status) || other.status == status)&&(identical(other.selectedChildId, selectedChildId) || other.selectedChildId == selectedChildId)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.prevTotalExpenseMinor, prevTotalExpenseMinor) || other.prevTotalExpenseMinor == prevTotalExpenseMinor)&&const DeepCollectionEquality().equals(other.dailyData, dailyData)&&const DeepCollectionEquality().equals(other.topCategories, topCategories)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,period,status,selectedChildId,totalExpenseMinor,prevTotalExpenseMinor,const DeepCollectionEquality().hash(dailyData),const DeepCollectionEquality().hash(topCategories),errorMessage);
+int get hashCode => Object.hash(runtimeType,period,status,selectedChildId,totalExpenseMinor,prevTotalExpenseMinor,const DeepCollectionEquality().hash(dailyData),const DeepCollectionEquality().hash(topCategories),selectedDate,errorMessage);
 
 @override
 String toString() {
-  return 'ParentStatisticState(period: $period, status: $status, selectedChildId: $selectedChildId, totalExpenseMinor: $totalExpenseMinor, prevTotalExpenseMinor: $prevTotalExpenseMinor, dailyData: $dailyData, topCategories: $topCategories, errorMessage: $errorMessage)';
+  return 'ParentStatisticState(period: $period, status: $status, selectedChildId: $selectedChildId, totalExpenseMinor: $totalExpenseMinor, prevTotalExpenseMinor: $prevTotalExpenseMinor, dailyData: $dailyData, topCategories: $topCategories, selectedDate: $selectedDate, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ParentStatisticStateCopyWith<$Res>  {
   factory $ParentStatisticStateCopyWith(ParentStatisticState value, $Res Function(ParentStatisticState) _then) = _$ParentStatisticStateCopyWithImpl;
 @useResult
 $Res call({
- ParentStatisticPeriod period, ParentStatisticStatus status, String selectedChildId, int totalExpenseMinor, int prevTotalExpenseMinor, List<StatisticDailyExpenseData> dailyData, List<StatisticCategoryData> topCategories, String? errorMessage
+ ParentStatisticPeriod period, ParentStatisticStatus status, String selectedChildId, int totalExpenseMinor, int prevTotalExpenseMinor, List<StatisticDailyExpenseData> dailyData, List<StatisticCategoryData> topCategories, DateTime? selectedDate, String? errorMessage
 });
 
 
@@ -63,7 +63,7 @@ class _$ParentStatisticStateCopyWithImpl<$Res>
 
 /// Create a copy of ParentStatisticState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? period = null,Object? status = null,Object? selectedChildId = null,Object? totalExpenseMinor = null,Object? prevTotalExpenseMinor = null,Object? dailyData = null,Object? topCategories = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? period = null,Object? status = null,Object? selectedChildId = null,Object? totalExpenseMinor = null,Object? prevTotalExpenseMinor = null,Object? dailyData = null,Object? topCategories = null,Object? selectedDate = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 period: null == period ? _self.period : period // ignore: cast_nullable_to_non_nullable
 as ParentStatisticPeriod,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -72,7 +72,8 @@ as String,totalExpenseMinor: null == totalExpenseMinor ? _self.totalExpenseMinor
 as int,prevTotalExpenseMinor: null == prevTotalExpenseMinor ? _self.prevTotalExpenseMinor : prevTotalExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,dailyData: null == dailyData ? _self.dailyData : dailyData // ignore: cast_nullable_to_non_nullable
 as List<StatisticDailyExpenseData>,topCategories: null == topCategories ? _self.topCategories : topCategories // ignore: cast_nullable_to_non_nullable
-as List<StatisticCategoryData>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as List<StatisticCategoryData>,selectedDate: freezed == selectedDate ? _self.selectedDate : selectedDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -84,7 +85,7 @@ as String?,
 
 
 class _ParentStatisticState extends ParentStatisticState {
-  const _ParentStatisticState({this.period = ParentStatisticPeriod.month, this.status = ParentStatisticStatus.initial, this.selectedChildId = '', this.totalExpenseMinor = 0, this.prevTotalExpenseMinor = 0, final  List<StatisticDailyExpenseData> dailyData = const [], final  List<StatisticCategoryData> topCategories = const [], this.errorMessage}): _dailyData = dailyData,_topCategories = topCategories,super._();
+  const _ParentStatisticState({this.period = ParentStatisticPeriod.month, this.status = ParentStatisticStatus.initial, this.selectedChildId = '', this.totalExpenseMinor = 0, this.prevTotalExpenseMinor = 0, final  List<StatisticDailyExpenseData> dailyData = const [], final  List<StatisticCategoryData> topCategories = const [], this.selectedDate, this.errorMessage}): _dailyData = dailyData,_topCategories = topCategories,super._();
   
 
 @override@JsonKey() final  ParentStatisticPeriod period;
@@ -106,6 +107,7 @@ class _ParentStatisticState extends ParentStatisticState {
   return EqualUnmodifiableListView(_topCategories);
 }
 
+@override final  DateTime? selectedDate;
 @override final  String? errorMessage;
 
 /// Create a copy of ParentStatisticState
@@ -118,16 +120,16 @@ _$ParentStatisticStateCopyWith<_ParentStatisticState> get copyWith => __$ParentS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ParentStatisticState&&(identical(other.period, period) || other.period == period)&&(identical(other.status, status) || other.status == status)&&(identical(other.selectedChildId, selectedChildId) || other.selectedChildId == selectedChildId)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.prevTotalExpenseMinor, prevTotalExpenseMinor) || other.prevTotalExpenseMinor == prevTotalExpenseMinor)&&const DeepCollectionEquality().equals(other._dailyData, _dailyData)&&const DeepCollectionEquality().equals(other._topCategories, _topCategories)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ParentStatisticState&&(identical(other.period, period) || other.period == period)&&(identical(other.status, status) || other.status == status)&&(identical(other.selectedChildId, selectedChildId) || other.selectedChildId == selectedChildId)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.prevTotalExpenseMinor, prevTotalExpenseMinor) || other.prevTotalExpenseMinor == prevTotalExpenseMinor)&&const DeepCollectionEquality().equals(other._dailyData, _dailyData)&&const DeepCollectionEquality().equals(other._topCategories, _topCategories)&&(identical(other.selectedDate, selectedDate) || other.selectedDate == selectedDate)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,period,status,selectedChildId,totalExpenseMinor,prevTotalExpenseMinor,const DeepCollectionEquality().hash(_dailyData),const DeepCollectionEquality().hash(_topCategories),errorMessage);
+int get hashCode => Object.hash(runtimeType,period,status,selectedChildId,totalExpenseMinor,prevTotalExpenseMinor,const DeepCollectionEquality().hash(_dailyData),const DeepCollectionEquality().hash(_topCategories),selectedDate,errorMessage);
 
 @override
 String toString() {
-  return 'ParentStatisticState(period: $period, status: $status, selectedChildId: $selectedChildId, totalExpenseMinor: $totalExpenseMinor, prevTotalExpenseMinor: $prevTotalExpenseMinor, dailyData: $dailyData, topCategories: $topCategories, errorMessage: $errorMessage)';
+  return 'ParentStatisticState(period: $period, status: $status, selectedChildId: $selectedChildId, totalExpenseMinor: $totalExpenseMinor, prevTotalExpenseMinor: $prevTotalExpenseMinor, dailyData: $dailyData, topCategories: $topCategories, selectedDate: $selectedDate, errorMessage: $errorMessage)';
 }
 
 
@@ -138,7 +140,7 @@ abstract mixin class _$ParentStatisticStateCopyWith<$Res> implements $ParentStat
   factory _$ParentStatisticStateCopyWith(_ParentStatisticState value, $Res Function(_ParentStatisticState) _then) = __$ParentStatisticStateCopyWithImpl;
 @override @useResult
 $Res call({
- ParentStatisticPeriod period, ParentStatisticStatus status, String selectedChildId, int totalExpenseMinor, int prevTotalExpenseMinor, List<StatisticDailyExpenseData> dailyData, List<StatisticCategoryData> topCategories, String? errorMessage
+ ParentStatisticPeriod period, ParentStatisticStatus status, String selectedChildId, int totalExpenseMinor, int prevTotalExpenseMinor, List<StatisticDailyExpenseData> dailyData, List<StatisticCategoryData> topCategories, DateTime? selectedDate, String? errorMessage
 });
 
 
@@ -155,7 +157,7 @@ class __$ParentStatisticStateCopyWithImpl<$Res>
 
 /// Create a copy of ParentStatisticState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? period = null,Object? status = null,Object? selectedChildId = null,Object? totalExpenseMinor = null,Object? prevTotalExpenseMinor = null,Object? dailyData = null,Object? topCategories = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? period = null,Object? status = null,Object? selectedChildId = null,Object? totalExpenseMinor = null,Object? prevTotalExpenseMinor = null,Object? dailyData = null,Object? topCategories = null,Object? selectedDate = freezed,Object? errorMessage = freezed,}) {
   return _then(_ParentStatisticState(
 period: null == period ? _self.period : period // ignore: cast_nullable_to_non_nullable
 as ParentStatisticPeriod,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -164,7 +166,8 @@ as String,totalExpenseMinor: null == totalExpenseMinor ? _self.totalExpenseMinor
 as int,prevTotalExpenseMinor: null == prevTotalExpenseMinor ? _self.prevTotalExpenseMinor : prevTotalExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,dailyData: null == dailyData ? _self._dailyData : dailyData // ignore: cast_nullable_to_non_nullable
 as List<StatisticDailyExpenseData>,topCategories: null == topCategories ? _self._topCategories : topCategories // ignore: cast_nullable_to_non_nullable
-as List<StatisticCategoryData>,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as List<StatisticCategoryData>,selectedDate: freezed == selectedDate ? _self.selectedDate : selectedDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

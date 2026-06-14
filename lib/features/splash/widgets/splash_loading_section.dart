@@ -1,96 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
-class SplashLoadingSection extends StatelessWidget {
+class SplashLoadingSection extends HookWidget {
   const SplashLoadingSection({
     super.key,
     required this.progress,
+    this.onComplete,
   });
 
   final int progress;
+  // Called once after the progress bar finishes animating to 100%.
+  final VoidCallback? onComplete;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final progressValue = progress / 100;
+    final shimmerCtrl = useAnimationController(
+      duration: const Duration(milliseconds: 1500),
+    );
+    final pulseCtrl = useAnimationController(
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    useEffect(() {
+      shimmerCtrl.repeat();
+      pulseCtrl.repeat(reverse: true);
+      return null;
+    }, const []);
+
+    final progressValue = (progress / 100.0).clamp(0.0, 1.0);
 
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 200),
-      padding: const EdgeInsets.only(bottom: 48, left: 16, right: 16),
+      padding: EdgeInsets.only(bottom: 60.h),
+      alignment: Alignment.center,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 300),
-              tween: Tween<double>(begin: 0, end: progress.toDouble()),
-              builder: (context, value, _) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'LOADING',
-                      style: context.typo.caption.large.copyWith(
-                        color: isDark
-                            ? AppTheme.primaryLight.withValues(alpha: 0.8)
-                            : AppTheme.primary.withValues(alpha: 0.8),
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    Text(
-                      '${value.toInt()}%',
-                      style: context.typo.caption.large.copyWith(
-                        color: AppTheme.textMuted,
-                      ),
-                    ),
-                  ],
-                );
-              },
+          // Status text with pulse
+          AnimatedBuilder(
+            animation: pulseCtrl,
+            builder: (_, __) => Opacity(
+              opacity: 0.4 + pulseCtrl.value * 0.4,
+              child: Text(
+                context.l10n.splashStatusLoading.toUpperCase(),
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 11 * 0.15,
+                  color: AppTheme.textBlack,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
+          // Progress track
           Container(
-            height: 6,
-            width: double.infinity,
+            width: 240.w,
+            height: 6.h,
             decoration: BoxDecoration(
-              color:
-                  isDark ? AppTheme.borderDark : AppTheme.borderLight,
-              borderRadius: BorderRadius.circular(9999),
+              color: Colors.black.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: TweenAnimationBuilder<double>(
-                duration: const Duration(milliseconds: 300),
-                tween: Tween<double>(begin: 0, end: progressValue),
-                builder: (context, value, _) {
-                  return FractionallySizedBox(
-                    widthFactor: value,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary,
-                        borderRadius: BorderRadius.circular(9999),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primary.withValues(alpha: 0.5),
-                            blurRadius: 10,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.r),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 400),
+                  tween: Tween(begin: 0.0, end: progressValue),
+                  onEnd: progress == 100 ? onComplete : null,
+                  builder: (_, value, __) => AnimatedBuilder(
+                    animation: shimmerCtrl,
+                    builder: (_, __) => FractionallySizedBox(
+                      widthFactor: value,
+                      alignment: Alignment.centerLeft,
+                      child: Stack(
+                        clipBehavior: Clip.hardEdge,
+                        children: [
+                          // Gradient fill
+                          Positioned.fill(
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [AppTheme.primary, AppTheme.primaryBright],
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Glow shadow via Container shadow
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 15.r,
+                                    color: AppTheme.primary.withValues(alpha: 0.4),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Shimmer pass
+                          Positioned(
+                            top: 0,
+                            bottom: 0,
+                            left: (shimmerCtrl.value * 4 - 1) * 60.w,
+                            child: Container(
+                              width: 60.w,
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Color(0x66FFFFFF),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'PhiÃªn báº£n 1.0.2',
-            style: context.typo.caption.small.copyWith(
-              color: AppTheme.textMuted,
             ),
           ),
         ],

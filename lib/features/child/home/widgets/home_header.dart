@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 
@@ -46,10 +47,6 @@ class _BrandSection extends StatelessWidget {
           height: 38.r,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.r),
-            gradient: AppTheme.primaryButtonGradient,
-            border: Border.all(
-              color: Color.lerp(Colors.white, AppTheme.primary, 0.35)!,
-            ),
             boxShadow: [
               BoxShadow(
                 color: AppTheme.primary.withValues(alpha: 0.20),
@@ -58,15 +55,11 @@ class _BrandSection extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(
-            child: Text(
-              'M',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: 16.sp,
-              ),
-            ),
+          child: Image.asset(
+            'assets/app_icon.png',
+            width: 38.r,
+            height: 38.r,
+            cacheWidth: decodePixelsFor(context, 38.r),
           ),
         ),
         SizedBox(width: 10.w),
@@ -177,6 +170,7 @@ class _AvatarCircle extends StatelessWidget {
               child: Image.network(
                 avatarUrl!,
                 fit: BoxFit.cover,
+                cacheWidth: decodePixelsFor(context, 32.r),
                 errorBuilder: (_, __, ___) => _InitialsText(initials: initials),
               ),
             )

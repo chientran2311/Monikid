@@ -24,6 +24,7 @@ class LimitDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final controller = useTextEditingController(
       text: (currentLimitMinor != null && currentLimitMinor! > 0)
@@ -67,9 +68,11 @@ class LimitDialog extends HookWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? AppTheme.surfaceDark : Colors.white,
             borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
+            border: Border.all(
+              color: isDark ? AppTheme.borderDark : const Color(0xFFF1F5F9),
+            ),
             boxShadow: [
               BoxShadow(
                 color: const Color(0x24000000),
@@ -260,7 +263,9 @@ class LimitDialog extends HookWidget {
                         isSaving.value ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.textDark,
-                      side: const BorderSide(color: AppTheme.borderLight),
+                      side: BorderSide(
+                        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+                      ),
                       padding: EdgeInsets.symmetric(vertical: 13.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.r),
@@ -300,6 +305,7 @@ class _QuickAmountChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -308,9 +314,11 @@ class _QuickAmountChip extends StatelessWidget {
         child: Ink(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceVeryLight,
+            color: isDark ? AppTheme.darkSurfaceVariant : AppTheme.surfaceVeryLight,
             borderRadius: BorderRadius.circular(999.r),
-            border: Border.all(color: AppTheme.borderLight),
+            border: Border.all(
+              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+            ),
           ),
           child: Text(
             label,

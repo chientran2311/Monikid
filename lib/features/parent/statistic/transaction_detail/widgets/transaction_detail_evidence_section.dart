@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
@@ -81,6 +82,10 @@ class TransactionDetailEvidenceSection extends HookConsumerWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrlSnapshot.data!,
               fit: BoxFit.cover,
+              memCacheWidth: decodePixelsFor(
+                context,
+                MediaQuery.sizeOf(context).width,
+              ),
               placeholder: (context, url) => Container(
                 height: 200.h,
                 color: isDark

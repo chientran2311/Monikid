@@ -14,8 +14,8 @@ abstract class StatisticState with _$StatisticState {
     @Default(false) bool isRefreshing,
     @Default(true) bool hasMore,
     @Default(8) int pageLimit,
-    /// 0: by week, 1: by month
-    @Default(1) int selectedMonthIndex,
+    /// 0: by week, 1: by month, 2: by year
+    @Default(1) int selectedTabIndex,
     DateTime? selectedDate,
     @Default(0.0) double totalExpense,
     @Default(0.0) double previousPeriodTotalExpense,

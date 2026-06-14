@@ -35,6 +35,10 @@ class ParentStatisticNotifier extends _$ParentStatisticNotifier {
     state = state.copyWith(period: period);
   }
 
+  void setSelectedDate(DateTime date) {
+    state = state.copyWith(selectedDate: date);
+  }
+
   Future<void> fetchForChild(String childUid) async {
     if (childUid.isEmpty) return;
 

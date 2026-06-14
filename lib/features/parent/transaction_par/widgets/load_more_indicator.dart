@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
-import 'package:monikid/features/child/transaction/transaction_history/transaction_history_skeleton.dart';
+import 'package:monikid/shared/widgets/skeleton_widget/transaction_history_skeleton.dart';
 
 class LoadMoreIndicator extends StatelessWidget {
   final bool isLoadingMore;

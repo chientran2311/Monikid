@@ -9,6 +9,7 @@ import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/join_family/join_family_provider.dart';
 import 'package:monikid/features/child/join_family/widgets/family_members_form_body.dart';
 import 'package:monikid/features/child/join_family/widgets/join_family_form_body.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 
 enum JoinFamilyPhase { phase1, phase2 }
 
@@ -55,7 +56,7 @@ class JoinFamilyScreen extends HookConsumerWidget {
       }
     });
 
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1;
     final appBarTitle = phase == JoinFamilyPhase.phase2
         ? s.familyMembersTitle
         : s.joinFamilyTitle;
@@ -83,37 +84,32 @@ class JoinFamilyScreen extends HookConsumerWidget {
             context.pop();
           },
         ),
-        actions: [
-          _CircleIconButton(
-            isDark: isDark,
-            icon: Icons.help_outline_rounded,
-            onPressed: null,
-          ),
-          SizedBox(width: 8.w),
-        ],
+        actions: const [],
       ),
-      body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: switch (phase) {
-            JoinFamilyPhase.phase2 => Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: FamilyMembersFormBody(
-                  isDark: isDark,
-                  state: state,
-                  notifier: notifier,
+      body: AppBackground(
+        child: SafeArea(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: switch (phase) {
+              JoinFamilyPhase.phase2 => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: FamilyMembersFormBody(
+                    isDark: isDark,
+                    state: state,
+                    notifier: notifier,
+                  ),
                 ),
-              ),
-            JoinFamilyPhase.phase1 => Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: JoinFamilyFormBody(
-                  isDark: isDark,
-                  state: state,
-                  notifier: notifier,
+              JoinFamilyPhase.phase1 => Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  child: JoinFamilyFormBody(
+                    isDark: isDark,
+                    state: state,
+                    notifier: notifier,
+                  ),
                 ),
-              ),
-          },
+            },
+          ),
         ),
       ),
     );

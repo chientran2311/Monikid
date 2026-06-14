@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/shared/widgets/notification_badge.dart';
 
@@ -97,7 +98,12 @@ class _AvatarWidget extends StatelessWidget {
       height: 32.r,
       child: CircleAvatar(
         backgroundColor: bgColor,
-        backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+        backgroundImage: avatarUrl != null
+            ? ResizeImage(
+                NetworkImage(avatarUrl!),
+                width: decodePixelsFor(context, 32.r),
+              )
+            : null,
         child: avatarUrl == null
             ? Icon(
                 Icons.person_outline_rounded,

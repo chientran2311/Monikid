@@ -25,9 +25,11 @@ abstract class CategoryModel with _$CategoryModel {
 }
 
 extension CategoryModelX on CategoryModel {
-  Map<String, dynamic> toFirestore() {
-    final json = toJson();
-    json.remove('id');
-    return json;
-  }
+  Map<String, dynamic> toFirestore() => {
+    'category_id': id,
+    'label': label,
+    'icon': icon,
+    'type': type,
+    'created_at': Timestamp.now(),
+  };
 }

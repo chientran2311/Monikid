@@ -10,18 +10,21 @@ class FamilyInfoCard extends StatelessWidget {
   const FamilyInfoCard({
     super.key,
     required this.family,
+    required this.ownerDisplayName,
     required this.nonHostParent,
     required this.isHostParent,
     this.onUnlinkParent,
   });
 
   final FamilyModel family;
+  final String ownerDisplayName;
   final FamilyMemberModel? nonHostParent;
   final bool isHostParent;
   final VoidCallback? onUnlinkParent;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final rawCode = family.inviteCode;
     final displayCode = rawCode.length == 6
@@ -31,7 +34,7 @@ class FamilyInfoCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: const [
           BoxShadow(
@@ -48,13 +51,17 @@ class FamilyInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _ParentRow(
-              displayName: family.parentName,
+              displayName: ownerDisplayName,
               avatarColor: AppTheme.primary,
               subtitle: s.familyManagementHostSubtitle,
             ),
             if (nonHostParent != null) ...[
               SizedBox(height: 12.h),
-              Divider(color: AppTheme.borderLight, height: 1, thickness: 1),
+              Divider(
+                color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+                height: 1,
+                thickness: 1,
+              ),
               SizedBox(height: 12.h),
               _ParentRow(
                 displayName: nonHostParent!.displayName,
@@ -69,7 +76,11 @@ class FamilyInfoCard extends StatelessWidget {
               ),
             ],
             SizedBox(height: 12.h),
-            Divider(color: AppTheme.borderLight, height: 1, thickness: 1),
+            Divider(
+              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+              height: 1,
+              thickness: 1,
+            ),
             SizedBox(height: 12.h),
             Row(
               children: [
@@ -148,6 +159,7 @@ class _ParentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
         CircleAvatar(
@@ -170,7 +182,7 @@ class _ParentRow extends StatelessWidget {
                 displayName,
                 style: context.typo.body.big.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textBlack,
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                 ),
               ),
               Text(

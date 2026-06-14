@@ -34,6 +34,7 @@ class HomeMonthlySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     final now = DateTime.now();
 
@@ -45,13 +46,20 @@ class HomeMonthlySummaryCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: const Alignment(-0.6, -1),
           end: Alignment.bottomRight,
-          colors: [
-            Color.lerp(Colors.white, AppTheme.primary, 0.16)!,
-            Colors.white,
-          ],
+          colors: isDark
+              ? [
+                  Color.lerp(AppTheme.surfaceDark, AppTheme.primary, 0.18)!,
+                  AppTheme.surfaceDark,
+                ]
+              : [
+                  Color.lerp(Colors.white, AppTheme.primary, 0.16)!,
+                  Colors.white,
+                ],
         ),
         border: Border.all(
-          color: Color.lerp(Colors.white, AppTheme.primary, 0.14)!,
+          color: isDark
+              ? AppTheme.darkBorder
+              : Color.lerp(Colors.white, AppTheme.primary, 0.14)!,
         ),
         borderRadius: BorderRadius.circular(28.r),
         boxShadow: [
@@ -74,7 +82,9 @@ class HomeMonthlySummaryCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    Color.lerp(Colors.white, AppTheme.primary, 0.20)!,
+                    isDark
+                        ? AppTheme.primary.withValues(alpha: 0.14)
+                        : Color.lerp(Colors.white, AppTheme.primary, 0.20)!,
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.7],
@@ -141,6 +151,7 @@ class _HeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +174,7 @@ class _HeaderRow extends StatelessWidget {
                 style: AppTextStyleFactory.style(
                   size: AppFontSizes.titleMedium,
                   weight: FontWeight.w800,
-                  color: AppTheme.textBlack,
+                  color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -207,6 +218,7 @@ class _AmountRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
     return Wrap(
       spacing: 10.w,
@@ -217,7 +229,7 @@ class _AmountRow extends StatelessWidget {
           style: AppTextStyleFactory.style(
             size: 38,
             weight: FontWeight.w900,
-            color: AppTheme.textBlack,
+            color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
             letterSpacing: -1.5,
           ),
         ),
@@ -255,12 +267,17 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.68),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.68),
         border: Border.all(
-          color: Color.lerp(Colors.white, AppTheme.primary, 0.12)!,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : Color.lerp(Colors.white, AppTheme.primary, 0.12)!,
         ),
         borderRadius: BorderRadius.circular(20.r),
       ),
@@ -273,7 +290,9 @@ class _StatCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: context.typo.caption.small.copyWith(
               fontWeight: FontWeight.w600,
-              color: Color.lerp(AppTheme.textGrey, AppTheme.primary, 0.55),
+              color: isDark
+                  ? AppTheme.darkTextSecondary
+                  : Color.lerp(AppTheme.textGrey, AppTheme.primary, 0.55),
               letterSpacing: 0.4,
             ),
           ),
@@ -285,7 +304,7 @@ class _StatCard extends StatelessWidget {
             style: AppTextStyleFactory.style(
               size: AppFontSizes.labelBig,
               weight: FontWeight.w800,
-              color: AppTheme.textBlack,
+              color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
               letterSpacing: -0.4,
             ),
           ),

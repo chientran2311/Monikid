@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
+import 'package:monikid/features/transaction/transaction_type.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
-import 'package:monikid/repositories/transaction/monthly_summary_repository.dart';
+import 'package:monikid/repositories/ai/receipt_ocr_service.dart';
+import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_evidence_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -70,6 +71,14 @@ abstract class TransactionRepository {
     int limit = 8,
   });
 
+  Future<List<TransactionModel>> getTransactionsByCategoryAndPeriod(
+    String userId, {
+    required String categoryKey,
+    required int selectedTabIndex,
+    required DateTime anchorDate,
+    TransactionType type = TransactionType.expense,
+  });
+
   Future<TransactionSummary?> getSummary(
     String userId, {
     DateTime? month,
@@ -92,14 +101,12 @@ class TransactionRepositoryImpl implements TransactionRepository {
     this._firestore,
     this._evidenceStorage,
     this._logger,
-    this._summaryRepo,
     this._ocrService,
   );
 
   final FirebaseFirestore _firestore;
   final TransactionEvidenceStorage _evidenceStorage;
   final Logger _logger;
-  final MonthlySummaryRepository _summaryRepo;
   final ReceiptOcrService _ocrService;
 
   String _monthKey(DateTime date) => DateFormat('yyyy-MM').format(date);
@@ -109,6 +116,17 @@ class TransactionRepositoryImpl implements TransactionRepository {
         .collection('users')
         .doc(userId)
         .collection('transactions');
+  }
+
+  DocumentReference<Map<String, dynamic>> _summaryDoc(
+    String userId,
+    String monthKey,
+  ) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('monthly_summaries')
+        .doc(monthKey);
   }
 
   @override
@@ -139,17 +157,27 @@ class TransactionRepositoryImpl implements TransactionRepository {
       );
 
       _logger.i('Adding transaction ${transaction.transactionId}.');
-      await _transactionsOfUser(
-        transaction.userId,
-      ).doc(transaction.transactionId).set(transactionToSave.toFirestore());
-      unawaited(_summaryRepo.applyDelta(
-        userId: transactionToSave.userId,
-        familyId: transactionToSave.familyId,
-        monthKey: _monthKey(transactionToSave.date),
-        deltaExpenseMinor: transactionToSave.type == 'expense' ? transactionToSave.amountMinor : 0,
-        deltaIncomeMinor: transactionToSave.type == 'income' ? transactionToSave.amountMinor : 0,
-        deltaCount: 1,
-      ));
+      final monthKey = _monthKey(transactionToSave.date);
+      final txRef = _transactionsOfUser(transactionToSave.userId)
+          .doc(transactionToSave.transactionId);
+      final summaryRef = _summaryDoc(transactionToSave.userId, monthKey);
+      final isExpense = transactionToSave.type == 'expense';
+      await _firestore.runTransaction((txn) async {
+        txn.set(txRef, transactionToSave.toFirestore());
+        txn.set(
+          summaryRef,
+          {
+            'month_key': monthKey,
+            'user_id': transactionToSave.userId,
+            'total_expense':
+                FieldValue.increment(isExpense ? transactionToSave.amountMinor : 0),
+            'total_income':
+                FieldValue.increment(!isExpense ? transactionToSave.amountMinor : 0),
+            'updated_at': FieldValue.serverTimestamp(),
+          },
+          SetOptions(merge: true),
+        );
+      });
       return transactionToSave;
     } catch (error, stackTrace) {
       if (uploadedEvidenceImage != null) {
@@ -203,17 +231,61 @@ class TransactionRepositoryImpl implements TransactionRepository {
             (removeExistingEvidence ? null : transaction.evidenceImage),
       );
       _logger.i('Updating transaction ${transaction.transactionId}.');
-      await _transactionsOfUser(
-        transaction.userId,
-      ).doc(transaction.transactionId).update(updatedTransaction.toFirestore());
-      unawaited(_summaryRepo.applyDelta(
-        userId: updatedTransaction.userId,
-        familyId: updatedTransaction.familyId,
-        monthKey: _monthKey(updatedTransaction.date),
-        deltaExpenseMinor: updatedTransaction.type == 'expense' ? updatedTransaction.amountMinor : 0,
-        deltaIncomeMinor: updatedTransaction.type == 'income' ? updatedTransaction.amountMinor : 0,
-        deltaCount: 0,
-      ));
+      final txRef = _transactionsOfUser(updatedTransaction.userId)
+          .doc(updatedTransaction.transactionId);
+      await _firestore.runTransaction((txn) async {
+        final oldSnap = await txn.get(txRef);
+        txn.update(txRef, updatedTransaction.toFirestore());
+        if (oldSnap.exists) {
+          final oldTx = TransactionModel.fromFirestore({
+            ...oldSnap.data()!,
+            'transaction_id': oldSnap.id,
+          });
+          final oldMonthKey = _monthKey(oldTx.date);
+          final newMonthKey = _monthKey(updatedTransaction.date);
+          final oldExp = oldTx.type == 'expense' ? oldTx.amountMinor : 0;
+          final newExp = updatedTransaction.type == 'expense' ? updatedTransaction.amountMinor : 0;
+          final oldInc = oldTx.type == 'income' ? oldTx.amountMinor : 0;
+          final newInc = updatedTransaction.type == 'income' ? updatedTransaction.amountMinor : 0;
+          if (oldMonthKey == newMonthKey) {
+            txn.set(
+              _summaryDoc(updatedTransaction.userId, newMonthKey),
+              {
+                'month_key': newMonthKey,
+                'user_id': updatedTransaction.userId,
+                'total_expense': FieldValue.increment(newExp - oldExp),
+                'total_income': FieldValue.increment(newInc - oldInc),
+                'updated_at': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true),
+            );
+          } else {
+            // Transaction moved to a different month — reverse old, add to new.
+            txn.set(
+              _summaryDoc(updatedTransaction.userId, oldMonthKey),
+              {
+                'month_key': oldMonthKey,
+                'user_id': updatedTransaction.userId,
+                'total_expense': FieldValue.increment(-oldExp),
+                'total_income': FieldValue.increment(-oldInc),
+                'updated_at': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true),
+            );
+            txn.set(
+              _summaryDoc(updatedTransaction.userId, newMonthKey),
+              {
+                'month_key': newMonthKey,
+                'user_id': updatedTransaction.userId,
+                'total_expense': FieldValue.increment(newExp),
+                'total_income': FieldValue.increment(newInc),
+                'updated_at': FieldValue.serverTimestamp(),
+              },
+              SetOptions(merge: true),
+            );
+          }
+        }
+      });
 
       if (uploadedEvidenceImage != null &&
           previousEvidenceImage != null &&
@@ -279,6 +351,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
       return TransactionModel.fromFirestore({
         ...data,
         'transaction_id': data['transaction_id'] ?? snapshot.id,
+        if ((data['user_id'] as String?) == null ||
+            (data['user_id'] as String).isEmpty)
+          'user_id': userId,
       });
     } catch (error, stackTrace) {
       _logger.e(
@@ -301,11 +376,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     Query<Map<String, dynamic>> query = _transactionsOfUser(userId)
         .where(
-          'date_ts',
+          'transaction_date',
           isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
         )
-        .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
-        .orderBy('date_ts', descending: true);
+        .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
+        .orderBy('transaction_date', descending: true);
 
     if (type != null && type != 'all') {
       query = query.where('type', isEqualTo: type);
@@ -338,7 +413,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     try {
       Query<Map<String, dynamic>> query = _transactionsOfUser(
         userId,
-      ).orderBy('date_ts', descending: true).limit(limit);
+      ).orderBy('transaction_date', descending: true).limit(limit);
 
       if (lastTransaction != null) {
         query = query.startAfter([Timestamp.fromDate(lastTransaction.dateTs)]);
@@ -383,6 +458,52 @@ class TransactionRepositoryImpl implements TransactionRepository {
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to fetch transactions by filter.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<TransactionModel>> getTransactionsByCategoryAndPeriod(
+    String userId, {
+    required String categoryKey,
+    required int selectedTabIndex,
+    required DateTime anchorDate,
+    TransactionType type = TransactionType.expense,
+  }) async {
+    _logger.d(
+      'TransactionRepositoryImpl.getTransactionsByCategoryAndPeriod: '
+      'userId=$userId, categoryKey=$categoryKey, selectedTabIndex=$selectedTabIndex, '
+      'type=${type.value}',
+    );
+    try {
+      final range = statisticGetPeriodRange(
+        selectedTabIndex: selectedTabIndex,
+        anchorDate: anchorDate,
+      );
+      final snapshot = await _transactionsOfUser(userId)
+          .where(
+            'transaction_date',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
+          )
+          .where(
+            'transaction_date',
+            isLessThanOrEqualTo: Timestamp.fromDate(range.end),
+          )
+          .where('category_id', isEqualTo: categoryKey)
+          .where('type', isEqualTo: type.value)
+          .orderBy('transaction_date', descending: true)
+          .get();
+      final result = snapshot.docs.map(_mapTransaction).toList();
+      _logger.i(
+        'TransactionRepositoryImpl.getTransactionsByCategoryAndPeriod: success. count=${result.length}',
+      );
+      return result;
+    } catch (error, stackTrace) {
+      _logger.e(
+        'TransactionRepositoryImpl.getTransactionsByCategoryAndPeriod failed.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -445,29 +566,29 @@ class TransactionRepositoryImpl implements TransactionRepository {
       final range = _dayRange(date);
       query = query
           .where(
-            'date_ts',
+            'transaction_date',
             isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
           )
-          .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
+          .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
     } else {
       final range = _monthRange(month ?? DateTime.now());
       query = query
           .where(
-            'date_ts',
+            'transaction_date',
             isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
           )
-          .where('date_ts', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
+          .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end));
     }
 
     if (categoryKey != null && categoryKey.isNotEmpty) {
-      query = query.where('category_key', isEqualTo: categoryKey);
+      query = query.where('category_id', isEqualTo: categoryKey);
     }
 
     if (type != null && type != 'all') {
       query = query.where('type', isEqualTo: type);
     }
 
-    return query.orderBy('date_ts', descending: true);
+    return query.orderBy('transaction_date', descending: true);
   }
 
   Query<Map<String, dynamic>> _buildSummaryQuery(
@@ -490,11 +611,15 @@ class TransactionRepositoryImpl implements TransactionRepository {
     QueryDocumentSnapshot<Map<String, dynamic>> doc,
   ) {
     final data = doc.data();
+    final inferredUserId = doc.reference.parent.parent?.id ?? '';
     return TransactionModel.fromFirestore({
       ...data,
       if ((data['transaction_id'] as String?) == null ||
           (data['transaction_id'] as String).isEmpty)
         'transaction_id': doc.id,
+      if ((data['user_id'] as String?) == null ||
+          (data['user_id'] as String).isEmpty)
+        'user_id': inferredUserId,
     });
   }
 

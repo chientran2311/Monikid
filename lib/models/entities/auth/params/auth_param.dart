@@ -18,7 +18,6 @@ abstract class SignUpParam with _$SignUpParam {
     required String email,
     required String password,
     required String fullName,
-    required String phone,
     required String role,
   }) = _SignUpParam;
 

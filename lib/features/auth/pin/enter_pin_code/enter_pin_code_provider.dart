@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_state.dart';
 import 'package:monikid/features/auth/pin/pin_code_snapshot/pin_security_snapshot.dart';
 import 'package:monikid/features/auth/pin/pin_input_validator.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
@@ -117,8 +118,11 @@ class EnterPINCode extends _$EnterPINCode {
       );
 
       if (correct) {
-        _logger.i('EnterPINCode.verifyCurrentPin: success.');
+        _logger.i('EnterPINCode.verifyCurrentPin: success — waiting for auth.');
         await _pinCodeRepository.resetPinAttemptState();
+        // Keep status=loading while waiting so the screen never shows an idle
+        // state. Auth may still be resolving when the user enters their PIN.
+        await _waitForAuthenticated();
         ref.read(authSessionProvider.notifier).markPinVerified();
         state = state.copyWith(
           currentPin: '',
@@ -208,6 +212,29 @@ class EnterPINCode extends _$EnterPINCode {
         status: EnterPINCodeStatus.error,
         errorMessage: 'Failed to load the PIN security state.',
       );
+    }
+  }
+
+  // Awaits authSessionProvider reaching isAuthenticated with a resolved account.
+  // Uses ref.listen so it reacts immediately on state change — no polling.
+  Future<void> _waitForAuthenticated() async {
+    final current = ref.read(authSessionProvider);
+    if (current.isAuthenticated && current.account != null) return;
+
+    final completer = Completer<void>();
+    final sub = ref.listen<AuthSessionState>(authSessionProvider, (_, AuthSessionState next) {
+      if (!completer.isCompleted && next.isAuthenticated && next.account != null) {
+        completer.complete();
+      }
+    });
+
+    try {
+      await completer.future.timeout(
+        const Duration(seconds: 6),
+        onTimeout: () => _logger.w('EnterPINCode._waitForAuthenticated: timed out.'),
+      );
+    } finally {
+      sub.close();
     }
   }
 

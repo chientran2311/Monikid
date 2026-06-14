@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # push_gemma_to_emulator.sh
 #
-# Downloads the Gemma model once to ~/.gemma_models/ (local cache),
-# then pushes it into the running Android emulator's app documents directory.
+# Pushes local model file into the running Android emulator's app documents directory.
+# Uses `adb root` (works on emulators) for a reliable direct push — avoids run-as
+# cp which silently fails on some emulator configs.
 #
 # Usage:
 #   bash scripts/push_gemma_to_emulator.sh
@@ -14,17 +15,18 @@ set -euo pipefail
 
 # ── Config ────────────────────────────────────────────────────────────────────
 PACKAGE="com.example.monikid"
-MODEL_FILENAME="Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
+APP_USER="u0_a141"
+MODEL_FILENAME="gemma-4-E2B-it.litertlm"
 # Bash-style path (for file existence check, wc, etc.)
-LOCAL_CACHE="/d/Flutter/project/Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
+LOCAL_CACHE="/d/Flutter/project/gemma-4-E2B-it.litertlm"
 # Windows-style path passed to adb push (MSYS_NO_PATHCONV blocks bash conversion)
-LOCAL_CACHE_WIN="D:/Flutter/project/Qwen2.5-1.5B-Instruct_seq128_q8_ekv1280.task"
+LOCAL_CACHE_WIN="D:/Flutter/project/gemma-4-E2B-it.litertlm"
 # Flutter path_provider getApplicationDocumentsDirectory() on Android = app_flutter/
-# NOT files/ — verified from device logs: /data/user/0/<package>/app_flutter/
+# Verified from device logs: /data/data/<package>/app_flutter/
 DEVICE_DIR="/data/data/$PACKAGE/app_flutter"
 # ─────────────────────────────────────────────────────────────────────────────
 
-echo "=== Gemma model → emulator push script ==="
+echo "=== Model → emulator push script ==="
 echo ""
 
 # ── 1. Check adb ──────────────────────────────────────────────────────────────
@@ -47,35 +49,32 @@ echo "→ Emulator: $DEVICE"
 # ── 3. Verify local file exists ───────────────────────────────────────────────
 if [[ ! -f "$LOCAL_CACHE" ]]; then
   echo "ERROR: Model file not found at $LOCAL_CACHE"
-  echo "  Expected: D:\\Flutter\\project\\gemma3-1b-it-int4.task"
+  echo "  Expected: D:\\Flutter\\project\\gemma-4-E2B-it.litertlm"
   exit 1
 fi
 SIZE_BYTES=$(wc -c < "$LOCAL_CACHE")
 SIZE_GB=$(awk "BEGIN {printf \"%.3f\", $SIZE_BYTES / 1000000000}")
 echo "→ Model file: $LOCAL_CACHE (${SIZE_GB} GB)"
 
-# ── 4. Push via /sdcard/ staging (works on non-rooted emulators) ──────────────
-# MSYS_NO_PATHCONV=1 prevents Git Bash from converting /sdcard/ → Windows path
-# /data/local/tmp is world-readable → run-as can copy from it (unlike /sdcard/ on Android 10+)
-TMP_STAGING="/data/local/tmp/$MODEL_FILENAME"
-
+# ── 4. Root adb (emulator only) + push directly ───────────────────────────────
+# run-as cp silently fails on many emulator configs — root push is reliable.
 echo ""
-echo "→ Pushing to emulator (staging via /data/local/tmp/) ..."
-MSYS_NO_PATHCONV=1 adb -s "$DEVICE" push "$LOCAL_CACHE_WIN" "$TMP_STAGING"
+echo "→ Restarting adb as root ..."
+MSYS_NO_PATHCONV=1 adb -s "$DEVICE" root
+sleep 2
 
-echo "→ Moving into app documents directory: $DEVICE_DIR/$MODEL_FILENAME"
-MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell run-as "$PACKAGE" mkdir -p app_flutter
-MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell run-as "$PACKAGE" cp "$TMP_STAGING" "app_flutter/$MODEL_FILENAME"
+echo "→ Pushing directly to $DEVICE_DIR/$MODEL_FILENAME ..."
+MSYS_NO_PATHCONV=1 adb -s "$DEVICE" push "$LOCAL_CACHE_WIN" "$DEVICE_DIR/$MODEL_FILENAME"
 
-echo "→ Cleaning up staging file ..."
-MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell rm "$TMP_STAGING"
+echo "→ Setting ownership and permissions ..."
+MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell chown "$APP_USER:$APP_USER" "$DEVICE_DIR/$MODEL_FILENAME"
+MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell chmod 644 "$DEVICE_DIR/$MODEL_FILENAME"
 
 # ── 5. Verify ─────────────────────────────────────────────────────────────────
 echo ""
-PUSHED_SIZE=$(MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell run-as "$PACKAGE" \
-  sh -c "ls -l app_flutter/$MODEL_FILENAME 2>/dev/null | awk '{print \$5}'" || echo "unknown")
+PUSHED_SIZE=$(MSYS_NO_PATHCONV=1 adb -s "$DEVICE" shell ls -la "$DEVICE_DIR/$MODEL_FILENAME" 2>/dev/null | awk '{print $5}' || echo "unknown")
 echo "✓ Done."
-echo "  Device path : $DEVICE_DIR/$MODEL_FILENAME"
+echo "  Device path  : $DEVICE_DIR/$MODEL_FILENAME"
 echo "  Size on device: $PUSHED_SIZE bytes"
 echo ""
 echo "Hot-restart the app — choose_ai_model_screen should show model as downloaded."

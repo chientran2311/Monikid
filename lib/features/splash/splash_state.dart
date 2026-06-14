@@ -6,7 +6,8 @@ enum SplashRouteTarget {
   none,
   login,
   onboarding,
-  pinGateway,
+  createNewPin,  // authenticated, no PIN stored
+  enterPinCode,  // authenticated, PIN stored
 }
 
 @freezed

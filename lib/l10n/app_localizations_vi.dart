@@ -163,17 +163,34 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeParFamilyMembersLabel => 'Thành viên gia đình';
 
   @override
-  String get homeParNoFamilyTitle => 'Chưa có thành viên gia đình';
+  String get homeParNoFamilyTitle => 'Bắt đầu hành trình';
 
   @override
   String get homeParNoFamilySubtitle =>
-      'Tạo gia đình để bắt đầu theo dõi chi tiêu của con';
+      'Chào mừng bạn đến với MoniKid. Hãy thêm thành viên đầu tiên để bắt đầu quản lý chi tiêu gia đình.';
 
   @override
   String get homeParCreateFamilyBtn => 'Tạo gia đình';
 
   @override
-  String get homeParInviteTitle => 'Thêm thành viên mới';
+  String get homeParNoFamilyHintSafe => 'Quản lý an toàn cho con';
+
+  @override
+  String get homeParNoFamilyHintChart => 'Theo dõi biểu đồ chi tiêu';
+
+  @override
+  String get homeParErrorTitle => 'Đã có lỗi xảy ra';
+
+  @override
+  String get homeParErrorDesc =>
+      'Không thể tải dữ liệu trang chủ. Vui lòng thử lại.';
+
+  @override
+  String get homeParInviteTitle => 'Mời thành viên';
+
+  @override
+  String get homeParInviteDesc =>
+      'Chia sẻ mã này với con hoặc người thân để họ tham gia vào gia đình MoniKid.';
 
   @override
   String get homeParInviteCodeLabel => 'Mã liên kết';
@@ -244,6 +261,28 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get homeParTotalMonthlySpending => 'Tổng chi tiêu tháng này';
+
+  @override
+  String get homeParLimitLabel => 'Hạn mức:';
+
+  @override
+  String homeParUsedPercent(String percent) {
+    return 'Đã dùng $percent%';
+  }
+
+  @override
+  String get homeParLowBalanceTitle => 'Số dư thấp';
+
+  @override
+  String homeParLowBalanceDesc(String name) {
+    return 'Tài khoản của $name đang dưới 100.000đ.';
+  }
+
+  @override
+  String get homeParTransactionSuccess => 'Thành công';
+
+  @override
   String get noTransactionsYet => 'Chưa có giao dịch nào.';
 
   @override
@@ -252,7 +291,7 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get settingFQA => 'Câu hỏi thường gặp';
+  String get settingFAQ => 'Câu hỏi thường gặp';
 
   @override
   String get msgNoData => 'Không có dữ liệu';
@@ -322,6 +361,27 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get transactionAmountLabel => 'Số tiền';
+
+  @override
+  String get transactionAmountInputLabel => 'Số tiền nhập';
+
+  @override
+  String get transactionDetailSectionLabel => 'Chi tiết';
+
+  @override
+  String get transactionDateRowLabel => 'Ngày giao dịch';
+
+  @override
+  String get transactionExpenseTab => 'Chi tiêu';
+
+  @override
+  String get transactionIncomeTab => 'Thu nhập';
+
+  @override
+  String get transactionCategoryViewAll => 'Xem tất cả';
+
+  @override
+  String get transactionEvidenceRowLabel => 'Ảnh hóa đơn';
 
   @override
   String get transactionCategoryLabel => 'Danh mục';
@@ -477,7 +537,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không tạo được gợi ý tự điền phù hợp. Vui lòng kiểm tra biểu mẫu thủ công.';
 
   @override
-  String get profileEditTitle => 'Chỉnh sửa hồ sơ';
+  String get profileEditTitle => 'Hồ sơ cá nhân';
 
   @override
   String get profileEditAvatarLabel => 'Thay đổi ảnh đại diện';
@@ -509,6 +569,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get profileEditDobHint => 'DD/MM/YYYY';
+
+  @override
+  String get profileEditDobPickerTitle => 'Chọn ngày sinh';
+
+  @override
+  String get profileEditDobPickerDone => 'Xong';
 
   @override
   String get actionSaveChanges => 'Lưu thay đổi';
@@ -831,6 +897,24 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get parentStatisticTotalExpenseLabel => 'TỔNG CHI';
+
+  @override
+  String get parentStatisticTxCountLabel => 'SỐ GD';
+
+  @override
+  String get parentStatisticPrevPeriodLabel => 'THÁNG TRƯỚC';
+
+  @override
+  String get parentStatisticTrendGood => 'Tốt';
+
+  @override
+  String get parentStatisticTrendBad => 'Kém';
+
+  @override
+  String get parentStatisticEditedBadge => 'Đã sửa';
+
+  @override
   String get settingParTitle => 'Cài đặt';
 
   @override
@@ -859,6 +943,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingParThemeLabel => 'Giao diện sáng/tối';
+
+  @override
+  String get settingThemeDarkLabel => 'Chế độ tối';
+
+  @override
+  String get settingThemeDarkSubtitle => 'Bật giao diện nền tối';
 
   @override
   String get settingParNotificationsTitle => 'Thông báo';
@@ -1178,8 +1268,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get setMoneyLimitFieldLabel => 'Hạn mức';
 
   @override
+  String get setMoneyLimitSubtitle =>
+      'Nhập số tiền tối đa con được phép chi trong tháng. Thay đổi sẽ áp dụng ngay cho tháng hiện tại.';
+
+  @override
   String get setMoneyLimitDescription =>
-      'Hạn mức này giúp bạn kiểm soát chi tiêu tốt hơn mỗi tháng.';
+      'Hãy kiểm tra mức chi phù hợp với kế hoạch tháng của con.';
 
   @override
   String get setMoneyLimitSkipAction => 'Bỏ qua';
@@ -1242,6 +1336,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticMonthNoun => 'tháng';
 
   @override
+  String get statisticYearNoun => 'năm';
+
+  @override
+  String get statisticLoadError =>
+      'Không thể tải dữ liệu thống kê. Vui lòng thử lại.';
+
+  @override
   String get statisticThisWeek => 'Tuần này';
 
   @override
@@ -1252,6 +1353,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get statisticLastMonth => 'Tháng trước';
+
+  @override
+  String get statisticThisYear => 'Năm này';
+
+  @override
+  String get statisticLastYear => 'Năm ngoái';
 
   @override
   String get statisticSmartInsightFallback =>
@@ -1329,7 +1436,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticStable => 'Ổn định';
 
   @override
-  String get statisticTopCategoriesTitle => 'Chi tiêu nhiều nhất';
+  String get statisticTopCategoriesTitle => 'Danh mục chi tiêu nhiều nhất';
+
+  @override
+  String get statisticTopIncomeCategoriesTitle =>
+      'Danh mục thu nhập nhiều nhất';
+
+  @override
+  String get statisticCategoryTransactionListTitle => 'Danh sách giao dịch';
 
   @override
   String get statisticStrongestIncrease => 'Tăng mạnh nhất';
@@ -1553,6 +1667,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get customCategoryAddNew => 'Thêm mới';
+
+  @override
+  String get customCategoryDelete => 'Xóa';
+
+  @override
+  String get customCategoryIconHint => 'Chọn biểu tượng';
+
+  @override
+  String get customCategoryDropToDelete => 'Thả vào đây để xóa';
+
+  @override
+  String get customCategoryDeleteFailed => 'Không thể xóa danh mục';
 
   @override
   String get setMoneyLimitManagedByParent => 'Hạn mức do phụ huynh quản lý';
@@ -1988,4 +2114,32 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get transactionHistorySubhead =>
       'Tất cả khoản thu chi của bạn theo thời gian.';
+
+  @override
+  String get splashStatusLoading => 'Đang tải tài nguyên cần thiết...';
+
+  @override
+  String get notifChildDailyTitle => 'Báo cáo chi tiêu hôm nay';
+
+  @override
+  String notifChildDailyBody(int pct, String expense, String month) {
+    return 'Bạn còn $pct% hạn mức, bạn đã tiêu $expense trong tháng $month';
+  }
+
+  @override
+  String notifChildNoLimitBody(String expense, String month) {
+    return 'Bạn đã tiêu $expense trong tháng $month';
+  }
+
+  @override
+  String get notifParentDailyTitle => 'Báo cáo chi tiêu gia đình';
+
+  @override
+  String notifParentChildBody(String name, int pct, String expense) {
+    return 'Con bạn $name chỉ còn $pct% theo hạn mức, đã tiêu $expense';
+  }
+
+  @override
+  String get notifScheduleError =>
+      'Không thể lên lịch thông báo. Vui lòng thử lại.';
 }

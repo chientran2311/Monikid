@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
@@ -13,13 +14,16 @@ import 'package:monikid/features/parent/family_management/widgets/child_member_c
 import 'package:monikid/features/parent/family_management/widgets/family_info_card.dart';
 import 'package:monikid/features/parent/family_management/widgets/limit_dialog.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class FamilyManagementScreen extends HookConsumerWidget {
   const FamilyManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
 
     final authState = ref.watch(authSessionProvider);
@@ -41,7 +45,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
     });
 
     final isHostParent = currentUserId != null &&
-        state.family?.parentId == currentUserId;
+        state.family?.ownerUid == currentUserId;
 
     Widget body;
     if (state.isLoading || state.status == FamilyManagementStatus.initial) {
@@ -51,7 +55,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
     } else {
       body = SingleChildScrollView(
         padding: EdgeInsets.only(
-          top: 16.h,
+          top: MediaQuery.of(context).padding.top + kToolbarHeight + 16.h,
           bottom: MediaQuery.of(context).padding.bottom + 24.h,
         ),
         child: Column(
@@ -60,6 +64,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
             if (state.family != null)
               FamilyInfoCard(
                 family: state.family!,
+                ownerDisplayName: state.parentMembers.firstOrNull?.displayName ?? '',
                 nonHostParent: state.nonHostParent,
                 isHostParent: isHostParent,
                 onUnlinkParent: state.nonHostParent != null
@@ -126,35 +131,19 @@ class FamilyManagementScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: AppTheme.surfaceLight,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: AppTheme.textBlack,
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(AppRoutes.parent);
-            }
-          },
-        ),
-        title: Text(
-          s.familyManagementTitle,
-          style: context.typo.subtitle.small.copyWith(
-            color: AppTheme.textBlack,
-          ),
-        ),
-        actions: const [],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Divider(color: AppTheme.borderLight, height: 1, thickness: 1),
-        ),
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(
+        title: s.familyManagementTitle,
+        onBackTap: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go(AppRoutes.parent);
+          }
+        },
       ),
-      body: body,
+      body: AppBackground(child: body),
     );
   }
 
@@ -168,46 +157,44 @@ class FamilyManagementScreen extends HookConsumerWidget {
     return colors[index % colors.length];
   }
 
-  Future<void> _onUnlinkParent({
+  void _onUnlinkParent({
     required BuildContext context,
     required String memberUid,
     required String memberName,
     required FamilyManagementNotifier notifier,
-  }) async {
+  }) {
     final s = context.l10n;
-    final confirmed = await showDialog<bool>(
+    showDialog<void>(
       context: context,
       builder: (_) => ConfirmDialog(
         title: s.familyManagementUnlinkConfirmTitle,
-        message: s.familyManagementUnlinkConfirmBody(memberName),
+        subtitle: s.familyManagementUnlinkConfirmBody(memberName),
         confirmLabel: s.familyManagementUnlinkConfirmButton,
         cancelLabel: s.familyManagementCancel,
-        confirmColor: AppTheme.redAlert,
+        isDestructive: true,
+        onConfirm: () => notifier.unlinkParentMember(memberUid),
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    await notifier.unlinkParentMember(memberUid);
   }
 
-  Future<void> _onUnlinkChild({
+  void _onUnlinkChild({
     required BuildContext context,
     required String childUid,
     required String childName,
     required FamilyManagementNotifier notifier,
-  }) async {
+  }) {
     final s = context.l10n;
-    final confirmed = await showDialog<bool>(
+    showDialog<void>(
       context: context,
       builder: (_) => ConfirmDialog(
         title: s.familyManagementUnlinkConfirmTitle,
-        message: s.familyManagementUnlinkConfirmBody(childName),
+        subtitle: s.familyManagementUnlinkConfirmBody(childName),
         confirmLabel: s.familyManagementUnlinkConfirmButton,
         cancelLabel: s.familyManagementCancel,
-        confirmColor: AppTheme.redAlert,
+        isDestructive: true,
+        onConfirm: () => notifier.unlinkChild(childUid),
       ),
     );
-    if (confirmed != true || !context.mounted) return;
-    await notifier.unlinkChild(childUid);
   }
 
   Future<void> _onSetLimit({
@@ -234,13 +221,18 @@ class _EmptyChildrenState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 32.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.people_outline, size: 64.w, color: AppTheme.borderLight),
+            Icon(
+              Icons.people_outline,
+              size: 64.w,
+              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+            ),
             SizedBox(height: 12.h),
             Text(
               message,

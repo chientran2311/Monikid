@@ -90,6 +90,8 @@ abstract class StatisticPeriodOverview with _$StatisticPeriodOverview {
     @Default(0) int transactionCount,
     @Default([]) List<StatisticDailyExpenseData> dailyExpenses,
     @Default([]) List<StatisticCategoryData> categories,
+    @Default(0) int totalIncomeMinor,
+    @Default([]) List<StatisticCategoryData> incomeCategories,
     StatisticInsightData? smartInsight,
     StatisticInsightData? strongestIncrease,
     StatisticInsightData? strongestDecrease,

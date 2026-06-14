@@ -1,33 +1,41 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/l10n/app_localizations.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
-class TransactionItem extends StatelessWidget {
+class TransactionItem extends ConsumerWidget {
   const TransactionItem({
     super.key,
     required this.transaction,
     required this.onTap,
+    this.showBadge = true,
   });
 
   final TransactionModel transaction;
   final VoidCallback onTap;
+  final bool showBadge;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final categoryLabel =
+        findCategoryByTransactionKey(categories, transaction.categoryKey)?.label ??
+        transaction.categoryLabel;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isExpense = transaction.type == 'expense';
     final style = _catStyleFor(transaction.categoryKey);
     final emoji = transaction.categoryIcon ?? (isExpense ? '🛍️' : '💸');
     final title = (transaction.note?.isNotEmpty ?? false)
         ? transaction.note!
-        : transaction.categoryLabel;
+        : categoryLabel;
     final amountStr =
         '${isExpense ? '-' : '+'}${CurrencyFormatter.format(transaction.amountMinor.toDouble())}';
 
@@ -68,16 +76,17 @@ class TransactionItem extends StatelessWidget {
                     child: _TransactionContent(
                       title: title,
                       date: transaction.dateTs,
-                      categoryLabel: transaction.categoryLabel,
+                      categoryLabel: categoryLabel,
                       isDark: isDark,
                       s: context.l10n,
                     ),
                   ),
                   SizedBox(width: 8.w),
-                  _AmountBadge(
-                    amountStr: amountStr,
-                    isExpense: isExpense,
-                  ),
+                  if (showBadge)
+                    _AmountBadge(
+                      amountStr: amountStr,
+                      isExpense: isExpense,
+                    ),
                 ],
               ),
             ),

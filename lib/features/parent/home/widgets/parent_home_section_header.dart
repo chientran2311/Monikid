@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/screen_utils.dart';
 
 class ParentHomeSectionHeader extends StatelessWidget {
   const ParentHomeSectionHeader({
@@ -21,27 +21,30 @@ class ParentHomeSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
-            title.toUpperCase(),
-            style: context.typo.body.small.copyWith(
-              fontWeight: FontWeight.w600,
-              color: mutedColor,
-              letterSpacing: 0.6,
+            title,
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w800,
+              color: textColor,
+              letterSpacing: -0.02 * 18,
             ),
           ),
         ),
         if (trailingLabel != null)
           GestureDetector(
             onTap: onTrailingTap,
+            behavior: HitTestBehavior.opaque,
             child: Text(
               trailingLabel!,
-              style: context.typo.body.small.copyWith(
-              fontWeight: FontWeight.w500,
-              color: AppTheme.primary,
-            ),
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w900,
+                color: AppTheme.primary,
+              ),
             ),
           ),
       ],

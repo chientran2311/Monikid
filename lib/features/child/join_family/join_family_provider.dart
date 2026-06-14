@@ -66,12 +66,14 @@ class JoinFamilyNotifier extends _$JoinFamilyNotifier {
       await _familyRepo.joinFamily(
         familyId: family.familyId,
         userId: uid,
-        userName: authState.account?.displayName ?? '',
-        role: authState.account?.role ?? 'child',
-        avatarUrl: authState.user?.photoURL,
       );
 
-      await ref.read(authSessionProvider.notifier).refreshSession();
+      // Patch authSession directly — no refreshSession needed.
+      // refreshSession would re-read Firestore which may still serve stale
+      // cache and overwrite familyId back to null, causing providers to return empty.
+      ref
+          .read(authSessionProvider.notifier)
+          .patchAccountFamilyId(family.familyId);
 
       state = state.copyWith(status: JoinFamilyStatus.success);
       _logger.i('joinWithCode: success for uid=$uid family=${family.familyId}');
@@ -92,7 +94,7 @@ class JoinFamilyNotifier extends _$JoinFamilyNotifier {
 
     state = state.copyWith(status: JoinFamilyStatus.loading, errorMessage: null);
     try {
-      await _familyRepo.removeChild(familyId: familyId, childId: uid);
+      await _familyRepo.removeMember(familyId: familyId, memberUid: uid);
       await ref.read(authSessionProvider.notifier).refreshSession();
       state = state.copyWith(status: JoinFamilyStatus.success);
       _logger.i('leaveFamily: success for uid=$uid family=$familyId');
@@ -112,14 +114,39 @@ class JoinFamilyNotifier extends _$JoinFamilyNotifier {
 
 @riverpod
 Future<FamilyModel?> linkedFamily(Ref ref) async {
+  final logger = getIt<Logger>();
   final familyId = ref.watch(authSessionProvider).account?.familyId;
-  if (familyId == null) return null;
-  return getIt<LinkFamilyRepository>().getFamilyById(familyId);
+  if (familyId == null) {
+    logger.w('linkedFamily: familyId is null — skipping fetch.');
+    return null;
+  }
+  logger.i('linkedFamily: fetching familyId=$familyId');
+  final family = await getIt<LinkFamilyRepository>().getFamilyById(familyId);
+  if (family == null) {
+    logger.w('linkedFamily: no family document found for familyId=$familyId');
+  } else {
+    logger.i('linkedFamily: loaded family=${family.familyId}');
+  }
+  return family;
 }
 
 @riverpod
 Stream<List<FamilyMemberModel>> familyMembers(Ref ref) {
+  final logger = getIt<Logger>();
   final familyId = ref.watch(authSessionProvider).account?.familyId;
-  if (familyId == null) return Stream.value([]);
-  return getIt<LinkFamilyRepository>().watchFamilyMembers(familyId);
+  if (familyId == null) {
+    logger.w('familyMembers: familyId is null — returning empty stream.');
+    return Stream.value([]);
+  }
+  logger.i('familyMembers: subscribing to familyId=$familyId');
+  return getIt<LinkFamilyRepository>().watchFamilyMembers(familyId).map(
+    (members) {
+      if (members.isEmpty) {
+        logger.w('familyMembers: stream emitted 0 members for familyId=$familyId');
+      } else {
+        logger.i('familyMembers: stream emitted ${members.length} members.');
+      }
+      return members;
+    },
+  );
 }

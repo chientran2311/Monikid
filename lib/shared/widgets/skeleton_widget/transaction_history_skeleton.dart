@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/mock_up_data/transaction_history_mock_data.dart';
-import 'package:monikid/core/utils/build_context_x.dart';
 
-class TransactionHistorySkeletonNew extends StatelessWidget {
-  const TransactionHistorySkeletonNew({super.key, required this.isDark});
-
-  final bool isDark;
+class TransactionHistorySkeleton extends StatelessWidget {
+  const TransactionHistorySkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final cardColor = isDark ? AppTheme.surfaceDark : Colors.white;
@@ -23,12 +22,8 @@ class TransactionHistorySkeletonNew extends StatelessWidget {
       child: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(
-            child: _MockSummaryCard(isDark: isDark),
-          ),
-          SliverToBoxAdapter(
-            child: _MockTabBar(isDark: isDark),
-          ),
+          SliverToBoxAdapter(child: SummaryCardSkeleton(isDark: isDark)),
+          SliverToBoxAdapter(child: _MockTabBar(isDark: isDark)),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) => _MockDateGroup(
@@ -47,8 +42,117 @@ class TransactionHistorySkeletonNew extends StatelessWidget {
   }
 }
 
-class _MockSummaryCard extends StatelessWidget {
-  const _MockSummaryCard({required this.isDark});
+// =============================================================================
+// TRANSACTION ITEM SKELETON — used for inline "load more" states
+// =============================================================================
+
+class TransactionItemSkeleton extends StatelessWidget {
+  const TransactionItemSkeleton({super.key, required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.surfaceVariant : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          _Shimmer(
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _shimmerBox(isDark: isDark, width: double.infinity),
+                const SizedBox(height: 8),
+                _shimmerBox(isDark: isDark, width: 100, height: 10),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          _shimmerBox(isDark: isDark, width: 72, height: 14),
+        ],
+      ),
+    );
+  }
+}
+
+class _Shimmer extends StatefulWidget {
+  const _Shimmer({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_Shimmer> createState() => _ShimmerState();
+}
+
+class _ShimmerState extends State<_Shimmer> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(
+      begin: 0.3,
+      end: 0.8,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(opacity: _animation, child: widget.child);
+  }
+}
+
+Widget _shimmerBox({
+  required bool isDark,
+  double? width,
+  double height = 14,
+  double radius = 8,
+}) {
+  return _Shimmer(
+    child: Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    ),
+  );
+}
+
+// =============================================================================
+// MOCK WIDGETS — mirror real screen structure for Skeletonizer
+// =============================================================================
+
+class SummaryCardSkeleton extends StatelessWidget {
+  const SummaryCardSkeleton({super.key, required this.isDark});
 
   final bool isDark;
 
@@ -124,7 +228,7 @@ class _MockTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final activeColor = AppTheme.primary;
+    const activeColor = AppTheme.primary;
     final inactiveColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Padding(
@@ -156,7 +260,10 @@ class _MockTabBar extends StatelessWidget {
                 child: Center(
                   child: Text(
                     kMockTabExpense,
-                    style: context.typo.body.small.copyWith(fontWeight: FontWeight.w600, color: activeColor),
+                    style: context.typo.body.small.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: activeColor,
+                    ),
                   ),
                 ),
               ),
@@ -165,7 +272,10 @@ class _MockTabBar extends StatelessWidget {
               child: Center(
                 child: Text(
                   kMockTabIncome,
-                  style: context.typo.body.small.copyWith(fontWeight: FontWeight.w500, color: inactiveColor),
+                  style: context.typo.body.small.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: inactiveColor,
+                  ),
                 ),
               ),
             ),
@@ -201,11 +311,17 @@ class _MockDateGroup extends StatelessWidget {
             children: [
               Text(
                 group.date,
-                style: context.typo.label.medium.copyWith(fontWeight: FontWeight.w600, color: mutedColor),
+                style: context.typo.label.medium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: mutedColor,
+                ),
               ),
               Text(
                 group.sum,
-                style: context.typo.label.medium.copyWith(fontWeight: FontWeight.w600, color: mutedColor),
+                style: context.typo.label.medium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: mutedColor,
+                ),
               ),
             ],
           ),
@@ -257,7 +373,7 @@ class _MockTxRow extends StatelessWidget {
           Container(
             width: 44.r,
             height: 44.r,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppTheme.primaryLight,
               shape: BoxShape.circle,
             ),
@@ -269,7 +385,10 @@ class _MockTxRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w600, color: textColor),
+                  style: context.typo.body.medium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -281,7 +400,10 @@ class _MockTxRow extends StatelessWidget {
           ),
           Text(
             amount,
-            style: context.typo.body.medium.copyWith(fontWeight: FontWeight.w600, color: textColor),
+            style: context.typo.body.medium.copyWith(
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
           ),
         ],
       ),

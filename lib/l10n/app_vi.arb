@@ -35,10 +35,15 @@
   "aiModelUseThisModel": "Dùng model này",
   "aiModelSavingModelSelection": "Đang lưu model đã chọn...",
   "homeParFamilyMembersLabel": "Thành viên gia đình",
-  "homeParNoFamilyTitle": "Chưa có thành viên gia đình",
-  "homeParNoFamilySubtitle": "Tạo gia đình để bắt đầu theo dõi chi tiêu của con",
+  "homeParNoFamilyTitle": "Bắt đầu hành trình",
+  "homeParNoFamilySubtitle": "Chào mừng bạn đến với MoniKid. Hãy thêm thành viên đầu tiên để bắt đầu quản lý chi tiêu gia đình.",
   "homeParCreateFamilyBtn": "Tạo gia đình",
-  "homeParInviteTitle": "Thêm thành viên mới",
+  "homeParNoFamilyHintSafe": "Quản lý an toàn cho con",
+  "homeParNoFamilyHintChart": "Theo dõi biểu đồ chi tiêu",
+  "homeParErrorTitle": "Đã có lỗi xảy ra",
+  "homeParErrorDesc": "Không thể tải dữ liệu trang chủ. Vui lòng thử lại.",
+  "homeParInviteTitle": "Mời thành viên",
+  "homeParInviteDesc": "Chia sẻ mã này với con hoặc người thân để họ tham gia vào gia đình MoniKid.",
   "homeParInviteCodeLabel": "Mã liên kết",
   "homeParCopyCode": "Sao chép mã",
   "homeParCodeCopied": "Đã sao chép!",
@@ -70,6 +75,22 @@
       "percent": { "type": "String" }
     }
   },
+  "homeParTotalMonthlySpending": "Tổng chi tiêu tháng này",
+  "homeParLimitLabel": "Hạn mức:",
+  "homeParUsedPercent": "Đã dùng {percent}%",
+  "@homeParUsedPercent": {
+    "placeholders": {
+      "percent": { "type": "String" }
+    }
+  },
+  "homeParLowBalanceTitle": "Số dư thấp",
+  "homeParLowBalanceDesc": "Tài khoản của {name} đang dưới 100.000đ.",
+  "@homeParLowBalanceDesc": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "homeParTransactionSuccess": "Thành công",
   "appBarBrandTitle": "SmartSpending",
   "appBarNotificationsTooltip": "Thông báo",
   "navParentHome": "Trang chủ",
@@ -114,6 +135,12 @@
       "count": { "type": "int" }
     }
   },
+  "parentStatisticTotalExpenseLabel": "TỔNG CHI",
+  "parentStatisticTxCountLabel": "SỐ GD",
+  "parentStatisticPrevPeriodLabel": "THÁNG TRƯỚC",
+  "parentStatisticTrendGood": "Tốt",
+  "parentStatisticTrendBad": "Kém",
+  "parentStatisticEditedBadge": "Đã sửa",
   "settingParTitle": "Cài đặt",
   "settingParEditProfile": "Chỉnh sửa hồ sơ",
   "settingParFamilyTitle": "Quản lý gia đình",
@@ -124,6 +151,8 @@
   "settingParSpendingLimitSubtitle": "Thiết lập giới hạn tuần/tháng",
   "settingParAppearanceTitle": "Giao diện",
   "settingParThemeLabel": "Giao diện sáng/tối",
+  "settingThemeDarkLabel": "Chế độ tối",
+  "settingThemeDarkSubtitle": "Bật giao diện nền tối",
   "settingParNotificationsTitle": "Thông báo",
   "settingParPushLabel": "Thông báo tức thì",
   "settingParPushSubtitle": "Khi con thực hiện giao dịch",
@@ -217,7 +246,7 @@
       }
     }
   },
-  "settingFQA": "Câu hỏi thường gặp",
+  "settingFAQ": "Câu hỏi thường gặp",
   "msgNoData": "Không có dữ liệu",
   "helpStillNeedHelp": "Vẫn cần trợ giúp?",
   "helpContactSupportDesc": "Nếu bạn không tìm thấy câu trả lời, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi 24/7.",
@@ -239,6 +268,13 @@
   "transactionCategoryLoadError": "Không thể tải danh mục. Vui lòng thử lại.",
   "transactionUserNotAuthenticated": "Người dùng chưa được xác thực.",
   "transactionAmountLabel": "Số tiền",
+  "transactionAmountInputLabel": "Số tiền nhập",
+  "transactionDetailSectionLabel": "Chi tiết",
+  "transactionDateRowLabel": "Ngày giao dịch",
+  "transactionExpenseTab": "Chi tiêu",
+  "transactionIncomeTab": "Thu nhập",
+  "transactionCategoryViewAll": "Xem tất cả",
+  "transactionEvidenceRowLabel": "Ảnh hóa đơn",
   "transactionCategoryLabel": "Danh mục",
   "transactionDateLabel": "Ngày",
   "transactionHistorySelectDateTitle": "Chọn ngày",
@@ -285,7 +321,7 @@
   "transactionScanFailed": "Không thể phân tích hóa đơn này. Bạn có thể thử lại hoặc nhập tay giao dịch.",
   "transactionScanNoTextFound": "Không tìm thấy nội dung chữ có thể đọc được trên ảnh hóa đơn này.",
   "transactionScanNoSuggestion": "Không tạo được gợi ý tự điền phù hợp. Vui lòng kiểm tra biểu mẫu thủ công.",
-  "profileEditTitle": "Chỉnh sửa hồ sơ",
+  "profileEditTitle": "Hồ sơ cá nhân",
   "profileEditAvatarLabel": "Thay đổi ảnh đại diện",
   "profileEditAvatarDesc": "Chụp ảnh mới hoặc chọn từ thư viện",
   "profileEditFullName": "Họ và tên",
@@ -296,6 +332,8 @@
   "profileEditEmailWarning": "Email không thể thay đổi để bảo mật tài khoản.",
   "profileEditDob": "Ngày sinh",
   "profileEditDobHint": "DD/MM/YYYY",
+  "profileEditDobPickerTitle": "Chọn ngày sinh",
+  "profileEditDobPickerDone": "Xong",
   "actionSaveChanges": "Lưu thay đổi",
   "profileEditSaveSuccess": "Cập nhật hồ sơ thành công",
   "profileEditErrorNameRequired": "Họ tên là bắt buộc",
@@ -451,7 +489,8 @@
   "homeStudentUsedLabel": "Đã dùng",
   "setMoneyLimitTitle": "Thiết lập hạn mức tháng",
   "setMoneyLimitFieldLabel": "Hạn mức",
-  "setMoneyLimitDescription": "Hạn mức này giúp bạn kiểm soát chi tiêu tốt hơn mỗi tháng.",
+  "setMoneyLimitSubtitle": "Nhập số tiền tối đa con được phép chi trong tháng. Thay đổi sẽ áp dụng ngay cho tháng hiện tại.",
+  "setMoneyLimitDescription": "Hãy kiểm tra mức chi phù hợp với kế hoạch tháng của con.",
   "setMoneyLimitSkipAction": "Bỏ qua",
   "setMoneyLimitUnauthenticated": "Vui lòng đăng nhập lại để thiết lập hạn mức tháng.",
   "setMoneyLimitSaveFailed": "Không thể lưu hạn mức tháng. Vui lòng thử lại.",
@@ -478,10 +517,14 @@
   "statisticChartComparisonTitle": "So sánh theo thời gian",
   "statisticWeekNoun": "tuần",
   "statisticMonthNoun": "tháng",
+  "statisticYearNoun": "năm",
+  "statisticLoadError": "Không thể tải dữ liệu thống kê. Vui lòng thử lại.",
   "statisticThisWeek": "Tuần này",
   "statisticLastWeek": "Tuần trước",
   "statisticThisMonth": "Tháng này",
   "statisticLastMonth": "Tháng trước",
+  "statisticThisYear": "Năm này",
+  "statisticLastYear": "Năm ngoái",
   "statisticSmartInsightFallback": "Chưa có biến động chi tiêu nổi bật trong kỳ này.",
   "statisticSmartInsightMessage": "{periodLabel} này bạn chi cho {categoryLabel} nhiều hơn {percent}% so với {periodLabel} trước. Đây là danh mục tăng mạnh nhất.",
   "@statisticSmartInsightMessage": {
@@ -555,7 +598,9 @@
   "statisticHigher": "Cao hơn",
   "statisticLower": "Thấp hơn",
   "statisticStable": "Ổn định",
-  "statisticTopCategoriesTitle": "Chi tiêu nhiều nhất",
+  "statisticTopCategoriesTitle": "Danh mục chi tiêu nhiều nhất",
+  "statisticTopIncomeCategoriesTitle": "Danh mục thu nhập nhiều nhất",
+  "statisticCategoryTransactionListTitle": "Danh sách giao dịch",
   "statisticStrongestIncrease": "Tăng mạnh nhất",
   "statisticStrongestDecrease": "Giảm nhiều nhất",
   "statisticNoCategoryChange": "Chưa có biến động danh mục",
@@ -633,6 +678,10 @@
   "customCategorySelectTitle": "Chọn danh mục",
   "customCategoryConfirmSelection": "Xong",
   "customCategoryAddNew": "Thêm mới",
+  "customCategoryDelete": "Xóa",
+  "customCategoryIconHint": "Chọn biểu tượng",
+  "customCategoryDropToDelete": "Thả vào đây để xóa",
+  "customCategoryDeleteFailed": "Không thể xóa danh mục",
   "setMoneyLimitManagedByParent": "Hạn mức do phụ huynh quản lý",
   "parentSetLimitTitle": "Thiết lập hạn mức tháng",
   "parentSetLimitDescription": "Hạn mức này giúp con kiểm soát chi tiêu tốt hơn mỗi tháng",
@@ -804,5 +853,36 @@
 
   "transactionHistoryEyebrow": "Quản lý chi tiêu",
   "transactionHistoryTitle": "Lịch sử giao dịch",
-  "transactionHistorySubhead": "Tất cả khoản thu chi của bạn theo thời gian."
+  "transactionHistorySubhead": "Tất cả khoản thu chi của bạn theo thời gian.",
+
+  "splashStatusLoading": "Đang tải tài nguyên cần thiết...",
+
+  "notifChildDailyTitle": "Báo cáo chi tiêu hôm nay",
+  "@notifChildDailyTitle": {},
+  "notifChildDailyBody": "Bạn còn {pct}% hạn mức, bạn đã tiêu {expense} trong tháng {month}",
+  "@notifChildDailyBody": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "expense": { "type": "String" },
+      "month": { "type": "String" }
+    }
+  },
+  "notifChildNoLimitBody": "Bạn đã tiêu {expense} trong tháng {month}",
+  "@notifChildNoLimitBody": {
+    "placeholders": {
+      "expense": { "type": "String" },
+      "month": { "type": "String" }
+    }
+  },
+  "notifParentDailyTitle": "Báo cáo chi tiêu gia đình",
+  "@notifParentDailyTitle": {},
+  "notifParentChildBody": "Con bạn {name} chỉ còn {pct}% theo hạn mức, đã tiêu {expense}",
+  "@notifParentChildBody": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "pct": { "type": "int" },
+      "expense": { "type": "String" }
+    }
+  },
+  "notifScheduleError": "Không thể lên lịch thông báo. Vui lòng thử lại."
 }

@@ -51,10 +51,11 @@ class _ChangeInsightTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(20.r),
         border: Border(left: BorderSide(color: borderColor, width: 4.w)),
         boxShadow: const [
@@ -76,7 +77,7 @@ class _ChangeInsightTile extends StatelessWidget {
           if (insight == null)
             Text(
               context.l10n.statisticNoCategoryChange,
-              style: context.typo.body.small.copyWith(fontWeight: FontWeight.w600, color: AppTheme.textBlack),
+              style: context.typo.body.small.copyWith(fontWeight: FontWeight.w600, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack),
             )
           else
             Row(
@@ -89,7 +90,7 @@ class _ChangeInsightTile extends StatelessWidget {
                 Expanded(
                   child: Text(
                     insight!.categoryLabel,
-                    style: context.typo.body.small.copyWith(fontWeight: FontWeight.w800, color: AppTheme.textBlack),
+                    style: context.typo.body.small.copyWith(fontWeight: FontWeight.w800, color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack),
                   ),
                 ),
               ],

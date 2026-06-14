@@ -86,10 +86,10 @@ class AuthSession extends _$AuthSession {
   }
 
   void markPinVerified() {
-    if (!state.isAuthenticated) {
-      return;
-    }
-
+    // No isAuthenticated guard: the user may have entered their PIN while
+    // _handleAuthUserChanged is still loading (Firestore fetch in progress).
+    // _handleAuthUserChanged preserves PinVerificationStatus.verified when
+    // it resolves, so setting it here is safe even in loading state.
     state = state.copyWith(
       pinVerificationStatus: PinVerificationStatus.verified,
     );
@@ -103,6 +103,12 @@ class AuthSession extends _$AuthSession {
     state = state.copyWith(
       pinVerificationStatus: PinVerificationStatus.required,
     );
+  }
+
+  void patchAccountFamilyId(String familyId) {
+    final account = state.account;
+    if (account == null) return;
+    state = state.copyWith(account: account.copyWith(familyId: familyId));
   }
 
   Future<void> _checkCurrentSession() async {
@@ -187,11 +193,18 @@ class AuthSession extends _$AuthSession {
       _logger.i(
         'Auth session resolved as authenticated for uid=${user.uid} role=${account.role}.',
       );
+      final hasPinCode =
+          await ref.read(pinCodeRepositoryProvider).hasPinCode();
       state = AuthSessionState(
         status: AuthStatus.isAuthenticated,
         firebaseUser: user,
         account: account,
-        pinVerificationStatus: PinVerificationStatus.required,
+        // Preserve 'verified' if markPinVerified() was already called
+        // (e.g., during concurrent _handleAuthUserChanged calls on startup).
+        pinVerificationStatus: state.isPinVerified
+            ? PinVerificationStatus.verified
+            : PinVerificationStatus.required,
+        hasPinCode: hasPinCode,
       );
     } catch (e, stackTrace) {
       _setErrorState(

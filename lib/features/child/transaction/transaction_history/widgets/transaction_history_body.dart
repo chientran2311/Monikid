@@ -5,10 +5,11 @@ import 'package:intl/intl.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.dart';
+import 'package:monikid/features/child/transaction/transaction_history/providers/transaction_filter_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/providers/transaction_summary_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
-import 'package:monikid/features/child/transaction/transaction_history/transaction_history_skeleton.dart';
 import 'package:monikid/shared/widgets/skeleton_widget/transaction_history_skeleton.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/grouped_transaction_list.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/summary_and_tabs_section.dart';
@@ -44,13 +45,13 @@ class TransactionHistoryBody extends ConsumerWidget {
       transactionHistoryProvider.select((v) => v.errorMessage),
     );
     final selectedDate = ref.watch(
-      transactionHistoryProvider.select((v) => v.selectedDate),
+      transactionFilterNotifierProvider.select((v) => v.selectedDate),
     );
     final transactionTypeFilter = ref.watch(
-      transactionHistoryProvider.select((v) => v.transactionTypeFilter),
+      transactionFilterNotifierProvider.select((v) => v.transactionTypeFilter),
     );
     final selectedCategoryKey = ref.watch(
-      transactionHistoryProvider.select((v) => v.selectedCategoryKey),
+      transactionFilterNotifierProvider.select((v) => v.selectedCategoryKey),
     );
     final hasMore = ref.watch(
       transactionHistoryProvider.select((v) => v.hasMore),
@@ -61,24 +62,36 @@ class TransactionHistoryBody extends ConsumerWidget {
 
     final now = DateTime.now();
     final currentMonth = DateTime(now.year, now.month);
+    final monthlyLimitMinor = ref.watch(
+      setMoneyLimitNotifierProvider.select((v) => v.storedLimitMinor),
+    );
     final summaryAsyncValue = ref.watch(
       streamSummaryCardProvider(
         date: selectedDate,
         month: selectedDate == null ? currentMonth : null,
         categoryKey: selectedCategoryKey,
-        type: transactionTypeFilter == 'all' ? null : transactionTypeFilter,
+        type: null,
       ),
     );
+    // Always unfiltered full-month totals for "Hạn mức còn lại" — never affected by date/category filter.
+    final monthlyTotalExpense = ref.watch(
+      streamSummaryCardProvider(
+        date: null,
+        month: currentMonth,
+        categoryKey: null,
+        type: null,
+      ),
+    ).valueOrNull?.totalExpense;
 
     if (isLoading) {
-      return Expanded(child: TransactionHistorySkeletonNew(isDark: isDark));
+      return const Expanded(child: TransactionHistorySkeleton());
     }
 
     // Category / date filter change → full-screen skeleton (hides summary card)
     if (isListLoading &&
         listLoadingTrigger != TransactionListLoadingTrigger.none &&
         listLoadingTrigger != TransactionListLoadingTrigger.tabSwitch) {
-      return Expanded(child: TransactionHistorySkeletonNew(isDark: isDark));
+      return const Expanded(child: TransactionHistorySkeleton());
     }
 
     if (errorMessage != null) {
@@ -132,6 +145,8 @@ class TransactionHistoryBody extends ConsumerWidget {
                 typeFilter: transactionTypeFilter,
                 notifier: notifier,
                 isDark: isDark,
+                monthlyLimitMinor: monthlyLimitMinor,
+                monthlyTotalExpense: monthlyTotalExpense,
               ),
               SliverFillRemaining(
                 child: Center(
@@ -184,6 +199,8 @@ class TransactionHistoryBody extends ConsumerWidget {
               typeFilter: transactionTypeFilter,
               notifier: notifier,
               isDark: isDark,
+              monthlyLimitMinor: monthlyLimitMinor,
+              monthlyTotalExpense: monthlyTotalExpense,
             ),
             if (isListLoading)
               SliverToBoxAdapter(
@@ -207,6 +224,7 @@ class TransactionHistoryBody extends ConsumerWidget {
               GroupedTransactionList(
                 grouped: sortAndGroup(transactions),
                 isDark: isDark,
+                showBadge: false,
                 onTap: (tx) {
                   notifier.selectTransaction(tx);
                   context.push(AppRoutes.detailTransactionPath(tx.transactionId));

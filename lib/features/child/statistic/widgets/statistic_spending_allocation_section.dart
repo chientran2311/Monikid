@@ -18,6 +18,7 @@ class StatisticSpendingAllocationSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final sourceCategories =
         categories.where((item) => item.amountMinor > 0).isEmpty
             ? _mockCategories
@@ -37,9 +38,9 @@ class StatisticSpendingAllocationSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
         borderRadius: BorderRadius.circular(26.r),
-        border: Border.all(color: AppTheme.borderLight),
+        border: Border.all(color: isDark ? AppTheme.borderDark : AppTheme.borderLight),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0D111811),
@@ -55,7 +56,7 @@ class StatisticSpendingAllocationSection extends StatelessWidget {
             context.l10n.statisticSpendingAllocationTitle,
             style: context.typo.title.medium.copyWith(
               fontWeight: FontWeight.w800,
-              color: AppTheme.textBlack,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
               letterSpacing: -0.5,
             ),
           ),
@@ -101,7 +102,7 @@ class StatisticSpendingAllocationSection extends StatelessWidget {
                           context.formatStatisticCompactCurrency(effectiveTotal),
                           style: context.typo.title.medium.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: AppTheme.textBlack,
+                            color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                             letterSpacing: -0.5,
                           ),
                         ),
@@ -142,7 +143,7 @@ class StatisticSpendingAllocationSection extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: context.typo.caption.big.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: AppTheme.textBlack,
+                                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                               ),
                             ),
                           ),

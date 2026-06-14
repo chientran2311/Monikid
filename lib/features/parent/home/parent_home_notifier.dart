@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/notification_settings/notification_settings_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/link_family/link_family_repository.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/parent_dashboard/parent_dashboard_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -22,29 +26,47 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
     _familyRepo = getIt<LinkFamilyRepository>();
     _dashRepo = getIt<ParentDashboardRepository>();
     _logger = getIt<Logger>();
+
+    ref.listen(authSessionProvider, (prev, next) {
+      if (next.isAuthenticated && !(prev?.isAuthenticated ?? false)) {
+        onInit();
+      }
+    });
+
     return const ParentHomeState();
   }
 
   String get _currentMonthKey => DateFormat('yyyy-MM').format(DateTime.now());
 
   Future<void> onInit() async {
+    _logger.i('ParentHome.onInit: start.');
     state = state.copyWith(status: ParentHomeStatus.loading);
     try {
       final authState = ref.read(authSessionProvider);
+      if (!authState.isAuthenticated || authState.account == null) {
+        _logger.i('ParentHome.onInit: auth not ready, skipping.');
+        state = state.copyWith(status: ParentHomeStatus.initial);
+        return;
+      }
+
       final familyId = authState.account?.familyId;
+      _logger.i('ParentHome.onInit: familyId=$familyId.');
 
       if (familyId == null || familyId.isEmpty) {
         state = state.copyWith(status: ParentHomeStatus.noFamily);
         return;
       }
 
+      _logger.i('ParentHome.onInit: fetching family + members.');
       final results = await Future.wait([
         _familyRepo.getFamilyById(familyId),
-        _familyRepo.watchFamilyMembers(familyId).first,
+        _familyRepo.getFamilyMembersOnce(familyId),
       ]);
 
       final family = results[0] as dynamic;
       final members = (results[1] as List).cast<FamilyMemberModel>();
+      _logger.i('ParentHome.onInit: fetched family=${family != null} '
+          'members=${members.length}.');
 
       if (family == null) {
         state = state.copyWith(status: ParentHomeStatus.noFamily);
@@ -59,7 +81,9 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
 
       if (members.isNotEmpty) {
         await selectMember(members.first.uid);
+        unawaited(_syncNotificationData(members));
       }
+      _logger.i('ParentHome.onInit: done.');
     } catch (error, stackTrace) {
       _logger.e('Failed to init parent home', error: error, stackTrace: stackTrace);
       state = state.copyWith(
@@ -84,6 +108,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
       return;
     }
 
+    _logger.i('ParentHome.selectMember: start uid=$uid.');
     state = state.copyWith(
       selectedMemberId: uid,
       isLoadingMemberData: true,
@@ -99,7 +124,10 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
       );
 
       final txs = await txsFuture;
+      _logger.i('ParentHome.selectMember: txs loaded count=${txs.length}.');
       final summary = await summaryFuture;
+      _logger.i('ParentHome.selectMember: summary loaded '
+          'expense=${summary.expenseMinor} income=${summary.incomeMinor}.');
 
       state = state.copyWith(
         selectedMemberTransactions: txs,
@@ -107,6 +135,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         selectedMemberIncomeMinor: summary.incomeMinor,
         isLoadingMemberData: false,
       );
+      _logger.i('ParentHome.selectMember: done uid=$uid.');
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to load data for member $uid',
@@ -122,15 +151,13 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
 
   Future<void> createFamily() async {
     final authState = ref.read(authSessionProvider);
-    final parentId = authState.account?.uid;
-    final parentName = authState.account?.displayName ?? '';
-    if (parentId == null) return;
+    final ownerUid = authState.account?.uid;
+    if (ownerUid == null) return;
 
     state = state.copyWith(isCreatingFamily: true);
     try {
       final family = await _familyRepo.createFamily(
-        parentId: parentId,
-        parentName: parentName,
+        ownerUid: ownerUid,
       );
       if (family != null) {
         state = state.copyWith(
@@ -160,7 +187,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
     }
 
     try {
-      final members = await _familyRepo.watchFamilyMembers(familyId).first;
+      final members = await _familyRepo.getFamilyMembersOnce(familyId);
       state = state.copyWith(members: members);
       
       if (members.isEmpty) {
@@ -208,4 +235,48 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
 
   List<TransactionModel> get selectedMemberTransactions =>
       state.selectedMemberTransactions;
+
+  Future<void> _syncNotificationData(List<FamilyMemberModel> allMembers) async {
+    try {
+      final childMembers = allMembers.where((m) => m.userRole == 'child').toList();
+      if (childMembers.isEmpty) return;
+
+      final memberUids = childMembers.map((m) => m.uid).toList();
+      final limits = await _dashRepo.getChildrenMonthlyLimits(childUids: memberUids);
+
+      final children = <({String name, int expenseMinor, int limitMinor})>[];
+      for (final member in childMembers) {
+        try {
+          final summary = await _dashRepo.getChildMonthlySummary(
+            childUid: member.uid,
+            monthKey: _currentMonthKey,
+          );
+          children.add((
+            name: member.displayName,
+            expenseMinor: summary.expenseMinor,
+            limitMinor: limits[member.uid] ?? 0,
+          ));
+        } catch (e, s) {
+          _logger.w(
+            'ParentHome._syncNotificationData: skip child ${member.uid}.',
+            error: e,
+            stackTrace: s,
+          );
+        }
+      }
+
+      if (children.isEmpty) return;
+
+      await getIt<NotificationRepository>().saveParentChildrenData(children: children);
+      await ref
+          .read(notificationSettingsNotifierProvider.notifier)
+          .rescheduleIfEnabled();
+    } catch (error, stackTrace) {
+      _logger.w(
+        'ParentHome._syncNotificationData failed.',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
 }

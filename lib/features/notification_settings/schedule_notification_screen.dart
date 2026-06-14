@@ -1,8 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:monikid/core/theme/theme.dart';
@@ -14,6 +11,8 @@ import 'package:monikid/features/notification_settings/widgets/notification_inst
 import 'package:monikid/features/notification_settings/widgets/notification_schedule_card.dart';
 import 'package:monikid/features/notification_settings/widgets/notification_toggle_card.dart';
 import 'package:monikid/features/notification_settings/widgets/time_picker_bottom_sheet.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class ScheduleNotificationScreen extends HookConsumerWidget {
   const ScheduleNotificationScreen({super.key});
@@ -25,9 +24,6 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
 
     final state = ref.watch(notificationSettingsNotifierProvider);
     final notifier = ref.read(notificationSettingsNotifierProvider.notifier);
-
-    final bgColor = isDark ? AppTheme.backgroundDark : const Color(0xFFF2FBF5);
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
 
     final heroAnim = useAnimationController(duration: const Duration(milliseconds: 500));
     final card1Anim = useAnimationController(duration: const Duration(milliseconds: 500));
@@ -49,82 +45,41 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
       extendBodyBehindAppBar: true,
-      appBar: _buildAppBar(context, s, textColor, isDark),
-      body: ListView(
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top + kToolbarHeight + 8.h,
-          left: 20.w,
-          right: 20.w,
-          bottom: 40.h,
-        ),
-        children: [
-          _FadeSlide(controller: heroAnim, child: const NotificationHeroSection()),
-          SizedBox(height: 16.h),
-          _FadeSlide(
-            controller: card1Anim,
-            child: NotificationToggleCard(
-              enabled: state.enabled,
-              onChanged: notifier.toggleEnabled,
-              isDark: isDark,
-            ),
+      appBar: GlassAppBar(title: s.notificationSettingsTitle),
+      body: AppBackground(
+        child: ListView(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + kToolbarHeight + 8.h,
+            left: 20.w,
+            right: 20.w,
+            bottom: 40.h,
           ),
-          SizedBox(height: 16.h),
-          _FadeSlide(
-            controller: card2Anim,
-            child: NotificationScheduleCard(
-              timeText: state.formattedTime,
-              onTimeTap: () => _pickTime(context, ref, state.hour, state.minute),
-              isDark: isDark,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          _FadeSlide(
-            controller: card3Anim,
-            child: const NotificationInstructionCard(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(
-    BuildContext context,
-    dynamic s,
-    Color textColor,
-    bool isDark,
-  ) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      titleSpacing: 0,
-      title: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Row(
           children: [
-            _GlassIconButton(
-              onTap: () => context.pop(),
-              isDark: isDark,
-              child: Icon(Icons.chevron_left_rounded, color: textColor, size: 26.r),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  s.notificationSettingsTitle,
-                  style: context.typo.subtitle.small.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                    letterSpacing: -0.01,
-                  ),
-                ),
+            _FadeSlide(controller: heroAnim, child: const NotificationHeroSection()),
+            SizedBox(height: 16.h),
+            _FadeSlide(
+              controller: card1Anim,
+              child: NotificationToggleCard(
+                enabled: state.enabled,
+                onChanged: notifier.toggleEnabled,
+                isDark: isDark,
               ),
             ),
-            _GlassIconButton(
-              onTap: () {},
-              isDark: isDark,
-              child: Icon(Icons.help_outline_rounded, color: textColor, size: 20.r),
+            SizedBox(height: 16.h),
+            _FadeSlide(
+              controller: card2Anim,
+              child: NotificationScheduleCard(
+                timeText: state.formattedTime,
+                onTimeTap: () => _pickTime(context, ref, state.hour, state.minute),
+                isDark: isDark,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            _FadeSlide(
+              controller: card3Anim,
+              child: const NotificationInstructionCard(),
             ),
           ],
         ),
@@ -162,44 +117,6 @@ class _FadeSlide extends StatelessWidget {
           end: Offset.zero,
         ).animate(curve),
         child: child,
-      ),
-    );
-  }
-}
-
-class _GlassIconButton extends StatelessWidget {
-  const _GlassIconButton({
-    required this.onTap,
-    required this.child,
-    required this.isDark,
-  });
-
-  final VoidCallback onTap;
-  final Widget child;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14.r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            width: 44.r,
-            height: 44.r,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.76),
-              borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(
-                color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-                width: 1,
-              ),
-            ),
-            child: Center(child: child),
-          ),
-        ),
       ),
     );
   }

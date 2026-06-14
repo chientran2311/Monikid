@@ -11,9 +11,9 @@ import 'package:monikid/features/child/home/widgets/home_monthly_summary_card.da
 import 'package:monikid/features/child/home/widgets/home_quick_actions.dart';
 import 'package:monikid/features/child/home/widgets/home_recent_transactions_section.dart';
 import 'package:monikid/features/child/home/widgets/section_container.dart';
-import 'package:monikid/features/child/home/widgets/seed_mock_button.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_dialog.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
 
@@ -66,24 +66,32 @@ class HomeTabStudentBody extends ConsumerWidget {
       }),
     );
 
-    final topCategory = ref.watch(
+    final categories =
+        ref.watch(categoryStreamProvider).value ?? defaultCategories;
+
+    final topCategoryEntry = ref.watch(
       transactionHistoryProvider.select((value) {
         final expenses =
             value.monthlyTransactions.where((tx) => tx.type == 'expense');
         if (expenses.isEmpty) return null;
-        final Map<String, ({String label, int amount})> totals = {};
+        final Map<String, int> totalsByKey = {};
         for (final tx in expenses) {
-          final prev = totals[tx.categoryKey];
-          totals[tx.categoryKey] = (
-            label: tx.categoryLabel,
-            amount: (prev?.amount ?? 0) + tx.amountMinor,
-          );
+          totalsByKey[tx.categoryKey] =
+              (totalsByKey[tx.categoryKey] ?? 0) + tx.amountMinor;
         }
-        final top = totals.entries
-            .reduce((a, b) => a.value.amount > b.value.amount ? a : b);
-        return (label: top.value.label, amount: top.value.amount.toDouble());
+        final top = totalsByKey.entries
+            .reduce((a, b) => a.value > b.value ? a : b);
+        return (categoryKey: top.key, amount: top.value.toDouble());
       }),
     );
+    // Resolve display label from the live category list (handles custom categories and old transactions with no stored label).
+    final topCategoryLabel = topCategoryEntry != null
+        ? (findCategoryByTransactionKey(
+                categories, topCategoryEntry.categoryKey)
+              ?.label ??
+            topCategoryEntry.categoryKey)
+        : null;
+    final topCategoryAmount = topCategoryEntry?.amount;
 
     final hasMonthlyLimit = limitState.hasStoredLimit;
     final limitMinor = limitState.storedLimitMinor;
@@ -95,7 +103,7 @@ class HomeTabStudentBody extends ConsumerWidget {
     final topPadding = 24.h;
     final sectionSpacing = 16.h;
     final smallSpacing = 8.h;
-    final bottomPadding = 100.h;
+   
     final screenWidth = MediaQuery.sizeOf(context).width;
     final sectionMaxWidth = screenWidth >= 840
         ? 720.0
@@ -180,8 +188,8 @@ class HomeTabStudentBody extends ConsumerWidget {
                 transactionCount: transactionCount,
                 isLimitConfigured: hasMonthlyLimit,
                 todayTransactionCount: todayTransactionCount,
-                topCategoryLabel: topCategory?.label,
-                topCategoryAmount: topCategory?.amount,
+                topCategoryLabel: topCategoryLabel,
+                topCategoryAmount: topCategoryAmount,
               ),
             ),
           ),
@@ -215,24 +223,9 @@ class HomeTabStudentBody extends ConsumerWidget {
               ),
               child: HomeRecentTransactionsSection(
                 title: s.homeStudentRecentTransactions,
-                viewAllLabel: s.homeStudentViewAll,
                 transactions: recentTransactions,
                 emptyLabel: s.noTransactionsYet,
               ),
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: SectionContainer(
-            maxWidth: sectionMaxWidth,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                0,
-                horizontalPadding,
-                bottomPadding,
-              ),
-              child: SeedMockButton(uid: uid),
             ),
           ),
         ),

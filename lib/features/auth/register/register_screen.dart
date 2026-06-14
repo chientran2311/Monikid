@@ -20,7 +20,6 @@ class RegisterScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final emailController = useTextEditingController();
     final usernameController = useTextEditingController();
-    final phoneController = useTextEditingController();
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
     final selectedRoleIndex = useState(0);
@@ -44,7 +43,6 @@ class RegisterScreen extends HookConsumerWidget {
         email: emailController.text,
         password: passwordController.text,
         fullName: usernameController.text,
-        phone: phoneController.text,
         role: selectedRoleIndex.value == 0 ? 'parent' : 'child',
       );
     }
@@ -87,20 +85,17 @@ class RegisterScreen extends HookConsumerWidget {
                       RegisterFormCard(
                         emailController: emailController,
                         usernameController: usernameController,
-                        phoneController: phoneController,
                         passwordController: passwordController,
                         confirmPasswordController: confirmPasswordController,
                         isLoading: registerState.isLoading,
                         errorMessage: registerState.errorMessage,
                         emailErrorText: registerState.emailError.message(context),
                         usernameErrorText: registerState.usernameError.message(context),
-                        phoneErrorText: registerState.phoneError.message(context),
                         passwordErrorText: registerState.passwordError.message(context),
                         confirmPasswordErrorText: registerState.confirmPasswordError.message(context),
                         onSubmit: canSubmit ? handleSignUp : null,
                         onEmailChanged: registerNotifier.validateEmail,
                         onUsernameChanged: registerNotifier.validateUsername,
-                        onPhoneChanged: registerNotifier.validatePhone,
                         onPasswordChanged: registerNotifier.validatePassword,
                         onConfirmPasswordChanged: (value) =>
                             registerNotifier.validateConfirmPassword(value, passwordController.text),
@@ -110,8 +105,6 @@ class RegisterScreen extends HookConsumerWidget {
                         emailPlaceholder: s.registerEmailPlaceholder,
                         usernameLabel: s.registerUsernameLabel,
                         usernamePlaceholder: s.registerUsernamePlaceholder,
-                        phoneLabel: s.registerPhoneLabel,
-                        phonePlaceholder: s.registerPhonePlaceholder,
                         passwordLabel: s.loginPasswordLabel,
                         passwordPlaceholder: s.registerPasswordPlaceholder,
                         confirmPasswordLabel: s.registerConfirmPasswordLabel,

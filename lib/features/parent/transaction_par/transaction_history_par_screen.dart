@@ -5,6 +5,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/parent/transaction_par/widgets/transaction_filter_bar.dart';
 import 'package:monikid/features/parent/transaction_par/widgets/transaction_history_par_body.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/app_bar_push.dart';
 
 class TransactionHistoryParScreen extends HookConsumerWidget {
@@ -13,7 +14,6 @@ class TransactionHistoryParScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
 
     final scrollCtrl = useScrollController();
 
@@ -47,17 +47,19 @@ class TransactionHistoryParScreen extends HookConsumerWidget {
     }, [scrollCtrl, isLoadingMore, hasMore]);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
       appBar: const AppBarPush(title: 'Lịch sử Giao dịch'),
-      body: SafeArea(
-        child: Column(
-          children: [
-            TransactionFilterBar(isDark: isDark),
-            TransactionHistoryParBody(
-              scrollController: scrollCtrl,
-              isDark: isDark,
-            ),
-          ],
+      body: AppBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              TransactionFilterBar(isDark: isDark),
+              TransactionHistoryParBody(
+                scrollController: scrollCtrl,
+                isDark: isDark,
+              ),
+            ],
+          ),
         ),
       ),
     );

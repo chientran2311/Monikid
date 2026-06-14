@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/currency_formatter.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/widgets/transaction_detail_evidence_section.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/widgets/transaction_detail_info_row.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 
-class ParentTransactionDetailCard extends StatelessWidget {
+class ParentTransactionDetailCard extends ConsumerWidget {
   const ParentTransactionDetailCard({
     required this.transaction,
     required this.isDark,
@@ -19,7 +21,11 @@ class ParentTransactionDetailCard extends StatelessWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categories = ref.watch(categoryStreamProvider).value ?? defaultCategories;
+    final categoryLabel =
+        findCategoryByTransactionKey(categories, transaction.categoryKey)?.label ??
+        transaction.categoryLabel;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
@@ -72,7 +78,7 @@ class ParentTransactionDetailCard extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               Text(
-                transaction.categoryLabel,
+                categoryLabel,
                 style: context.typo.body.medium.copyWith(color: mutedColor),
               ),
               SizedBox(height: 24.h),

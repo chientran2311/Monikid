@@ -1,19 +1,22 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
-class InviteCodeSheet extends StatelessWidget {
-  const InviteCodeSheet({
+class InviteCodeDialog extends HookConsumerWidget {
+  const InviteCodeDialog({
     super.key,
     required this.inviteCode,
-    required this.isDark,
   });
 
   final String inviteCode;
-  final bool isDark;
 
   String get _formattedCode {
     if (inviteCode.length == 6) {
@@ -23,110 +26,150 @@ class InviteCodeSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final s = context.l10n;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor =
-        isDark ? AppTheme.textMuted : AppTheme.textGrey;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ctrl = useAnimationController(
+      duration: const Duration(milliseconds: 400),
+    );
+    final anim = CurvedAnimation(
+      parent: ctrl,
+      curve: const Cubic(0.175, 0.885, 0.32, 1.275),
+    );
+    useEffect(() {
+      ctrl.forward();
+      return null;
+    }, const []);
 
-    return Container(
-      margin: EdgeInsets.all(12.r),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(20.r),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
+      child: AnimatedBuilder(
+        animation: anim,
+        builder: (_, child) => Transform.scale(
+          scale: 0.9 + 0.1 * anim.value,
+          child: Transform.translate(
+            offset: Offset(0, 10.h * (1 - anim.value)),
+            child: child,
+          ),
+        ),
+        child: _InviteCard(
+          inviteCode: inviteCode,
+          formattedCode: _formattedCode,
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 20.h),
-          Container(
-            width: 48.r,
-            height: 48.r,
-            decoration: BoxDecoration(
-              color: AppTheme.primaryLight,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.link_rounded,
-              size: 24.r,
-              color: AppTheme.primary,
-            ),
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            s.homeParInviteTitle,
-            style: context.typo.subtitle.medium.copyWith(
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            s.homeParInviteCodeLabel,
-            style: context.typo.body.small.copyWith(color: mutedColor),
-          ),
-          SizedBox(height: 16.h),
+    );
+  }
+}
 
-          // Code display
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 24.w),
-            padding:
-                EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : AppTheme.surfaceGrey,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: borderColor, width: 0.5),
-            ),
-            child: Text(
-              _formattedCode,
-              style: context.typo.display.big.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: 8,
-                color: AppTheme.primary,
+class _InviteCard extends StatelessWidget {
+  const _InviteCard({
+    required this.inviteCode,
+    required this.formattedCode,
+  });
+
+  final String inviteCode;
+  final String formattedCode;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final s = context.l10n;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: EdgeInsets.all(28.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.94),
+            borderRadius: BorderRadius.circular(32.r),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+            boxShadow: [
+              BoxShadow(
+                offset: Offset(0, 30.h),
+                blurRadius: 60.r,
+                color: Colors.black.withValues(alpha: 0.15),
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ),
-          SizedBox(height: 20.h),
-
-          // Copy button
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  await Clipboard.setData(
-                      ClipboardData(text: inviteCode));
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64.w,
+                height: 64.w,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryLight,
+                  borderRadius: BorderRadius.circular(22.r),
+                ),
+                child: Icon(
+                  Icons.person_add_rounded,
+                  color: AppTheme.primary,
+                  size: 32.w,
+                ),
+              ),
+              SizedBox(height: 20.h),
+              Text(
+                s.homeParInviteTitle,
+                textAlign: TextAlign.center,
+                style: context.typo.headline.small.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: Text(
+                  s.homeParInviteDesc,
+                  textAlign: TextAlign.center,
+                  style: context.typo.body.medium.copyWith(
+                    fontSize: 15.sp,
+                    height: 1.5,
+                    color: AppTheme.textGrey,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+                decoration: BoxDecoration(
+                  color: isDark ? AppTheme.darkBorder : AppTheme.surfaceGrey,
+                  borderRadius: BorderRadius.circular(18.r),
+                  border: Border.all(
+                    color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+                  ),
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    formattedCode,
+                    style: context.typo.display.big.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 10,
+                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+                    ),
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              SizedBox(height: 28.h),
+              PrimaryButton(
+                title: s.actionDone,
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: inviteCode));
                   if (!context.mounted) return;
                   context.showSuccessSnackBar(s.homeParCodeCopied);
                   context.pop();
                 },
-                icon: Icon(Icons.copy_rounded, size: 18.r),
-                label: Text(
-                  s.homeParCopyCode,
-                  style: context.typo.body.big.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 0,
-                ),
+                height: 56.h,
               ),
-            ),
+            ],
           ),
-          SizedBox(height: 24.h),
-        ],
+        ),
       ),
     );
   }

@@ -74,6 +74,7 @@ class GeminiSectionCard extends HookConsumerWidget {
     }
 
     final errorText = _resolveErrorText(s, state.error);
+    final isApiSectionDisabled = state.hasKeyInStorage && !state.hasSavedApiKey;
 
     return Container(
       decoration: BoxDecoration(
@@ -105,80 +106,159 @@ class GeminiSectionCard extends HookConsumerWidget {
             ),
             SizedBox(height: 14.h),
             Divider(height: 1, thickness: 1, color: borderColor),
-            // Toggle row
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 14.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      s.aiModelEnableGemini,
-                      style: context.typo.body.medium.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: textColor,
-                        fontSize: 15.sp,
+            // Toggle row — only visible when a key exists in storage
+            if (state.hasKeyInStorage)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 14.h),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        s.aiModelEnableGemini,
+                        style: context.typo.body.medium.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: textColor,
+                          fontSize: 15.sp,
+                        ),
                       ),
                     ),
-                  ),
-                  if (state.isSavingApiKey)
-                    SizedBox(
-                      width: 22.r,
-                      height: 22.r,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppTheme.primary,
+                    if (state.isSavingApiKey)
+                      SizedBox(
+                        width: 22.r,
+                        height: 22.r,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppTheme.primary,
+                        ),
+                      )
+                    else
+                      AppIosSwitch(
+                        value: state.hasSavedApiKey,
+                        onChanged: state.isBusy
+                            ? null
+                            : (v) => v
+                                ? notifier.enableApiKey()
+                                : notifier.disableApiKey(),
                       ),
-                    )
-                  else
-                    AppIosSwitch(
-                      value: state.hasSavedApiKey,
-                      onChanged: (state.isBusy || !state.hasKeyInStorage)
-                          ? null
-                          : (v) => v
-                              ? notifier.enableApiKey()
-                              : notifier.disableApiKey(),
-                      scale: 0.6,
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            // API box
-            Container(
-              decoration: BoxDecoration(
-                color: apiBoxBg,
-                border: Border.all(color: apiBoxBorder, width: 1),
-                borderRadius: BorderRadius.circular(18.r),
-              ),
-              padding: EdgeInsets.all(14.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    s.aiModelApiKeyLabel.toUpperCase(),
-                    style: context.typo.body.small.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                      color: mutedColor,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  if (state.hasSavedApiKey) ...[
-                    // Masked key field container
+            // API box + model picker — disabled + grayed when switch is OFF
+            IgnorePointer(
+              ignoring: isApiSectionDisabled,
+              child: AnimatedOpacity(
+                opacity: isApiSectionDisabled ? 0.4 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Container(
-                      constraints: BoxConstraints(minHeight: 48.h),
-                      padding: EdgeInsets.only(
-                          left: 14.w, right: 10.w),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        borderRadius: BorderRadius.circular(14.r),
-                        border: Border.all(
-                            color: AppTheme.primaryLight, width: 1),
+                        color: apiBoxBg,
+                        border: Border.all(color: apiBoxBorder, width: 1),
+                        borderRadius: BorderRadius.circular(18.r),
                       ),
-                      child: Row(
+                      padding: EdgeInsets.all(14.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: TextField(
+                          Text(
+                            s.aiModelApiKeyLabel.toUpperCase(),
+                            style: context.typo.body.small.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                              color: mutedColor,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                          SizedBox(height: 10.h),
+                          if (state.hasSavedApiKey) ...[
+                            // Masked key field container
+                            Container(
+                              constraints: BoxConstraints(minHeight: 48.h),
+                              padding: EdgeInsets.only(left: 14.w, right: 10.w),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryLight,
+                                borderRadius: BorderRadius.circular(14.r),
+                                border: Border.all(
+                                    color: AppTheme.primaryLight, width: 1),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: apiKeyController,
+                                      onChanged: notifier.updateApiKeyInput,
+                                      obscureText: obscureApiKey.value,
+                                      style: context.typo.body.medium
+                                          .copyWith(color: textColor),
+                                      decoration: InputDecoration(
+                                        hintText: s.aiModelApiKeyHint,
+                                        hintStyle: context.typo.body.medium
+                                            .copyWith(color: mutedColor),
+                                        border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        isDense: true,
+                                        contentPadding:
+                                            EdgeInsets.symmetric(vertical: 14.h),
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () =>
+                                        obscureApiKey.value = !obscureApiKey.value,
+                                    child: Icon(
+                                      obscureApiKey.value
+                                          ? Icons.visibility_off_rounded
+                                          : Icons.visibility_rounded,
+                                      size: 20.r,
+                                      color: mutedColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            GestureDetector(
+                              onTap: state.isSavingApiKey
+                                  ? null
+                                  : notifier.removeApiKey,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (state.isSavingApiKey)
+                                    SizedBox(
+                                      width: 16.r,
+                                      height: 16.r,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: errorColor,
+                                      ),
+                                    )
+                                  else
+                                    Icon(Icons.delete_outline_rounded,
+                                        size: 18.r, color: errorColor),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    s.aiModelRemoveApiKey,
+                                    style: context.typo.body.medium.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: errorColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              s.aiModelApiKeySessionNote,
+                              style: context.typo.caption.big
+                                  .copyWith(color: mutedColor),
+                            ),
+                          ] else ...[
+                            // Plain text field
+                            TextField(
                               controller: apiKeyController,
                               onChanged: notifier.updateApiKeyInput,
                               obscureText: obscureApiKey.value,
@@ -192,139 +272,77 @@ class GeminiSectionCard extends HookConsumerWidget {
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 isDense: true,
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 14.h),
+                                contentPadding: EdgeInsets.zero,
+                                suffixIcon: GestureDetector(
+                                  onTap: () =>
+                                      obscureApiKey.value = !obscureApiKey.value,
+                                  child: Icon(
+                                    obscureApiKey.value
+                                        ? Icons.visibility_off_rounded
+                                        : Icons.visibility_rounded,
+                                    size: 20.r,
+                                    color: mutedColor,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () =>
-                                obscureApiKey.value = !obscureApiKey.value,
-                            child: Icon(
-                              obscureApiKey.value
-                                  ? Icons.visibility_off_rounded
-                                  : Icons.visibility_rounded,
-                              size: 20.r,
-                              color: mutedColor,
+                            SizedBox(height: 12.h),
+                            PrimaryButton(
+                              title: s.aiModelAddApiKey,
+                              onTap: state.isSavingApiKey
+                                  ? null
+                                  : notifier.saveApiKey,
+                              isLoading: state.isSavingApiKey,
                             ),
-                          ),
+                          ],
+                          if (errorText != null) ...[
+                            SizedBox(height: 8.h),
+                            Text(
+                              errorText,
+                              style: context.typo.caption.big
+                                  .copyWith(color: errorColor),
+                            ),
+                          ],
                         ],
                       ),
                     ),
-                    SizedBox(height: 10.h),
-                    GestureDetector(
-                      onTap: state.isSavingApiKey ? null : notifier.removeApiKey,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (state.isSavingApiKey)
-                            SizedBox(
-                              width: 16.r,
-                              height: 16.r,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: errorColor,
+                    SizedBox(height: 4.h),
+                    // Model picker row
+                    Divider(height: 1, thickness: 1, color: borderColor),
+                    InkWell(
+                      onTap: state.isBusy ? null : showModelPicker,
+                      borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(24.r)),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    s.aiModelSelectModelLabel,
+                                    style: context.typo.caption.big
+                                        .copyWith(color: mutedColor),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    selectedModelName,
+                                    style: context.typo.subtitle.small.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            )
-                          else
-                            Icon(Icons.delete_outline_rounded,
-                                size: 18.r, color: errorColor),
-                          SizedBox(width: 4.w),
-                          Text(
-                            s.aiModelRemoveApiKey,
-                            style: context.typo.body.medium.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: errorColor,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 6.h),
-                    Text(
-                      s.aiModelApiKeySessionNote,
-                      style: context.typo.caption.big.copyWith(color: mutedColor),
-                    ),
-                  ] else ...[
-                    // Plain text field
-                    TextField(
-                      controller: apiKeyController,
-                      onChanged: notifier.updateApiKeyInput,
-                      obscureText: obscureApiKey.value,
-                      style: context.typo.body.medium.copyWith(color: textColor),
-                      decoration: InputDecoration(
-                        hintText: s.aiModelApiKeyHint,
-                        hintStyle:
-                            context.typo.body.medium.copyWith(color: mutedColor),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                        suffixIcon: GestureDetector(
-                          onTap: () =>
-                              obscureApiKey.value = !obscureApiKey.value,
-                          child: Icon(
-                            obscureApiKey.value
-                                ? Icons.visibility_off_rounded
-                                : Icons.visibility_rounded,
-                            size: 20.r,
-                            color: mutedColor,
-                          ),
+                            Icon(Icons.chevron_right_rounded,
+                                size: 20.r, color: mutedColor),
+                          ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 12.h),
-                    PrimaryButton(
-                      title: s.aiModelAddApiKey,
-                      onTap: state.isSavingApiKey ? null : notifier.saveApiKey,
-                      isLoading: state.isSavingApiKey,
-                    ),
-                  ],
-                  if (errorText != null) ...[
-                    SizedBox(height: 8.h),
-                    Text(
-                      errorText,
-                      style:
-                          context.typo.caption.big.copyWith(color: errorColor),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            SizedBox(height: 4.h),
-            // Model picker row
-            Divider(height: 1, thickness: 1, color: borderColor),
-            InkWell(
-              onTap: state.isBusy ? null : showModelPicker,
-              borderRadius:
-                  BorderRadius.vertical(bottom: Radius.circular(24.r)),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            s.aiModelSelectModelLabel,
-                            style: context.typo.caption.big
-                                .copyWith(color: mutedColor),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            selectedModelName,
-                            style: context.typo.subtitle.small.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.chevron_right_rounded,
-                        size: 20.r, color: mutedColor),
                   ],
                 ),
               ),
@@ -464,7 +482,6 @@ class _ModelPickerSheet extends StatelessWidget {
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final surfaceColor = isDark ? AppTheme.surfaceDark : Colors.white;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
     return Container(
       margin: EdgeInsets.all(12.r),
@@ -521,25 +538,9 @@ class _ModelPickerSheet extends StatelessWidget {
           }),
           Padding(
             padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 14.h),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => context.pop(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: mutedColor,
-                  side: BorderSide(color: borderColor),
-                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                ),
-                child: Text(
-                  s.actionCancel,
-                  style: context.typo.body.medium.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
+            child: PrimaryButton.secondary(
+              title: s.actionCancel,
+              onTap: () => context.pop(),
             ),
           ),
         ],

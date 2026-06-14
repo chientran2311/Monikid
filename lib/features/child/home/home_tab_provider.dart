@@ -6,6 +6,8 @@ import 'package:monikid/core/service/gemini_ai_service.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_state.dart';
+import 'package:monikid/features/notification_settings/notification_settings_provider.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -126,6 +128,10 @@ class HomeTabNotifier extends _$HomeTabNotifier {
         'HomeTabNotifier.refresh() done. '
         'income=${summary.totalIncome} expense=${summary.totalExpense}',
       );
+      unawaited(_syncNotificationData(
+        expenseMinor: summary.totalExpense.round(),
+        limitMinor: ref.read(authSessionProvider).account?.monthlyLimit ?? 0,
+      ));
     } catch (error, stackTrace) {
       _logger.e(
         'HomeTabNotifier.refresh() failed.',
@@ -135,6 +141,27 @@ class HomeTabNotifier extends _$HomeTabNotifier {
       state = state.copyWith(
         status: HomeTabStatus.error,
         errorMessage: 'Unable to load home dashboard data.',
+      );
+    }
+  }
+
+  Future<void> _syncNotificationData({
+    required int expenseMinor,
+    required int limitMinor,
+  }) async {
+    try {
+      await getIt<NotificationRepository>().saveChildData(
+        expenseMinor: expenseMinor,
+        limitMinor: limitMinor,
+      );
+      await ref
+          .read(notificationSettingsNotifierProvider.notifier)
+          .rescheduleIfEnabled();
+    } catch (error, stackTrace) {
+      _logger.w(
+        'HomeTabNotifier._syncNotificationData failed.',
+        error: error,
+        stackTrace: stackTrace,
       );
     }
   }

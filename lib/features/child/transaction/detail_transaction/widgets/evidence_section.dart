@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_provider.dart';
 import 'package:monikid/features/child/transaction/detail_transaction/detail_transaction_state.dart';
@@ -109,6 +110,10 @@ class EvidenceSection extends ConsumerWidget {
               height: 180.h,
               width: double.infinity,
               fit: BoxFit.cover,
+              cacheWidth: decodePixelsFor(
+                context,
+                MediaQuery.sizeOf(context).width,
+              ),
               errorBuilder: (context, error, stackTrace) {
                 return const BrokenImagePlaceholder();
               },

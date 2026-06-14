@@ -7,7 +7,7 @@ part of 'parent_home_notifier.dart';
 // **************************************************************************
 
 String _$parentHomeNotifierHash() =>
-    r'483a94e931d096a33e78cdf7be77de444279249a';
+    r'5836b2faba1993fab890b6f5d529692346fea23e';
 
 /// See also [ParentHomeNotifier].
 @ProviderFor(ParentHomeNotifier)

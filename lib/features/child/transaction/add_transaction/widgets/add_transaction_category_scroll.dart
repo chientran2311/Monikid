@@ -55,6 +55,7 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -68,9 +69,17 @@ class _CategoryChip extends StatelessWidget {
             height: 60.r,
             transform: Matrix4.translationValues(0, isActive ? -2.h : 0, 0),
             decoration: BoxDecoration(
-              color: isActive ? AppTheme.primaryLight : AppTheme.surfaceLight,
+              color: isActive
+                  ? AppTheme.primaryLight
+                  : isDark
+                      ? AppTheme.surfaceDark
+                      : AppTheme.surfaceLight,
               border: Border.all(
-                color: isActive ? AppTheme.primary : AppTheme.borderLight,
+                color: isActive
+                    ? AppTheme.primary
+                    : isDark
+                        ? AppTheme.borderDark
+                        : AppTheme.borderLight,
                 width: 1.5.r,
               ),
               borderRadius: BorderRadius.circular(18.r),

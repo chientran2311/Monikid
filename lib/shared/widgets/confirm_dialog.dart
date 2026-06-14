@@ -1,102 +1,163 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
-class ConfirmDialog extends StatelessWidget {
+class ConfirmDialog extends HookWidget {
   const ConfirmDialog({
     super.key,
     required this.title,
-    required this.message,
+    required this.subtitle,
     required this.confirmLabel,
     required this.cancelLabel,
-    this.confirmColor,
+    required this.onConfirm,
+    this.onCancel,
+    this.icon,
+    this.isDestructive = false,
   });
 
   final String title;
-  final String message;
+  final String subtitle;
   final String confirmLabel;
   final String cancelLabel;
-  final Color? confirmColor;
+  final VoidCallback onConfirm;
+  final VoidCallback? onCancel;
+  final IconData? icon;
+  final bool isDestructive;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+    final ctrl = useAnimationController(
+      duration: const Duration(milliseconds: 380),
+    );
+    final anim = CurvedAnimation(
+      parent: ctrl,
+      curve: const Cubic(0.175, 0.885, 0.32, 1.275),
+    );
+    useEffect(() {
+      ctrl.forward();
+      return null;
+    }, const []);
 
     return Dialog(
-      backgroundColor: surfaceColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(24.r),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: context.typo.subtitle.small.copyWith(
-                fontWeight: FontWeight.w700,
-                color: textColor,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
+      child: AnimatedBuilder(
+        animation: anim,
+        builder: (_, child) => Transform.scale(
+          scale: 0.9 + 0.1 * anim.value,
+          child: Transform.translate(
+            offset: Offset(0, 10.h * (1 - anim.value)),
+            child: child,
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32.r),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              padding: EdgeInsets.all(28.w),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppTheme.surfaceDark.withValues(alpha: 0.94)
+                    : Colors.white.withValues(alpha: 0.94),
+                borderRadius: BorderRadius.circular(32.r),
+                border: Border.all(
+                  color: isDark
+                      ? AppTheme.darkBorder
+                      : Colors.white.withValues(alpha: 0.5),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0, 30.h),
+                    blurRadius: 60.r,
+                    color: Colors.black.withValues(alpha: 0.15),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              message,
-              style: context.typo.body.medium.copyWith(
-                height: 1.45,
-                color: mutedColor,
-              ),
-            ),
-            SizedBox(height: 24.h),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => context.pop(false),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 13.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Container(
+                      width: 64.w,
+                      height: 64.w,
+                      decoration: BoxDecoration(
+                        color: isDestructive
+                            ? AppTheme.dangerSurface
+                            : AppTheme.primaryLight,
+                        borderRadius: BorderRadius.circular(22.r),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: isDestructive
+                            ? AppTheme.redDark
+                            : AppTheme.primary,
+                        size: 32.w,
                       ),
                     ),
+                    SizedBox(height: 20.h),
+                  ],
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: context.typo.headline.small.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  SizedBox(height: 10.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
                     child: Text(
-                      cancelLabel,
+                      subtitle,
+                      textAlign: TextAlign.center,
                       style: context.typo.body.medium.copyWith(
-                        fontWeight: FontWeight.w600,
+                        fontSize: 15.sp,
+                        height: 1.5,
+                        color: AppTheme.textGrey,
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => context.pop(true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: confirmColor ?? AppTheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 13.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      elevation: 0,
+                  SizedBox(height: 28.h),
+                  if (isDestructive)
+                    PrimaryButton.danger(
+                      title: confirmLabel,
+                      onTap: () {
+                        context.pop();
+                        onConfirm();
+                      },
+                      height: 56.h,
+                    )
+                  else
+                    PrimaryButton(
+                      title: confirmLabel,
+                      onTap: () {
+                        context.pop();
+                        onConfirm();
+                      },
+                      height: 56.h,
                     ),
-                    child: Text(
-                      confirmLabel,
-                      style: context.typo.body.medium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  SizedBox(height: 12.h),
+                  PrimaryButton.secondary(
+                    title: cancelLabel,
+                    onTap: () {
+                      context.pop();
+                      onCancel?.call();
+                    },
+                    height: 56.h,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

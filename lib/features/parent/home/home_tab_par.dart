@@ -9,16 +9,16 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
+import 'package:monikid/features/parent/home/widgets/alert_card.dart';
 import 'package:monikid/features/parent/home/widgets/family_members_section.dart';
-import 'package:monikid/features/parent/home/widgets/member_spending_card.dart';
+import 'package:monikid/features/parent/home/widgets/home_error_state.dart';
+import 'package:monikid/features/parent/home/widgets/home_summary_card.dart';
+import 'package:monikid/features/parent/home/widgets/home_transaction_row.dart';
 import 'package:monikid/features/parent/home/widgets/no_family_empty_state.dart';
+import 'package:monikid/features/parent/home/widgets/parent_home_app_bar.dart';
 import 'package:monikid/features/parent/home/widgets/parent_home_section_header.dart';
-import 'package:monikid/features/parent/home/widgets/parent_transaction_list_card.dart';
-import 'package:monikid/features/parent/home/widgets/top_category_alert_card.dart';
-import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
-import 'package:monikid/features/parent/statistic/parent_statistic_provider.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
-import 'package:monikid/shared/widgets/main_app_bar.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 
 class HomeTabParent extends HookConsumerWidget {
   const HomeTabParent({super.key});
@@ -27,31 +27,38 @@ class HomeTabParent extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final textColor = isDark ? AppTheme.textWhite : AppTheme.homeParFg;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
-    final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
     final notifier = ref.read(parentHomeNotifierProvider.notifier);
     final state = ref.watch(parentHomeNotifierProvider);
-    final statisticState = ref.watch(parentStatisticNotifierProvider);
 
     final authState = ref.watch(authSessionProvider);
     final uid = authState.account?.uid ?? authState.user?.uid;
     final fallbackAvatarUrl =
-        authState.account?.photoUrl ?? authState.user?.photoURL;
+        authState.account?.avatarUrl ?? authState.user?.photoURL;
     final profileImageUrl = uid == null
         ? null
         : ref
               .watch(profileImageProvider(uid))
-              .maybeWhen(data: (avatarUrl) => avatarUrl, orElse: () => null);
+              .maybeWhen(data: (url) => url, orElse: () => null);
     final resolvedAvatarUrl = profileImageUrl ?? fallbackAvatarUrl;
+
+    final animCtrl = useAnimationController(
+      duration: const Duration(milliseconds: 700),
+    );
 
     useEffect(() {
       Future.microtask(() => notifier.onInit());
       return null;
-    }, const []);
+    }, [authState.isAuthenticated]);
+
+    useEffect(() {
+      if (!state.isLoading && state.status != ParentHomeStatus.initial) {
+        animCtrl.forward();
+      }
+      return null;
+    }, [state.isLoading, state.status]);
 
     ref.listen(parentHomeNotifierProvider, (previous, next) {
       if (next.errorMessage != null &&
@@ -60,142 +67,177 @@ class HomeTabParent extends HookConsumerWidget {
       }
     });
 
-    Widget body;
+    debugPrint('[HomeTabParent] status=${state.status} isLoading=${state.isLoading} isNoFamily=${state.isNoFamily}');
+
+    Widget scrollBody;
 
     if (state.isLoading || state.status == ParentHomeStatus.initial) {
-      body = const Center(child: CircularProgressIndicator());
+      scrollBody = const Center(child: CircularProgressIndicator());
+    } else if (state.status == ParentHomeStatus.error) {
+      scrollBody = HomeErrorState(
+        isDark: isDark,
+        message: state.errorMessage,
+        onRetry: () => notifier.onInit(),
+      );
     } else if (state.isNoFamily) {
-      body = NoFamilyEmptyState(
+      debugPrint('[HomeTabParent] → entering noFamily branch');
+      scrollBody = NoFamilyEmptyState(
         isDark: isDark,
         isLoading: state.isCreatingFamily,
         onCreateTap: () => notifier.createFamily(),
       );
     } else {
-      body = RefreshIndicator(
+      final selectedMemberName = state.selectedMember?.displayName;
+      final remaining =
+          state.selectedMemberIncomeMinor - state.selectedMemberExpenseMinor;
+      final showLowBalanceAlert = state.selectedMember != null &&
+          state.selectedMemberIncomeMinor > 0 &&
+          remaining < 10000000;
+
+      scrollBody = RefreshIndicator(
         onRefresh: () async {
-          if (uid != null) {
-            ref.invalidate(profileImageProvider(uid));
-          }
+          if (uid != null) ref.invalidate(profileImageProvider(uid));
           await notifier.refresh();
         },
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            SizedBox(height: 24.h),
-            FamilyMembersSection(
-              isDark: isDark,
-              members: state.members,
-              selectedMemberId: state.selectedMemberId,
-              inviteCode: state.family?.inviteCode ?? '',
-              onMemberTap: notifier.selectMember,
+            SizedBox(height: 8.h),
+            _fadeSlide(
+              FamilyMembersSection(
+                isDark: isDark,
+                members: state.members,
+                selectedMemberId: state.selectedMemberId,
+                inviteCode: state.family?.inviteCode ?? '',
+                onMemberTap: notifier.selectMember,
+              ),
+              0.1,
+              animCtrl,
             ),
             SizedBox(height: 20.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: MemberSpendingCard(
-                isDark: isDark,
-                isLoading: state.isLoadingMemberData,
-                expenseMinor: state.selectedMemberExpenseMinor,
-                incomeMinor: state.selectedMemberIncomeMinor,
+            _fadeSlide(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: HomeSummaryCard(
+                  isDark: isDark,
+                  isLoading: state.isLoadingMemberData,
+                  expenseMinor: state.selectedMemberExpenseMinor,
+                  limitMinor: state.selectedMemberIncomeMinor,
+                ),
               ),
+              0.2,
+              animCtrl,
             ),
-            SizedBox(height: 24.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ParentHomeSectionHeader(
-                    title: s.homeParRecentTransactionsLabel,
-                    trailingLabel: s.homeParSeeAll,
-                    textColor: textColor,
-                    mutedColor: mutedColor,
-                    onTrailingTap: () {
-                      context.push(AppRoutes.parentTransactionHistory);
-                    },
-                  ),
-                  SizedBox(height: 8.h),
-                  ParentTransactionListCard(
+            if (showLowBalanceAlert) ...[
+              SizedBox(height: 16.h),
+              _fadeSlide(
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: AlertCard(
                     isDark: isDark,
-                    surfaceColor: surfaceColor,
-                    borderColor: borderColor,
-                    textColor: textColor,
-                    mutedColor: mutedColor,
-                    transactions: state.selectedMemberTransactions,
-                    isLoading: state.isLoadingMemberData,
-                    emptyLabel: s.noTransactionsYet,
+                    title: s.homeParLowBalanceTitle,
+                    description:
+                        s.homeParLowBalanceDesc(selectedMemberName ?? ''),
+                    onTap: () =>
+                        context.push(AppRoutes.parentTransactionHistory),
                   ),
-                  SizedBox(height: 24.h),
-                  ParentHomeSectionHeader(
-                    title: s.homeParAlertsLabel,
-                    textColor: textColor,
-                    mutedColor: mutedColor,
-                  ),
-                  SizedBox(height: 8.h),
-                  if (statisticState.topCategories.isNotEmpty &&
-                      state.selectedMember != null)
-                    TopCategoryAlertCard(
-                      isDark: isDark,
-                      topCategory: statisticState.topCategories.first,
-                      onTap: () {
-                        final selectedChild = state.selectedMember;
-                        if (selectedChild != null) {
-                          final topCategory =
-                              statisticState.topCategories.first;
-                          context.push(
-                            AppRoutes.parentCategoryTransactions,
-                            extra: ParentCategoryTransactionsArgs(
-                              childUid: selectedChild.uid,
-                              categoryKey: topCategory.categoryKey,
-                              categoryLabel: topCategory.categoryLabel,
-                              period: statisticState.period,
-                            ),
-                          );
-                        }
-                      },
-                    )
-                  else
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark ? AppTheme.surfaceDark : Colors.white,
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: isDark
-                            ? Border.all(color: borderColor, width: 0.5)
-                            : null,
-                        boxShadow: isDark
-                            ? null
-                            : [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                      ),
-                      padding: EdgeInsets.all(16.r),
-                      child: Center(
-                        child: Text(
-                          s.msgNoData,
-                          style: context.typo.body.medium.copyWith(
-                            color: mutedColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: 32.h),
-                ],
+                ),
+                0.25,
+                animCtrl,
               ),
+            ],
+            SizedBox(height: 24.h),
+            _fadeSlide(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: ParentHomeSectionHeader(
+                  title: s.homeParRecentTransactionsLabel,
+                  trailingLabel: s.homeParSeeAll,
+                  textColor: textColor,
+                  mutedColor: mutedColor,
+                  onTrailingTap: () =>
+                      context.push(AppRoutes.parentTransactionHistory),
+                ),
+              ),
+              0.3,
+              animCtrl,
             ),
+            SizedBox(height: 12.h),
+            if (state.isLoadingMemberData)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (state.selectedMemberTransactions.isEmpty)
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                child: Center(
+                  child: Text(
+                    s.noTransactionsYet,
+                    style: TextStyle(fontSize: 14.sp, color: mutedColor),
+                  ),
+                ),
+              )
+            else
+              ...state.selectedMemberTransactions.asMap().entries.map((e) {
+                return _fadeSlide(
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 10.h),
+                    child: HomeTransactionRow(
+                      tx: e.value,
+                      isDark: isDark,
+                      memberName: selectedMemberName,
+                    ),
+                  ),
+                  (0.35 + e.key * 0.05).clamp(0.0, 0.9),
+                  animCtrl,
+                );
+              }),
+            SizedBox(height: 120.h),
           ],
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      appBar: MainAppBar(avatarUrl: resolvedAvatarUrl),
-      body: body,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      body: AppBackground(
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: ParentHomeAppBar(
+                avatarUrl: resolvedAvatarUrl,
+              ),
+            ),
+            Expanded(child: scrollBody),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fadeSlide(
+    Widget child,
+    double startFraction,
+    AnimationController ctrl,
+  ) {
+    final end = (startFraction + 0.4).clamp(0.0, 1.0);
+    final anim = CurvedAnimation(
+      parent: ctrl,
+      curve: Interval(startFraction, end, curve: Curves.easeOut),
+    );
+    return FadeTransition(
+      opacity: anim,
+      child: SlideTransition(
+        position:
+            Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
+                .animate(anim),
+        child: child,
+      ),
     );
   }
 }
+
+

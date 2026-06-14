@@ -20,10 +20,12 @@ class SummaryHeader extends StatelessWidget {
     final amountText = formatted.endsWith('đ')
         ? formatted.substring(0, formatted.length - 1).trim()
         : formatted;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
+    final textColor = isExpense
+        ? (isDark ? AppTheme.textWhite : AppTheme.textBlack)
+        : AppTheme.chartGreen;
 
     return Padding(
-      padding: EdgeInsets.only(top: 24.h, bottom: 28.h),
+      padding: EdgeInsets.only(top: 8.h, bottom: 28.h),
       child: Column(
         children: [
           Row(

@@ -41,11 +41,12 @@ class FirestoreSpendingLimitRepositoryImpl implements SetMoneyLimitRepository {
       final snap = await _userDoc(userId).get();
       final data = snap.data();
       if (data == null) return null;
-      final raw = data['monthly_limit_minor'];
+      // Reads new key (monthly_limit) with fallback to legacy (monthly_limit_minor).
+      final raw = data['monthly_limit'];
       return raw is int ? raw : null;
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to read monthly_limit_minor from Firestore.',
+        'Failed to read monthly_limit from Firestore.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -59,14 +60,14 @@ class FirestoreSpendingLimitRepositoryImpl implements SetMoneyLimitRepository {
     required int amountMinor,
   }) async {
     try {
-      await _userDoc(userId).set(
-        {'monthly_limit_minor': amountMinor},
-        SetOptions(merge: true),
-      );
-      _logger.i('Saved monthly_limit_minor=$amountMinor for userId=$userId.');
+      await _userDoc(userId).update({
+        'monthly_limit': amountMinor,
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+      _logger.i('Saved monthly_limit=$amountMinor for userId=$userId.');
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to save monthly_limit_minor to Firestore.',
+        'Failed to save monthly_limit to Firestore.',
         error: error,
         stackTrace: stackTrace,
       );
@@ -78,12 +79,13 @@ class FirestoreSpendingLimitRepositoryImpl implements SetMoneyLimitRepository {
   Future<void> clearMonthlyLimitMinor(String userId) async {
     try {
       await _userDoc(userId).update({
-        'monthly_limit_minor': FieldValue.delete(),
+        'monthly_limit': FieldValue.delete(),
+        'updated_at': FieldValue.serverTimestamp(),
       });
-      _logger.i('Cleared monthly_limit_minor for userId=$userId.');
+      _logger.i('Cleared monthly_limit for userId=$userId.');
     } catch (error, stackTrace) {
       _logger.e(
-        'Failed to clear monthly_limit_minor from Firestore.',
+        'Failed to clear monthly_limit from Firestore.',
         error: error,
         stackTrace: stackTrace,
       );

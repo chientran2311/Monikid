@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:monikid/app/app.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
@@ -10,10 +12,15 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/change_profile/change_profile_provider.dart';
 import 'package:monikid/features/change_profile/change_profile_state.dart';
 import 'package:monikid/features/change_profile/widgets/profile_edit_avatar_section.dart';
+import 'package:monikid/features/change_profile/widgets/profile_edit_form_card.dart';
+import 'package:monikid/features/change_profile/widgets/profile_edit_form_row.dart';
 import 'package:monikid/features/change_profile/widgets/profile_edit_text_field.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_dialog.dart';
 import 'package:monikid/features/upload_or_take_picture/upload_pic_provider.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 import 'package:monikid/shared/widgets/loading_screen.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 class ProfileEditScreen extends HookConsumerWidget {
   const ProfileEditScreen({super.key});
@@ -22,13 +29,18 @@ class ProfileEditScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(changeProfileProvider);
     final notifier = ref.read(changeProfileProvider.notifier);
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight;
-    final surfaceColor = isDark ? AppTheme.surfaceVariant : AppTheme.backgroundLight;
-    final textColor = isDark ? AppTheme.textWhite : AppTheme.textBlack;
-    final subTextColor = AppTheme.textGrey;
-    final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
+
+    final fullNameController = useTextEditingController(text: state.fullName);
+
+    useEffect(() {
+      if (state.status == ChangeProfileStatus.ready) {
+        if (fullNameController.text != state.fullName) {
+          fullNameController.text = state.fullName;
+        }
+      }
+      return null;
+    }, [state.status]);
 
     ref.listen(changeProfileProvider, (previous, next) {
       if (next.status == ChangeProfileStatus.success &&
@@ -43,162 +55,117 @@ class ProfileEditScreen extends HookConsumerWidget {
       }
     });
 
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1;
+
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: textColor, size: 20.r),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          s.profileEditTitle,
-          style: context.typo.subtitle.medium.copyWith(
-            fontWeight: FontWeight.w700,
-            color: textColor,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
+      extendBodyBehindAppBar: true,
+      appBar: GlassAppBar(title: s.profileEditTitle),
+      body: AppBackground(
         child: state.status == ChangeProfileStatus.loading
-            ? const Center(child: CircularProgressIndicator())
-            : Stack(
-                children: [
-                  Column(
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + kToolbarHeight + 24.h,
+                    bottom: 100.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 24.h),
-                          ProfileEditAvatarSection(
-                            avatarUrl: state.profile?.avatarUrl,
-                            bgColor: bgColor,
-                            surfaceColor: surfaceColor,
-                            subTextColor: subTextColor,
-                            onTap: () => _showAvatarPicker(context, ref),
-                          ),
-                          SizedBox(height: 12.h),
-                          Text(
-                            s.profileEditAvatarLabel,
-                            style: context.typo.body.medium.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.primary,
-                            ),
-                          ),
-                          SizedBox(height: 32.h),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 24.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ProfileEditTextField(
-                                  label: s.profileEditFullName,
-                                  hint: s.profileEditFullNameHint,
-                                  initialValue: state.fullName,
-                                  errorText: _fieldErrorText(context, state.fullNameError),
-                                  onChanged: notifier.updateFullName,
-                                  isDark: isDark,
-                                ),
-                                SizedBox(height: 20.h),
-                                ProfileEditTextField(
-                                  label: s.profileEditPhone,
-                                  hint: s.profileEditPhoneHint,
-                                  initialValue: state.phone,
-                                  errorText: _fieldErrorText(context, state.phoneError),
-                                  onChanged: notifier.updatePhone,
-                                  icon: Icons.call,
-                                  keyboardType: TextInputType.phone,
-                                  isDark: isDark,
-                                ),
-                                SizedBox(height: 20.h),
-                                ProfileEditTextField(
-                                  label: s.profileEditEmail,
-                                  initialValue: state.profile?.email ?? '',
-                                  icon: Icons.mail,
-                                  keyboardType: TextInputType.emailAddress,
-                                  enabled: false,
-                                  isDark: isDark,
-                                  onChanged: (_) {},
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 8.h, left: 4.w),
-                                  child: Text(
-                                    s.profileEditEmailWarning,
-                                    style: context.typo.caption.medium.copyWith(
-                                      color: subTextColor,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 20.h),
-                                ProfileEditTextField(
-                                  label: s.profileEditDob,
-                                  hint: s.profileEditDobHint,
-                                  initialValue: state.dob,
-                                  onChanged: notifier.updateDob,
-                                  icon: Icons.calendar_today,
-                                  isDark: isDark,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 48.h),
-                        ],
+                      ProfileEditAvatarSection(
+                        avatarUrl: state.profile?.avatarUrl,
+                        fullName: state.fullName,
+                        onTap: () => _showAvatarPicker(context, ref),
                       ),
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(24.w),
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      border: Border(top: BorderSide(color: borderColor)),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: state.isFormValid && !state.isSavingProfile
-                            ? () => notifier.saveProfile()
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          disabledBackgroundColor:
-                              AppTheme.primary.withValues(alpha: 0.3),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          elevation: 4,
-                          shadowColor: AppTheme.primary.withValues(alpha: 0.4),
+                      SizedBox(height: 8.h),
+                      Text(
+                        s.profileEditAvatarLabel,
+                        style: TextStyle(
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
                         ),
-                        child: state.isSavingProfile
-                            ? SizedBox(
-                                width: 20.r,
-                                height: 20.r,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.r,
-                                  valueColor: const AlwaysStoppedAnimation<Color>(
-                                    AppTheme.textWhite,
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                s.actionSaveChanges,
-                                style: context.typo.subtitle.small,
+                      ),
+                      SizedBox(height: 24.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: ProfileEditFormCard(
+                          isDark: isDark,
+                          children: [
+                            ProfileEditFormRow(
+                              icon: Icons.person_outline_rounded,
+                              label: s.profileEditFullName.toUpperCase(),
+                              isDark: isDark,
+                              child: ProfileEditTextField(
+                                controller: fullNameController,
+                                hint: s.profileEditFullNameHint,
+                                errorText: _fieldErrorText(context, state.fullNameError),
+                                onChanged: notifier.updateFullName,
+                                isDark: isDark,
                               ),
+                            ),
+                            ProfileEditFormRow(
+                              icon: Icons.email_outlined,
+                              label: s.profileEditEmail.toUpperCase(),
+                              isDark: isDark,
+                              showDivider: false,
+                              trailingWidget: Icon(
+                                Icons.lock_outline,
+                                size: 16.r,
+                                color: AppTheme.textMuted,
+                              ),
+                              child: Text(
+                                state.profile?.email ?? '',
+                                style: TextStyle(
+                                  color: AppTheme.textMuted,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(
+                      20.w,
+                      12.h,
+                      20.w,
+                      MediaQuery.of(context).padding.bottom + 12.h,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          bgColor.withValues(alpha: 0),
+                          bgColor,
+                        ],
+                        stops: const [0.0, 0.35],
                       ),
                     ),
+                    child: PrimaryButton(
+                      title: s.actionSaveChanges,
+                      onTap: state.isFormValid && !state.isSavingProfile
+                          ? notifier.saveProfile
+                          : null,
+                      isLoading: state.isSavingProfile,
+                    ),
                   ),
-                ],
-              ),
-                  if (state.isSavingProfile) const LoadingScreen(),
-                ],
-              ),
-      ),
+                ),
+                if (state.isSavingProfile) const LoadingScreen(),
+              ],
+            ),
+        ),
     );
   }
 
@@ -209,8 +176,6 @@ class ProfileEditScreen extends HookConsumerWidget {
         return context.l10n.profileEditErrorNameRequired;
       case ChangeProfileFieldError.fullNameTooShort:
         return context.l10n.profileEditErrorNameTooShort;
-      case ChangeProfileFieldError.invalidPhoneFormat:
-        return context.l10n.profileEditErrorInvalidPhone;
     }
   }
 

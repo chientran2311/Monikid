@@ -12,6 +12,7 @@ import 'package:monikid/features/child/home/widgets/home_tab_student_body.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_dialog.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 
 class HomeTabStudent extends HookConsumerWidget {
   const HomeTabStudent({super.key});
@@ -26,7 +27,7 @@ class HomeTabStudent extends HookConsumerWidget {
     final userName = authState.account?.displayName ?? s.homeStudentDefaultName;
     final uid = authState.account?.uid ?? authState.user?.uid;
     final fallbackAvatarUrl =
-        authState.account?.photoUrl ?? authState.user?.photoURL;
+        authState.account?.avatarUrl ?? authState.user?.photoURL;
     final profileImageUrl = uid == null
         ? null
         : ref.watch(profileImageProvider(uid)).maybeWhen(
@@ -73,21 +74,24 @@ class HomeTabStudent extends HookConsumerWidget {
     }, [limitState.status, limitState.hasStoredLimit]);
 
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight,
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            if (uid != null) ref.invalidate(profileImageProvider(uid));
-            await ref
-                .read(setMoneyLimitNotifierProvider.notifier)
-                .loadCurrentLimit();
-            await ref.read(homeTabNotifierProvider.notifier).refresh();
-          },
-          child: HomeTabStudentBody(
-            uid: uid,
-            userName: userName,
-            avatarUrl: avatarUrl,
-            isDark: isDark,
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight,
+      body: AppBackground(
+        whiteBackground: true,
+        child: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () async {
+              if (uid != null) ref.invalidate(profileImageProvider(uid));
+              await ref
+                  .read(setMoneyLimitNotifierProvider.notifier)
+                  .loadCurrentLimit();
+              await ref.read(homeTabNotifierProvider.notifier).refresh();
+            },
+            child: HomeTabStudentBody(
+              uid: uid,
+              userName: userName,
+              avatarUrl: avatarUrl,
+              isDark: isDark,
+            ),
           ),
         ),
       ),

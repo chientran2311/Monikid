@@ -5,35 +5,47 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
 
+/// Reusable "top categories" card. Renders the highest-ranked categories for a
+/// given metric (expense or income); the data semantics are decided entirely by
+/// the caller through [title] and [categories], so this widget stays metric-agnostic.
 class StatisticTopCategoriesSection extends StatelessWidget {
   const StatisticTopCategoriesSection({
     super.key,
+    required this.title,
     required this.categories,
-    required this.onViewAll,
+    this.onItemTap,
   });
 
+  /// Maximum number of category rows shown in the card.
+  static const int _maxVisibleCategories = 5;
+
+  /// Soft drop shadow color used for the card surface in light mode.
+  static const Color _cardShadowColor = Color(0x0D111811);
+
+  final String title;
   final List<StatisticCategoryData> categories;
-  final VoidCallback onViewAll;
+  final void Function(StatisticCategoryData)? onItemTap;
 
   @override
   Widget build(BuildContext context) {
     final visibleCategories = categories
         .where((item) => item.amountMinor > 0)
-        .take(5)
+        .take(_maxVisibleCategories)
         .toList(growable: false);
     if (visibleCategories.isEmpty) {
       return const SizedBox.shrink();
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
         borderRadius: BorderRadius.circular(26.r),
-        border: Border.all(color: AppTheme.borderLight),
+        border: Border.all(color: isDark ? AppTheme.borderDark : AppTheme.borderLight),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D111811),
+            color: _cardShadowColor,
             blurRadius: 28,
             offset: Offset(0, 12),
           ),
@@ -42,40 +54,13 @@ class StatisticTopCategoriesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  context.l10n.statisticTopCategoriesTitle,
-                  style: context.typo.title.medium.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.textBlack,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: onViewAll,
-                borderRadius: BorderRadius.circular(14.r),
-                child: Ink(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.w,
-                    vertical: 10.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryLight,
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Text(
-                    context.l10n.homeStudentViewAll,
-                    style: context.typo.caption.big.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            title,
+            style: context.typo.title.medium.copyWith(
+              fontWeight: FontWeight.w800,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+              letterSpacing: -0.5,
+            ),
           ),
           SizedBox(height: 14.h),
           ...List.generate(visibleCategories.length, (index) {
@@ -85,7 +70,9 @@ class StatisticTopCategoriesSection extends StatelessWidget {
               ),
               child: _TrendItem(
                 category: visibleCategories[index],
-                iconBackground: _iconBackground(index),
+                onTap: onItemTap != null
+                    ? () => onItemTap!(visibleCategories[index])
+                    : null,
               ),
             );
           }),
@@ -93,33 +80,23 @@ class StatisticTopCategoriesSection extends StatelessWidget {
       ),
     );
   }
-
-  Color _iconBackground(int index) {
-    const backgrounds = [
-      Color(0xFFEEF7EE),
-      Color(0xFFE8F5E9),
-      Color(0xFFEDF7EE),
-      Color(0xFFEEF8F1),
-      Color(0xFFF1F7F1),
-    ];
-    return backgrounds[index % backgrounds.length];
-  }
 }
 
 class _TrendItem extends StatelessWidget {
   const _TrendItem({
     required this.category,
-    required this.iconBackground,
+    this.onTap,
   });
 
   final StatisticCategoryData category;
-  final Color iconBackground;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final sharePercent = (category.shareRatio * 100).toStringAsFixed(0);
 
-    return Row(
+    final content = Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
@@ -127,7 +104,7 @@ class _TrendItem extends StatelessWidget {
           height: 46.w,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: iconBackground,
+            color: AppTheme.surfaceLightGreen,
             borderRadius: BorderRadius.circular(16.r),
           ),
           child: Text(
@@ -144,7 +121,7 @@ class _TrendItem extends StatelessWidget {
                 category.categoryLabel,
                 style: context.typo.body.medium.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textBlack,
+                  color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                   letterSpacing: -0.2,
                 ),
               ),
@@ -169,7 +146,7 @@ class _TrendItem extends StatelessWidget {
               context.formatStatisticCurrency(category.amountMinor),
               style: context.typo.body.medium.copyWith(
                 fontWeight: FontWeight.w800,
-                color: AppTheme.textBlack,
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
                 letterSpacing: -0.3,
               ),
             ),
@@ -183,7 +160,26 @@ class _TrendItem extends StatelessWidget {
             ),
           ],
         ),
+        if (onTap != null) ...[
+          SizedBox(width: 4.w),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: 18.r,
+            color: AppTheme.textGrey,
+          ),
+        ],
       ],
+    );
+
+    if (onTap == null) return content;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 4.h),
+        child: content,
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/image_decode_size.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 /// Animated brand hero used on auth screens (login, register).
@@ -148,11 +149,6 @@ class _MainIcon extends StatelessWidget {
       height: 84.r,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30.r),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppTheme.primary, AppTheme.primaryDark],
-        ),
         boxShadow: [
           BoxShadow(
             offset: Offset(0, 20.h),
@@ -161,27 +157,11 @@ class _MainIcon extends StatelessWidget {
           ),
         ],
       ),
-      foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.r),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.white.withValues(alpha: 0.30),
-            Colors.transparent,
-          ],
-          stops: const [0.0, 0.45],
-        ),
-      ),
-      child: Center(
-        child: Text(
-          'M',
-          style: AppTextStyleFactory.style(
-            size: AppFontSizes.displayMedium,
-            weight: FontWeight.w900,
-            color: Colors.white,
-          ),
-        ),
+      child: Image.asset(
+        'assets/app_icon.png',
+        width: 84.r,
+        height: 84.r,
+        cacheWidth: decodePixelsFor(context, 84.r),
       ),
     );
   }

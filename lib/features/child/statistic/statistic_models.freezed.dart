@@ -710,7 +710,7 @@ as double?,
 /// @nodoc
 mixin _$StatisticPeriodOverview {
 
- StatisticDateRange get range; int get totalExpenseMinor; int get transactionCount; List<StatisticDailyExpenseData> get dailyExpenses; List<StatisticCategoryData> get categories; StatisticInsightData? get smartInsight; StatisticInsightData? get strongestIncrease; StatisticInsightData? get strongestDecrease;
+ StatisticDateRange get range; int get totalExpenseMinor; int get transactionCount; List<StatisticDailyExpenseData> get dailyExpenses; List<StatisticCategoryData> get categories; int get totalIncomeMinor; List<StatisticCategoryData> get incomeCategories; StatisticInsightData? get smartInsight; StatisticInsightData? get strongestIncrease; StatisticInsightData? get strongestDecrease;
 /// Create a copy of StatisticPeriodOverview
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -721,16 +721,16 @@ $StatisticPeriodOverviewCopyWith<StatisticPeriodOverview> get copyWith => _$Stat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticPeriodOverview&&(identical(other.range, range) || other.range == range)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.transactionCount, transactionCount) || other.transactionCount == transactionCount)&&const DeepCollectionEquality().equals(other.dailyExpenses, dailyExpenses)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.smartInsight, smartInsight) || other.smartInsight == smartInsight)&&(identical(other.strongestIncrease, strongestIncrease) || other.strongestIncrease == strongestIncrease)&&(identical(other.strongestDecrease, strongestDecrease) || other.strongestDecrease == strongestDecrease));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is StatisticPeriodOverview&&(identical(other.range, range) || other.range == range)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.transactionCount, transactionCount) || other.transactionCount == transactionCount)&&const DeepCollectionEquality().equals(other.dailyExpenses, dailyExpenses)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.totalIncomeMinor, totalIncomeMinor) || other.totalIncomeMinor == totalIncomeMinor)&&const DeepCollectionEquality().equals(other.incomeCategories, incomeCategories)&&(identical(other.smartInsight, smartInsight) || other.smartInsight == smartInsight)&&(identical(other.strongestIncrease, strongestIncrease) || other.strongestIncrease == strongestIncrease)&&(identical(other.strongestDecrease, strongestDecrease) || other.strongestDecrease == strongestDecrease));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,range,totalExpenseMinor,transactionCount,const DeepCollectionEquality().hash(dailyExpenses),const DeepCollectionEquality().hash(categories),smartInsight,strongestIncrease,strongestDecrease);
+int get hashCode => Object.hash(runtimeType,range,totalExpenseMinor,transactionCount,const DeepCollectionEquality().hash(dailyExpenses),const DeepCollectionEquality().hash(categories),totalIncomeMinor,const DeepCollectionEquality().hash(incomeCategories),smartInsight,strongestIncrease,strongestDecrease);
 
 @override
 String toString() {
-  return 'StatisticPeriodOverview(range: $range, totalExpenseMinor: $totalExpenseMinor, transactionCount: $transactionCount, dailyExpenses: $dailyExpenses, categories: $categories, smartInsight: $smartInsight, strongestIncrease: $strongestIncrease, strongestDecrease: $strongestDecrease)';
+  return 'StatisticPeriodOverview(range: $range, totalExpenseMinor: $totalExpenseMinor, transactionCount: $transactionCount, dailyExpenses: $dailyExpenses, categories: $categories, totalIncomeMinor: $totalIncomeMinor, incomeCategories: $incomeCategories, smartInsight: $smartInsight, strongestIncrease: $strongestIncrease, strongestDecrease: $strongestDecrease)';
 }
 
 
@@ -741,7 +741,7 @@ abstract mixin class $StatisticPeriodOverviewCopyWith<$Res>  {
   factory $StatisticPeriodOverviewCopyWith(StatisticPeriodOverview value, $Res Function(StatisticPeriodOverview) _then) = _$StatisticPeriodOverviewCopyWithImpl;
 @useResult
 $Res call({
- StatisticDateRange range, int totalExpenseMinor, int transactionCount, List<StatisticDailyExpenseData> dailyExpenses, List<StatisticCategoryData> categories, StatisticInsightData? smartInsight, StatisticInsightData? strongestIncrease, StatisticInsightData? strongestDecrease
+ StatisticDateRange range, int totalExpenseMinor, int transactionCount, List<StatisticDailyExpenseData> dailyExpenses, List<StatisticCategoryData> categories, int totalIncomeMinor, List<StatisticCategoryData> incomeCategories, StatisticInsightData? smartInsight, StatisticInsightData? strongestIncrease, StatisticInsightData? strongestDecrease
 });
 
 
@@ -758,13 +758,15 @@ class _$StatisticPeriodOverviewCopyWithImpl<$Res>
 
 /// Create a copy of StatisticPeriodOverview
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? range = null,Object? totalExpenseMinor = null,Object? transactionCount = null,Object? dailyExpenses = null,Object? categories = null,Object? smartInsight = freezed,Object? strongestIncrease = freezed,Object? strongestDecrease = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? range = null,Object? totalExpenseMinor = null,Object? transactionCount = null,Object? dailyExpenses = null,Object? categories = null,Object? totalIncomeMinor = null,Object? incomeCategories = null,Object? smartInsight = freezed,Object? strongestIncrease = freezed,Object? strongestDecrease = freezed,}) {
   return _then(_self.copyWith(
 range: null == range ? _self.range : range // ignore: cast_nullable_to_non_nullable
 as StatisticDateRange,totalExpenseMinor: null == totalExpenseMinor ? _self.totalExpenseMinor : totalExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,transactionCount: null == transactionCount ? _self.transactionCount : transactionCount // ignore: cast_nullable_to_non_nullable
 as int,dailyExpenses: null == dailyExpenses ? _self.dailyExpenses : dailyExpenses // ignore: cast_nullable_to_non_nullable
 as List<StatisticDailyExpenseData>,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
+as List<StatisticCategoryData>,totalIncomeMinor: null == totalIncomeMinor ? _self.totalIncomeMinor : totalIncomeMinor // ignore: cast_nullable_to_non_nullable
+as int,incomeCategories: null == incomeCategories ? _self.incomeCategories : incomeCategories // ignore: cast_nullable_to_non_nullable
 as List<StatisticCategoryData>,smartInsight: freezed == smartInsight ? _self.smartInsight : smartInsight // ignore: cast_nullable_to_non_nullable
 as StatisticInsightData?,strongestIncrease: freezed == strongestIncrease ? _self.strongestIncrease : strongestIncrease // ignore: cast_nullable_to_non_nullable
 as StatisticInsightData?,strongestDecrease: freezed == strongestDecrease ? _self.strongestDecrease : strongestDecrease // ignore: cast_nullable_to_non_nullable
@@ -824,7 +826,7 @@ $StatisticInsightDataCopyWith<$Res>? get strongestDecrease {
 
 
 class _StatisticPeriodOverview implements StatisticPeriodOverview {
-  const _StatisticPeriodOverview({required this.range, this.totalExpenseMinor = 0, this.transactionCount = 0, final  List<StatisticDailyExpenseData> dailyExpenses = const [], final  List<StatisticCategoryData> categories = const [], this.smartInsight, this.strongestIncrease, this.strongestDecrease}): _dailyExpenses = dailyExpenses,_categories = categories;
+  const _StatisticPeriodOverview({required this.range, this.totalExpenseMinor = 0, this.transactionCount = 0, final  List<StatisticDailyExpenseData> dailyExpenses = const [], final  List<StatisticCategoryData> categories = const [], this.totalIncomeMinor = 0, final  List<StatisticCategoryData> incomeCategories = const [], this.smartInsight, this.strongestIncrease, this.strongestDecrease}): _dailyExpenses = dailyExpenses,_categories = categories,_incomeCategories = incomeCategories;
   
 
 @override final  StatisticDateRange range;
@@ -844,6 +846,14 @@ class _StatisticPeriodOverview implements StatisticPeriodOverview {
   return EqualUnmodifiableListView(_categories);
 }
 
+@override@JsonKey() final  int totalIncomeMinor;
+ final  List<StatisticCategoryData> _incomeCategories;
+@override@JsonKey() List<StatisticCategoryData> get incomeCategories {
+  if (_incomeCategories is EqualUnmodifiableListView) return _incomeCategories;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_incomeCategories);
+}
+
 @override final  StatisticInsightData? smartInsight;
 @override final  StatisticInsightData? strongestIncrease;
 @override final  StatisticInsightData? strongestDecrease;
@@ -858,16 +868,16 @@ _$StatisticPeriodOverviewCopyWith<_StatisticPeriodOverview> get copyWith => __$S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticPeriodOverview&&(identical(other.range, range) || other.range == range)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.transactionCount, transactionCount) || other.transactionCount == transactionCount)&&const DeepCollectionEquality().equals(other._dailyExpenses, _dailyExpenses)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.smartInsight, smartInsight) || other.smartInsight == smartInsight)&&(identical(other.strongestIncrease, strongestIncrease) || other.strongestIncrease == strongestIncrease)&&(identical(other.strongestDecrease, strongestDecrease) || other.strongestDecrease == strongestDecrease));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _StatisticPeriodOverview&&(identical(other.range, range) || other.range == range)&&(identical(other.totalExpenseMinor, totalExpenseMinor) || other.totalExpenseMinor == totalExpenseMinor)&&(identical(other.transactionCount, transactionCount) || other.transactionCount == transactionCount)&&const DeepCollectionEquality().equals(other._dailyExpenses, _dailyExpenses)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.totalIncomeMinor, totalIncomeMinor) || other.totalIncomeMinor == totalIncomeMinor)&&const DeepCollectionEquality().equals(other._incomeCategories, _incomeCategories)&&(identical(other.smartInsight, smartInsight) || other.smartInsight == smartInsight)&&(identical(other.strongestIncrease, strongestIncrease) || other.strongestIncrease == strongestIncrease)&&(identical(other.strongestDecrease, strongestDecrease) || other.strongestDecrease == strongestDecrease));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,range,totalExpenseMinor,transactionCount,const DeepCollectionEquality().hash(_dailyExpenses),const DeepCollectionEquality().hash(_categories),smartInsight,strongestIncrease,strongestDecrease);
+int get hashCode => Object.hash(runtimeType,range,totalExpenseMinor,transactionCount,const DeepCollectionEquality().hash(_dailyExpenses),const DeepCollectionEquality().hash(_categories),totalIncomeMinor,const DeepCollectionEquality().hash(_incomeCategories),smartInsight,strongestIncrease,strongestDecrease);
 
 @override
 String toString() {
-  return 'StatisticPeriodOverview(range: $range, totalExpenseMinor: $totalExpenseMinor, transactionCount: $transactionCount, dailyExpenses: $dailyExpenses, categories: $categories, smartInsight: $smartInsight, strongestIncrease: $strongestIncrease, strongestDecrease: $strongestDecrease)';
+  return 'StatisticPeriodOverview(range: $range, totalExpenseMinor: $totalExpenseMinor, transactionCount: $transactionCount, dailyExpenses: $dailyExpenses, categories: $categories, totalIncomeMinor: $totalIncomeMinor, incomeCategories: $incomeCategories, smartInsight: $smartInsight, strongestIncrease: $strongestIncrease, strongestDecrease: $strongestDecrease)';
 }
 
 
@@ -878,7 +888,7 @@ abstract mixin class _$StatisticPeriodOverviewCopyWith<$Res> implements $Statist
   factory _$StatisticPeriodOverviewCopyWith(_StatisticPeriodOverview value, $Res Function(_StatisticPeriodOverview) _then) = __$StatisticPeriodOverviewCopyWithImpl;
 @override @useResult
 $Res call({
- StatisticDateRange range, int totalExpenseMinor, int transactionCount, List<StatisticDailyExpenseData> dailyExpenses, List<StatisticCategoryData> categories, StatisticInsightData? smartInsight, StatisticInsightData? strongestIncrease, StatisticInsightData? strongestDecrease
+ StatisticDateRange range, int totalExpenseMinor, int transactionCount, List<StatisticDailyExpenseData> dailyExpenses, List<StatisticCategoryData> categories, int totalIncomeMinor, List<StatisticCategoryData> incomeCategories, StatisticInsightData? smartInsight, StatisticInsightData? strongestIncrease, StatisticInsightData? strongestDecrease
 });
 
 
@@ -895,13 +905,15 @@ class __$StatisticPeriodOverviewCopyWithImpl<$Res>
 
 /// Create a copy of StatisticPeriodOverview
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? range = null,Object? totalExpenseMinor = null,Object? transactionCount = null,Object? dailyExpenses = null,Object? categories = null,Object? smartInsight = freezed,Object? strongestIncrease = freezed,Object? strongestDecrease = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? range = null,Object? totalExpenseMinor = null,Object? transactionCount = null,Object? dailyExpenses = null,Object? categories = null,Object? totalIncomeMinor = null,Object? incomeCategories = null,Object? smartInsight = freezed,Object? strongestIncrease = freezed,Object? strongestDecrease = freezed,}) {
   return _then(_StatisticPeriodOverview(
 range: null == range ? _self.range : range // ignore: cast_nullable_to_non_nullable
 as StatisticDateRange,totalExpenseMinor: null == totalExpenseMinor ? _self.totalExpenseMinor : totalExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,transactionCount: null == transactionCount ? _self.transactionCount : transactionCount // ignore: cast_nullable_to_non_nullable
 as int,dailyExpenses: null == dailyExpenses ? _self._dailyExpenses : dailyExpenses // ignore: cast_nullable_to_non_nullable
 as List<StatisticDailyExpenseData>,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
+as List<StatisticCategoryData>,totalIncomeMinor: null == totalIncomeMinor ? _self.totalIncomeMinor : totalIncomeMinor // ignore: cast_nullable_to_non_nullable
+as int,incomeCategories: null == incomeCategories ? _self._incomeCategories : incomeCategories // ignore: cast_nullable_to_non_nullable
 as List<StatisticCategoryData>,smartInsight: freezed == smartInsight ? _self.smartInsight : smartInsight // ignore: cast_nullable_to_non_nullable
 as StatisticInsightData?,strongestIncrease: freezed == strongestIncrease ? _self.strongestIncrease : strongestIncrease // ignore: cast_nullable_to_non_nullable
 as StatisticInsightData?,strongestDecrease: freezed == strongestDecrease ? _self.strongestDecrease : strongestDecrease // ignore: cast_nullable_to_non_nullable

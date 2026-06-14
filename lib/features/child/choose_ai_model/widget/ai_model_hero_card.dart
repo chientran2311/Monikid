@@ -75,13 +75,12 @@ class _EyebrowChip extends StatelessWidget {
         color: AppTheme.primaryLight,
         borderRadius: BorderRadius.circular(999.r),
       ),
-      alignment: Alignment.center,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 8.r,
-            height: 8.r,
+            width: 7.r,
+            height: 7.r,
             decoration: const BoxDecoration(
               color: AppTheme.primary,
               shape: BoxShape.circle,
@@ -90,10 +89,10 @@ class _EyebrowChip extends StatelessWidget {
           SizedBox(width: 6.w),
           Text(
             label,
-            style: context.typo.body.small.copyWith(
+            style: context.typo.caption.medium.copyWith(
               fontWeight: FontWeight.w800,
               color: AppTheme.primary,
-              fontSize: 12.sp,
+              letterSpacing: 0.02,
             ),
           ),
         ],

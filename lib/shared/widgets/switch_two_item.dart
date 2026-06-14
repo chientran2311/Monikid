@@ -33,6 +33,7 @@ class SwitchTwoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 42.h,
       padding: EdgeInsets.all(3.r),
@@ -55,7 +56,8 @@ class SwitchTwoItem extends StatelessWidget {
                 width: pillWidth,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceLight,
+                    color:
+                        isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight,
                     borderRadius: BorderRadius.circular(11.r),
                     boxShadow: [
                       BoxShadow(

@@ -15,7 +15,7 @@ enum _Variant { primary, secondary, danger }
 /// // Grey outline — dismiss / skip
 /// PrimaryButton.secondary(title: 'Để sau', onTap: onSkip)
 ///
-/// // Red border — destructive action
+/// // Red filled — destructive action
 /// PrimaryButton.danger(title: 'Xoá', onTap: onDelete)
 ///
 /// // With leading icon
@@ -54,7 +54,7 @@ class PrimaryButton extends StatelessWidget {
   final Widget? icon;
   final bool isLoading;
 
-  /// Defaults to 56.h when null.
+  /// Defaults to 65.h when null.
   final double? height;
 
   final _Variant _variant;
@@ -67,7 +67,7 @@ class PrimaryButton extends StatelessWidget {
       onTap: _tappable ? onTap : null,
       child: SizedBox(
         width: double.infinity,
-        height: height ?? 56.h,
+        height: height ?? 65.h,
         child: switch (_variant) {
           _Variant.primary   => _PrimaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
           _Variant.secondary => _SecondaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
@@ -211,12 +211,18 @@ class _DangerBody extends StatelessWidget {
       opacity: enabled ? 1.0 : 0.45,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppTheme.dangerSurface,
+          color: AppTheme.redDark,
           borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(color: AppTheme.dangerBorder),
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, 8.h),
+              blurRadius: 20.r,
+              color: AppTheme.redDark.withValues(alpha: 0.24),
+            ),
+          ],
         ),
         child: Center(
-          child: _content(title, icon, isLoading, AppTheme.redAlert),
+          child: _content(title, icon, isLoading, AppTheme.textWhite),
         ),
       ),
     );

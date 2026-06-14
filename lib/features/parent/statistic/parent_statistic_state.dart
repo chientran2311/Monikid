@@ -18,10 +18,14 @@ abstract class ParentStatisticState with _$ParentStatisticState {
     @Default(0) int prevTotalExpenseMinor,
     @Default([]) List<StatisticDailyExpenseData> dailyData,
     @Default([]) List<StatisticCategoryData> topCategories,
+    DateTime? selectedDate,
     String? errorMessage,
   }) = _ParentStatisticState;
 
   const ParentStatisticState._();
+
+  int get totalTransactionCount =>
+      topCategories.fold(0, (sum, c) => sum + c.transactionCount);
 
   bool get isLoading => status == ParentStatisticStatus.loading;
 

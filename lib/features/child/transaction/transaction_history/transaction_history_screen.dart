@@ -7,6 +7,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_filter_bar.dart';
 import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_history_body.dart';
+import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/screen_page_header.dart';
 
 class TransactionHistoryScreen extends HookConsumerWidget {
@@ -16,7 +17,7 @@ class TransactionHistoryScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.backgroundLight;
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.surfaceLight;
 
     final scrollCtrl = useScrollController();
 
@@ -51,25 +52,28 @@ class TransactionHistoryScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 20.h),
-              child: ScreenPageHeader(
-                eyebrow: s.transactionHistoryEyebrow,
-                title: s.transactionHistoryTitle,
-                subtitle: s.transactionHistorySubhead,
+      body: AppBackground(
+        whiteBackground: true,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 20.h),
+                child: ScreenPageHeader(
+                  eyebrow: s.transactionHistoryEyebrow,
+                  title: s.transactionHistoryTitle,
+                  subtitle: s.transactionHistorySubhead,
+                  isDark: isDark,
+                ),
+              ),
+              TransactionFilterBar(isDark: isDark),
+              TransactionHistoryBody(
+                scrollController: scrollCtrl,
                 isDark: isDark,
               ),
-            ),
-            TransactionFilterBar(isDark: isDark),
-            TransactionHistoryBody(
-              scrollController: scrollCtrl,
-              isDark: isDark,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

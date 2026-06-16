@@ -32,11 +32,19 @@ class ParentStatisticNotifier extends _$ParentStatisticNotifier {
 
   void setPeriod(ParentStatisticPeriod period) {
     if (state.period == period) return;
-    state = state.copyWith(period: period);
+    // Reset the anchor to "now" when switching period, then refetch — matches
+    // the child statistic screen's setTabIndex behavior.
+    state = state.copyWith(period: period, selectedDate: DateTime.now());
+    if (state.selectedChildId.isNotEmpty) {
+      fetchForChild(state.selectedChildId);
+    }
   }
 
   void setSelectedDate(DateTime date) {
     state = state.copyWith(selectedDate: date);
+    if (state.selectedChildId.isNotEmpty) {
+      fetchForChild(state.selectedChildId);
+    }
   }
 
   Future<void> fetchForChild(String childUid) async {
@@ -53,11 +61,13 @@ class ParentStatisticNotifier extends _$ParentStatisticNotifier {
     try {
       final overview = await _repository.getChildOverview(
         childUid: childUid,
-        anchorDate: DateTime.now(),
+        anchorDate: state.selectedDate ?? DateTime.now(),
+        selectedTabIndex: state.period.index,
       );
 
       final newStatus = overview.totalExpenseMinor == 0 &&
-              overview.topCategories.isEmpty
+              overview.topCategories.isEmpty &&
+              overview.topIncomeCategories.isEmpty
           ? ParentStatisticStatus.empty
           : ParentStatisticStatus.success;
 
@@ -67,6 +77,7 @@ class ParentStatisticNotifier extends _$ParentStatisticNotifier {
         prevTotalExpenseMinor: overview.prevTotalExpenseMinor,
         dailyData: overview.dailyData,
         topCategories: overview.topCategories,
+        incomeCategories: overview.topIncomeCategories,
       );
 
       _logger.i(

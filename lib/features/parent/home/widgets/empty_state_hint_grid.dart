@@ -14,25 +14,31 @@ class EmptyStateHintGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: _HintChip(
-            isDark: isDark,
-            emoji: '🛡️',
-            text: s.homeParNoFamilyHintSafe,
+    // IntrinsicHeight gives the Row a bounded cross-axis (height) so that
+    // CrossAxisAlignment.stretch can size both chips to equal height. Without
+    // it the Row sits under an unbounded-height parent (SingleChildScrollView)
+    // and stretch throws "BoxConstraints forces an infinite height".
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _HintChip(
+              isDark: isDark,
+              emoji: '🛡️',
+              text: s.homeParNoFamilyHintSafe,
+            ),
           ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _HintChip(
-            isDark: isDark,
-            emoji: '📊',
-            text: s.homeParNoFamilyHintChart,
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _HintChip(
+              isDark: isDark,
+              emoji: '📊',
+              text: s.homeParNoFamilyHintChart,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

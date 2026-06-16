@@ -13,6 +13,9 @@ analyzer:
   exclude:
     - html_to_flutter_converter/templates/**
     - html_to_flutter_converter/output/**
+    # Generated sources — lints here are emitted by codegen, not editable by hand.
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
 
 linter:
   # The lint rules applied to this project can be customized in the

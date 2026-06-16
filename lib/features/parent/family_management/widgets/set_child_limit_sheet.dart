@@ -5,9 +5,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
-import 'package:monikid/features/parent/home/parent_home_notifier.dart';
-import 'package:monikid/shared/widgets/app_amount_field.dart';
+import 'package:monikid/features/parent/family_management/family_management_notifier.dart';
+import 'package:monikid/shared/widgets/amount_input_box.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
+/// Bottom sheet for a host parent to set a child's monthly spending limit.
+/// Persists via [FamilyManagementNotifier.setChildLimit].
 class SetChildLimitSheet extends HookConsumerWidget {
   const SetChildLimitSheet({
     super.key,
@@ -28,15 +31,14 @@ class SetChildLimitSheet extends HookConsumerWidget {
     final isLoading = useState(false);
 
     Future<void> confirm() async {
-      final digitsOnly =
-          controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final digitsOnly = controller.text.replaceAll(RegExp(r'[^0-9]'), '');
       final amount = int.tryParse(digitsOnly);
       if (amount == null || amount <= 0) return;
       isLoading.value = true;
       try {
         await ref
-            .read(parentHomeNotifierProvider.notifier)
-            .setChildLimit(childUid: childUid, amountMinor: amount);
+            .read(familyManagementNotifierProvider.notifier)
+            .setChildLimit(childUid, amount);
         if (context.mounted) Navigator.of(context).pop(true);
       } catch (_) {
         if (context.mounted) {
@@ -49,16 +51,13 @@ class SetChildLimitSheet extends HookConsumerWidget {
     }
 
     void addPreset(int presetMinor) {
-      final digitsOnly =
-          controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+      final digitsOnly = controller.text.replaceAll(RegExp(r'[^0-9]'), '');
       final current = int.tryParse(digitsOnly) ?? 0;
       controller.text = (current + presetMinor).toString();
     }
 
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 32.h),
         decoration: BoxDecoration(
@@ -83,8 +82,8 @@ class SetChildLimitSheet extends HookConsumerWidget {
             Text(
               s.parentSetLimitTitle,
               style: context.typo.subtitle.small.copyWith(
-              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
-            ),
+                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+              ),
             ),
             SizedBox(height: 4.h),
             Text(
@@ -92,18 +91,10 @@ class SetChildLimitSheet extends HookConsumerWidget {
               style: context.typo.body.small.copyWith(color: AppTheme.textGrey),
             ),
             SizedBox(height: 20.h),
-            AppAmountField(
+            AmountInputBox(
               controller: controller,
+              label: childName,
               autofocus: true,
-              textAlign: TextAlign.start,
-              bordered: true,
-              labelText: childName,
-              textStyle: context.typo.title.medium.copyWith(
-                color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
-              ),
-              suffixStyle: context.typo.subtitle.small.copyWith(
-                color: AppTheme.textGrey,
-              ),
             ),
             SizedBox(height: 12.h),
             Wrap(
@@ -119,55 +110,21 @@ class SetChildLimitSheet extends HookConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
-                    onPressed:
-                        isLoading.value ? null : () => Navigator.of(context).pop(),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.textDark,
-                      side: BorderSide(
-                        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 13.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                    ),
-                    child: Text(
-                      s.setMoneyLimitSkipAction,
-                      style: context.typo.body.big.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  child: PrimaryButton.secondary(
+                    title: s.setMoneyLimitSkipAction,
+                    height: 52.h,
+                    onTap: isLoading.value
+                        ? null
+                        : () => Navigator.of(context).pop(),
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: FilledButton(
-                    onPressed: isLoading.value ? null : confirm,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      disabledBackgroundColor:
-                          AppTheme.primary.withValues(alpha: 0.5),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                    ),
-                    child: isLoading.value
-                        ? SizedBox(
-                            width: 20.r,
-                            height: 20.r,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2.4,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            s.actionConfirm,
-                            style: context.typo.subtitle.small.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                  child: PrimaryButton(
+                    title: s.actionConfirm,
+                    height: 52.h,
+                    isLoading: isLoading.value,
+                    onTap: confirm,
                   ),
                 ),
               ],

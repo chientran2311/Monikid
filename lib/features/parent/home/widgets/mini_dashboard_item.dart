@@ -9,12 +9,12 @@ class MiniDashboardItem extends StatelessWidget {
   final Color color;
 
   const MiniDashboardItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.amount,
     required this.icon,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

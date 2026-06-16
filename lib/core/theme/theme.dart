@@ -96,6 +96,7 @@ class AppTheme {
   static const Color redDark = Color(0xFFDC2626); // red-600: dark red for strong errors
   static const Color redMedium = Color(0xFFEF4444); // red-500: medium red (can also use redAlert)
   static const Color redLight = Color(0xFFFCA5A5); // red-300: light red for backgrounds
+  static const Color dangerSurfaceStrong = Color(0xFFFEE2E2); // red-100: unlink pill background
   static const Color redVeryLight = Color(0xFFF87171); // red-400: very light red
 
   // Green variants (success, positive states)

@@ -8,8 +8,9 @@ part 'family_model.g.dart';
 abstract class FamilyModel with _$FamilyModel {
   const factory FamilyModel({
     required String familyId,
-    required String ownerUid,
-    required String inviteCode,
+    required String inviteCode, // '' if code not yet created
+    required String hostDisplayName, // denormalized host name (child reads)
+    String? hostAvatarUrl, // denormalized host avatar (child reads)
     required DateTime createdAt,
     DateTime? updatedAt,
   }) = _FamilyModel;
@@ -21,18 +22,11 @@ abstract class FamilyModel with _$FamilyModel {
     final data = doc.data() as Map<String, dynamic>;
     final now = DateTime.now();
 
-    // ownerUid derived from embedded members array — no longer stored as top-level field
-    final members = (data['members'] as List<dynamic>? ?? [])
-        .cast<Map<String, dynamic>>();
-    final ownerMember = members.firstWhere(
-      (m) => m['role'] == 'owner',
-      orElse: () => <String, dynamic>{},
-    );
-
     return FamilyModel(
       familyId: doc.id,
-      ownerUid: ownerMember['user_id'] as String? ?? '',
       inviteCode: data['invite_code'] as String? ?? '',
+      hostDisplayName: data['host_display_name'] as String? ?? '',
+      hostAvatarUrl: data['host_avatar_url'] as String?,
       createdAt: data['created_at'] != null
           ? (data['created_at'] as Timestamp).toDate()
           : now,

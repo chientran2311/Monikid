@@ -34,20 +34,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
   final Logger _logger;
   final http.Client _httpClient;
 
-  String? _readProfileImageUrl(Map<String, dynamic> data) {
-    final avatarUrl = (data['avatar_url'] as String?)?.trim();
-    if (avatarUrl != null && avatarUrl.isNotEmpty) {
-      return avatarUrl;
-    }
-
-    final photoUrl = (data['photo_url'] as String?)?.trim();
-    if (photoUrl != null && photoUrl.isNotEmpty) {
-      return photoUrl;
-    }
-
-    return null;
-  }
-
   @override
   Future<ProfileModel?> getProfile(String uid) async {
     try {
@@ -56,13 +42,11 @@ class ProfileRepositoryImpl implements ProfileRepository {
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;
         _logger.i('Profile loaded successfully for uid: $uid');
-        final fullName = (data['display_name'] as String? ?? data['full_name'] as String?)?.trim() ?? '';
-        final avatarUrl = _readProfileImageUrl(data);
         return ProfileModel(
           id: doc.id,
-          fullName: fullName,
+          fullName: (data['display_name'] as String?)?.trim() ?? '',
           email: (data['email'] as String?)?.trim() ?? '',
-          avatarUrl: avatarUrl,
+          avatarUrl: data['avatar_url'] as String?,
           role: (data['role'] as String?)?.trim() ?? '',
           familyId: data['family_id'] as String?,
         );
@@ -87,7 +71,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         return null;
       }
 
-      final url = _readProfileImageUrl(data);
+      final url = data['avatar_url'] as String?;
       _logger.i('Profile image resolved for uid: $uid (hasUrl=${url != null})');
       return url;
     } catch (error, stackTrace) {
@@ -109,7 +93,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
         'updated_at': FieldValue.serverTimestamp(),
       });
       _logger.i('Profile updated successfully for uid: ${profile.id}');
-      await _syncFamilyMemberProfile(
+      await _syncHostProfile(
         userId: profile.id,
         familyId: profile.familyId,
         displayName: profile.fullName,
@@ -120,7 +104,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
     }
   }
 
-  Future<void> _syncFamilyMemberProfile({
+  /// Denormalizes the host's name/avatar onto the family doc so the child app
+  /// can read them with a single family-doc read. Only the host syncs — other
+  /// members are read live from their user doc by the parent app.
+  Future<void> _syncHostProfile({
     required String userId,
     required String? familyId,
     String? displayName,
@@ -128,28 +115,29 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }) async {
     if (familyId == null || familyId.isEmpty) return;
     try {
-      _logger.i('Syncing family member profile for user $userId in family $familyId.');
+      _logger.i('Syncing host profile for user $userId in family $familyId.');
       final familyDoc = await _firestore.collection('families').doc(familyId).get();
       if (!familyDoc.exists) return;
 
-      final members = List<Map<String, dynamic>>.from(
-        (familyDoc.data()?['members'] as List<dynamic>?) ?? [],
+      final members = (familyDoc.data()?['members'] as List<dynamic>? ?? [])
+          .cast<Map<String, dynamic>>();
+      final me = members.firstWhere(
+        (m) => m['user_id'] == userId,
+        orElse: () => <String, dynamic>{},
       );
-      final idx = members.indexWhere((m) => m['user_id'] == userId);
-      if (idx == -1) return;
+      if (me['family_role'] != 'host') {
+        // Non-host members are not denormalized — nothing to sync.
+        return;
+      }
 
-      final updated = Map<String, dynamic>.from(members[idx]);
-      if (displayName != null) updated['display_name'] = displayName;
-      if (avatarUrl != null) updated['avatar_url'] = avatarUrl;
-      members[idx] = updated;
+      final update = <String, dynamic>{'updated_at': FieldValue.serverTimestamp()};
+      if (displayName != null) update['host_display_name'] = displayName;
+      if (avatarUrl != null) update['host_avatar_url'] = avatarUrl;
 
-      await _firestore.collection('families').doc(familyId).update({
-        'members': members,
-        'updated_at': FieldValue.serverTimestamp(),
-      });
-      _logger.i('Family member profile synced for user $userId.');
+      await _firestore.collection('families').doc(familyId).update(update);
+      _logger.i('Host profile synced for user $userId.');
     } catch (error, stackTrace) {
-      _logger.e('Failed to sync family member profile.', error: error, stackTrace: stackTrace);
+      _logger.e('Failed to sync host profile.', error: error, stackTrace: stackTrace);
     }
   }
 
@@ -202,7 +190,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
       _logger.i('Avatar URL updated in Firestore for user $userId.');
       final userDoc = await _firestore.collection('users').doc(userId).get();
       final familyId = userDoc.data()?['family_id'] as String?;
-      await _syncFamilyMemberProfile(
+      await _syncHostProfile(
         userId: userId,
         familyId: familyId,
         avatarUrl: secureUrl,

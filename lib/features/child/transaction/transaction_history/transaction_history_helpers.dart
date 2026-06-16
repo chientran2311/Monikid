@@ -70,7 +70,7 @@ class TransactionHistoryHelpers {
     required bool hasTransactions,
   }) {
     if (!reset) {
-      return LoadingStateParams(
+      return const LoadingStateParams(
         isLoading: false,
         isListLoading: false,
         isLoadingMore: true,

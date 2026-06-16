@@ -15,12 +15,12 @@ class TransactionItem extends ConsumerWidget {
   const TransactionItem({
     super.key,
     required this.transaction,
-    required this.onTap,
+    this.onTap,
     this.showBadge = true,
   });
 
   final TransactionModel transaction;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool showBadge;
 
   @override
@@ -86,6 +86,10 @@ class TransactionItem extends ConsumerWidget {
                     _AmountBadge(
                       amountStr: amountStr,
                       isExpense: isExpense,
+                      isEdited: transaction.updatedAt != null &&
+                          transaction.createdAt != null &&
+                          transaction.updatedAt!.isAfter(transaction.createdAt!),
+                      isDark: isDark,
                     ),
                 ],
               ),
@@ -188,14 +192,24 @@ class _AmountBadge extends StatelessWidget {
   const _AmountBadge({
     required this.amountStr,
     required this.isExpense,
+    required this.isEdited,
+    required this.isDark,
   });
 
   final String amountStr;
   final bool isExpense;
+  final bool isEdited;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     final s = context.l10n;
+    final badgeBg = isEdited
+        ? (isDark ? AppTheme.darkWarningSurface : AppTheme.amberFill)
+        : AppTheme.primary.withValues(alpha: 0.10);
+    final badgeTextColor = isEdited
+        ? (isDark ? AppTheme.darkWarningText : AppTheme.amberText)
+        : AppTheme.primary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -211,14 +225,14 @@ class _AmountBadge extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
           decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.10),
+            color: badgeBg,
             borderRadius: BorderRadius.circular(999.r),
           ),
           child: Text(
-            isExpense ? s.txStatusSuccess : s.txStatusCompleted,
+            isEdited ? s.homeParTransactionTagEdited : s.homeParTransactionTagNew,
             style: context.typo.caption.small.copyWith(
               fontWeight: FontWeight.w800,
-              color: AppTheme.primary,
+              color: badgeTextColor,
             ),
           ),
         ),

@@ -80,7 +80,7 @@ class TransactionItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: context.typo.caption.large.copyWith(
+                      style: context.typo.caption.big.copyWith(
                         color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
                       ),
                     ),

@@ -43,7 +43,7 @@ final familyMembersProvider =
 typedef FamilyMembersRef =
     AutoDisposeStreamProviderRef<List<FamilyMemberModel>>;
 String _$joinFamilyNotifierHash() =>
-    r'14246195f756a4c39734c45b5359c2ce3fc39a32';
+    r'c8a109b3fa07bfe967101356dfebfdbb8228e2e3';
 
 /// See also [JoinFamilyNotifier].
 @ProviderFor(JoinFamilyNotifier)

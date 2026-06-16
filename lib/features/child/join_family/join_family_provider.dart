@@ -25,7 +25,7 @@ class JoinFamilyNotifier extends _$JoinFamilyNotifier {
   Future<void> joinWithCode(String code) async {
     final trimmed = code.trim();
 
-    if (!RegExp(r'^\d{6}$').hasMatch(trimmed)) {
+    if (!RegExp(r'^[A-Z0-9]{6}$').hasMatch(trimmed.toUpperCase())) {
       state = state.copyWith(
         status: JoinFamilyStatus.error,
         errorMessage: 'invalid_code',

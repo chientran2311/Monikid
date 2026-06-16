@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -17,6 +18,10 @@ abstract class ParentDashboardRepository {
     required String childUid,
     required String monthKey,
   });
+
+  /// Reads the monthly spending limit (VND) set on the child's user doc.
+  /// Returns null when no limit is configured.
+  Future<int?> getChildMonthlyLimit({required String childUid});
 
   Future<void> setChildMonthlyLimit({
     required String childUid,
@@ -100,6 +105,22 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
   }
 
   @override
+  Future<int?> getChildMonthlyLimit({required String childUid}) async {
+    try {
+      final doc = await _firestore.collection('users').doc(childUid).get();
+      if (!doc.exists) return null;
+      return (doc.data()?['monthly_limit'] as num?)?.toInt();
+    } catch (error, stackTrace) {
+      _logger.e(
+        'Failed to fetch monthly limit for child $childUid',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> setChildMonthlyLimit({
     required String childUid,
     required int amountMinor,
@@ -173,7 +194,6 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
 }
 
 @riverpod
-ParentDashboardRepository parentDashboardRepository(
-    ParentDashboardRepositoryRef ref) {
+ParentDashboardRepository parentDashboardRepository(Ref ref) {
   return getIt<ParentDashboardRepository>();
 }

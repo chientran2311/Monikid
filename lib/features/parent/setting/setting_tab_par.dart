@@ -9,6 +9,7 @@ import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/change_theme/change_theme_provider.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/logout_dialog.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 import 'package:monikid/shared/widgets/theme_toggle_switch.dart';
 import 'widgets/setting_group.dart';
 import 'widgets/setting_item.dart';
@@ -139,57 +140,22 @@ class SettingTabParent extends ConsumerWidget {
               ],
             ),
             SizedBox(height: 24.h),
-            _SignOutButton(
-              label: s.settingParLogoutLabel,
-              surfaceColor: surfaceColor,
-              borderColor: borderColor,
-              onTap: handleSignOut,
+            SizedBox(height: 10.h),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: PrimaryButton.danger(
+                  title: s.settingParLogoutLabel,
+                  icon: const Icon(Icons.logout_rounded),
+                  onTap: handleSignOut,
+                  borderRadius: 999.r,
+                ),
+              ),
             ),
             SizedBox(height: 32.h),
           ],
         ),
       ),
-      ),
-    );
-  }
-}
-
-class _SignOutButton extends StatelessWidget {
-  const _SignOutButton({
-    required this.label,
-    required this.surfaceColor,
-    required this.borderColor,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color surfaceColor;
-  final Color borderColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: surfaceColor,
-      borderRadius: BorderRadius.circular(12.r),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12.r),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: borderColor, width: 0.5),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: context.typo.subtitle.small.copyWith(
-              color: AppTheme.redAlert,
-            ),
-          ),
-        ),
       ),
     );
   }

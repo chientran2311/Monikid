@@ -12,14 +12,14 @@ class FamilyMembersSection extends StatelessWidget {
     required this.isDark,
     required this.members,
     required this.selectedMemberId,
-    required this.inviteCode,
+    required this.familyId,
     required this.onMemberTap,
   });
 
   final bool isDark;
   final List<FamilyMemberModel> members;
   final String? selectedMemberId;
-  final String inviteCode;
+  final String familyId;
   final ValueChanged<String> onMemberTap;
 
   @override
@@ -51,7 +51,7 @@ class FamilyMembersSection extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             physics: const BouncingScrollPhysics(),
             children: [
-              _AddMemberButton(isDark: isDark, inviteCode: inviteCode),
+              _AddMemberButton(isDark: isDark, familyId: familyId),
               SizedBox(width: 16.w),
               ...members.map((member) {
                 final isSelected = member.uid == selectedMemberId;
@@ -282,10 +282,10 @@ class _DashedRoundedRectPainter extends CustomPainter {
 }
 
 class _AddMemberButton extends StatelessWidget {
-  const _AddMemberButton({required this.isDark, required this.inviteCode});
+  const _AddMemberButton({required this.isDark, required this.familyId});
 
   final bool isDark;
-  final String inviteCode;
+  final String familyId;
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +295,7 @@ class _AddMemberButton extends StatelessWidget {
     return GestureDetector(
       onTap: () => showDialog(
         context: context,
-        builder: (_) => InviteCodeDialog(inviteCode: inviteCode),
+        builder: (_) => InviteCodeDialog(familyId: familyId),
       ),
       child: SizedBox(
         width: 56.w,

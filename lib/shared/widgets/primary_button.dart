@@ -29,6 +29,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.height,
+    this.borderRadius,
   }) : _variant = _Variant.primary;
 
   const PrimaryButton.secondary({
@@ -38,6 +39,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.height,
+    this.borderRadius,
   }) : _variant = _Variant.secondary;
 
   const PrimaryButton.danger({
@@ -47,6 +49,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.isLoading = false,
     this.height,
+    this.borderRadius,
   }) : _variant = _Variant.danger;
 
   final String title;
@@ -56,6 +59,9 @@ class PrimaryButton extends StatelessWidget {
 
   /// Defaults to 65.h when null.
   final double? height;
+
+  /// Corner radius. Defaults to 18.r when null. Pass a large value for a pill.
+  final double? borderRadius;
 
   final _Variant _variant;
 
@@ -69,9 +75,9 @@ class PrimaryButton extends StatelessWidget {
         width: double.infinity,
         height: height ?? 65.h,
         child: switch (_variant) {
-          _Variant.primary   => _PrimaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
-          _Variant.secondary => _SecondaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
-          _Variant.danger    => _DangerBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable),
+          _Variant.primary   => _PrimaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable, radius: borderRadius),
+          _Variant.secondary => _SecondaryBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable, radius: borderRadius),
+          _Variant.danger    => _DangerBody(title: title, icon: icon, isLoading: isLoading, enabled: _tappable, radius: borderRadius),
         },
       ),
     );
@@ -121,12 +127,14 @@ class _PrimaryBody extends StatelessWidget {
     required this.icon,
     required this.isLoading,
     required this.enabled,
+    this.radius,
   });
 
   final String title;
   final Widget? icon;
   final bool isLoading;
   final bool enabled;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +143,7 @@ class _PrimaryBody extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: AppTheme.primaryButtonGradient,
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(radius ?? 18.r),
           boxShadow: [
             BoxShadow(
               offset: Offset(0, 16.h),
@@ -162,12 +170,14 @@ class _SecondaryBody extends StatelessWidget {
     required this.icon,
     required this.isLoading,
     required this.enabled,
+    this.radius,
   });
 
   final String title;
   final Widget? icon;
   final bool isLoading;
   final bool enabled;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +187,7 @@ class _SecondaryBody extends StatelessWidget {
       opacity: enabled ? 1.0 : 0.45,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(radius ?? 18.r),
           border: Border.all(color: border),
         ),
         child: Center(
@@ -198,12 +208,14 @@ class _DangerBody extends StatelessWidget {
     required this.icon,
     required this.isLoading,
     required this.enabled,
+    this.radius,
   });
 
   final String title;
   final Widget? icon;
   final bool isLoading;
   final bool enabled;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +224,7 @@ class _DangerBody extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppTheme.redDark,
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(radius ?? 18.r),
           boxShadow: [
             BoxShadow(
               offset: Offset(0, 8.h),

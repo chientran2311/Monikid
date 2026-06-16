@@ -13,14 +13,14 @@ class SummaryCard extends StatelessWidget {
   final VoidCallback onVisibilityToggle;
 
   const SummaryCard({
-    Key? key,
+    super.key,
     required this.parentPrimary,
     required this.balance,
     required this.totalIncome,
     required this.totalExpense,
     required this.isBalanceVisible,
     required this.onVisibilityToggle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

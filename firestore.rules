@@ -48,6 +48,15 @@ service cloud.firestore {
         && targetUserDoc(uid).role == 'child';
     }
 
+    // Any parent may read the user DOC (not subcollections) of any member in
+    // their own family — including the other parent. Used by the parent app to
+    // enrich member name/avatar. Children are NOT granted this.
+    function isParentViewingFamilyMember(uid) {
+      return isParent()
+        && requesterDoc().family_id != null
+        && requesterDoc().family_id == targetUserDoc(uid).family_id;
+    }
+
     // ─── User ─────────────────────────────────────────────────────────────────
 
     function isValidUserCreate(uid) {
@@ -228,23 +237,27 @@ service cloud.firestore {
 
     // ─── Family ───────────────────────────────────────────────────────────────
 
-    // members may include creator as initial owner (optional). Absent or [] also valid.
+    // Family create: host member only; invite_code is null until step 2.
     function isValidFamilyCreate(familyId) {
       let data = request.resource.data;
       let members = data.get('members', []);
       return isParent()
         && hasNoFamily()
-        && data.keys().hasOnly(['family_id', 'invite_code', 'created_at', 'updated_at', 'members'])
-        && data.keys().hasAll(['family_id', 'created_at', 'updated_at'])
+        && data.keys().hasOnly(['family_id', 'invite_code', 'host_display_name',
+            'host_avatar_url', 'created_at', 'updated_at', 'members'])
+        && data.keys().hasAll(['family_id', 'host_display_name', 'created_at', 'updated_at'])
         && data.family_id == familyId
         && data.created_at is timestamp && data.updated_at is timestamp
-        && (data.get('invite_code', null) == null
-            || (data.invite_code is string && data.invite_code.matches('^[A-Z0-9]{6}$')))
-        && (members == []
-            || (members.size() == 1
-                && members[0].user_id == request.auth.uid
-                && members[0].role == 'owner'
-                && isValidMemberEntry(members[0])));
+        && data.host_display_name is string
+        && data.host_display_name.size() > 0 && data.host_display_name.size() <= 80
+        && (data.get('host_avatar_url', null) == null
+            || (data.host_avatar_url is string && data.host_avatar_url.size() <= 2048))
+        && data.get('invite_code', null) == null
+        && members.size() == 1
+        && members[0].user_id == request.auth.uid
+        && members[0].family_role == 'host'
+        && members[0].user_role == 'parent'
+        && isValidMemberEntry(members[0]);
     }
 
     // diff.hasOnly guarantees family_id and created_at are unchanged — no need to re-check.
@@ -258,17 +271,27 @@ service cloud.firestore {
             || (data.invite_code is string && data.invite_code.matches('^[A-Z0-9]{6}$')));
     }
 
+    // Host denormalizes their own name/avatar onto the family doc (child reads these).
+    function isValidFamilyHostProfileUpdate(familyId) {
+      let diff = request.resource.data.diff(resource.data).affectedKeys();
+      let data = request.resource.data;
+      return isFamilyParent(familyId)
+        && diff.hasOnly(['host_display_name', 'host_avatar_url', 'updated_at'])
+        && data.updated_at is timestamp
+        && data.host_display_name is string
+        && data.host_display_name.size() > 0 && data.host_display_name.size() <= 80
+        && (data.get('host_avatar_url', null) == null
+            || (data.host_avatar_url is string && data.host_avatar_url.size() <= 2048));
+    }
+
+    // Lean member entry — name/avatar live in the user doc, not here.
     function isValidMemberEntry(entry) {
       return entry is map
-        && entry.keys().hasOnly(['user_id', 'role', 'user_role', 'display_name', 'avatar_url'])
-        && entry.keys().hasAll(['user_id', 'role', 'user_role', 'display_name'])
+        && entry.keys().hasOnly(['user_id', 'family_role', 'user_role'])
+        && entry.keys().hasAll(['user_id', 'family_role', 'user_role'])
         && entry.user_id is string && entry.user_id.size() > 0
-        && (entry.role == 'owner' || entry.role == 'member')
-        && (entry.user_role == 'parent' || entry.user_role == 'child')
-        && entry.display_name is string
-        && entry.display_name.size() > 0 && entry.display_name.size() <= 80
-        && (entry.get('avatar_url', null) == null
-            || (entry.avatar_url is string && entry.avatar_url.size() <= 2048));
+        && (entry.family_role == 'host' || entry.family_role == 'member')
+        && (entry.user_role == 'parent' || entry.user_role == 'child');
     }
 
     // Grows by exactly 1. New entry appended last, must be requester. Existing entries frozen.
@@ -284,7 +307,7 @@ service cloud.firestore {
         && newMembers.size() == oldMembers.size() + 1
         && newMembers.size() <= 5
         && newEntry.user_id == request.auth.uid
-        && newEntry.role == 'member'
+        && newEntry.family_role == 'member'
         && isValidMemberEntry(newEntry)
         && (oldMembers.size() < 1 || newMembers[0] == oldMembers[0])
         && (oldMembers.size() < 2 || newMembers[1] == oldMembers[1])
@@ -304,34 +327,27 @@ service cloud.firestore {
         && newMembers.size() == oldMembers.size() - 1;
     }
 
-    // Same size — a member syncs their display_name / avatar_url after profile update.
-    function isValidMembersSync(familyId) {
-      let diff = request.resource.data.diff(resource.data).affectedKeys();
-      return isFamilyMember(familyId)
-        && diff.hasOnly(['members', 'updated_at'])
-        && request.resource.data.updated_at is timestamp
-        && request.resource.data.get('members', []).size()
-            == resource.data.get('members', []).size();
-    }
-
     // ─── Invite code ──────────────────────────────────────────────────────────
 
     function isValidInviteCodeCreate(code) {
       let data = request.resource.data;
       return isParent()
         && requesterDoc().family_id != null
-        && data.keys().hasOnly(['code', 'family_id', 'expired_at'])
-        && data.keys().hasAll(['code', 'family_id', 'expired_at'])
-        && data.code == code
-        && data.code.matches('^[A-Z0-9]{6}$')
+        && data.keys().hasOnly(['invite_code', 'family_id', 'created_at', 'expired_at'])
+        && data.keys().hasAll(['invite_code', 'family_id', 'created_at', 'expired_at'])
+        && data.invite_code == code
+        && data.invite_code.matches('^[A-Z0-9]{6}$')
         && data.family_id == requesterDoc().family_id
+        && data.created_at is timestamp
         && data.expired_at is timestamp;
     }
 
     // ─── Match blocks ─────────────────────────────────────────────────────────
 
     match /users/{uid} {
-      allow read: if isSelf(uid) || isParentViewingChild(uid);
+      allow read: if isSelf(uid)
+        || isParentViewingChild(uid)
+        || isParentViewingFamilyMember(uid);
       allow create: if isSelf(uid) && isValidUserCreate(uid);
       allow update: if isValidUserProfileUpdate(uid)
         || isValidFamilyJoin(uid)
@@ -372,9 +388,9 @@ service cloud.firestore {
       allow read: if isFamilyMember(familyId) || hasNoFamily();
       allow create: if isValidFamilyCreate(familyId);
       allow update: if isValidFamilyInviteCodeUpdate(familyId)
+        || isValidFamilyHostProfileUpdate(familyId)
         || isValidMemberJoin(familyId)
-        || isValidMemberRemove(familyId)
-        || isValidMembersSync(familyId);
+        || isValidMemberRemove(familyId);
       allow delete: if false;
     }
 

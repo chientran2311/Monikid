@@ -10,12 +10,13 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/family_management/family_management_notifier.dart';
 import 'package:monikid/features/parent/family_management/family_management_state.dart';
-import 'package:monikid/features/parent/family_management/widgets/child_member_card.dart';
-import 'package:monikid/features/parent/family_management/widgets/family_info_card.dart';
-import 'package:monikid/features/parent/family_management/widgets/limit_dialog.dart';
+import 'package:monikid/features/parent/family_management/widgets/family_id_card.dart';
+import 'package:monikid/features/parent/family_management/widgets/family_management_skeleton.dart';
+import 'package:monikid/features/parent/family_management/widgets/member_list_card.dart';
+import 'package:monikid/features/parent/family_management/widgets/set_child_limit_sheet.dart';
+import 'package:monikid/features/parent/family_management/widgets/unlink_confirm_sheet.dart';
 import 'package:monikid/models/entities/link_family/family_member_model.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
-import 'package:monikid/shared/widgets/confirm_dialog.dart';
 import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class FamilyManagementScreen extends HookConsumerWidget {
@@ -33,7 +34,7 @@ class FamilyManagementScreen extends HookConsumerWidget {
     final state = ref.watch(familyManagementNotifierProvider);
 
     useEffect(() {
-      Future.microtask(() => notifier.loadFamily());
+      Future.microtask(notifier.loadFamily);
       return null;
     }, const []);
 
@@ -44,15 +45,16 @@ class FamilyManagementScreen extends HookConsumerWidget {
       }
     });
 
-    final isHostParent = currentUserId != null &&
-        state.family?.ownerUid == currentUserId;
+    final isHostParent =
+        currentUserId != null && state.hostUid == currentUserId;
 
-    Widget body;
-    if (state.isLoading || state.status == FamilyManagementStatus.initial) {
-      body = const Center(
-        child: CircularProgressIndicator(color: AppTheme.primary),
-      );
+    final Widget body;
+    if (state.isLoading ||
+        state.status == FamilyManagementStatus.initial ||
+        state.family == null) {
+      body = FamilyManagementSkeleton(isDark: isDark);
     } else {
+      final members = state.sortedMembers;
       body = SingleChildScrollView(
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).padding.top + kToolbarHeight + 16.h,
@@ -61,69 +63,19 @@ class FamilyManagementScreen extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (state.family != null)
-              FamilyInfoCard(
-                family: state.family!,
-                ownerDisplayName: state.parentMembers.firstOrNull?.displayName ?? '',
-                nonHostParent: state.nonHostParent,
-                isHostParent: isHostParent,
-                onUnlinkParent: state.nonHostParent != null
-                    ? () => _onUnlinkParent(
-                          context: context,
-                          memberUid: state.nonHostParent!.uid,
-                          memberName: state.nonHostParent!.displayName,
-                          notifier: notifier,
-                        )
-                    : null,
-              ),
+            _SectionLabel(text: s.familyManagementSectionFamily),
+            FamilyIdCard(family: state.family!),
             SizedBox(height: 24.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                s.familyManagementSectionMembers,
-                style: context.typo.caption.medium.copyWith(
-                  color: AppTheme.textGrey,
-                  letterSpacing: 1.5,
-                ),
-              ),
+            _SectionLabel(
+              text: s.familyManagementSectionMembersCount(members.length),
             ),
-            SizedBox(height: 8.h),
-            if (state.childMembers.isEmpty)
-              _EmptyChildrenState(message: s.familyManagementEmptyChildren)
-            else
-              ...state.childMembers.asMap().entries.map((entry) {
-                final index = entry.key;
-                final member = entry.value;
-                final limitMinor = state.monthlyLimits[member.uid];
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 8.h),
-                  child: ChildMemberCard(
-                    member: member,
-                    limitMinor: limitMinor,
-                    avatarColor: _childAvatarColor(index),
-                    isHostParent: isHostParent,
-                    isProcessing: state.isProcessing,
-                    onSetLimit: () => _onSetLimit(
-                      context: context,
-                      member: member,
-                      limitMinor: limitMinor,
-                      notifier: notifier,
-                    ),
-                    onUnlink: isHostParent
-                        ? () => _onUnlinkChild(
-                              context: context,
-                              childUid: member.uid,
-                              childName: member.displayName,
-                              notifier: notifier,
-                            )
-                        : null,
-                  ),
-                );
-              }),
-            SizedBox(height: 16.h),
-            _FamilyBanner(
-              title: s.familyManagementBannerTitle,
-              subtitle: s.familyManagementBannerSubtitle,
+            MemberListCard(
+              members: members,
+              currentUserId: currentUserId,
+              isHostParent: isHostParent,
+              isProcessing: state.isProcessing,
+              onSetLimit: (member) => _onSetLimit(context, member),
+              onUnlink: (member) => _onUnlink(context, notifier, member),
             ),
           ],
         ),
@@ -147,162 +99,62 @@ class FamilyManagementScreen extends HookConsumerWidget {
     );
   }
 
-  Color _childAvatarColor(int index) {
-    const colors = [
-      AppTheme.chartBlue,
-      AppTheme.chartOrange,
-      AppTheme.chartGreen,
-      AppTheme.chartPurple,
-    ];
-    return colors[index % colors.length];
-  }
-
-  void _onUnlinkParent({
-    required BuildContext context,
-    required String memberUid,
-    required String memberName,
-    required FamilyManagementNotifier notifier,
-  }) {
-    final s = context.l10n;
-    showDialog<void>(
+  Future<void> _onSetLimit(
+    BuildContext context,
+    FamilyMemberModel member,
+  ) async {
+    await showModalBottomSheet<bool>(
       context: context,
-      builder: (_) => ConfirmDialog(
-        title: s.familyManagementUnlinkConfirmTitle,
-        subtitle: s.familyManagementUnlinkConfirmBody(memberName),
-        confirmLabel: s.familyManagementUnlinkConfirmButton,
-        cancelLabel: s.familyManagementCancel,
-        isDestructive: true,
-        onConfirm: () => notifier.unlinkParentMember(memberUid),
-      ),
-    );
-  }
-
-  void _onUnlinkChild({
-    required BuildContext context,
-    required String childUid,
-    required String childName,
-    required FamilyManagementNotifier notifier,
-  }) {
-    final s = context.l10n;
-    showDialog<void>(
-      context: context,
-      builder: (_) => ConfirmDialog(
-        title: s.familyManagementUnlinkConfirmTitle,
-        subtitle: s.familyManagementUnlinkConfirmBody(childName),
-        confirmLabel: s.familyManagementUnlinkConfirmButton,
-        cancelLabel: s.familyManagementCancel,
-        isDestructive: true,
-        onConfirm: () => notifier.unlinkChild(childUid),
-      ),
-    );
-  }
-
-  Future<void> _onSetLimit({
-    required BuildContext context,
-    required FamilyMemberModel member,
-    required int? limitMinor,
-    required FamilyManagementNotifier notifier,
-  }) async {
-    await showDialog<void>(
-      context: context,
-      builder: (_) => LimitDialog(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SetChildLimitSheet(
         childUid: member.uid,
         childName: member.displayName,
-        currentLimitMinor: limitMinor,
-        notifier: notifier,
+      ),
+    );
+  }
+
+  void _onUnlink(
+    BuildContext context,
+    FamilyManagementNotifier notifier,
+    FamilyMemberModel member,
+  ) {
+    final s = context.l10n;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => UnlinkConfirmSheet(
+        title: s.familyManagementUnlinkSheetTitle(member.displayName),
+        description: s.familyManagementUnlinkSheetDesc(member.displayName),
+        onConfirm: () {
+          if (member.userRole == 'parent') {
+            notifier.unlinkParentMember(member.uid);
+          } else {
+            notifier.unlinkChild(member.uid);
+          }
+        },
       ),
     );
   }
 }
 
-class _EmptyChildrenState extends StatelessWidget {
-  const _EmptyChildrenState({required this.message});
-  final String message;
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.text});
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 32.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 64.w,
-              color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              message,
-              style: context.typo.body.medium.copyWith(
-                color: AppTheme.textGrey,
-              ),
-            ),
-          ],
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 24.h, 16.w, 8.h),
+      child: Text(
+        text,
+        style: context.typo.caption.big.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppTheme.textMuted,
+          letterSpacing: 0.6,
         ),
-      ),
-    );
-  }
-}
-
-class _FamilyBanner extends StatelessWidget {
-  const _FamilyBanner({required this.title, required this.subtitle});
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      height: 130.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        gradient: const LinearGradient(
-          colors: [AppTheme.greenDark, AppTheme.primary, AppTheme.chartGreen],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -10.w,
-            top: -10.h,
-            child: Opacity(
-              opacity: 0.12,
-              child: Icon(
-                Icons.eco_rounded,
-                size: 120.w,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  title,
-                  style: context.typo.subtitle.small.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  subtitle,
-                  style: context.typo.caption.big.copyWith(
-                    color: Colors.white.withOpacity(0.85),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

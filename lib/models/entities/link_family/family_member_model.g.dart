@@ -9,7 +9,7 @@ part of 'family_member_model.dart';
 _FamilyMemberModel _$FamilyMemberModelFromJson(Map<String, dynamic> json) =>
     _FamilyMemberModel(
       uid: json['uid'] as String,
-      role: json['role'] as String? ?? 'member',
+      familyRole: json['familyRole'] as String? ?? 'member',
       userRole: json['userRole'] as String? ?? 'child',
       displayName: json['displayName'] as String? ?? '',
       avatarUrl: json['avatarUrl'] as String?,
@@ -18,7 +18,7 @@ _FamilyMemberModel _$FamilyMemberModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$FamilyMemberModelToJson(_FamilyMemberModel instance) =>
     <String, dynamic>{
       'uid': instance.uid,
-      'role': instance.role,
+      'familyRole': instance.familyRole,
       'userRole': instance.userRole,
       'displayName': instance.displayName,
       'avatarUrl': instance.avatarUrl,

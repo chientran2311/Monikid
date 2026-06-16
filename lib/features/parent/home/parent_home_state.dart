@@ -17,6 +17,7 @@ abstract class ParentHomeState with _$ParentHomeState {
     @Default([]) List<TransactionModel> selectedMemberTransactions,
     @Default(0) int selectedMemberExpenseMinor,
     @Default(0) int selectedMemberIncomeMinor,
+    @Default(0) int selectedMemberLimitMinor,
     @Default(false) bool isLoadingMemberData,
     @Default(false) bool isCreatingFamily,
     String? errorMessage,

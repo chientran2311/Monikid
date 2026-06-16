@@ -66,9 +66,16 @@ class SettingTabStudent extends ConsumerWidget {
               SizedBox(height: 24.h),
               _SettingsList(langCode: langCode, isDark: isDark),
               SizedBox(height: 20.h),
-              PrimaryButton.danger(
-                title: s.settingParLogoutLabel,
-                onTap: handleSignOut,
+              SizedBox(height: 10.h),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  child: PrimaryButton.danger(
+                    title: s.settingParLogoutLabel,
+                    onTap: handleSignOut,
+                    borderRadius: 999.r,
+                  ),
+                ),
               ),
               SizedBox(height: 100.h),
             ],

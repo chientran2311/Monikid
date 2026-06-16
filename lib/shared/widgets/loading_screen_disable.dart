@@ -132,7 +132,7 @@ class _ScanBillLoadingDialogState extends ConsumerState<ScanBillLoadingDialog>
                 // Title
                 Text(
                   s.scanBillLoadingTitle,
-                  style: context.typo.title.large.copyWith(
+                  style: context.typo.title.big.copyWith(
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.02,
                     color: isDark ? AppTheme.textWhite : AppTheme.textBlack,

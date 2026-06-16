@@ -5,25 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/parent/home/invite_code_provider.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
+import 'package:monikid/shared/widgets/skeleton.dart';
 
 class InviteCodeDialog extends HookConsumerWidget {
-  const InviteCodeDialog({
-    super.key,
-    required this.inviteCode,
-  });
+  const InviteCodeDialog({super.key, required this.familyId});
 
-  final String inviteCode;
-
-  String get _formattedCode {
-    if (inviteCode.length == 6) {
-      return '${inviteCode.substring(0, 3)} ${inviteCode.substring(3)}';
-    }
-    return inviteCode;
-  }
+  final String familyId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,6 +32,8 @@ class InviteCodeDialog extends HookConsumerWidget {
       return null;
     }, const []);
 
+    final codeAsync = ref.watch(familyInviteCodeProvider(familyId));
+
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -53,25 +48,29 @@ class InviteCodeDialog extends HookConsumerWidget {
           ),
         ),
         child: _InviteCard(
-          inviteCode: inviteCode,
-          formattedCode: _formattedCode,
+          familyId: familyId,
+          codeAsync: codeAsync,
         ),
       ),
     );
   }
 }
 
-class _InviteCard extends StatelessWidget {
-  const _InviteCard({
-    required this.inviteCode,
-    required this.formattedCode,
-  });
+class _InviteCard extends ConsumerWidget {
+  const _InviteCard({required this.familyId, required this.codeAsync});
 
-  final String inviteCode;
-  final String formattedCode;
+  final String familyId;
+  final AsyncValue<String> codeAsync;
+
+  String _formatCode(String code) {
+    if (code.length == 6) {
+      return '${code.substring(0, 3)} ${code.substring(3)}';
+    }
+    return code;
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
 
@@ -132,42 +131,108 @@ class _InviteCard extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                decoration: BoxDecoration(
-                  color: isDark ? AppTheme.darkBorder : AppTheme.surfaceGrey,
-                  borderRadius: BorderRadius.circular(18.r),
-                  border: Border.all(
-                    color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-                  ),
-                ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    formattedCode,
-                    style: context.typo.display.big.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 10,
-                      color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
-                    ),
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+              _CodeBox(
+                isDark: isDark,
+                codeAsync: codeAsync,
+                familyId: familyId,
+                formatCode: _formatCode,
               ),
               SizedBox(height: 28.h),
               PrimaryButton(
                 title: s.actionDone,
-                onTap: () async {
-                  await Clipboard.setData(ClipboardData(text: inviteCode));
-                  if (!context.mounted) return;
-                  context.showSuccessSnackBar(s.homeParCodeCopied);
-                  context.pop();
-                },
+                onTap: codeAsync.isLoading
+                    ? null
+                    : () async {
+                        final code = codeAsync.valueOrNull;
+                        if (code != null && code.isNotEmpty) {
+                          await Clipboard.setData(ClipboardData(text: code));
+                          if (!context.mounted) return;
+                          context.showSuccessSnackBar(s.homeParCodeCopied);
+                        }
+                        if (!context.mounted) return;
+                        context.pop();
+                      },
                 height: 56.h,
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CodeBox extends ConsumerWidget {
+  const _CodeBox({
+    required this.isDark,
+    required this.codeAsync,
+    required this.familyId,
+    required this.formatCode,
+  });
+
+  final bool isDark;
+  final AsyncValue<String> codeAsync;
+  final String familyId;
+  final String Function(String) formatCode;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = context.l10n;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkBorder : AppTheme.surfaceGrey,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(
+          color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
+        ),
+      ),
+      child: codeAsync.when(
+        loading: () => Skeleton(
+          height: 48.h,
+          width: double.infinity,
+          borderRadius: 12.r,
+        ),
+        error: (_, __) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              s.homeParInviteCodeLoadError,
+              textAlign: TextAlign.center,
+              style: context.typo.body.medium.copyWith(
+                color: AppTheme.redAlert,
+                fontSize: 14.sp,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            TextButton(
+              onPressed: () =>
+                  ref.invalidate(familyInviteCodeProvider(familyId)),
+              child: Text(s.actionRetry),
+            ),
+          ],
+        ),
+        data: (code) => GestureDetector(
+          onTap: () async {
+            await Clipboard.setData(ClipboardData(text: code));
+            if (!context.mounted) return;
+            context.showSuccessSnackBar(s.homeParCodeCopied);
+            context.pop();
+          },
+          child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            formatCode(code),
+            style: context.typo.display.big.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: 10,
+              color: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+            ),
+            maxLines: 1,
+            textAlign: TextAlign.center,
+          ),
           ),
         ),
       ),

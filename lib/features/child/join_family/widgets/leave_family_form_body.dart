@@ -29,9 +29,8 @@ class LeaveFamilyFormBody extends ConsumerWidget {
     final surfaceColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
     final borderColor = isDark ? AppTheme.borderDark : AppTheme.borderLight;
 
-    final members = ref.watch(familyMembersProvider).valueOrNull ?? [];
     final familyName =
-        members.where((m) => m.role == 'owner').firstOrNull?.displayName ?? '';
+        ref.watch(linkedFamilyProvider).valueOrNull?.hostDisplayName ?? '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,

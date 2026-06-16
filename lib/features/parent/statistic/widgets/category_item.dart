@@ -17,7 +17,7 @@ class CategoryItem extends StatelessWidget {
   final bool isDark;
 
   const CategoryItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.amount,
@@ -30,7 +30,7 @@ class CategoryItem extends StatelessWidget {
     required this.textColor,
     required this.textSubColor,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

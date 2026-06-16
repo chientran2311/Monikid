@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,10 +14,15 @@ import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_screen.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_provider.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_state.dart';
+import 'package:monikid/features/parent/statistic/widgets/parent_income_expense_bar.dart';
+import 'package:monikid/features/parent/statistic/widgets/parent_stat_insights_row.dart';
 import 'package:monikid/features/parent/statistic/widgets/parent_statistic_child_selector.dart';
+import 'package:monikid/features/parent/statistic/widgets/parent_statistic_skeleton.dart';
 import 'package:monikid/features/parent/statistic/widgets/parent_statistic_state_card.dart';
 import 'package:monikid/features/parent/statistic/widgets/parent_top_categories_section.dart';
+import 'package:monikid/features/parent/statistic/widgets/parent_top_category_card.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/features/transaction/transaction_type.dart';
 import 'package:monikid/shared/widgets/glass_tab_app_bar.dart';
 import 'package:monikid/shared/widgets/switchtab_three_item.dart';
 
@@ -30,7 +37,8 @@ class StatisticTabParent extends ConsumerWidget {
     final notifier = ref.read(parentStatisticNotifierProvider.notifier);
 
     final homeState = ref.watch(parentHomeNotifierProvider);
-    final children = homeState.members.where((m) => m.role == 'child').toList();
+    final children =
+        homeState.members.where((m) => m.userRole == 'child').toList();
     final selectedChildId = homeState.selectedMemberId;
     final selectedChild =
         children.where((c) => c.uid == selectedChildId).firstOrNull ??
@@ -68,6 +76,7 @@ class StatisticTabParent extends ConsumerWidget {
                     onChanged: (i) => notifier.setPeriod(
                       ParentStatisticPeriod.values[i],
                     ),
+                    onGlassBackground: true,
                   ),
                   if (children.isEmpty)
                     Padding(
@@ -79,14 +88,7 @@ class StatisticTabParent extends ConsumerWidget {
                       ),
                     )
                   else if (state.isLoading)
-                    Padding(
-                      padding: EdgeInsets.only(top: 16.h),
-                      child: ParentStatisticStateCard(
-                        isDark: isDark,
-                        showSpinner: true,
-                        message: s.parentStatisticLoading,
-                      ),
-                    )
+                    ParentStatisticSkeleton(isDark: isDark)
                   else if (state.hasError)
                     Padding(
                       padding: EdgeInsets.only(top: 16.h),
@@ -106,15 +108,37 @@ class StatisticTabParent extends ConsumerWidget {
                     SizedBox(height: 24.h),
                     _SummaryRow(state: state, isDark: isDark),
                     SizedBox(height: 16.h),
+                    ParentStatInsightsRow(
+                      isDark: isDark,
+                      avgPerDayMinor:
+                          state.avgPerDayMinorForPeriod(state.period),
+                      peakDay: state.peakDay,
+                      streak: state.currentSpendingStreak,
+                    ),
+                    SizedBox(height: 16.h),
+                    ParentIncomeExpenseBar(
+                      isDark: isDark,
+                      totalIncomeMinor: state.totalIncomeMinor,
+                      totalExpenseMinor: state.totalExpenseMinor,
+                    ),
+                    SizedBox(height: 16.h),
                     StatisticSpendingTrendSection(
-                      dailyExpenses: state.resolvedDailyData,
+                      dailyExpenses: state.dailyData,
                       selectedTabIndex: state.period.index,
                       selectedDate: state.selectedDate ?? DateTime.now(),
                       onDateSelected: notifier.setSelectedDate,
                     ),
+                    SizedBox(height: 16.h),
+                    ParentTopCategoryCard(
+                      isDark: isDark,
+                      category: state.topCategories.isEmpty
+                          ? null
+                          : state.topCategories.first,
+                    ),
                     SizedBox(height: 24.h),
                     ParentTopCategoriesSection(
                       isDark: isDark,
+                      title: s.statisticTopCategoriesTitle,
                       categories: state.topCategories,
                       onItemTap: selectedChild == null
                           ? null
@@ -128,8 +152,31 @@ class StatisticTabParent extends ConsumerWidget {
                                 ),
                               ),
                     ),
+                    SizedBox(height: 24.h),
+                    ParentTopCategoriesSection(
+                      isDark: isDark,
+                      title: s.statisticTopIncomeCategoriesTitle,
+                      categories: state.incomeCategories,
+                      isExpense: false,
+                      onItemTap: selectedChild == null
+                          ? null
+                          : (category) => context.push(
+                                AppRoutes.parentCategoryTransactions,
+                                extra: ParentCategoryTransactionsArgs(
+                                  childUid: selectedChild.uid,
+                                  categoryKey: category.categoryKey,
+                                  categoryLabel: category.categoryLabel,
+                                  period: state.period,
+                                  transactionType: TransactionType.income,
+                                ),
+                              ),
+                    ),
                   ],
-                  SizedBox(height: 32.h),
+                  // Extra bottom space so the floating nav pill doesn't
+                  // cover the list end (safe area inset + base spacing).
+                  SizedBox(
+                    height: 32.h + MediaQuery.of(context).padding.bottom,
+                  ),
                 ],
               ),
             ),
@@ -173,40 +220,43 @@ class _SummaryRow extends StatelessWidget {
     final prevSubColor =
         isDown ? AppTheme.primary : (isUp ? AppTheme.redAlert : AppTheme.textBlack.withValues(alpha: 0.35));
 
-    return Row(
-      children: [
-        Expanded(
-          child: _MetricCard(
-            isDark: isDark,
-            label: s.parentStatisticTotalExpenseLabel,
-            value: context.formatStatisticCompactCurrency(
-              state.totalExpenseMinor,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _MetricCard(
+              isDark: isDark,
+              label: s.parentStatisticTotalExpenseLabel,
+              value: context.formatStatisticCompactCurrency(
+                state.totalExpenseMinor,
+              ),
+              subLabel: trendBadge,
+              subColor: trendColor,
             ),
-            subLabel: trendBadge,
-            subColor: trendColor,
           ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _MetricCard(
-            isDark: isDark,
-            label: s.parentStatisticTxCountLabel,
-            value: '${state.totalTransactionCount}',
-            subLabel: null,
-            subColor: null,
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _MetricCard(
+              isDark: isDark,
+              label: s.parentStatisticTxCountLabel,
+              value: '${state.totalTransactionCount}',
+              subLabel: null,
+              subColor: null,
+            ),
           ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: _MetricCard(
-            isDark: isDark,
-            label: s.parentStatisticPrevPeriodLabel,
-            value: prevLabel,
-            subLabel: prevSubLabel,
-            subColor: prevSubColor,
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _MetricCard(
+              isDark: isDark,
+              label: s.parentStatisticPrevPeriodLabel,
+              value: prevLabel,
+              subLabel: prevSubLabel,
+              subColor: prevSubColor,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -228,66 +278,73 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // HTML .metric-card tokens:
-    // bg: rgba(255,255,255,.94)  border: mix(accent 16%, white)
-    // shadow: 0 8px 20px rgba(47,127,51,.04)  radius: 20px
-    final bgColor =
-        isDark ? AppTheme.surfaceDark : Colors.white.withValues(alpha: 0.94);
-    final borderColor = isDark
-        ? AppTheme.borderDark
-        : AppTheme.primary.withValues(alpha: 0.16);
+    // Frosted glass card (iOS26 style): translucent fill + backdrop blur +
+    // hairline border, sized to a uniform height by the parent IntrinsicHeight.
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark
         ? AppTheme.textMuted
         : AppTheme.textBlack.withValues(alpha: 0.45);
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: isDark ? 0.0 : 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: context.typo.caption.small.copyWith(
-              color: mutedColor,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.02 * 11,
-              fontSize: 11.sp,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24.r),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppTheme.surfaceDark.withValues(alpha: 0.6)
+                : Colors.white.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(24.r),
+            border: Border.all(
+              color: isDark
+                  ? AppTheme.borderDark
+                  : Colors.white.withValues(alpha: 0.6),
             ),
-          ),
-          SizedBox(height: 4.h),
-          Text(
-            value,
-            style: context.typo.subtitle.medium.copyWith(
-              fontWeight: FontWeight.w900,
-              color: textColor,
-              fontSize: 16.sp,
-            ),
-          ),
-          if (subLabel != null) ...[
-            SizedBox(height: 2.h),
-            Text(
-              subLabel!,
-              style: context.typo.caption.small.copyWith(
-                color: subColor,
-                fontWeight: FontWeight.w700,
-                fontSize: 11.sp,
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withValues(alpha: isDark ? 0.0 : 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-            ),
-          ],
-        ],
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: context.typo.caption.small.copyWith(
+                  color: mutedColor,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.02 * 11,
+                  fontSize: 11.sp,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                value,
+                style: context.typo.subtitle.medium.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: textColor,
+                  fontSize: 16.sp,
+                ),
+              ),
+              SizedBox(height: 2.h),
+              // Reserve the sub-label slot so all three cards align even when
+              // a card has no sub-label.
+              Text(
+                subLabel ?? '',
+                style: context.typo.caption.small.copyWith(
+                  color: subColor,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11.sp,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -13,6 +13,7 @@ import 'package:monikid/features/child/transaction/providers/category_provider.d
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_provider.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_state.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_state.dart';
+import 'package:monikid/features/transaction/transaction_type.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/glass_app_bar.dart';
@@ -23,12 +24,14 @@ class ParentCategoryTransactionsArgs {
     required this.categoryKey,
     required this.categoryLabel,
     required this.period,
+    this.transactionType = TransactionType.expense,
   });
 
   final String childUid;
   final String categoryKey;
   final String categoryLabel;
   final ParentStatisticPeriod period;
+  final TransactionType transactionType;
 }
 
 class ParentCategoryTransactionsScreen extends HookConsumerWidget {
@@ -46,10 +49,11 @@ class ParentCategoryTransactionsScreen extends HookConsumerWidget {
               childUid: args.childUid,
               categoryKey: args.categoryKey,
               period: args.period,
+              transactionType: args.transactionType,
             ),
       );
       return null;
-    }, [args.childUid, args.categoryKey, args.period]);
+    }, [args.childUid, args.categoryKey, args.period, args.transactionType]);
 
     final state = ref.watch(parentCategoryTransactionsNotifierProvider);
 

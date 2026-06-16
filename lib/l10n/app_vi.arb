@@ -45,6 +45,7 @@
   "homeParInviteTitle": "Mời thành viên",
   "homeParInviteDesc": "Chia sẻ mã này với con hoặc người thân để họ tham gia vào gia đình MoniKid.",
   "homeParInviteCodeLabel": "Mã liên kết",
+  "homeParInviteCodeLoadError": "Không tải được mã mời. Vui lòng thử lại.",
   "homeParCopyCode": "Sao chép mã",
   "homeParCodeCopied": "Đã sao chép!",
   "homeParManageMembers": "Quản lý",
@@ -140,6 +141,33 @@
   "parentStatisticPrevPeriodLabel": "THÁNG TRƯỚC",
   "parentStatisticTrendGood": "Tốt",
   "parentStatisticTrendBad": "Kém",
+  "parentStatisticHeatmapTitle": "Lịch chi tiêu",
+  "parentStatisticHeatmapNoData": "Không có dữ liệu kỳ này",
+  "parentStatisticTopCategoryTitle": "Danh mục nổi bật",
+  "parentStatisticTopCategorySubtitle": "Chi nhiều nhất",
+  "parentStatisticTopCategoryShare": "{percent}% tổng chi",
+  "@parentStatisticTopCategoryShare": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "parentStatisticBalanceTitle": "Cân đối",
+  "parentStatisticBalanceIncome": "Thu",
+  "parentStatisticBalanceExpense": "Chi",
+  "parentStatisticInsightsAvgPerDay": "TB / ngày",
+  "parentStatisticInsightsPeakDay": "Ngày cao nhất",
+  "parentStatisticInsightsStreak": "Chuỗi chi",
+  "parentStatisticInsightsStreakDays": "{days} ngày",
+  "@parentStatisticInsightsStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "parentStatisticInsightsNoPeak": "—",
   "parentStatisticEditedBadge": "Đã sửa",
   "settingParTitle": "Cài đặt",
   "settingParEditProfile": "Chỉnh sửa hồ sơ",
@@ -615,6 +643,7 @@
     }
   },
   "statisticTrendIncrease": "Tăng mạnh nhất",
+  "statisticTopBadge": "Nhiều nhất",
   "statisticTrendDecrease": "Giảm",
   "statisticTrendStable": "Ổn định",
   "statisticNoDataTitle": "Chưa có dữ liệu chi tiêu",
@@ -770,6 +799,30 @@
   "familyManagementRemoveLimitError": "Lỗi khi xóa hạn mức",
   "familyManagementBannerTitle": "Xây dựng tương lai cùng con",
   "familyManagementBannerSubtitle": "Dạy trẻ cách quản lý chi tiêu thông minh từ hôm nay.",
+  "familyManagementSectionFamily": "GIA ĐÌNH CỦA BẠN",
+  "familyManagementFamilyName": "Gia đình {host}",
+  "@familyManagementFamilyName": {
+    "placeholders": { "host": {} }
+  },
+  "familyManagementFamilyCardSubtitle": "Host family • Chủ sở hữu",
+  "familyManagementSectionMembersCount": "THÀNH VIÊN GIA ĐÌNH ({count})",
+  "@familyManagementSectionMembersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "familyManagementRoleHost": "Ba/Mẹ • Host",
+  "familyManagementRoleParent": "Ba/Mẹ",
+  "familyManagementRoleChild": "Con cái",
+  "familyManagementYouSuffix": " (Bạn)",
+  "familyManagementUnlinkSheetTitle": "Hủy liên kết với {name}",
+  "@familyManagementUnlinkSheetTitle": {
+    "placeholders": { "name": {} }
+  },
+  "familyManagementUnlinkSheetDesc": "Bạn có chắc chắn muốn hủy liên kết với {name} khỏi gia đình không?",
+  "@familyManagementUnlinkSheetDesc": {
+    "placeholders": { "name": {} }
+  },
+  "familyManagementUnlinkSheetConfirm": "Xác nhận",
+  "familyManagementUnlinkSheetCancel": "Hủy bỏ",
   "notificationSettingsTitle": "Thông báo",
   "notificationSettingsDailySection": "THÔNG BÁO HÀNG NGÀY",
   "notificationSettingsEnableLabel": "Bật thông báo",

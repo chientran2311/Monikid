@@ -7,7 +7,7 @@ part of 'parent_category_transactions_provider.dart';
 // **************************************************************************
 
 String _$parentCategoryTransactionsNotifierHash() =>
-    r'623924f0e4955c3f661a301879ddff2089ad96dd';
+    r'211078ea1ea8093aef5e9d1778613a3174e5ba41';
 
 /// See also [ParentCategoryTransactionsNotifier].
 @ProviderFor(ParentCategoryTransactionsNotifier)

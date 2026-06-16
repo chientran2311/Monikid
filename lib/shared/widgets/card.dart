@@ -35,7 +35,7 @@ class Card extends StatelessWidget {
         children: [
           Text(
             'Total Balance',
-            style: context.typo.text.medium.copyWith(color: AppTheme.textGrey),
+            style: context.typo.body.medium.copyWith(color: AppTheme.textGrey),
           ),
           const SizedBox(height: 8),
           Row(
@@ -43,7 +43,7 @@ class Card extends StatelessWidget {
             children: [
               Text(
                 '\$12,450.00',
-                style: context.typo.amount.medium.copyWith(
+                style: context.typo.display.medium.copyWith(
                   color: AppTheme.textWhite,
                 ),
               ),

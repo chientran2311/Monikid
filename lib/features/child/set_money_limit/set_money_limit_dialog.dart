@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +8,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_provider.dart';
 import 'package:monikid/features/child/set_money_limit/set_money_limit_state.dart';
+import 'package:monikid/shared/widgets/amount_input_box.dart';
 import 'package:monikid/shared/widgets/primary_button.dart';
 
 Future<void> showSetMoneyLimitDialog(BuildContext context, WidgetRef ref) async {
@@ -32,8 +32,6 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
     final isManagedByParent =
         ref.watch(authSessionProvider).account?.familyId != null;
     final amountController = useTextEditingController(text: state.amountInput);
-    final focusNode = useFocusNode();
-    final hasFocus = useState(false);
     final errorText = _buildErrorText(context, state.validationError);
     final screenSize = MediaQuery.sizeOf(context);
     final dialogMaxWidth =
@@ -47,12 +45,6 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
       );
       return null;
     }, [state.amountInput, amountController]);
-
-    useEffect(() {
-      void listener() => hasFocus.value = focusNode.hasFocus;
-      focusNode.addListener(listener);
-      return () => focusNode.removeListener(listener);
-    }, [focusNode]);
 
     final hasError = errorText != null;
 
@@ -140,113 +132,15 @@ class SetMoneyLimitDialog extends HookConsumerWidget {
                       ),
                       SizedBox(height: 10.h),
                     ],
-                    Text(
-                      s.setMoneyLimitFieldLabel.toUpperCase(),
-                      style: context.typo.caption.big.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.72,
-                        color: AppTheme.textGrey,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      curve: Curves.ease,
-                      constraints: BoxConstraints(minHeight: 80.h),
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      decoration: BoxDecoration(
-                        color: hasError
-                            ? AppTheme.dangerSurface
-                            : isDark
-                                ? AppTheme.darkSurfaceVariant
-                                : AppTheme.surfaceVeryLight,
-                        border: Border.all(
-                          color: hasError
-                              ? AppTheme.redAlert
-                              : hasFocus.value
-                                  ? AppTheme.primary.withValues(alpha: 0.5)
-                                  : isDark
-                                      ? AppTheme.borderDark
-                                      : AppTheme.borderLight,
-                          width: 1.5,
-                        ),
-                        borderRadius: BorderRadius.circular(18.r),
-                        boxShadow: hasError
-                            ? [
-                                BoxShadow(
-                                  spreadRadius: 4.r,
-                                  color: AppTheme.redAlert.withValues(
-                                    alpha: 0.12,
-                                  ),
-                                ),
-                              ]
-                            : hasFocus.value
-                            ? [
-                                BoxShadow(
-                                  spreadRadius: 4.r,
-                                  color: AppTheme.primary.withValues(
-                                    alpha: 0.12,
-                                  ),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: amountController,
-                              focusNode: focusNode,
-                              autofocus: !isManagedByParent,
-                              enabled: !isManagedByParent,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              style: context.typo.display.small.copyWith(
-                                color: AppTheme.primary,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.8,
-                              ),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                focusedErrorBorder: InputBorder.none,
-                                hintText: '0',
-                                hintStyle: context.typo.display.small.copyWith(
-                                  color: isDark
-                                      ? AppTheme.borderDark
-                                      : AppTheme.borderLight,
-                                  letterSpacing: -0.8,
-                                ),
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 16.h),
-                              ),
-                              onChanged: notifier.updateAmountInput,
-                            ),
-                          ),
-                          Text(
-                            'đ',
-                            style: context.typo.subtitle.small.copyWith(
-                              color: AppTheme.primary,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      hasError ? errorText : s.setMoneyLimitDescription,
-                      style: context.typo.caption.big.copyWith(
-                        color: hasError ? AppTheme.redAlert : AppTheme.textGrey,
-                        height: 1.45,
-                      ),
+                    AmountInputBox(
+                      controller: amountController,
+                      label: s.setMoneyLimitFieldLabel.toUpperCase(),
+                      helperText:
+                          hasError ? errorText : s.setMoneyLimitDescription,
+                      hasError: hasError,
+                      enabled: !isManagedByParent,
+                      autofocus: !isManagedByParent,
+                      onChanged: notifier.updateAmountInput,
                     ),
                   ],
                 ),

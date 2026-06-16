@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
+import 'package:monikid/features/transaction/transaction_type.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/child_statistic/statistic_repository.dart';
 
@@ -22,12 +23,14 @@ class ParentChildOverview {
     required this.prevTotalExpenseMinor,
     required this.dailyData,
     required this.topCategories,
+    required this.topIncomeCategories,
   });
 
   final int totalExpenseMinor;
   final int prevTotalExpenseMinor;
   final List<StatisticDailyExpenseData> dailyData;
   final List<StatisticCategoryData> topCategories;
+  final List<StatisticCategoryData> topIncomeCategories;
 
   double get percentChange {
     if (prevTotalExpenseMinor == 0) return 0.0;
@@ -50,6 +53,7 @@ abstract class ParentStatisticRepository {
   Future<ParentChildOverview> getChildOverview({
     required String childUid,
     required DateTime anchorDate,
+    required int selectedTabIndex,
   });
 
   Future<List<TransactionModel>> getChildTransactionsByCategory({
@@ -57,6 +61,7 @@ abstract class ParentStatisticRepository {
     required String categoryKey,
     required int selectedTabIndex,
     required DateTime anchorDate,
+    TransactionType transactionType = TransactionType.expense,
   });
 
   Future<TransactionModel?> getChildTransactionById({
@@ -95,42 +100,54 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
   Future<ParentChildOverview> getChildOverview({
     required String childUid,
     required DateTime anchorDate,
+    required int selectedTabIndex,
   }) async {
-    const monthMode = 1;
     final currentRange = statisticGetPeriodRange(
-      selectedTabIndex: monthMode,
+      selectedTabIndex: selectedTabIndex,
       anchorDate: anchorDate,
     );
     final previousRange = statisticGetPreviousPeriodRange(
-      selectedTabIndex: monthMode,
+      selectedTabIndex: selectedTabIndex,
       anchorDate: anchorDate,
     );
-    final currentMonthKey = DateFormat('yyyy-MM').format(anchorDate);
+    // Monthly summaries only exist for month mode; other periods compute totals
+    // straight from transactions (mirrors the child statistic repository).
+    final currentMonthKey = DateFormat('yyyy-MM').format(currentRange.start);
 
     _logger.i(
       'ParentStatisticRepository: loading overview for child=$childUid '
-      'month=$currentMonthKey.',
+      'mode=$selectedTabIndex month=$currentMonthKey.',
     );
 
     try {
       final results = await Future.wait<Object?>([
         _fetchExpenses(childUid, currentRange),
         _fetchExpenses(childUid, previousRange),
-        _fetchSummary(childUid, currentMonthKey),
+        selectedTabIndex == 1
+            ? _fetchSummary(childUid, currentMonthKey)
+            : Future<Map<String, dynamic>?>.value(null),
+        _fetchIncome(childUid, currentRange),
       ]);
 
       final currentTransactions = results[0]! as List<TransactionModel>;
       final previousTransactions = results[1]! as List<TransactionModel>;
       final summaryData = results[2] as Map<String, dynamic>?;
+      final incomeTransactions = results[3]! as List<TransactionModel>;
 
       final overview = buildStatisticPeriodOverview(
         range: currentRange,
         transactions: currentTransactions,
         previousTransactions: previousTransactions,
+        incomeTransactions: incomeTransactions,
         summaryData: summaryData,
       );
 
       final topCategories = (overview.categories.toList()
+            ..sort((a, b) => b.amountMinor.compareTo(a.amountMinor)))
+          .take(5)
+          .toList(growable: false);
+
+      final topIncomeCategories = (overview.incomeCategories.toList()
             ..sort((a, b) => b.amountMinor.compareTo(a.amountMinor)))
           .take(5)
           .toList(growable: false);
@@ -140,6 +157,7 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
         prevTotalExpenseMinor: _sumExpenses(previousTransactions),
         dailyData: overview.dailyExpenses,
         topCategories: topCategories,
+        topIncomeCategories: topIncomeCategories,
       );
     } catch (error, stackTrace) {
       _logger.e(
@@ -157,6 +175,7 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
     required String categoryKey,
     required int selectedTabIndex,
     required DateTime anchorDate,
+    TransactionType transactionType = TransactionType.expense,
   }) async {
     final range = statisticGetPeriodRange(
       selectedTabIndex: selectedTabIndex,
@@ -170,7 +189,7 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
 
     try {
       final snapshot = await _transactionsOfChild(childUid)
-          .where('type', isEqualTo: 'expense')
+          .where('type', isEqualTo: transactionType.value)
           .where('category_id', isEqualTo: categoryKey)
           .where(
             'transaction_date',
@@ -229,6 +248,23 @@ class ParentStatisticRepositoryImpl implements ParentStatisticRepository {
   ) async {
     final snapshot = await _transactionsOfChild(childUid)
         .where('type', isEqualTo: 'expense')
+        .where(
+          'transaction_date',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),
+        )
+        .where('transaction_date', isLessThanOrEqualTo: Timestamp.fromDate(range.end))
+        .orderBy('transaction_date', descending: true)
+        .get();
+
+    return snapshot.docs.map(_mapTransaction).toList(growable: false);
+  }
+
+  Future<List<TransactionModel>> _fetchIncome(
+    String childUid,
+    StatisticDateRange range,
+  ) async {
+    final snapshot = await _transactionsOfChild(childUid)
+        .where('type', isEqualTo: 'income')
         .where(
           'transaction_date',
           isGreaterThanOrEqualTo: Timestamp.fromDate(range.start),

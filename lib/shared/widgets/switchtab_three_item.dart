@@ -24,6 +24,7 @@ class SwitchTabThreeItem extends StatelessWidget {
     required this.title3,
     required this.selectedIndex,
     required this.onChanged,
+    this.onGlassBackground = false,
   });
 
   final String title1;
@@ -34,11 +35,20 @@ class SwitchTabThreeItem extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onChanged;
 
+  /// When true, renders a translucent "glass" track tuned for colored
+  /// backgrounds (e.g. parent's green AppBackground). Default keeps the
+  /// existing opaque track used on white screens.
+  final bool onGlassBackground;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final trackColor = isDark ? AppTheme.surfaceVariant : AppTheme.controlTrack;
+    final trackColor = isDark
+        ? AppTheme.surfaceVariant
+        : onGlassBackground
+            ? Colors.white.withValues(alpha: 0.45)
+            : AppTheme.controlTrack;
     final pillColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
 
     return Container(
@@ -47,6 +57,9 @@ class SwitchTabThreeItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: trackColor,
         borderRadius: BorderRadius.circular(14.r),
+        border: onGlassBackground && !isDark
+            ? Border.all(color: Colors.white.withValues(alpha: 0.6))
+            : null,
       ),
       child: LayoutBuilder(
         builder: (_, constraints) {

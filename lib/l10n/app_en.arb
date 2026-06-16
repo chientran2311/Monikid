@@ -61,6 +61,7 @@
   "homeParInviteTitle": "Invite Member",
   "homeParInviteDesc": "Share this code with your child or family member to join your MoniKid family.",
   "homeParInviteCodeLabel": "Link Code",
+  "homeParInviteCodeLoadError": "Couldn't load the invite code. Please try again.",
   "homeParCopyCode": "Copy Code",
   "homeParCodeCopied": "Copied!",
   "homeParManageMembers": "Manage",
@@ -321,6 +322,33 @@
   "parentStatisticPrevPeriodLabel": "PREV PERIOD",
   "parentStatisticTrendGood": "Good",
   "parentStatisticTrendBad": "Bad",
+  "parentStatisticHeatmapTitle": "Spending Calendar",
+  "parentStatisticHeatmapNoData": "No data for this period",
+  "parentStatisticTopCategoryTitle": "Top Category",
+  "parentStatisticTopCategorySubtitle": "Top spending",
+  "parentStatisticTopCategoryShare": "{percent}% of total",
+  "@parentStatisticTopCategoryShare": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "parentStatisticBalanceTitle": "Balance",
+  "parentStatisticBalanceIncome": "Income",
+  "parentStatisticBalanceExpense": "Expense",
+  "parentStatisticInsightsAvgPerDay": "Avg / day",
+  "parentStatisticInsightsPeakDay": "Peak day",
+  "parentStatisticInsightsStreak": "Spend streak",
+  "parentStatisticInsightsStreakDays": "{days}d",
+  "@parentStatisticInsightsStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "parentStatisticInsightsNoPeak": "—",
   "parentStatisticEditedBadge": "Edited",
   "settingParTitle": "Settings",
   "settingParEditProfile": "Edit profile",
@@ -615,6 +643,7 @@
     }
   },
   "statisticTrendIncrease": "Biggest increase",
+  "statisticTopBadge": "Top",
   "statisticTrendDecrease": "Decrease",
   "statisticTrendStable": "Stable",
   "statisticNoDataTitle": "No spending data yet",
@@ -770,6 +799,30 @@
   "familyManagementRemoveLimitError": "Error removing limit",
   "familyManagementBannerTitle": "Building a future together",
   "familyManagementBannerSubtitle": "Teach your children to manage money wisely from today.",
+  "familyManagementSectionFamily": "YOUR FAMILY",
+  "familyManagementFamilyName": "{host}'s family",
+  "@familyManagementFamilyName": {
+    "placeholders": { "host": {} }
+  },
+  "familyManagementFamilyCardSubtitle": "Host family • Owner",
+  "familyManagementSectionMembersCount": "FAMILY MEMBERS ({count})",
+  "@familyManagementSectionMembersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "familyManagementRoleHost": "Parent • Host",
+  "familyManagementRoleParent": "Parent",
+  "familyManagementRoleChild": "Child",
+  "familyManagementYouSuffix": " (You)",
+  "familyManagementUnlinkSheetTitle": "Unlink {name}",
+  "@familyManagementUnlinkSheetTitle": {
+    "placeholders": { "name": {} }
+  },
+  "familyManagementUnlinkSheetDesc": "Are you sure you want to unlink {name} from the family?",
+  "@familyManagementUnlinkSheetDesc": {
+    "placeholders": { "name": {} }
+  },
+  "familyManagementUnlinkSheetConfirm": "Confirm",
+  "familyManagementUnlinkSheetCancel": "Cancel",
   "notificationSettingsTitle": "Notifications",
   "notificationSettingsDailySection": "DAILY NOTIFICATIONS",
   "notificationSettingsEnableLabel": "Enable notifications",

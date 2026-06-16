@@ -63,7 +63,7 @@ class FamilyManagementNotifier extends _$FamilyManagementNotifier {
 
       await _membersSubscription?.cancel();
       _membersSubscription = _linkFamilyRepo
-          .watchFamilyMembers(familyId)
+          .watchFamilyMembersEnriched(familyId)
           .listen((membersList) {
         state = state.copyWith(members: membersList);
         _loadMonthlyLimitsForChildren();

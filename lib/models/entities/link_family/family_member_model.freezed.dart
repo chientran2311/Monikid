@@ -16,7 +16,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FamilyMemberModel {
 
- String get uid; String get role; String get userRole; String get displayName; String? get avatarUrl;
+ String get uid; String get familyRole;// 'host' | 'member'
+ String get userRole;// 'parent' | 'child'
+ String get displayName;// runtime-enriched (parent only)
+ String? get avatarUrl;
 /// Create a copy of FamilyMemberModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +32,16 @@ $FamilyMemberModelCopyWith<FamilyMemberModel> get copyWith => _$FamilyMemberMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyMemberModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.role, role) || other.role == role)&&(identical(other.userRole, userRole) || other.userRole == userRole)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyMemberModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.familyRole, familyRole) || other.familyRole == familyRole)&&(identical(other.userRole, userRole) || other.userRole == userRole)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,role,userRole,displayName,avatarUrl);
+int get hashCode => Object.hash(runtimeType,uid,familyRole,userRole,displayName,avatarUrl);
 
 @override
 String toString() {
-  return 'FamilyMemberModel(uid: $uid, role: $role, userRole: $userRole, displayName: $displayName, avatarUrl: $avatarUrl)';
+  return 'FamilyMemberModel(uid: $uid, familyRole: $familyRole, userRole: $userRole, displayName: $displayName, avatarUrl: $avatarUrl)';
 }
 
 
@@ -49,7 +52,7 @@ abstract mixin class $FamilyMemberModelCopyWith<$Res>  {
   factory $FamilyMemberModelCopyWith(FamilyMemberModel value, $Res Function(FamilyMemberModel) _then) = _$FamilyMemberModelCopyWithImpl;
 @useResult
 $Res call({
- String uid, String role, String userRole, String displayName, String? avatarUrl
+ String uid, String familyRole, String userRole, String displayName, String? avatarUrl
 });
 
 
@@ -66,10 +69,10 @@ class _$FamilyMemberModelCopyWithImpl<$Res>
 
 /// Create a copy of FamilyMemberModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? role = null,Object? userRole = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? familyRole = null,Object? userRole = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
   return _then(_self.copyWith(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,familyRole: null == familyRole ? _self.familyRole : familyRole // ignore: cast_nullable_to_non_nullable
 as String,userRole: null == userRole ? _self.userRole : userRole // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
@@ -84,13 +87,16 @@ as String?,
 @JsonSerializable()
 
 class _FamilyMemberModel extends FamilyMemberModel {
-  const _FamilyMemberModel({required this.uid, this.role = 'member', this.userRole = 'child', this.displayName = '', this.avatarUrl}): super._();
+  const _FamilyMemberModel({required this.uid, this.familyRole = 'member', this.userRole = 'child', this.displayName = '', this.avatarUrl}): super._();
   factory _FamilyMemberModel.fromJson(Map<String, dynamic> json) => _$FamilyMemberModelFromJson(json);
 
 @override final  String uid;
-@override@JsonKey() final  String role;
+@override@JsonKey() final  String familyRole;
+// 'host' | 'member'
 @override@JsonKey() final  String userRole;
+// 'parent' | 'child'
 @override@JsonKey() final  String displayName;
+// runtime-enriched (parent only)
 @override final  String? avatarUrl;
 
 /// Create a copy of FamilyMemberModel
@@ -106,16 +112,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyMemberModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.role, role) || other.role == role)&&(identical(other.userRole, userRole) || other.userRole == userRole)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyMemberModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.familyRole, familyRole) || other.familyRole == familyRole)&&(identical(other.userRole, userRole) || other.userRole == userRole)&&(identical(other.displayName, displayName) || other.displayName == displayName)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,role,userRole,displayName,avatarUrl);
+int get hashCode => Object.hash(runtimeType,uid,familyRole,userRole,displayName,avatarUrl);
 
 @override
 String toString() {
-  return 'FamilyMemberModel(uid: $uid, role: $role, userRole: $userRole, displayName: $displayName, avatarUrl: $avatarUrl)';
+  return 'FamilyMemberModel(uid: $uid, familyRole: $familyRole, userRole: $userRole, displayName: $displayName, avatarUrl: $avatarUrl)';
 }
 
 
@@ -126,7 +132,7 @@ abstract mixin class _$FamilyMemberModelCopyWith<$Res> implements $FamilyMemberM
   factory _$FamilyMemberModelCopyWith(_FamilyMemberModel value, $Res Function(_FamilyMemberModel) _then) = __$FamilyMemberModelCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String role, String userRole, String displayName, String? avatarUrl
+ String uid, String familyRole, String userRole, String displayName, String? avatarUrl
 });
 
 
@@ -143,10 +149,10 @@ class __$FamilyMemberModelCopyWithImpl<$Res>
 
 /// Create a copy of FamilyMemberModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? role = null,Object? userRole = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? familyRole = null,Object? userRole = null,Object? displayName = null,Object? avatarUrl = freezed,}) {
   return _then(_FamilyMemberModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,familyRole: null == familyRole ? _self.familyRole : familyRole // ignore: cast_nullable_to_non_nullable
 as String,userRole: null == userRole ? _self.userRole : userRole // ignore: cast_nullable_to_non_nullable
 as String,displayName: null == displayName ? _self.displayName : displayName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable

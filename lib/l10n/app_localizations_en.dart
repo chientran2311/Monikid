@@ -195,6 +195,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeParInviteCodeLabel => 'Link Code';
 
   @override
+  String get homeParInviteCodeLoadError =>
+      'Couldn\'t load the invite code. Please try again.';
+
+  @override
   String get homeParCopyCode => 'Copy Code';
 
   @override
@@ -913,6 +917,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentStatisticTrendBad => 'Bad';
 
   @override
+  String get parentStatisticHeatmapTitle => 'Spending Calendar';
+
+  @override
+  String get parentStatisticHeatmapNoData => 'No data for this period';
+
+  @override
+  String get parentStatisticTopCategoryTitle => 'Top Category';
+
+  @override
+  String get parentStatisticTopCategorySubtitle => 'Top spending';
+
+  @override
+  String parentStatisticTopCategoryShare(String percent) {
+    return '$percent% of total';
+  }
+
+  @override
+  String get parentStatisticBalanceTitle => 'Balance';
+
+  @override
+  String get parentStatisticBalanceIncome => 'Income';
+
+  @override
+  String get parentStatisticBalanceExpense => 'Expense';
+
+  @override
+  String get parentStatisticInsightsAvgPerDay => 'Avg / day';
+
+  @override
+  String get parentStatisticInsightsPeakDay => 'Peak day';
+
+  @override
+  String get parentStatisticInsightsStreak => 'Spend streak';
+
+  @override
+  String parentStatisticInsightsStreakDays(int days) {
+    return '${days}d';
+  }
+
+  @override
+  String get parentStatisticInsightsNoPeak => '—';
+
+  @override
   String get parentStatisticEditedBadge => 'Edited';
 
   @override
@@ -1470,6 +1517,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statisticTrendIncrease => 'Biggest increase';
 
   @override
+  String get statisticTopBadge => 'Top';
+
+  @override
   String get statisticTrendDecrease => 'Decrease';
 
   @override
@@ -1883,6 +1933,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get familyManagementBannerSubtitle =>
       'Teach your children to manage money wisely from today.';
+
+  @override
+  String get familyManagementSectionFamily => 'YOUR FAMILY';
+
+  @override
+  String familyManagementFamilyName(Object host) {
+    return '$host\'s family';
+  }
+
+  @override
+  String get familyManagementFamilyCardSubtitle => 'Host family • Owner';
+
+  @override
+  String familyManagementSectionMembersCount(int count) {
+    return 'FAMILY MEMBERS ($count)';
+  }
+
+  @override
+  String get familyManagementRoleHost => 'Parent • Host';
+
+  @override
+  String get familyManagementRoleParent => 'Parent';
+
+  @override
+  String get familyManagementRoleChild => 'Child';
+
+  @override
+  String get familyManagementYouSuffix => ' (You)';
+
+  @override
+  String familyManagementUnlinkSheetTitle(Object name) {
+    return 'Unlink $name';
+  }
+
+  @override
+  String familyManagementUnlinkSheetDesc(Object name) {
+    return 'Are you sure you want to unlink $name from the family?';
+  }
+
+  @override
+  String get familyManagementUnlinkSheetConfirm => 'Confirm';
+
+  @override
+  String get familyManagementUnlinkSheetCancel => 'Cancel';
 
   @override
   String get notificationSettingsTitle => 'Notifications';

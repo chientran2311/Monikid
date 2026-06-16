@@ -18,12 +18,12 @@ class HomeSummaryCard extends StatelessWidget {
   final int expenseMinor;
   final int limitMinor;
 
-  String _formatAmount(int minor) {
+  String _formatAmount(int amount) {
     final formatted = NumberFormat.currency(
       locale: 'vi_VN',
       symbol: '',
       decimalDigits: 0,
-    ).format(minor / 100);
+    ).format(amount);
     return '${formatted.trim()}đ';
   }
 
@@ -157,10 +157,15 @@ class HomeSummaryCard extends StatelessWidget {
                                   child: Container(
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [
-                                          AppTheme.primary.withValues(alpha: 0.7),
-                                          AppTheme.primary,
-                                        ],
+                                        colors: ratio >= 1.0
+                                            ? [
+                                                AppTheme.redMedium.withValues(alpha: 0.8),
+                                                AppTheme.redDark,
+                                              ]
+                                            : [
+                                                AppTheme.primary.withValues(alpha: 0.7),
+                                                AppTheme.primary,
+                                              ],
                                       ),
                                     ),
                                   ),

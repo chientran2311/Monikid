@@ -7,11 +7,11 @@ class LegendItem extends StatelessWidget {
   final Color textSubColor;
 
   const LegendItem({
-    Key? key,
+    super.key,
     required this.label,
     required this.color,
     required this.textSubColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

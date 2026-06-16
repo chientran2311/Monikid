@@ -422,6 +422,12 @@ abstract class AppLocalizations {
   /// **'Link Code'**
   String get homeParInviteCodeLabel;
 
+  /// No description provided for @homeParInviteCodeLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the invite code. Please try again.'**
+  String get homeParInviteCodeLoadError;
+
   /// No description provided for @homeParCopyCode.
   ///
   /// In en, this message translates to:
@@ -1730,6 +1736,84 @@ abstract class AppLocalizations {
   /// **'Bad'**
   String get parentStatisticTrendBad;
 
+  /// No description provided for @parentStatisticHeatmapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Calendar'**
+  String get parentStatisticHeatmapTitle;
+
+  /// No description provided for @parentStatisticHeatmapNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data for this period'**
+  String get parentStatisticHeatmapNoData;
+
+  /// No description provided for @parentStatisticTopCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Category'**
+  String get parentStatisticTopCategoryTitle;
+
+  /// No description provided for @parentStatisticTopCategorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Top spending'**
+  String get parentStatisticTopCategorySubtitle;
+
+  /// No description provided for @parentStatisticTopCategoryShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of total'**
+  String parentStatisticTopCategoryShare(String percent);
+
+  /// No description provided for @parentStatisticBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get parentStatisticBalanceTitle;
+
+  /// No description provided for @parentStatisticBalanceIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get parentStatisticBalanceIncome;
+
+  /// No description provided for @parentStatisticBalanceExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get parentStatisticBalanceExpense;
+
+  /// No description provided for @parentStatisticInsightsAvgPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg / day'**
+  String get parentStatisticInsightsAvgPerDay;
+
+  /// No description provided for @parentStatisticInsightsPeakDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak day'**
+  String get parentStatisticInsightsPeakDay;
+
+  /// No description provided for @parentStatisticInsightsStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Spend streak'**
+  String get parentStatisticInsightsStreak;
+
+  /// No description provided for @parentStatisticInsightsStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d'**
+  String parentStatisticInsightsStreakDays(int days);
+
+  /// No description provided for @parentStatisticInsightsNoPeak.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get parentStatisticInsightsNoPeak;
+
   /// No description provided for @parentStatisticEditedBadge.
   ///
   /// In en, this message translates to:
@@ -2748,6 +2832,12 @@ abstract class AppLocalizations {
   /// **'Biggest increase'**
   String get statisticTrendIncrease;
 
+  /// No description provided for @statisticTopBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Top'**
+  String get statisticTopBadge;
+
   /// No description provided for @statisticTrendDecrease.
   ///
   /// In en, this message translates to:
@@ -3509,6 +3599,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Teach your children to manage money wisely from today.'**
   String get familyManagementBannerSubtitle;
+
+  /// No description provided for @familyManagementSectionFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR FAMILY'**
+  String get familyManagementSectionFamily;
+
+  /// No description provided for @familyManagementFamilyName.
+  ///
+  /// In en, this message translates to:
+  /// **'{host}\'s family'**
+  String familyManagementFamilyName(Object host);
+
+  /// No description provided for @familyManagementFamilyCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Host family • Owner'**
+  String get familyManagementFamilyCardSubtitle;
+
+  /// No description provided for @familyManagementSectionMembersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'FAMILY MEMBERS ({count})'**
+  String familyManagementSectionMembersCount(int count);
+
+  /// No description provided for @familyManagementRoleHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent • Host'**
+  String get familyManagementRoleHost;
+
+  /// No description provided for @familyManagementRoleParent.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get familyManagementRoleParent;
+
+  /// No description provided for @familyManagementRoleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get familyManagementRoleChild;
+
+  /// No description provided for @familyManagementYouSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' (You)'**
+  String get familyManagementYouSuffix;
+
+  /// No description provided for @familyManagementUnlinkSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink {name}'**
+  String familyManagementUnlinkSheetTitle(Object name);
+
+  /// No description provided for @familyManagementUnlinkSheetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to unlink {name} from the family?'**
+  String familyManagementUnlinkSheetDesc(Object name);
+
+  /// No description provided for @familyManagementUnlinkSheetConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get familyManagementUnlinkSheetConfirm;
+
+  /// No description provided for @familyManagementUnlinkSheetCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get familyManagementUnlinkSheetCancel;
 
   /// No description provided for @notificationSettingsTitle.
   ///

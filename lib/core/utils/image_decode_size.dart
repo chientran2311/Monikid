@@ -10,7 +10,11 @@ import 'package:flutter/widgets.dart';
 /// [displaySize] is the width (or height) the widget actually paints, in
 /// logical pixels. Pass the box size for fixed widgets (e.g. an avatar `32.r`),
 /// or the screen width for full-width images.
-int decodePixelsFor(BuildContext context, double displaySize) {
+/// Returns null when the resolved size is not yet positive (e.g. ScreenUtil
+/// not initialized, so `.w`/`.r` evaluate to 0). A null cacheWidth disables
+/// resize-on-decode for that frame and avoids the `cacheWidth > 0` assertion.
+int? decodePixelsFor(BuildContext context, double displaySize) {
   final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
-  return (displaySize * devicePixelRatio).ceil();
+  final pixels = (displaySize * devicePixelRatio).ceil();
+  return pixels > 0 ? pixels : null;
 }

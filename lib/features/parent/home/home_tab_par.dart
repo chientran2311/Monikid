@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -13,9 +15,10 @@ import 'package:monikid/features/parent/home/widgets/alert_card.dart';
 import 'package:monikid/features/parent/home/widgets/family_members_section.dart';
 import 'package:monikid/features/parent/home/widgets/home_error_state.dart';
 import 'package:monikid/features/parent/home/widgets/home_summary_card.dart';
-import 'package:monikid/features/parent/home/widgets/home_transaction_row.dart';
+import 'package:monikid/features/child/transaction/widgets/transaction_item.dart';
 import 'package:monikid/features/parent/home/widgets/no_family_empty_state.dart';
 import 'package:monikid/features/parent/home/widgets/parent_home_app_bar.dart';
+import 'package:monikid/features/parent/home/widgets/parent_home_skeleton.dart';
 import 'package:monikid/features/parent/home/widgets/parent_home_section_header.dart';
 import 'package:monikid/repositories/profile/profile_repository.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
@@ -25,7 +28,9 @@ class HomeTabParent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = context.l10n;
+    final logger = getIt<Logger>();
+    logger.d('HomeTabParent.build: start.');
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppTheme.textWhite : AppTheme.homeParFg;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
@@ -43,6 +48,17 @@ class HomeTabParent extends HookConsumerWidget {
               .watch(profileImageProvider(uid))
               .maybeWhen(data: (url) => url, orElse: () => null);
     final resolvedAvatarUrl = profileImageUrl ?? fallbackAvatarUrl;
+    logger.d('HomeTabParent.build: uid=$uid hasAvatar=${resolvedAvatarUrl != null}.');
+
+    // Post-frame diagnostic: fires only if build + layout + paint complete.
+    // If this log never appears for a given status, the freeze is in the
+    // paint phase (e.g. heavy BackdropFilter), not in build logic.
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        logger.i('HomeTabParent: frame rendered. status=${state.status}.');
+      });
+      return null;
+    }, [state.status]);
 
     final animCtrl = useAnimationController(
       duration: const Duration(milliseconds: 700),
@@ -67,26 +83,91 @@ class HomeTabParent extends HookConsumerWidget {
       }
     });
 
-    debugPrint('[HomeTabParent] status=${state.status} isLoading=${state.isLoading} isNoFamily=${state.isNoFamily}');
+    logger.i('HomeTabParent.build: status=${state.status} '
+        'isLoading=${state.isLoading} isNoFamily=${state.isNoFamily} '
+        'members=${state.members.length}.');
 
     Widget scrollBody;
 
-    if (state.isLoading || state.status == ParentHomeStatus.initial) {
-      scrollBody = const Center(child: CircularProgressIndicator());
-    } else if (state.status == ParentHomeStatus.error) {
+    try {
+      if (state.isLoading || state.status == ParentHomeStatus.initial) {
+        logger.d('HomeTabParent.build: → loading branch.');
+        scrollBody = ParentHomeSkeleton(isDark: isDark);
+      } else if (state.status == ParentHomeStatus.error) {
+        logger.d('HomeTabParent.build: → error branch. msg=${state.errorMessage}.');
+        scrollBody = HomeErrorState(
+          isDark: isDark,
+          message: state.errorMessage,
+          onRetry: () => notifier.onInit(),
+        );
+      } else if (state.isNoFamily) {
+        logger.d('HomeTabParent.build: → noFamily branch.');
+        scrollBody = NoFamilyEmptyState(
+          isDark: isDark,
+          isLoading: state.isCreatingFamily,
+          onCreateTap: () => notifier.createFamily(),
+        );
+      } else {
+        logger.d('HomeTabParent.build: → hasFamily branch.');
+        scrollBody = _buildHasFamilyBody(
+          context,
+          ref,
+          state,
+          notifier,
+          animCtrl,
+          uid,
+          isDark,
+          textColor,
+          mutedColor,
+        );
+      }
+    } catch (error, stackTrace) {
+      logger.e(
+        'HomeTabParent.build: failed to build scrollBody. status=${state.status}.',
+        error: error,
+        stackTrace: stackTrace,
+      );
       scrollBody = HomeErrorState(
         isDark: isDark,
-        message: state.errorMessage,
+        message: error.toString(),
         onRetry: () => notifier.onInit(),
       );
-    } else if (state.isNoFamily) {
-      debugPrint('[HomeTabParent] → entering noFamily branch');
-      scrollBody = NoFamilyEmptyState(
-        isDark: isDark,
-        isLoading: state.isCreatingFamily,
-        onCreateTap: () => notifier.createFamily(),
-      );
-    } else {
+    }
+
+    logger.d('HomeTabParent.build: scrollBody ready, returning Scaffold.');
+
+    return Scaffold(
+      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+      body: AppBackground(
+        child: Column(
+          children: [
+            SafeArea(
+              bottom: false,
+              child: ParentHomeAppBar(
+                avatarUrl: resolvedAvatarUrl,
+              ),
+            ),
+            Expanded(child: scrollBody),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHasFamilyBody(
+    BuildContext context,
+    WidgetRef ref,
+    ParentHomeState state,
+    ParentHomeNotifier notifier,
+    AnimationController animCtrl,
+    String? uid,
+    bool isDark,
+    Color textColor,
+    Color mutedColor,
+  ) {
+      final s = context.l10n;
+      final childMembers =
+          state.members.where((m) => m.isChild).toList(growable: false);
       final selectedMemberName = state.selectedMember?.displayName;
       final remaining =
           state.selectedMemberIncomeMinor - state.selectedMemberExpenseMinor;
@@ -94,7 +175,7 @@ class HomeTabParent extends HookConsumerWidget {
           state.selectedMemberIncomeMinor > 0 &&
           remaining < 10000000;
 
-      scrollBody = RefreshIndicator(
+      return RefreshIndicator(
         onRefresh: () async {
           if (uid != null) ref.invalidate(profileImageProvider(uid));
           await notifier.refresh();
@@ -106,9 +187,9 @@ class HomeTabParent extends HookConsumerWidget {
             _fadeSlide(
               FamilyMembersSection(
                 isDark: isDark,
-                members: state.members,
+                members: childMembers,
                 selectedMemberId: state.selectedMemberId,
-                inviteCode: state.family?.inviteCode ?? '',
+                familyId: state.family?.familyId ?? '',
                 onMemberTap: notifier.selectMember,
               ),
               0.1,
@@ -122,7 +203,7 @@ class HomeTabParent extends HookConsumerWidget {
                   isDark: isDark,
                   isLoading: state.isLoadingMemberData,
                   expenseMinor: state.selectedMemberExpenseMinor,
-                  limitMinor: state.selectedMemberIncomeMinor,
+                  limitMinor: state.selectedMemberLimitMinor,
                 ),
               ),
               0.2,
@@ -183,11 +264,9 @@ class HomeTabParent extends HookConsumerWidget {
               ...state.selectedMemberTransactions.asMap().entries.map((e) {
                 return _fadeSlide(
                   Padding(
-                    padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 10.h),
-                    child: HomeTransactionRow(
-                      tx: e.value,
-                      isDark: isDark,
-                      memberName: selectedMemberName,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: TransactionItem(
+                      transaction: e.value,
                     ),
                   ),
                   (0.35 + e.key * 0.05).clamp(0.0, 0.9),
@@ -198,24 +277,6 @@ class HomeTabParent extends HookConsumerWidget {
           ],
         ),
       );
-    }
-
-    return Scaffold(
-      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
-      body: AppBackground(
-        child: Column(
-          children: [
-            SafeArea(
-              bottom: false,
-              child: ParentHomeAppBar(
-                avatarUrl: resolvedAvatarUrl,
-              ),
-            ),
-            Expanded(child: scrollBody),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _fadeSlide(

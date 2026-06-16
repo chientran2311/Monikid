@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/parent/statistic/category_transactions/parent_category_transactions_state.dart';
 import 'package:monikid/features/parent/statistic/parent_statistic_state.dart';
+import 'package:monikid/features/transaction/transaction_type.dart';
 import 'package:monikid/repositories/parent_statistic/parent_statistic_repository.dart';
 
 part 'parent_category_transactions_provider.g.dart';
@@ -25,6 +26,7 @@ class ParentCategoryTransactionsNotifier
     required String childUid,
     required String categoryKey,
     required ParentStatisticPeriod period,
+    TransactionType transactionType = TransactionType.expense,
   }) async {
     if (childUid.isEmpty || categoryKey.isEmpty) {
       state = const ParentCategoryTransactionsState(
@@ -42,8 +44,9 @@ class ParentCategoryTransactionsNotifier
       final transactions = await _repository.getChildTransactionsByCategory(
         childUid: childUid,
         categoryKey: categoryKey,
-        selectedTabIndex: period == ParentStatisticPeriod.week ? 0 : 1,
+        selectedTabIndex: period.index,
         anchorDate: DateTime.now(),
+        transactionType: transactionType,
       );
 
       state = state.copyWith(

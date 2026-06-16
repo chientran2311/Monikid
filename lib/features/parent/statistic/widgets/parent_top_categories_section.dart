@@ -13,18 +13,23 @@ class ParentTopCategoriesSection extends StatelessWidget {
   const ParentTopCategoriesSection({
     super.key,
     required this.isDark,
+    required this.title,
     required this.categories,
+    this.isExpense = true,
     this.onItemTap,
   });
 
   final bool isDark;
+  final String title;
   final List<StatisticCategoryData> categories;
+
+  /// Expense lists highlight the #1 rank in danger red; income lists in the
+  /// app's primary green.
+  final bool isExpense;
   final ValueChanged<StatisticCategoryData>? onItemTap;
 
   @override
   Widget build(BuildContext context) {
-    final s = context.l10n;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -33,7 +38,7 @@ class ParentTopCategoriesSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              s.parentStatisticTrendTitle,
+              title,
               style: context.typo.title.medium.copyWith(
                 fontWeight: FontWeight.w800,
                 color: isDark ? Colors.white : AppTheme.textBlack,
@@ -45,7 +50,8 @@ class ParentTopCategoriesSection extends StatelessWidget {
         if (categories.isEmpty)
           _EmptyState(isDark: isDark)
         else
-          // HTML .trend-list { gap: 10px } — each item is a separate card
+          // HTML .trend-list { gap: 10px } — each item is a separate card.
+          // Only the #1 category (first item) is highlighted.
           Column(
             children: List.generate(categories.length, (i) {
               return Padding(
@@ -55,7 +61,11 @@ class ParentTopCategoriesSection extends StatelessWidget {
                 child: _CategoryCard(
                   item: categories[i],
                   isDark: isDark,
-                  onTap: onItemTap != null ? () => onItemTap!(categories[i]) : null,
+                  isTopRank: i == 0,
+                  isExpense: isExpense,
+                  onTap: onItemTap != null
+                      ? () => onItemTap!(categories[i])
+                      : null,
                 ),
               );
             }),
@@ -95,11 +105,15 @@ class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
     required this.item,
     required this.isDark,
+    required this.isTopRank,
+    required this.isExpense,
     this.onTap,
   });
 
   final StatisticCategoryData item;
   final bool isDark;
+  final bool isTopRank;
+  final bool isExpense;
   final VoidCallback? onTap;
 
   @override
@@ -116,6 +130,10 @@ class _CategoryCard extends StatelessWidget {
     final mutedColor = isDark
         ? AppTheme.textMuted
         : AppTheme.textBlack.withValues(alpha: 0.45);
+    // #1 rank highlight: expense → danger red, income → primary green.
+    final topRankColor = isExpense ? AppTheme.redAlert : AppTheme.primary;
+    final effectiveBorderColor = isTopRank ? topRankColor : borderColor;
+    final borderWidth = isTopRank ? 1.5 : 1.0;
 
     return InkWell(
       onTap: onTap,
@@ -125,7 +143,7 @@ class _CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(24.r),
-          border: Border.all(color: borderColor),
+          border: Border.all(color: effectiveBorderColor, width: borderWidth),
           boxShadow: [
             BoxShadow(
               color: AppTheme.primary.withValues(alpha: isDark ? 0.0 : 0.06),
@@ -156,15 +174,25 @@ class _CategoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    item.categoryLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.typo.body.medium.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: textColor,
-                      fontSize: 14.sp,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          item.categoryLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.typo.body.medium.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: textColor,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                      ),
+                      if (isTopRank) ...[
+                        SizedBox(width: 6.w),
+                        _TopBadge(isExpense: isExpense),
+                      ],
+                    ],
                   ),
                   SizedBox(height: 2.h),
                   Text(
@@ -179,14 +207,24 @@ class _CategoryCard extends StatelessWidget {
                 ],
               ),
             ),
-            // HTML .trend-amount { font-size:15, weight:900 }
-            Text(
-              context.formatStatisticCompactCurrency(item.amountMinor),
-              style: context.typo.body.medium.copyWith(
-                fontWeight: FontWeight.w900,
-                color: textColor,
-                fontSize: 15.sp,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // HTML .trend-amount { font-size:15, weight:900 }
+                Text(
+                  context.formatStatisticCompactCurrency(item.amountMinor),
+                  style: context.typo.body.medium.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: textColor,
+                    fontSize: 15.sp,
+                  ),
+                ),
+                if (_hasComparablePercent(item)) ...[
+                  SizedBox(height: 4.h),
+                  _TrendPill(item: item, isDark: isDark),
+                ],
+              ],
             ),
             SizedBox(width: 4.w),
             Icon(
@@ -205,5 +243,90 @@ class _CategoryCard extends StatelessWidget {
     final colors = statisticAllocationColors;
     final base = colors[item.categoryKey.hashCode.abs() % colors.length];
     return base.withValues(alpha: 0.15);
+  }
+
+  bool _hasComparablePercent(StatisticCategoryData item) {
+    return item.changePercent != null &&
+        (item.trendDirection == StatisticTrendDirection.up ||
+            item.trendDirection == StatisticTrendDirection.down);
+  }
+}
+
+class _TrendPill extends StatelessWidget {
+  const _TrendPill({required this.item, required this.isDark});
+
+  final StatisticCategoryData item;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final direction = item.trendDirection;
+    final color = statisticTrendColor(direction);
+    final surface = statisticTrendSurfaceColor(direction, isDark: isDark);
+    final isUp = direction == StatisticTrendDirection.up;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isUp ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+            size: 14.r,
+            color: color,
+          ),
+          Text(
+            '${item.changePercent!.toStringAsFixed(0)}%',
+            style: context.typo.caption.small.copyWith(
+              color: color,
+              fontWeight: FontWeight.w800,
+              fontSize: 10.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TopBadge extends StatelessWidget {
+  const _TopBadge({required this.isExpense});
+
+  final bool isExpense;
+
+  @override
+  Widget build(BuildContext context) {
+    // #1 rank badge — expense: danger red, income: app primary green gradient.
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: isExpense ? AppTheme.redAlert : null,
+        gradient: isExpense ? null : AppTheme.primaryButtonGradient,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.emoji_events_rounded,
+            size: 11.r,
+            color: Colors.white,
+          ),
+          SizedBox(width: 3.w),
+          Text(
+            context.l10n.statisticTopBadge,
+            style: context.typo.caption.small.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 10.sp,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

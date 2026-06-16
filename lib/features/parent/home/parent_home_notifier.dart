@@ -79,8 +79,12 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         members: members,
       );
 
+      final childMembers =
+          members.where((m) => m.isChild).toList(growable: false);
+      if (childMembers.isNotEmpty) {
+        await selectMember(childMembers.first.uid);
+      }
       if (members.isNotEmpty) {
-        await selectMember(members.first.uid);
         unawaited(_syncNotificationData(members));
       }
       _logger.i('ParentHome.onInit: done.');
@@ -103,6 +107,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         selectedMemberTransactions: const [],
         selectedMemberExpenseMinor: 0,
         selectedMemberIncomeMinor: 0,
+        selectedMemberLimitMinor: 0,
         isLoadingMemberData: false,
       );
       return;
@@ -122,17 +127,21 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         childUid: uid,
         monthKey: _currentMonthKey,
       );
+      final limitFuture = _dashRepo.getChildMonthlyLimit(childUid: uid);
 
       final txs = await txsFuture;
       _logger.i('ParentHome.selectMember: txs loaded count=${txs.length}.');
       final summary = await summaryFuture;
       _logger.i('ParentHome.selectMember: summary loaded '
           'expense=${summary.expenseMinor} income=${summary.incomeMinor}.');
+      final limitMinor = await limitFuture;
+      _logger.i('ParentHome.selectMember: limit loaded limit=$limitMinor.');
 
       state = state.copyWith(
         selectedMemberTransactions: txs,
         selectedMemberExpenseMinor: summary.expenseMinor,
         selectedMemberIncomeMinor: summary.incomeMinor,
+        selectedMemberLimitMinor: limitMinor ?? 0,
         isLoadingMemberData: false,
       );
       _logger.i('ParentHome.selectMember: done uid=$uid.');
@@ -150,15 +159,23 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
   }
 
   Future<void> createFamily() async {
+    _logger.d('ParentHomeNotifier.createFamily: start.');
     final authState = ref.read(authSessionProvider);
     final ownerUid = authState.account?.uid;
-    if (ownerUid == null) return;
+    if (ownerUid == null) {
+      _logger.w('ParentHomeNotifier.createFamily: aborted, ownerUid is null.');
+      return;
+    }
+    _logger.d('ParentHomeNotifier.createFamily: ownerUid=$ownerUid.');
 
     state = state.copyWith(isCreatingFamily: true);
     try {
+      _logger.d('ParentHomeNotifier.createFamily: calling repo.createFamily.');
       final family = await _familyRepo.createFamily(
         ownerUid: ownerUid,
       );
+      _logger.i('ParentHomeNotifier.createFamily: repo returned. '
+          'familyId=${family?.familyId} isNull=${family == null}.');
       if (family != null) {
         state = state.copyWith(
           isCreatingFamily: false,
@@ -168,10 +185,22 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
           selectedMemberId: null,
           selectedMemberTransactions: const [],
         );
+        _logger.d('ParentHomeNotifier.createFamily: state→hasFamily, '
+            'refreshing session.');
         await ref.read(authSessionProvider.notifier).refreshSession();
+        _logger.i('ParentHomeNotifier.createFamily: session refreshed, done.');
+      } else {
+        // Repo returned null — clear loading so the button does not hang.
+        _logger.w('ParentHomeNotifier.createFamily: repo returned null, '
+            'clearing loading.');
+        state = state.copyWith(
+          isCreatingFamily: false,
+          errorMessage: 'Failed to create family.',
+        );
       }
     } catch (error, stackTrace) {
-      _logger.e('Failed to create family', error: error, stackTrace: stackTrace);
+      _logger.e('ParentHomeNotifier.createFamily failed. ownerUid=$ownerUid',
+          error: error, stackTrace: stackTrace);
       state = state.copyWith(
         isCreatingFamily: false,
         errorMessage: error.toString(),
@@ -189,28 +218,32 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
     try {
       final members = await _familyRepo.getFamilyMembersOnce(familyId);
       state = state.copyWith(members: members);
-      
-      if (members.isEmpty) {
-        // Không còn member nào → clear selection
+
+      final childMembers =
+          members.where((m) => m.isChild).toList(growable: false);
+
+      if (childMembers.isEmpty) {
+        // Không còn child nào → clear selection
         state = state.copyWith(
           selectedMemberId: null,
           selectedMemberTransactions: const [],
           selectedMemberExpenseMinor: 0,
           selectedMemberIncomeMinor: 0,
+          selectedMemberLimitMinor: 0,
         );
         return;
       }
 
       final selectedId = state.selectedMemberId;
-      final stillExists = selectedId != null && 
-          members.any((m) => m.uid == selectedId);
+      final stillExists = selectedId != null &&
+          childMembers.any((m) => m.uid == selectedId);
 
       if (stillExists) {
-        // Member còn tồn tại → re-select
+        // Child còn tồn tại → re-select
         await selectMember(selectedId);
       } else {
-        // Member đã leave → chọn member đầu tiên
-        await selectMember(members.first.uid);
+        // Child đã leave → chọn child đầu tiên
+        await selectMember(childMembers.first.uid);
       }
     } catch (error, stackTrace) {
       _logger.e('Failed to refresh parent home', error: error, stackTrace: stackTrace);

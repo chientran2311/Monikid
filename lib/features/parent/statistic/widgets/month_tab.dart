@@ -8,12 +8,12 @@ class MonthTab extends StatelessWidget {
   final Color unselectedColor;
 
   const MonthTab({
-    Key? key,
+    super.key,
     required this.title,
     required this.isActive,
     required this.primaryColor,
     required this.unselectedColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

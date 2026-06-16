@@ -50,7 +50,7 @@ abstract class UserModel with _$UserModel {
       uid: (json['user_id'] as String?)?.trim() ?? '',
       email: (json['email'] as String?)?.trim() ?? '',
       displayName: (json['display_name'] as String?)?.trim() ?? '',
-      avatarUrl: (json['avatar_url'] as String?) ?? (json['photo_url'] as String?),
+      avatarUrl: json['avatar_url'] as String?,
       role: normalizedRole,
       monthlyLimit: json['monthly_limit'] as int?,
       familyId: json['family_id'] as String?,

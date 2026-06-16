@@ -18,6 +18,7 @@ abstract class ParentStatisticState with _$ParentStatisticState {
     @Default(0) int prevTotalExpenseMinor,
     @Default([]) List<StatisticDailyExpenseData> dailyData,
     @Default([]) List<StatisticCategoryData> topCategories,
+    @Default([]) List<StatisticCategoryData> incomeCategories,
     DateTime? selectedDate,
     String? errorMessage,
   }) = _ParentStatisticState;
@@ -47,10 +48,40 @@ abstract class ParentStatisticState with _$ParentStatisticState {
     return StatisticTrendDirection.stable;
   }
 
-  List<StatisticDailyExpenseData> get resolvedDailyData {
-    if (period == ParentStatisticPeriod.week && dailyData.length > 7) {
-      return dailyData.sublist(dailyData.length - 7);
+  int get totalIncomeMinor =>
+      incomeCategories.fold(0, (sum, c) => sum + c.amountMinor);
+
+  int avgPerDayMinorForPeriod(ParentStatisticPeriod period) {
+    final days = switch (period) {
+      ParentStatisticPeriod.week => 7,
+      ParentStatisticPeriod.month => 30,
+      ParentStatisticPeriod.year => 365,
+    };
+    if (days == 0 || totalExpenseMinor == 0) return 0;
+    return (totalExpenseMinor / days).round();
+  }
+
+  StatisticDailyExpenseData? get peakDay => dailyData.isEmpty
+      ? null
+      : dailyData.reduce((a, b) => a.amountMinor >= b.amountMinor ? a : b);
+
+  int get currentSpendingStreak {
+    if (dailyData.isEmpty) return 0;
+    final sorted = [...dailyData]..sort((a, b) => a.date.compareTo(b.date));
+    int streak = 0, maxStreak = 0;
+    for (var i = 0; i < sorted.length; i++) {
+      if (sorted[i].amountMinor > 0) {
+        if (i == 0) {
+          streak = 1;
+        } else {
+          final diff = sorted[i].date.difference(sorted[i - 1].date).inDays;
+          streak = diff == 1 ? streak + 1 : 1;
+        }
+        if (streak > maxStreak) maxStreak = streak;
+      } else {
+        streak = 0;
+      }
     }
-    return dailyData;
+    return maxStreak;
   }
 }

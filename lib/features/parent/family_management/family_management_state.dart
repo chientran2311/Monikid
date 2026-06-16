@@ -33,9 +33,19 @@ abstract class FamilyManagementState with _$FamilyManagementState {
   List<FamilyMemberModel> get parentMembers =>
       members.where((m) => m.userRole == 'parent').toList();
 
+  String? get hostUid => members.where((m) => m.isHost).firstOrNull?.uid;
+
   FamilyMemberModel? get nonHostParent {
-    if (family == null) return null;
-    final hostId = family!.ownerUid;
-    return parentMembers.where((p) => p.uid != hostId).firstOrNull;
+    final host = hostUid;
+    return parentMembers.where((p) => p.uid != host).firstOrNull;
+  }
+
+  /// Members ordered for the unified list: host first, then other parents,
+  /// then children.
+  List<FamilyMemberModel> get sortedMembers {
+    int rank(FamilyMemberModel m) =>
+        m.isHost ? 0 : (m.userRole == 'parent' ? 1 : 2);
+    final list = [...members]..sort((a, b) => rank(a).compareTo(rank(b)));
+    return list;
   }
 }

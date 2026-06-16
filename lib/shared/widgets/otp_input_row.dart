@@ -63,13 +63,13 @@ class OtpInputRowState extends State<OtpInputRow> {
       widget.onChanged?.call(_otp);
       return;
     }
-    final digit = value.replaceAll(RegExp(r'\D'), '');
-    if (digit.isEmpty) {
+    final char = value.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toUpperCase();
+    if (char.isEmpty) {
       _controllers[index].clear();
       widget.onChanged?.call(_otp);
       return;
     }
-    _controllers[index].text = digit[0];
+    _controllers[index].text = char[0];
     _controllers[index].selection = const TextSelection.collapsed(offset: 1);
     widget.onChanged?.call(_otp);
     if (index < widget.length - 1) {
@@ -81,7 +81,7 @@ class OtpInputRowState extends State<OtpInputRow> {
   }
 
   void _handlePaste(int startIndex, String text) {
-    final digits = text.replaceAll(RegExp(r'\D'), '');
+    final digits = text.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toUpperCase();
     final count = digits.length.clamp(0, widget.length - startIndex);
     for (var i = 0; i < count; i++) {
       _controllers[startIndex + i].text = digits[i];
@@ -202,11 +202,12 @@ class _OtpCellState extends State<_OtpCell> {
           enabled: widget.enabled,
           textAlign: TextAlign.center,
           textAlignVertical: TextAlignVertical.center,
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.visiblePassword,
+          textCapitalization: TextCapitalization.characters,
           maxLines: 1,
           inputFormatters: [
             _OtpPasteFormatter(widget.onPaste),
-            FilteringTextInputFormatter.digitsOnly,
+            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
             LengthLimitingTextInputFormatter(1),
           ],
           style: AppTextStyleFactory.style(

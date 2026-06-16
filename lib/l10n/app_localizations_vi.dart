@@ -196,6 +196,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeParInviteCodeLabel => 'Mã liên kết';
 
   @override
+  String get homeParInviteCodeLoadError =>
+      'Không tải được mã mời. Vui lòng thử lại.';
+
+  @override
   String get homeParCopyCode => 'Sao chép mã';
 
   @override
@@ -912,6 +916,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get parentStatisticTrendBad => 'Kém';
 
   @override
+  String get parentStatisticHeatmapTitle => 'Lịch chi tiêu';
+
+  @override
+  String get parentStatisticHeatmapNoData => 'Không có dữ liệu kỳ này';
+
+  @override
+  String get parentStatisticTopCategoryTitle => 'Danh mục nổi bật';
+
+  @override
+  String get parentStatisticTopCategorySubtitle => 'Chi nhiều nhất';
+
+  @override
+  String parentStatisticTopCategoryShare(String percent) {
+    return '$percent% tổng chi';
+  }
+
+  @override
+  String get parentStatisticBalanceTitle => 'Cân đối';
+
+  @override
+  String get parentStatisticBalanceIncome => 'Thu';
+
+  @override
+  String get parentStatisticBalanceExpense => 'Chi';
+
+  @override
+  String get parentStatisticInsightsAvgPerDay => 'TB / ngày';
+
+  @override
+  String get parentStatisticInsightsPeakDay => 'Ngày cao nhất';
+
+  @override
+  String get parentStatisticInsightsStreak => 'Chuỗi chi';
+
+  @override
+  String parentStatisticInsightsStreakDays(int days) {
+    return '$days ngày';
+  }
+
+  @override
+  String get parentStatisticInsightsNoPeak => '—';
+
+  @override
   String get parentStatisticEditedBadge => 'Đã sửa';
 
   @override
@@ -1469,6 +1516,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get statisticTrendIncrease => 'Tăng mạnh nhất';
 
   @override
+  String get statisticTopBadge => 'Nhiều nhất';
+
+  @override
   String get statisticTrendDecrease => 'Giảm';
 
   @override
@@ -1881,6 +1931,50 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get familyManagementBannerSubtitle =>
       'Dạy trẻ cách quản lý chi tiêu thông minh từ hôm nay.';
+
+  @override
+  String get familyManagementSectionFamily => 'GIA ĐÌNH CỦA BẠN';
+
+  @override
+  String familyManagementFamilyName(Object host) {
+    return 'Gia đình $host';
+  }
+
+  @override
+  String get familyManagementFamilyCardSubtitle => 'Host family • Chủ sở hữu';
+
+  @override
+  String familyManagementSectionMembersCount(int count) {
+    return 'THÀNH VIÊN GIA ĐÌNH ($count)';
+  }
+
+  @override
+  String get familyManagementRoleHost => 'Ba/Mẹ • Host';
+
+  @override
+  String get familyManagementRoleParent => 'Ba/Mẹ';
+
+  @override
+  String get familyManagementRoleChild => 'Con cái';
+
+  @override
+  String get familyManagementYouSuffix => ' (Bạn)';
+
+  @override
+  String familyManagementUnlinkSheetTitle(Object name) {
+    return 'Hủy liên kết với $name';
+  }
+
+  @override
+  String familyManagementUnlinkSheetDesc(Object name) {
+    return 'Bạn có chắc chắn muốn hủy liên kết với $name khỏi gia đình không?';
+  }
+
+  @override
+  String get familyManagementUnlinkSheetConfirm => 'Xác nhận';
+
+  @override
+  String get familyManagementUnlinkSheetCancel => 'Hủy bỏ';
 
   @override
   String get notificationSettingsTitle => 'Thông báo';

@@ -18,8 +18,8 @@ abstract class ProfileModel with _$ProfileModel {
       _$ProfileModelFromJson(json);
 
   factory ProfileModel.fromFirestore(Map<String, dynamic> json) {
-    final fullName = (json['display_name'] as String? ?? json['full_name'] as String?)?.trim() ?? '';
-    final avatarUrl = json['avatar_url'] as String? ?? json['photo_url'] as String?;
+    final fullName = (json['display_name'] as String?)?.trim() ?? '';
+    final avatarUrl = json['avatar_url'] as String?;
     return ProfileModel(
       id: (json['user_id'] as String?)?.trim() ?? '',
       avatarUrl: avatarUrl,

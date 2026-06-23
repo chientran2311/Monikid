@@ -1010,6 +1010,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingParAppearanceTitle => 'Appearance';
 
   @override
+  String get settingParSupportTitle => 'Support';
+
+  @override
   String get settingParThemeLabel => 'Light/Dark mode';
 
   @override
@@ -1278,7 +1281,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeStudentSummaryTitle(int month) {
-    return 'Month $month spending';
+    return 'Your month $month spending';
   }
 
   @override
@@ -1623,6 +1626,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinFamilyCodeOnlyDigits => 'Only accepts a 6-digit numeric code';
+
+  @override
+  String get joinFamilyHostDisabledHint =>
+      'You are the family host, so you can\'t join another family.';
 
   @override
   String get joinFamilyJoinNow => 'Join now';
@@ -2070,6 +2077,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationSettingsTip3 =>
+      'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.';
+
+  @override
+  String get notificationSettingsEyebrowChild => 'Track spending';
+
+  @override
+  String get notificationSettingsHeroTitleChild =>
+      'Enable notifications to stay on top of your spending';
+
+  @override
+  String get notificationSettingsHeroSubtitleChild =>
+      'Get instant alerts when you spend, at the time you choose — so managing your money feels effortless.';
+
+  @override
+  String get notificationSettingsEnableHintChild =>
+      'Notify when you make payments, transfers, or your balance changes.';
+
+  @override
+  String get notificationSettingsInstructionTitleChild =>
+      'Notifications help you track your spending in time';
+
+  @override
+  String get notificationSettingsInstructionDescChild =>
+      'When you enable this feature, you will receive alerts whenever a new transaction occurs or your balance changes unusually.';
+
+  @override
+  String get notificationSettingsTip1Child =>
+      'Tap Allow when the system asks for notification permission so everything works properly.';
+
+  @override
+  String get notificationSettingsTip2Child =>
+      'Choose a suitable time to avoid evening interruptions while still catching important transactions.';
+
+  @override
+  String get notificationSettingsTip3Child =>
       'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.';
 
   @override

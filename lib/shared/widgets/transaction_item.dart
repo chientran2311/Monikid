@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class TransactionItem extends StatelessWidget {
   final String emoji;
@@ -30,9 +31,8 @@ class TransactionItem extends StatelessWidget {
     final borderColor = isDark ? AppTheme.surfaceVariant : AppTheme.surfaceLightGrey;
     final amountColor = isIncome ? AppTheme.primary : AppTheme.redAlert;
 
-    return InkWell(
+    return BounceTap(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

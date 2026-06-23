@@ -10,6 +10,7 @@ import 'package:monikid/features/child/join_family/join_family_provider.dart';
 import 'package:monikid/features/child/join_family/widgets/family_members_form_body.dart';
 import 'package:monikid/features/child/join_family/widgets/join_family_form_body.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 enum JoinFamilyPhase { phase1, phase2 }
 
@@ -21,11 +22,41 @@ class JoinFamilyScreen extends HookConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = context.l10n;
 
-    final hasFamily = ref.watch(
-      authSessionProvider.select((a) => a.account?.familyId != null),
+    final familyId = ref.watch(
+      authSessionProvider.select((a) => a.account?.familyId),
     );
+    final isParent = ref.watch(
+      authSessionProvider.select((a) => a.account?.isParent ?? false),
+    );
+    final uid = ref.watch(
+      authSessionProvider.select((a) => a.account?.uid),
+    );
+    final hasFamily = familyId != null;
 
-    final phase = hasFamily ? JoinFamilyPhase.phase2 : JoinFamilyPhase.phase1;
+    // Host status only matters for a parent that already has a family. The
+    // members stream is the only carrier of family_role. While it resolves,
+    // fall back to "host" so a real host never briefly sees the phase2
+    // "Leave family" button.
+    final membersAsync =
+        (isParent && hasFamily) ? ref.watch(familyMembersProvider) : null;
+    final isHost = membersAsync?.maybeWhen(
+          data: (members) => members.any((m) => m.uid == uid && m.isHost),
+          orElse: () => true,
+        ) ??
+        false;
+
+    // Host already owns a family -> a join would be rejected by the
+    // isValidMemberJoin rule; show the join form but disabled. Every other
+    // case keeps the original phase rule unchanged.
+    final JoinFamilyPhase phase;
+    final bool joinDisabled;
+    if (isHost) {
+      phase = JoinFamilyPhase.phase1;
+      joinDisabled = true;
+    } else {
+      phase = hasFamily ? JoinFamilyPhase.phase2 : JoinFamilyPhase.phase1;
+      joinDisabled = false;
+    }
 
     useEffect(() {
       if (phase == JoinFamilyPhase.phase2) {
@@ -63,28 +94,12 @@ class JoinFamilyScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        title: Text(
-          appBarTitle,
-          style: context.typo.title.small.copyWith(
-            color: isDark ? Colors.white : AppTheme.textBlack,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.3,
-          ),
-        ),
-        leading: _CircleIconButton(
-          isDark: isDark,
-          icon: Icons.arrow_back_ios_new_rounded,
-          onPressed: () {
-            notifier.reset();
-            context.pop();
-          },
-        ),
-        actions: const [],
+      appBar: GlassAppBar(
+        title: appBarTitle,
+        onBackTap: () {
+          notifier.reset();
+          context.pop();
+        },
       ),
       body: AppBackground(
         child: SafeArea(
@@ -106,57 +121,10 @@ class JoinFamilyScreen extends HookConsumerWidget {
                     isDark: isDark,
                     state: state,
                     notifier: notifier,
+                    disabled: joinDisabled,
                   ),
                 ),
             },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({
-    required this.isDark,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final bool isDark;
-  final IconData icon;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: 42.r,
-          height: 42.r,
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppTheme.surfaceDark
-                : Colors.white.withValues(alpha: 0.72),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: isDark
-                  ? AppTheme.borderDark
-                  : Colors.white.withValues(alpha: 0.86),
-            ),
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0, 8.h),
-                blurRadius: 18.r,
-                color: const Color(0xFF4D5F7C).withValues(alpha: 0.06),
-              ),
-            ],
-          ),
-          child: Icon(
-            icon,
-            size: 18.r,
-            color: isDark ? Colors.white : AppTheme.textBlack,
           ),
         ),
       ),

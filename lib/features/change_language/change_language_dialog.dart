@@ -32,7 +32,7 @@ class ChangeLanguageDialog extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _DialogHeader(isDark: isDark, onDone: () => context.pop()),
+            _DialogHeader(isDark: isDark),
             Flexible(
               child: SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 18.h),
@@ -63,10 +63,9 @@ class ChangeLanguageDialog extends ConsumerWidget {
 }
 
 class _DialogHeader extends StatelessWidget {
-  const _DialogHeader({required this.isDark, required this.onDone});
+  const _DialogHeader({required this.isDark});
 
   final bool isDark;
-  final VoidCallback onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -74,25 +73,16 @@ class _DialogHeader extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.fromLTRB(22.w, 22.h, 22.w, 16.h),
-          child: Row(
-            children: [
-              const Spacer(),
-              Text(
-                s.language,
-                style: TextStyle(
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w800,
-                  color: isDark ? AppTheme.textWhite : AppTheme.primaryDark,
-                  letterSpacing: -0.4,
-                ),
+          child: Center(
+            child: Text(
+              s.language,
+              style: TextStyle(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w800,
+                color: isDark ? AppTheme.textWhite : AppTheme.primaryDark,
+                letterSpacing: -0.4,
               ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: _DoneChip(isDark: isDark, onTap: onDone),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         Divider(
@@ -102,42 +92,6 @@ class _DialogHeader extends StatelessWidget {
               : AppTheme.primary.withValues(alpha: 0.10),
         ),
       ],
-    );
-  }
-}
-
-class _DoneChip extends StatelessWidget {
-  const _DoneChip({required this.isDark, required this.onTap});
-
-  final bool isDark;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: isDark
-              ? AppTheme.primary.withValues(alpha: 0.15)
-              : AppTheme.primaryLight,
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: AppTheme.primary.withValues(alpha: 0.15),
-            width: 1,
-          ),
-        ),
-        child: Text(
-          s.actionDone,
-          style: TextStyle(
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.primary,
-            letterSpacing: 0.1,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -1009,6 +1009,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingParAppearanceTitle => 'Giao diện';
 
   @override
+  String get settingParSupportTitle => 'Hỗ trợ';
+
+  @override
   String get settingParThemeLabel => 'Giao diện sáng/tối';
 
   @override
@@ -1275,7 +1278,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String homeStudentSummaryTitle(int month) {
-    return 'Chi tiêu tháng $month của con';
+    return 'Chi tiêu tháng $month của bạn';
   }
 
   @override
@@ -1621,6 +1624,10 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get joinFamilyCodeOnlyDigits => 'Chỉ chấp nhận mã số gồm 6 chữ số';
+
+  @override
+  String get joinFamilyHostDisabledHint =>
+      'Bạn là chủ gia đình nên không thể tham gia gia đình khác.';
 
   @override
   String get joinFamilyJoinNow => 'Tham gia ngay';
@@ -2068,6 +2075,41 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get notificationSettingsTip3 =>
+      'Bạn vẫn sẽ nhận cảnh báo ngay lập tức với các giao dịch cần chú ý như chi tiêu vượt hạn mức hoặc thanh toán bất thường.';
+
+  @override
+  String get notificationSettingsEyebrowChild => 'Theo dõi chi tiêu';
+
+  @override
+  String get notificationSettingsHeroTitleChild =>
+      'Bật thông báo để không bỏ lỡ giao dịch của bạn';
+
+  @override
+  String get notificationSettingsHeroSubtitleChild =>
+      'Nhận cảnh báo ngay khi bạn chi tiêu, đúng khung giờ bạn muốn để việc quản lý tiền nhẹ nhàng hơn.';
+
+  @override
+  String get notificationSettingsEnableHintChild =>
+      'Thông báo khi bạn thanh toán, chuyển tiền hoặc số dư thay đổi.';
+
+  @override
+  String get notificationSettingsInstructionTitleChild =>
+      'Thông báo giúp bạn theo dõi chi tiêu kịp thời';
+
+  @override
+  String get notificationSettingsInstructionDescChild =>
+      'Khi bật tính năng này, bạn sẽ nhận được cảnh báo ngay khi có giao dịch mới hoặc khi số dư của bạn thay đổi bất thường.';
+
+  @override
+  String get notificationSettingsTip1Child =>
+      'Nhấn Cho phép khi hệ thống hỏi quyền gửi thông báo để hệ thống hoạt động đầy đủ.';
+
+  @override
+  String get notificationSettingsTip2Child =>
+      'Chọn giờ nhận phù hợp để không bị làm phiền vào buổi tối nhưng vẫn nắm được giao dịch quan trọng.';
+
+  @override
+  String get notificationSettingsTip3Child =>
       'Bạn vẫn sẽ nhận cảnh báo ngay lập tức với các giao dịch cần chú ý như chi tiêu vượt hạn mức hoặc thanh toán bất thường.';
 
   @override

@@ -1902,6 +1902,12 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingParAppearanceTitle;
 
+  /// No description provided for @settingParSupportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get settingParSupportTitle;
+
   /// No description provided for @settingParThemeLabel.
   ///
   /// In en, this message translates to:
@@ -2421,7 +2427,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeStudentSummaryTitle.
   ///
   /// In en, this message translates to:
-  /// **'Month {month} spending'**
+  /// **'Your month {month} spending'**
   String homeStudentSummaryTitle(int month);
 
   /// No description provided for @homeStudentTodayTransactionsSub.
@@ -3021,6 +3027,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only accepts a 6-digit numeric code'**
   String get joinFamilyCodeOnlyDigits;
+
+  /// No description provided for @joinFamilyHostDisabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You are the family host, so you can\'t join another family.'**
+  String get joinFamilyHostDisabledHint;
 
   /// No description provided for @joinFamilyJoinNow.
   ///
@@ -3825,6 +3837,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.'**
   String get notificationSettingsTip3;
+
+  /// No description provided for @notificationSettingsEyebrowChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Track spending'**
+  String get notificationSettingsEyebrowChild;
+
+  /// No description provided for @notificationSettingsHeroTitleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to stay on top of your spending'**
+  String get notificationSettingsHeroTitleChild;
+
+  /// No description provided for @notificationSettingsHeroSubtitleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Get instant alerts when you spend, at the time you choose — so managing your money feels effortless.'**
+  String get notificationSettingsHeroSubtitleChild;
+
+  /// No description provided for @notificationSettingsEnableHintChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Notify when you make payments, transfers, or your balance changes.'**
+  String get notificationSettingsEnableHintChild;
+
+  /// No description provided for @notificationSettingsInstructionTitleChild.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications help you track your spending in time'**
+  String get notificationSettingsInstructionTitleChild;
+
+  /// No description provided for @notificationSettingsInstructionDescChild.
+  ///
+  /// In en, this message translates to:
+  /// **'When you enable this feature, you will receive alerts whenever a new transaction occurs or your balance changes unusually.'**
+  String get notificationSettingsInstructionDescChild;
+
+  /// No description provided for @notificationSettingsTip1Child.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Allow when the system asks for notification permission so everything works properly.'**
+  String get notificationSettingsTip1Child;
+
+  /// No description provided for @notificationSettingsTip2Child.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a suitable time to avoid evening interruptions while still catching important transactions.'**
+  String get notificationSettingsTip2Child;
+
+  /// No description provided for @notificationSettingsTip3Child.
+  ///
+  /// In en, this message translates to:
+  /// **'You will still receive instant alerts for transactions that need attention, such as over-limit spending or unusual payments.'**
+  String get notificationSettingsTip3Child;
 
   /// No description provided for @onboardingWelcomeTitle.
   ///

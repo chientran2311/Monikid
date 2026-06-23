@@ -9,6 +9,7 @@ import 'package:monikid/features/child/transaction/update_transaction/widgets/tr
 import 'package:monikid/features/child/transaction/update_transaction/update_transaction_state.dart';
 import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 import 'package:monikid/shared/widgets/switch_two_item.dart';
 import 'package:monikid/shared/widgets/transaction_amount_section.dart';
 import 'package:monikid/shared/widgets/transaction_detail_card.dart';
@@ -52,27 +53,8 @@ class UpdateTransactionView extends StatelessWidget {
     return PopScope(
       canPop: !isBusy,
       child: Scaffold(
-        backgroundColor: AppTheme.homeParBg1,
-        appBar: AppBar(
-          backgroundColor: AppTheme.backgroundLight,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: IconButton(
-            onPressed: isBusy ? null : () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            color: AppTheme.textBlack,
-            iconSize: 20,
-          ),
-          title: Text(
-            s.updateTransactionAction,
-            style: AppTextStyleFactory.style(
-              size: AppFontSizes.titleSmall,
-              weight: FontWeight.w700,
-              color: AppTheme.textBlack,
-            ),
-          ),
-          centerTitle: true,
-        ),
+        backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
+        appBar: GlassAppBar(title: s.updateTransactionAction),
         body: AppBackground(
           child: Stack(
           children: [

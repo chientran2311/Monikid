@@ -72,26 +72,6 @@ class HomeMonthlySummaryCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Positioned(
-            top: -88.h,
-            right: -70.w,
-            child: Container(
-              width: 210.r,
-              height: 210.r,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    isDark
-                        ? AppTheme.primary.withValues(alpha: 0.14)
-                        : Color.lerp(Colors.white, AppTheme.primary, 0.20)!,
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.7],
-                ),
-              ),
-            ),
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

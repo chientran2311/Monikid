@@ -50,8 +50,7 @@ class CategoryTransactionListScreen extends HookConsumerWidget {
     CategoryTransactionListState state,
     bool isDark,
   ) {
-    final topPadding =
-        MediaQuery.of(context).padding.top + kToolbarHeight + 16.h;
+    final topPadding = MediaQuery.of(context).padding.top + kToolbarHeight;
 
     if (state.status == CategoryTransactionListStatus.initial ||
         state.isLoading) {

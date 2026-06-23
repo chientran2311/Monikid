@@ -6,6 +6,8 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
+import 'package:monikid/features/change_language/change_language_dialog.dart';
+import 'package:monikid/features/change_language/change_language_provider.dart';
 import 'package:monikid/features/change_theme/change_theme_provider.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/logout_dialog.dart';
@@ -21,6 +23,8 @@ class SettingTabParent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final langCode =
+        ref.watch(changeLanguageProvider.select((l) => l.localeCode));
 
     Future<void> handleSignOut() async {
       final confirmed = await showDialog<bool>(
@@ -100,8 +104,18 @@ class SettingTabParent extends ConsumerWidget {
                   title: s.settingParManageFamilyLabel,
                   textColor: textColor,
                   borderColor: borderColor,
-                  showBorder: false,
+                  showBorder: true,
                   onTap: () => context.push(AppRoutes.manageFamily),
+                ),
+                SettingItem(
+                  icon: Icons.family_restroom_rounded,
+                  iconColor: AppTheme.primary,
+                  iconBgColor: AppTheme.primaryLight,
+                  title: s.joinFamilyTitle,
+                  textColor: textColor,
+                  borderColor: borderColor,
+                  showBorder: false,
+                  onTap: () => context.push(AppRoutes.joinFamily),
                 ),
               ],
             ),
@@ -133,9 +147,45 @@ class SettingTabParent extends ConsumerWidget {
               borderColor: borderColor,
               isDark: isDark,
               children: [
+                SettingItem(
+                  icon: Icons.language_rounded,
+                  iconColor: AppTheme.primary,
+                  iconBgColor: AppTheme.primaryLight,
+                  title: s.language,
+                  subtitle: langCode == 'vi' ? s.vietnamese : s.english,
+                  textColor: textColor,
+                  borderColor: borderColor,
+                  showBorder: true,
+                  onTap: () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const ChangeLanguageDialog(),
+                  ),
+                ),
                 _ThemeSettingItem(
                   textColor: textColor,
                   borderColor: borderColor,
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h),
+            SettingGroup(
+              title: s.settingParSupportTitle,
+              titleColor: mutedColor,
+              surfaceColor: surfaceColor,
+              borderColor: borderColor,
+              isDark: isDark,
+              children: [
+                SettingItem(
+                  icon: Icons.help_outline_rounded,
+                  iconColor: AppTheme.primary,
+                  iconBgColor: AppTheme.primaryLight,
+                  title: s.settingFAQ,
+                  textColor: textColor,
+                  borderColor: borderColor,
+                  showBorder: false,
+                  onTap: () => context.push(AppRoutes.faq),
                 ),
               ],
             ),

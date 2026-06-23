@@ -95,6 +95,13 @@ class ReEnterPIN extends _$ReEnterPIN {
       errorMessage: null,
     );
 
+    // Keep the provider alive across the async gap and the navigation-triggering
+    // side effects below; otherwise autoDispose may tear it down mid-flight and
+    // using `ref`/`state` afterwards throws "Cannot use ref after dispose".
+    final keepAlive = ref.keepAlive();
+    // Capture notifiers before the await so they are resolved while alive.
+    final createNewPinNotifier = ref.read(createNewPINProvider.notifier);
+    final authSessionNotifier = ref.read(authSessionProvider.notifier);
     try {
       if (pin != draftPinCode) {
         state = state.copyWith(
@@ -108,14 +115,16 @@ class ReEnterPIN extends _$ReEnterPIN {
 
       final pinCodeHash = await _pinCodeRepository.hashPinCode(draftPinCode);
       await _pinCodeRepository.savePinCodeHash(pinCodeHash);
-      ref.read(createNewPINProvider.notifier).reset();
-      ref.read(authSessionProvider.notifier).markPinVerified();
       _logger.i('ReEnterPIN.confirmAndSavePinCode: success.');
+      // Set the terminal state before triggering navigation side effects so the
+      // last write to `state` happens while the notifier is guaranteed alive.
       state = state.copyWith(
         currentPin: '',
         status: ReEnterPINCodeStatus.success,
         errorMessage: null,
       );
+      createNewPinNotifier.reset();
+      authSessionNotifier.markPinVerified();
     } catch (error, stackTrace) {
       _logger.e(
         'ReEnterPIN.confirmAndSavePinCode failed.',
@@ -127,6 +136,8 @@ class ReEnterPIN extends _$ReEnterPIN {
         status: ReEnterPINCodeStatus.error,
         errorMessage: 'Failed to save the PIN code.',
       );
+    } finally {
+      keepAlive.close();
     }
   }
 

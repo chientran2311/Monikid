@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class SettingItem extends StatelessWidget {
   const SettingItem({
@@ -29,11 +30,9 @@ class SettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mutedColor = borderColor;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap ?? () {},
-        child: Container(
+    return BounceTap(
+      onTap: onTap,
+      child: Container(
           decoration: showBorder
               ? BoxDecoration(
                   border: Border(
@@ -70,7 +69,7 @@ class SettingItem extends StatelessWidget {
                       Text(
                         subtitle!,
                         style: context.typo.caption.big.copyWith(
-                          color: mutedColor,
+                          color: textColor.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -85,7 +84,7 @@ class SettingItem extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
+

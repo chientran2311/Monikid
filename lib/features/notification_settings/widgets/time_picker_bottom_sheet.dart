@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/done_chip.dart';
 
 Future<TimeOfDay?> showTimePickerBottomSheet(
   BuildContext context, {
@@ -93,7 +94,7 @@ class _TimePickerBottomSheetState extends State<_TimePickerBottomSheet> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: SizedBox(
-              height: 28.h,
+              height: 44.h,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -105,13 +106,9 @@ class _TimePickerBottomSheetState extends State<_TimePickerBottomSheet> {
                   ),
                   Positioned(
                     right: 0,
-                    child: GestureDetector(
+                    child: DoneChip(
                       onTap: () => Navigator.of(context).pop(
                         TimeOfDay(hour: _hour, minute: _minute),
-                      ),
-                      child: Text(
-                        s.actionDone,
-                        style: context.typo.subtitle.small.copyWith(color: AppTheme.primary),
                       ),
                     ),
                   ),

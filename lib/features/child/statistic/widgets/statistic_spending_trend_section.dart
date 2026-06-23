@@ -5,6 +5,7 @@ import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/statistic/statistic_models.dart';
 import 'package:monikid/features/child/statistic/widgets/statistic_ui_helpers.dart';
+import 'package:monikid/shared/widgets/done_chip.dart';
 
 class StatisticSpendingTrendSection extends StatefulWidget {
   const StatisticSpendingTrendSection({
@@ -352,14 +353,9 @@ class _PeriodPickerBottomSheetState extends State<_PeriodPickerBottomSheet> {
                   ),
                   Positioned(
                     right: 0,
-                    child: GestureDetector(
+                    child: DoneChip(
                       onTap: () => Navigator.of(context)
                           .pop(widget.options[_selectedIndex]),
-                      child: Text(
-                        context.l10n.actionDone,
-                        style: context.typo.subtitle.small
-                            .copyWith(color: AppTheme.primary),
-                      ),
                     ),
                   ),
                 ],

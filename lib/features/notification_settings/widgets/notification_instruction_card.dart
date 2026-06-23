@@ -8,7 +8,9 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/notification_settings/widgets/notification_tip_item.dart';
 
 class NotificationInstructionCard extends StatelessWidget {
-  const NotificationInstructionCard({super.key});
+  const NotificationInstructionCard({super.key, required this.isChild});
+
+  final bool isChild;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +18,16 @@ class NotificationInstructionCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
+
+    final instructionTitle = isChild
+        ? s.notificationSettingsInstructionTitleChild
+        : s.notificationSettingsInstructionTitle;
+    final instructionDesc = isChild
+        ? s.notificationSettingsInstructionDescChild
+        : s.notificationSettingsInstructionDesc;
+    final tip1 = isChild ? s.notificationSettingsTip1Child : s.notificationSettingsTip1;
+    final tip2 = isChild ? s.notificationSettingsTip2Child : s.notificationSettingsTip2;
+    final tip3 = isChild ? s.notificationSettingsTip3Child : s.notificationSettingsTip3;
 
     return Container(
       decoration: BoxDecoration(
@@ -61,7 +73,7 @@ class NotificationInstructionCard extends StatelessWidget {
                         children: [
                           SizedBox(height: 1.h),
                           Text(
-                            s.notificationSettingsInstructionTitle,
+                            instructionTitle,
                             style: context.typo.title.small.copyWith(
                               fontWeight: FontWeight.w700,
                               color: textColor,
@@ -71,7 +83,7 @@ class NotificationInstructionCard extends StatelessWidget {
                           ),
                           SizedBox(height: 6.h),
                           Text(
-                            s.notificationSettingsInstructionDesc,
+                            instructionDesc,
                             style: context.typo.body.medium.copyWith(color: mutedColor, height: 1.56),
                           ),
                         ],
@@ -80,11 +92,11 @@ class NotificationInstructionCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 14.h),
-                NotificationTipItem(number: '1', text: s.notificationSettingsTip1, textColor: textColor, isDark: isDark),
+                NotificationTipItem(number: '1', text: tip1, textColor: textColor, isDark: isDark),
                 SizedBox(height: 10.h),
-                NotificationTipItem(number: '2', text: s.notificationSettingsTip2, textColor: textColor, isDark: isDark),
+                NotificationTipItem(number: '2', text: tip2, textColor: textColor, isDark: isDark),
                 SizedBox(height: 10.h),
-                NotificationTipItem(number: '3', text: s.notificationSettingsTip3, textColor: textColor, isDark: isDark),
+                NotificationTipItem(number: '3', text: tip3, textColor: textColor, isDark: isDark),
               ],
             ),
           ),

@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/notification_settings/notification_settings_provider.dart';
 import 'package:monikid/features/notification_settings/widgets/notification_hero_section.dart';
 import 'package:monikid/features/notification_settings/widgets/notification_instruction_card.dart';
@@ -24,6 +25,7 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
 
     final state = ref.watch(notificationSettingsNotifierProvider);
     final notifier = ref.read(notificationSettingsNotifierProvider.notifier);
+    final isChild = ref.watch(authSessionProvider).account?.isChild ?? false;
 
     final heroAnim = useAnimationController(duration: const Duration(milliseconds: 500));
     final card1Anim = useAnimationController(duration: const Duration(milliseconds: 500));
@@ -57,7 +59,10 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
             bottom: 40.h,
           ),
           children: [
-            _FadeSlide(controller: heroAnim, child: const NotificationHeroSection()),
+            _FadeSlide(
+              controller: heroAnim,
+              child: NotificationHeroSection(isChild: isChild),
+            ),
             SizedBox(height: 16.h),
             _FadeSlide(
               controller: card1Anim,
@@ -65,6 +70,7 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
                 enabled: state.enabled,
                 onChanged: notifier.toggleEnabled,
                 isDark: isDark,
+                isChild: isChild,
               ),
             ),
             SizedBox(height: 16.h),
@@ -79,7 +85,7 @@ class ScheduleNotificationScreen extends HookConsumerWidget {
             SizedBox(height: 16.h),
             _FadeSlide(
               controller: card3Anim,
-              child: const NotificationInstructionCard(),
+              child: NotificationInstructionCard(isChild: isChild),
             ),
           ],
         ),

@@ -5,7 +5,9 @@ import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 
 class NotificationHeroSection extends StatelessWidget {
-  const NotificationHeroSection({super.key});
+  const NotificationHeroSection({super.key, required this.isChild});
+
+  final bool isChild;
 
   @override
   Widget build(BuildContext context) {
@@ -14,15 +16,25 @@ class NotificationHeroSection extends StatelessWidget {
     final textColor = isDark ? Colors.white : AppTheme.textBlack;
     final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
 
+    final eyebrow = isChild
+        ? s.notificationSettingsEyebrowChild
+        : s.notificationSettingsEyebrow;
+    final title = isChild
+        ? s.notificationSettingsHeroTitleChild
+        : s.notificationSettingsHeroTitle;
+    final subtitle = isChild
+        ? s.notificationSettingsHeroSubtitleChild
+        : s.notificationSettingsHeroSubtitle;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 8.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Eyebrow(isDark: isDark, label: s.notificationSettingsEyebrow),
+          _Eyebrow(isDark: isDark, label: eyebrow),
           SizedBox(height: 14.h),
           Text(
-            s.notificationSettingsHeroTitle,
+            title,
             style: context.typo.display.medium.copyWith(
               fontWeight: FontWeight.w700,
               color: textColor,
@@ -32,7 +44,7 @@ class NotificationHeroSection extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            s.notificationSettingsHeroSubtitle,
+            subtitle,
             style: context.typo.body.medium.copyWith(
               color: mutedColor,
               height: 1.52,

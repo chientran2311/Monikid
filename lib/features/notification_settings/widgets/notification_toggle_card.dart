@@ -12,11 +12,13 @@ class NotificationToggleCard extends StatelessWidget {
     required this.enabled,
     required this.onChanged,
     required this.isDark,
+    required this.isChild,
   });
 
   final bool enabled;
   final ValueChanged<bool> onChanged;
   final bool isDark;
+  final bool isChild;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,9 @@ class NotificationToggleCard extends StatelessWidget {
                 ),
                 SizedBox(height: 3.h),
                 Text(
-                  s.notificationSettingsEnableHint,
+                  isChild
+                      ? s.notificationSettingsEnableHintChild
+                      : s.notificationSettingsEnableHint,
                   style: context.typo.body.small.copyWith(
                     color: mutedColor,
                     height: 1.4,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class QuickAction extends StatelessWidget {
   const QuickAction({
@@ -21,7 +22,7 @@ class QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return BounceTap(
       onTap: onTap,
       child: Container(
         constraints: BoxConstraints(minHeight: 72.h),

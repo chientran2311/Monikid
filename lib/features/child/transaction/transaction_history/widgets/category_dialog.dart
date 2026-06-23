@@ -17,6 +17,7 @@ import 'package:monikid/models/entities/category_model.dart';
 import 'package:monikid/repositories/category/add_custom_category_repository.dart';
 import 'package:monikid/shared/widgets/app_snackbar.dart';
 import 'package:monikid/shared/widgets/confirm_dialog.dart';
+import 'package:monikid/shared/widgets/done_chip.dart';
 
 const _allCategory = CategoryModel(
   id: 'all',
@@ -133,16 +134,7 @@ class CategoryDialog extends HookConsumerWidget {
                             ),
                             Positioned(
                               right: 20.w,
-                              child: GestureDetector(
-                                onTap: confirm,
-                                child: Text(
-                                  s.customCategoryConfirmSelection,
-                                  style: context.typo.subtitle.small.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.primary,
-                                  ),
-                                ),
-                              ),
+                              child: DoneChip(onTap: confirm),
                             ),
                           ],
                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class QuickAction extends StatelessWidget {
   final IconData icon;
@@ -38,31 +39,25 @@ class QuickAction extends StatelessWidget {
 
     return Column(
       children: [
-        Material(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
-            child: Ink(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: borderColor),
-                boxShadow: [
-                  if (!isDark && !isPrimary)
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                ],
-              ),
-              child: Icon(icon, color: iconColor, size: 28),
+        BounceTap(
+          onTap: onTap,
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
+              boxShadow: [
+                if (!isDark && !isPrimary)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+              ],
             ),
+            child: Icon(icon, color: iconColor, size: 28),
           ),
         ),
         const SizedBox(height: 8),

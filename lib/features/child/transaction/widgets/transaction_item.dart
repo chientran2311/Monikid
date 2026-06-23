@@ -10,6 +10,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/child/transaction/providers/category_provider.dart';
 import 'package:monikid/l10n/app_localizations.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
+import 'package:monikid/shared/widgets/bounce_tap.dart';
 
 class TransactionItem extends ConsumerWidget {
   const TransactionItem({
@@ -39,7 +40,7 @@ class TransactionItem extends ConsumerWidget {
     final amountStr =
         '${isExpense ? '-' : '+'}${CurrencyFormatter.format(transaction.amountMinor.toDouble())}';
 
-    return GestureDetector(
+    return BounceTap(
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(bottom: 10.h),

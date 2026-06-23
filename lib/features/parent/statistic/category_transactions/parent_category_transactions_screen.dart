@@ -100,7 +100,7 @@ class _Body extends StatelessWidget {
 
     return ListView.separated(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + kToolbarHeight + 20.h,
+        top: MediaQuery.of(context).padding.top + 20.h,
         left: 20.w,
         right: 20.w,
         bottom: 20.h,

@@ -6,6 +6,7 @@ import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/calendar_utils.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/done_chip.dart';
 
 class CalendarDialog extends StatefulWidget {
   const CalendarDialog({
@@ -133,13 +134,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                 ),
                 Positioned(
                   right: 0,
-                  child: GestureDetector(
-                    onTap: _confirm,
-                    child: Text(
-                      s.actionDone,
-                      style: context.typo.subtitle.small.copyWith(fontWeight: FontWeight.w600, color: AppTheme.primary),
-                    ),
-                  ),
+                  child: DoneChip(onTap: _confirm),
                 ),
               ],
             ),

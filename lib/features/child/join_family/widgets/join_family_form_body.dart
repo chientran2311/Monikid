@@ -14,12 +14,14 @@ class JoinFamilyFormBody extends HookWidget {
     required this.isDark,
     required this.state,
     required this.notifier,
+    this.disabled = false,
     super.key,
   });
 
   final bool isDark;
   final JoinFamilyState state;
   final JoinFamilyNotifier notifier;
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +80,7 @@ class JoinFamilyFormBody extends HookWidget {
                           isDark: isDark,
                           otpKey: otpKey,
                           isBusy: state.isBusy,
+                          disabled: disabled,
                           onOtpChanged: (v) => code.value = v,
                         ),
                       ),
@@ -89,7 +92,9 @@ class JoinFamilyFormBody extends HookWidget {
                   child: PrimaryButton(
                     title: context.l10n.joinFamilyJoinNow,
                     isLoading: state.isBusy,
-                    onTap: isReady ? () => notifier.joinWithCode(code.value) : null,
+                    onTap: (!disabled && isReady)
+                        ? () => notifier.joinWithCode(code.value)
+                        : null,
                   ),
                 ),
               ],
@@ -106,12 +111,14 @@ class _SheetContent extends StatelessWidget {
     required this.isDark,
     required this.otpKey,
     required this.isBusy,
+    required this.disabled,
     required this.onOtpChanged,
   });
 
   final bool isDark;
   final GlobalKey<OtpInputRowState> otpKey;
   final bool isBusy;
+  final bool disabled;
   final void Function(String) onOtpChanged;
 
   @override
@@ -153,12 +160,15 @@ class _SheetContent extends StatelessWidget {
             key: otpKey,
             onCompleted: (_) {},
             onChanged: onOtpChanged,
-            enabled: !isBusy,
+            enabled: !isBusy && !disabled,
           ),
           SizedBox(height: 4.h),
           Text(
-            s.joinFamilyCodeOnlyDigits,
-            style: context.typo.caption.big.copyWith(color: mutedColor),
+            disabled ? s.joinFamilyHostDisabledHint : s.joinFamilyCodeOnlyDigits,
+            textAlign: TextAlign.center,
+            style: context.typo.caption.big.copyWith(
+              color: disabled ? AppTheme.warningText : mutedColor,
+            ),
           ),
         ],
       ),

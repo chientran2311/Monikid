@@ -173,15 +173,15 @@ class GeminiSectionCard extends HookConsumerWidget {
                           ),
                           SizedBox(height: 10.h),
                           if (state.hasSavedApiKey) ...[
-                            // Masked key field container
+                   
                             Container(
                               constraints: BoxConstraints(minHeight: 48.h),
                               padding: EdgeInsets.only(left: 14.w, right: 10.w),
                               decoration: BoxDecoration(
-                                color: AppTheme.primaryLight,
+                                color: Colors.transparent,
                                 borderRadius: BorderRadius.circular(14.r),
                                 border: Border.all(
-                                    color: AppTheme.primaryLight, width: 1),
+                                    color: apiBoxBorder, width: 1),
                               ),
                               child: Row(
                                 children: [

@@ -15,10 +15,15 @@ import 'package:monikid/features/child/transaction/transaction_history/widgets/c
 class TransactionFilterBar extends ConsumerWidget {
   const TransactionFilterBar({
     required this.isDark,
+    this.allowCategoryManagement = true,
     super.key,
   });
 
   final bool isDark;
+
+  /// When false, the category dialog becomes read-only for management:
+  /// no "add custom category" tile and no drag-to-delete (parent view).
+  final bool allowCategoryManagement;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,6 +129,8 @@ class TransactionFilterBar extends ConsumerWidget {
         categoryType: transactionTypeFilter == 'all' || transactionTypeFilter == null
             ? null
             : transactionTypeFilter,
+        showAddButton: allowCategoryManagement,
+        allowDeleteCategory: allowCategoryManagement,
       ),
     );
   }

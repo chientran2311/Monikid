@@ -91,6 +91,22 @@
       "name": { "type": "String" }
     }
   },
+  "homeParSpendingWarningTitle": "Chi tiêu hôm nay vượt ngưỡng",
+  "homeParSpendingWarningDesc": "{name} đã tiêu {todayAmount} hôm nay — vượt ngưỡng 5% hạn mức ({threshold}).",
+  "@homeParSpendingWarningDesc": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "todayAmount": { "type": "String" },
+      "threshold": { "type": "String" }
+    }
+  },
+  "homeParSpendingSafeTitle": "Chi tiêu hôm nay ổn định",
+  "homeParSpendingSafeDesc": "{name} vẫn đang trong ngưỡng an toàn hôm nay.",
+  "@homeParSpendingSafeDesc": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "homeParTransactionSuccess": "Thành công",
   "appBarBrandTitle": "SmartSpending",
   "appBarNotificationsTooltip": "Thông báo",

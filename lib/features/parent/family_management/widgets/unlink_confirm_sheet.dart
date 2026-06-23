@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/shared/widgets/primary_button.dart';
 
 /// Bottom sheet confirming a destructive unlink action. Confirm-only — it does
 /// not collect a password. Mirrors the `.bottom-sheet` block from the design.
@@ -61,60 +62,19 @@ class UnlinkConfirmSheet extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h),
-            _SheetButton(
-              label: s.familyManagementUnlinkSheetConfirm,
-              background: AppTheme.redAlert,
-              foreground: Colors.white,
+            PrimaryButton.danger(
+              title: s.familyManagementUnlinkSheetConfirm,
               onTap: () {
                 Navigator.of(context).pop();
                 onConfirm();
               },
             ),
             SizedBox(height: 12.h),
-            _SheetButton(
-              label: s.familyManagementUnlinkSheetCancel,
-              background:
-                  isDark ? AppTheme.darkSurfaceVariant : AppTheme.surfaceLightGrey,
-              foreground: isDark ? AppTheme.darkTextPrimary : AppTheme.textBlack,
+            PrimaryButton.secondary(
+              title: s.familyManagementUnlinkSheetCancel,
               onTap: () => Navigator.of(context).pop(),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SheetButton extends StatelessWidget {
-  const _SheetButton({
-    required this.label,
-    required this.background,
-    required this.foreground,
-    required this.onTap,
-  });
-
-  final String label;
-  final Color background;
-  final Color foreground;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56.h,
-      child: Material(
-        color: background,
-        borderRadius: BorderRadius.circular(999.r),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(999.r),
-          child: Center(
-            child: Text(
-              label,
-              style: context.typo.button.medium.copyWith(color: foreground),
-            ),
-          ),
         ),
       ),
     );

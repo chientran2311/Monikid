@@ -20,10 +20,15 @@ class TransactionHistoryBody extends ConsumerWidget {
     super.key,
     required this.scrollController,
     required this.isDark,
+    this.showMonthlyLimit = true,
   });
 
   final ScrollController scrollController;
   final bool isDark;
+
+  /// When false, hides the monthly-limit logic + "Hạn mức còn lại" box
+  /// (parent view has no money-limit business logic).
+  final bool showMonthlyLimit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,9 +67,12 @@ class TransactionHistoryBody extends ConsumerWidget {
 
     final now = DateTime.now();
     final currentMonth = DateTime(now.year, now.month);
-    final monthlyLimitMinor = ref.watch(
-      setMoneyLimitNotifierProvider.select((v) => v.storedLimitMinor),
-    );
+    // Money-limit data only subscribed when the limit box is shown (child view).
+    final monthlyLimitMinor = showMonthlyLimit
+        ? ref.watch(
+            setMoneyLimitNotifierProvider.select((v) => v.storedLimitMinor),
+          )
+        : null;
     final summaryAsyncValue = ref.watch(
       streamSummaryCardProvider(
         date: selectedDate,
@@ -74,14 +82,16 @@ class TransactionHistoryBody extends ConsumerWidget {
       ),
     );
     // Always unfiltered full-month totals for "Hạn mức còn lại" — never affected by date/category filter.
-    final monthlyTotalExpense = ref.watch(
-      streamSummaryCardProvider(
-        date: null,
-        month: currentMonth,
-        categoryKey: null,
-        type: null,
-      ),
-    ).valueOrNull?.totalExpense;
+    final monthlyTotalExpense = showMonthlyLimit
+        ? ref.watch(
+            streamSummaryCardProvider(
+              date: null,
+              month: currentMonth,
+              categoryKey: null,
+              type: null,
+            ),
+          ).valueOrNull?.totalExpense
+        : null;
 
     if (isLoading) {
       return const Expanded(child: TransactionHistorySkeleton());
@@ -147,6 +157,7 @@ class TransactionHistoryBody extends ConsumerWidget {
                 isDark: isDark,
                 monthlyLimitMinor: monthlyLimitMinor,
                 monthlyTotalExpense: monthlyTotalExpense,
+                showMonthlyLimit: showMonthlyLimit,
               ),
               SliverFillRemaining(
                 child: Center(

@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:monikid/app/router.dart';
 import 'package:monikid/core/di/di.dart';
 import 'package:monikid/core/theme/theme.dart';
@@ -11,7 +12,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/home/parent_home_state.dart';
-import 'package:monikid/features/parent/home/widgets/alert_card.dart';
+import 'package:monikid/features/parent/home/widgets/spending_alert_card.dart';
 import 'package:monikid/features/parent/home/widgets/family_members_section.dart';
 import 'package:monikid/features/parent/home/widgets/home_error_state.dart';
 import 'package:monikid/features/parent/home/widgets/home_summary_card.dart';
@@ -40,6 +41,8 @@ class HomeTabParent extends HookConsumerWidget {
 
     final authState = ref.watch(authSessionProvider);
     final uid = authState.account?.uid ?? authState.user?.uid;
+    final displayName =
+        authState.account?.displayName ?? authState.user?.displayName;
     final fallbackAvatarUrl =
         authState.account?.avatarUrl ?? authState.user?.photoURL;
     final profileImageUrl = uid == null
@@ -145,6 +148,7 @@ class HomeTabParent extends HookConsumerWidget {
               bottom: false,
               child: ParentHomeAppBar(
                 avatarUrl: resolvedAvatarUrl,
+                userName: displayName,
               ),
             ),
             Expanded(child: scrollBody),
@@ -169,11 +173,11 @@ class HomeTabParent extends HookConsumerWidget {
       final childMembers =
           state.members.where((m) => m.isChild).toList(growable: false);
       final selectedMemberName = state.selectedMember?.displayName;
-      final remaining =
-          state.selectedMemberIncomeMinor - state.selectedMemberExpenseMinor;
-      final showLowBalanceAlert = state.selectedMember != null &&
-          state.selectedMemberIncomeMinor > 0 &&
-          remaining < 10000000;
+      final hasLimit = state.selectedMemberLimitMinor > 0;
+      final showSpendingCard = state.selectedMember != null && hasLimit;
+      final threshold = (state.selectedMemberLimitMinor * 0.05).round();
+      final isSpendingWarning =
+          state.selectedMemberTodayExpenseMinor > threshold;
 
       return RefreshIndicator(
         onRefresh: () async {
@@ -209,16 +213,18 @@ class HomeTabParent extends HookConsumerWidget {
               0.2,
               animCtrl,
             ),
-            if (showLowBalanceAlert) ...[
+            if (showSpendingCard) ...[
               SizedBox(height: 16.h),
               _fadeSlide(
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: AlertCard(
+                  child: SpendingAlertCard(
                     isDark: isDark,
-                    title: s.homeParLowBalanceTitle,
-                    description:
-                        s.homeParLowBalanceDesc(selectedMemberName ?? ''),
+                    isWarning: isSpendingWarning,
+                    memberName: selectedMemberName ?? '',
+                    todayExpenseMinor:
+                        state.selectedMemberTodayExpenseMinor,
+                    limitMinor: state.selectedMemberLimitMinor,
                     onTap: () =>
                         context.push(AppRoutes.parentTransactionHistory),
                   ),
@@ -245,9 +251,13 @@ class HomeTabParent extends HookConsumerWidget {
             ),
             SizedBox(height: 12.h),
             if (state.isLoadingMemberData)
-              const Padding(
-                padding: EdgeInsets.all(24),
-                child: Center(child: CircularProgressIndicator()),
+              Skeletonizer.zone(
+                child: Column(
+                  children: List.generate(
+                    3,
+                    (_) => ParentTxRowSkeleton(isDark: isDark),
+                  ),
+                ),
               )
             else if (state.selectedMemberTransactions.isEmpty)
               Padding(

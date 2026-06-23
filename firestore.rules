@@ -333,10 +333,9 @@ service cloud.firestore {
       let data = request.resource.data;
       return isParent()
         && requesterDoc().family_id != null
-        && data.keys().hasOnly(['invite_code', 'family_id', 'created_at', 'expired_at'])
-        && data.keys().hasAll(['invite_code', 'family_id', 'created_at', 'expired_at'])
-        && data.invite_code == code
-        && data.invite_code.matches('^[A-Z0-9]{6}$')
+        && data.keys().hasOnly(['family_id', 'created_at', 'expired_at'])
+        && data.keys().hasAll(['family_id', 'created_at', 'expired_at'])
+        && code.matches('^[A-Z0-9]{6}$')
         && data.family_id == requesterDoc().family_id
         && data.created_at is timestamp
         && data.expired_at is timestamp;

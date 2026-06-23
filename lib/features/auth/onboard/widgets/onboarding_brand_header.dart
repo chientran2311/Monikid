@@ -23,11 +23,14 @@ class OnboardingBrandHeader extends StatelessWidget {
               ),
             ],
           ),
-          child: Image.asset(
-            'assets/app_icon.png',
-            width: 36.r,
-            height: 36.r,
-            cacheWidth: decodePixelsFor(context, 36.r),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9.r),
+            child: Image.asset(
+              'assets/app_icon.png',
+              width: 36.r,
+              height: 36.r,
+              cacheWidth: decodePixelsFor(context, 36.r),
+            ),
           ),
         ),
         SizedBox(width: 10.w),

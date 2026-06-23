@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:logger/logger.dart';
 import 'package:timezone/timezone.dart' as tz;
+
+import 'package:monikid/core/service/notification_tap_intent.dart';
 
 class LocalNotificationService {
   LocalNotificationService(this._logger);
@@ -12,11 +16,23 @@ class LocalNotificationService {
   static const String _channelId = 'monikid_daily';
   static const String _channelName = 'Daily Reminders';
 
+  final _tapController = StreamController<NotificationTapIntent>.broadcast();
+
+  /// Emits when the user taps a notification while the app process is alive.
+  Stream<NotificationTapIntent> get onNotificationTap => _tapController.stream;
+
+  /// Set during [initialize] when the app was COLD-STARTED by a notification
+  /// tap. Consume once (read then null) from the app layer.
+  NotificationTapIntent? initialTapIntent;
+
   Future<void> initialize() async {
     const initSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     );
-    await _plugin.initialize(settings: initSettings);
+    await _plugin.initialize(
+      settings: initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+    );
 
     final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
@@ -31,25 +47,58 @@ class LocalNotificationService {
       ),
     );
 
+    // Cold start: app launched by tapping a notification while terminated.
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      final payload = launchDetails?.notificationResponse?.payload;
+      initialTapIntent = NotificationTapIntent.tryParse(payload);
+      _logger.i(
+        'LocalNotificationService.initialize: cold-start tap '
+        'payload=$payload intent=${initialTapIntent?.target}',
+      );
+    }
+
     _logger.i('LocalNotificationService initialized.');
   }
 
-  Future<void> requestPermission() async {
+  void _onNotificationTap(NotificationResponse response) {
+    final intent = NotificationTapIntent.tryParse(response.payload);
+    if (intent == null) {
+      _logger.w(
+        'LocalNotificationService._onNotificationTap: unparseable '
+        'payload=${response.payload}',
+      );
+      return;
+    }
+    _logger.i(
+      'LocalNotificationService._onNotificationTap: target=${intent.target} '
+      'childUid=${intent.childUid}',
+    );
+    _tapController.add(intent);
+  }
+
+  /// Requests POST_NOTIFICATIONS permission (required to display).
+  /// Scheduling uses inexact alarms, so no exact-alarm permission is needed.
+  Future<bool> requestPermission() async {
     _logger.d('LocalNotificationService.requestPermission: start.');
     try {
       final androidPlugin = _plugin
           .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
-      final granted = await androidPlugin?.requestNotificationsPermission();
+      final granted =
+          await androidPlugin?.requestNotificationsPermission() ?? false;
+
       _logger.i(
-        'LocalNotificationService.requestPermission: granted=$granted',
+        'LocalNotificationService.requestPermission: notificationsGranted=$granted',
       );
+      return granted;
     } catch (error, stackTrace) {
       _logger.e(
         'LocalNotificationService.requestPermission failed.',
         error: error,
         stackTrace: stackTrace,
       );
+      return false;
     }
   }
 
@@ -59,6 +108,7 @@ class LocalNotificationService {
     required String body,
     required int hour,
     required int minute,
+    String? payload,
   }) async {
     _logger.d(
       'LocalNotificationService.scheduleZoned: id=$id hour=$hour minute=$minute',
@@ -79,6 +129,7 @@ class LocalNotificationService {
       body: body,
       scheduledDate: scheduledDate,
       details: details,
+      payload: payload,
     );
   }
 
@@ -109,10 +160,14 @@ class LocalNotificationService {
     required String body,
     required tz.TZDateTime scheduledDate,
     required NotificationDetails details,
+    String? payload,
   }) async {
+    // Daily reminder does not need second-precision. Use inexact directly:
+    // SCHEDULE_EXACT_ALARM is not auto-granted on Android 14+ and trying exact
+    // first throws PlatformException(exact_alarms_not_permitted) on every call.
     try {
       _logger.d(
-        'LocalNotificationService._scheduleWithFallback: exact id=$id '
+        'LocalNotificationService._scheduleWithFallback: inexact id=$id '
         'scheduledDate=$scheduledDate',
       );
       await _plugin.zonedSchedule(
@@ -121,35 +176,17 @@ class LocalNotificationService {
         body: body,
         scheduledDate: scheduledDate,
         notificationDetails: details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
+        payload: payload,
       );
-      _logger.d('LocalNotificationService: exact schedule success id=$id');
-    } catch (exactError, exactStack) {
-      _logger.w(
-        'LocalNotificationService: exact schedule failed id=$id, '
-        'falling back to inexact.',
-        error: exactError,
-        stackTrace: exactStack,
+      _logger.d('LocalNotificationService: inexact schedule success id=$id');
+    } catch (error, stackTrace) {
+      _logger.e(
+        'LocalNotificationService: schedule failed id=$id.',
+        error: error,
+        stackTrace: stackTrace,
       );
-      try {
-        await _plugin.zonedSchedule(
-          id: id,
-          title: title,
-          body: body,
-          scheduledDate: scheduledDate,
-          notificationDetails: details,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.time,
-        );
-        _logger.d('LocalNotificationService: inexact schedule success id=$id');
-      } catch (inexactError, inexactStack) {
-        _logger.e(
-          'LocalNotificationService: inexact schedule also failed id=$id.',
-          error: inexactError,
-          stackTrace: inexactStack,
-        );
-      }
     }
   }
 

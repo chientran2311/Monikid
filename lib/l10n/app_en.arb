@@ -107,6 +107,22 @@
       "name": { "type": "String" }
     }
   },
+  "homeParSpendingWarningTitle": "Daily spending over threshold",
+  "homeParSpendingWarningDesc": "{name} spent {todayAmount} today — over the 5% daily threshold ({threshold}).",
+  "@homeParSpendingWarningDesc": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "todayAmount": { "type": "String" },
+      "threshold": { "type": "String" }
+    }
+  },
+  "homeParSpendingSafeTitle": "Daily spending on track",
+  "homeParSpendingSafeDesc": "{name} is within safe spending limits today.",
+  "@homeParSpendingSafeDesc": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "homeParTransactionSuccess": "Success",
   "noTransactionsYet": "No transactions yet.",
   "errorGeneric": "Error: {error}",

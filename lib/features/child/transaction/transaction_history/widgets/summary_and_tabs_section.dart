@@ -14,6 +14,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
     required this.isDark,
     this.monthlyLimitMinor,
     this.monthlyTotalExpense,
+    this.showMonthlyLimit = true,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
   final bool isDark;
   final int? monthlyLimitMinor;
   final double? monthlyTotalExpense;
+  final bool showMonthlyLimit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,6 +51,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
                     displayMonth: selectedDate ?? DateTime.now(),
                     monthlyLimitMinor: monthlyLimitMinor,
                     monthlyTotalExpense: monthlyTotalExpense,
+                    showMonthlyLimit: showMonthlyLimit,
                   );
                 }
                 return SummaryCard(
@@ -58,6 +61,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
                   displayMonth: selectedDate ?? DateTime.now(),
                   monthlyLimitMinor: monthlyLimitMinor,
                   monthlyTotalExpense: monthlyTotalExpense,
+                  showMonthlyLimit: showMonthlyLimit,
                 );
               },
               error: (error, StackTrace? stack) {
@@ -73,6 +77,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
                   displayMonth: selectedDate ?? DateTime.now(),
                   monthlyLimitMinor: monthlyLimitMinor,
                   monthlyTotalExpense: monthlyTotalExpense,
+                  showMonthlyLimit: showMonthlyLimit,
                 );
               },
               data: (summary) => SummaryCard(
@@ -82,6 +87,7 @@ class SummaryAndTabsSection extends ConsumerWidget {
                 displayMonth: selectedDate ?? DateTime.now(),
                 monthlyLimitMinor: monthlyLimitMinor,
                 monthlyTotalExpense: monthlyTotalExpense,
+                showMonthlyLimit: showMonthlyLimit,
               ),
             ),
           ),

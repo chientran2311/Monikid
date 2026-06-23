@@ -284,6 +284,26 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get homeParSpendingWarningTitle => 'Chi tiêu hôm nay vượt ngưỡng';
+
+  @override
+  String homeParSpendingWarningDesc(
+    String name,
+    String todayAmount,
+    String threshold,
+  ) {
+    return '$name đã tiêu $todayAmount hôm nay — vượt ngưỡng 5% hạn mức ($threshold).';
+  }
+
+  @override
+  String get homeParSpendingSafeTitle => 'Chi tiêu hôm nay ổn định';
+
+  @override
+  String homeParSpendingSafeDesc(String name) {
+    return '$name vẫn đang trong ngưỡng an toàn hôm nay.';
+  }
+
+  @override
   String get homeParTransactionSuccess => 'Thành công';
 
   @override

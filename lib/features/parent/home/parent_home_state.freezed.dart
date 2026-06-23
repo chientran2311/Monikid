@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ParentHomeState {
 
- ParentHomeStatus get status; FamilyModel? get family; List<FamilyMemberModel> get members; String? get selectedMemberId; List<TransactionModel> get selectedMemberTransactions; int get selectedMemberExpenseMinor; int get selectedMemberIncomeMinor; int get selectedMemberLimitMinor; bool get isLoadingMemberData; bool get isCreatingFamily; String? get errorMessage;
+ ParentHomeStatus get status; FamilyModel? get family; List<FamilyMemberModel> get members; String? get selectedMemberId; List<TransactionModel> get selectedMemberTransactions; int get selectedMemberExpenseMinor; int get selectedMemberIncomeMinor; int get selectedMemberLimitMinor; int get selectedMemberTodayExpenseMinor; bool get isLoadingMemberData; bool get isCreatingFamily; String? get errorMessage;
 /// Create a copy of ParentHomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ParentHomeStateCopyWith<ParentHomeState> get copyWith => _$ParentHomeStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ParentHomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.selectedMemberId, selectedMemberId) || other.selectedMemberId == selectedMemberId)&&const DeepCollectionEquality().equals(other.selectedMemberTransactions, selectedMemberTransactions)&&(identical(other.selectedMemberExpenseMinor, selectedMemberExpenseMinor) || other.selectedMemberExpenseMinor == selectedMemberExpenseMinor)&&(identical(other.selectedMemberIncomeMinor, selectedMemberIncomeMinor) || other.selectedMemberIncomeMinor == selectedMemberIncomeMinor)&&(identical(other.selectedMemberLimitMinor, selectedMemberLimitMinor) || other.selectedMemberLimitMinor == selectedMemberLimitMinor)&&(identical(other.isLoadingMemberData, isLoadingMemberData) || other.isLoadingMemberData == isLoadingMemberData)&&(identical(other.isCreatingFamily, isCreatingFamily) || other.isCreatingFamily == isCreatingFamily)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ParentHomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other.members, members)&&(identical(other.selectedMemberId, selectedMemberId) || other.selectedMemberId == selectedMemberId)&&const DeepCollectionEquality().equals(other.selectedMemberTransactions, selectedMemberTransactions)&&(identical(other.selectedMemberExpenseMinor, selectedMemberExpenseMinor) || other.selectedMemberExpenseMinor == selectedMemberExpenseMinor)&&(identical(other.selectedMemberIncomeMinor, selectedMemberIncomeMinor) || other.selectedMemberIncomeMinor == selectedMemberIncomeMinor)&&(identical(other.selectedMemberLimitMinor, selectedMemberLimitMinor) || other.selectedMemberLimitMinor == selectedMemberLimitMinor)&&(identical(other.selectedMemberTodayExpenseMinor, selectedMemberTodayExpenseMinor) || other.selectedMemberTodayExpenseMinor == selectedMemberTodayExpenseMinor)&&(identical(other.isLoadingMemberData, isLoadingMemberData) || other.isLoadingMemberData == isLoadingMemberData)&&(identical(other.isCreatingFamily, isCreatingFamily) || other.isCreatingFamily == isCreatingFamily)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(members),selectedMemberId,const DeepCollectionEquality().hash(selectedMemberTransactions),selectedMemberExpenseMinor,selectedMemberIncomeMinor,selectedMemberLimitMinor,isLoadingMemberData,isCreatingFamily,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(members),selectedMemberId,const DeepCollectionEquality().hash(selectedMemberTransactions),selectedMemberExpenseMinor,selectedMemberIncomeMinor,selectedMemberLimitMinor,selectedMemberTodayExpenseMinor,isLoadingMemberData,isCreatingFamily,errorMessage);
 
 @override
 String toString() {
-  return 'ParentHomeState(status: $status, family: $family, members: $members, selectedMemberId: $selectedMemberId, selectedMemberTransactions: $selectedMemberTransactions, selectedMemberExpenseMinor: $selectedMemberExpenseMinor, selectedMemberIncomeMinor: $selectedMemberIncomeMinor, selectedMemberLimitMinor: $selectedMemberLimitMinor, isLoadingMemberData: $isLoadingMemberData, isCreatingFamily: $isCreatingFamily, errorMessage: $errorMessage)';
+  return 'ParentHomeState(status: $status, family: $family, members: $members, selectedMemberId: $selectedMemberId, selectedMemberTransactions: $selectedMemberTransactions, selectedMemberExpenseMinor: $selectedMemberExpenseMinor, selectedMemberIncomeMinor: $selectedMemberIncomeMinor, selectedMemberLimitMinor: $selectedMemberLimitMinor, selectedMemberTodayExpenseMinor: $selectedMemberTodayExpenseMinor, isLoadingMemberData: $isLoadingMemberData, isCreatingFamily: $isCreatingFamily, errorMessage: $errorMessage)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ParentHomeStateCopyWith<$Res>  {
   factory $ParentHomeStateCopyWith(ParentHomeState value, $Res Function(ParentHomeState) _then) = _$ParentHomeStateCopyWithImpl;
 @useResult
 $Res call({
- ParentHomeStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? selectedMemberId, List<TransactionModel> selectedMemberTransactions, int selectedMemberExpenseMinor, int selectedMemberIncomeMinor, int selectedMemberLimitMinor, bool isLoadingMemberData, bool isCreatingFamily, String? errorMessage
+ ParentHomeStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? selectedMemberId, List<TransactionModel> selectedMemberTransactions, int selectedMemberExpenseMinor, int selectedMemberIncomeMinor, int selectedMemberLimitMinor, int selectedMemberTodayExpenseMinor, bool isLoadingMemberData, bool isCreatingFamily, String? errorMessage
 });
 
 
@@ -63,7 +63,7 @@ class _$ParentHomeStateCopyWithImpl<$Res>
 
 /// Create a copy of ParentHomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? selectedMemberId = freezed,Object? selectedMemberTransactions = null,Object? selectedMemberExpenseMinor = null,Object? selectedMemberIncomeMinor = null,Object? selectedMemberLimitMinor = null,Object? isLoadingMemberData = null,Object? isCreatingFamily = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? selectedMemberId = freezed,Object? selectedMemberTransactions = null,Object? selectedMemberExpenseMinor = null,Object? selectedMemberIncomeMinor = null,Object? selectedMemberLimitMinor = null,Object? selectedMemberTodayExpenseMinor = null,Object? isLoadingMemberData = null,Object? isCreatingFamily = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ParentHomeStatus,family: freezed == family ? _self.family : family // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as String?,selectedMemberTransactions: null == selectedMemberTransactions ? _sel
 as List<TransactionModel>,selectedMemberExpenseMinor: null == selectedMemberExpenseMinor ? _self.selectedMemberExpenseMinor : selectedMemberExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,selectedMemberIncomeMinor: null == selectedMemberIncomeMinor ? _self.selectedMemberIncomeMinor : selectedMemberIncomeMinor // ignore: cast_nullable_to_non_nullable
 as int,selectedMemberLimitMinor: null == selectedMemberLimitMinor ? _self.selectedMemberLimitMinor : selectedMemberLimitMinor // ignore: cast_nullable_to_non_nullable
+as int,selectedMemberTodayExpenseMinor: null == selectedMemberTodayExpenseMinor ? _self.selectedMemberTodayExpenseMinor : selectedMemberTodayExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,isLoadingMemberData: null == isLoadingMemberData ? _self.isLoadingMemberData : isLoadingMemberData // ignore: cast_nullable_to_non_nullable
 as bool,isCreatingFamily: null == isCreatingFamily ? _self.isCreatingFamily : isCreatingFamily // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -99,7 +100,7 @@ $FamilyModelCopyWith<$Res>? get family {
 
 
 class _ParentHomeState extends ParentHomeState {
-  const _ParentHomeState({this.status = ParentHomeStatus.initial, this.family, final  List<FamilyMemberModel> members = const [], this.selectedMemberId, final  List<TransactionModel> selectedMemberTransactions = const [], this.selectedMemberExpenseMinor = 0, this.selectedMemberIncomeMinor = 0, this.selectedMemberLimitMinor = 0, this.isLoadingMemberData = false, this.isCreatingFamily = false, this.errorMessage}): _members = members,_selectedMemberTransactions = selectedMemberTransactions,super._();
+  const _ParentHomeState({this.status = ParentHomeStatus.initial, this.family, final  List<FamilyMemberModel> members = const [], this.selectedMemberId, final  List<TransactionModel> selectedMemberTransactions = const [], this.selectedMemberExpenseMinor = 0, this.selectedMemberIncomeMinor = 0, this.selectedMemberLimitMinor = 0, this.selectedMemberTodayExpenseMinor = 0, this.isLoadingMemberData = false, this.isCreatingFamily = false, this.errorMessage}): _members = members,_selectedMemberTransactions = selectedMemberTransactions,super._();
   
 
 @override@JsonKey() final  ParentHomeStatus status;
@@ -122,6 +123,7 @@ class _ParentHomeState extends ParentHomeState {
 @override@JsonKey() final  int selectedMemberExpenseMinor;
 @override@JsonKey() final  int selectedMemberIncomeMinor;
 @override@JsonKey() final  int selectedMemberLimitMinor;
+@override@JsonKey() final  int selectedMemberTodayExpenseMinor;
 @override@JsonKey() final  bool isLoadingMemberData;
 @override@JsonKey() final  bool isCreatingFamily;
 @override final  String? errorMessage;
@@ -136,16 +138,16 @@ _$ParentHomeStateCopyWith<_ParentHomeState> get copyWith => __$ParentHomeStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ParentHomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.selectedMemberId, selectedMemberId) || other.selectedMemberId == selectedMemberId)&&const DeepCollectionEquality().equals(other._selectedMemberTransactions, _selectedMemberTransactions)&&(identical(other.selectedMemberExpenseMinor, selectedMemberExpenseMinor) || other.selectedMemberExpenseMinor == selectedMemberExpenseMinor)&&(identical(other.selectedMemberIncomeMinor, selectedMemberIncomeMinor) || other.selectedMemberIncomeMinor == selectedMemberIncomeMinor)&&(identical(other.selectedMemberLimitMinor, selectedMemberLimitMinor) || other.selectedMemberLimitMinor == selectedMemberLimitMinor)&&(identical(other.isLoadingMemberData, isLoadingMemberData) || other.isLoadingMemberData == isLoadingMemberData)&&(identical(other.isCreatingFamily, isCreatingFamily) || other.isCreatingFamily == isCreatingFamily)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ParentHomeState&&(identical(other.status, status) || other.status == status)&&(identical(other.family, family) || other.family == family)&&const DeepCollectionEquality().equals(other._members, _members)&&(identical(other.selectedMemberId, selectedMemberId) || other.selectedMemberId == selectedMemberId)&&const DeepCollectionEquality().equals(other._selectedMemberTransactions, _selectedMemberTransactions)&&(identical(other.selectedMemberExpenseMinor, selectedMemberExpenseMinor) || other.selectedMemberExpenseMinor == selectedMemberExpenseMinor)&&(identical(other.selectedMemberIncomeMinor, selectedMemberIncomeMinor) || other.selectedMemberIncomeMinor == selectedMemberIncomeMinor)&&(identical(other.selectedMemberLimitMinor, selectedMemberLimitMinor) || other.selectedMemberLimitMinor == selectedMemberLimitMinor)&&(identical(other.selectedMemberTodayExpenseMinor, selectedMemberTodayExpenseMinor) || other.selectedMemberTodayExpenseMinor == selectedMemberTodayExpenseMinor)&&(identical(other.isLoadingMemberData, isLoadingMemberData) || other.isLoadingMemberData == isLoadingMemberData)&&(identical(other.isCreatingFamily, isCreatingFamily) || other.isCreatingFamily == isCreatingFamily)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(_members),selectedMemberId,const DeepCollectionEquality().hash(_selectedMemberTransactions),selectedMemberExpenseMinor,selectedMemberIncomeMinor,selectedMemberLimitMinor,isLoadingMemberData,isCreatingFamily,errorMessage);
+int get hashCode => Object.hash(runtimeType,status,family,const DeepCollectionEquality().hash(_members),selectedMemberId,const DeepCollectionEquality().hash(_selectedMemberTransactions),selectedMemberExpenseMinor,selectedMemberIncomeMinor,selectedMemberLimitMinor,selectedMemberTodayExpenseMinor,isLoadingMemberData,isCreatingFamily,errorMessage);
 
 @override
 String toString() {
-  return 'ParentHomeState(status: $status, family: $family, members: $members, selectedMemberId: $selectedMemberId, selectedMemberTransactions: $selectedMemberTransactions, selectedMemberExpenseMinor: $selectedMemberExpenseMinor, selectedMemberIncomeMinor: $selectedMemberIncomeMinor, selectedMemberLimitMinor: $selectedMemberLimitMinor, isLoadingMemberData: $isLoadingMemberData, isCreatingFamily: $isCreatingFamily, errorMessage: $errorMessage)';
+  return 'ParentHomeState(status: $status, family: $family, members: $members, selectedMemberId: $selectedMemberId, selectedMemberTransactions: $selectedMemberTransactions, selectedMemberExpenseMinor: $selectedMemberExpenseMinor, selectedMemberIncomeMinor: $selectedMemberIncomeMinor, selectedMemberLimitMinor: $selectedMemberLimitMinor, selectedMemberTodayExpenseMinor: $selectedMemberTodayExpenseMinor, isLoadingMemberData: $isLoadingMemberData, isCreatingFamily: $isCreatingFamily, errorMessage: $errorMessage)';
 }
 
 
@@ -156,7 +158,7 @@ abstract mixin class _$ParentHomeStateCopyWith<$Res> implements $ParentHomeState
   factory _$ParentHomeStateCopyWith(_ParentHomeState value, $Res Function(_ParentHomeState) _then) = __$ParentHomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- ParentHomeStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? selectedMemberId, List<TransactionModel> selectedMemberTransactions, int selectedMemberExpenseMinor, int selectedMemberIncomeMinor, int selectedMemberLimitMinor, bool isLoadingMemberData, bool isCreatingFamily, String? errorMessage
+ ParentHomeStatus status, FamilyModel? family, List<FamilyMemberModel> members, String? selectedMemberId, List<TransactionModel> selectedMemberTransactions, int selectedMemberExpenseMinor, int selectedMemberIncomeMinor, int selectedMemberLimitMinor, int selectedMemberTodayExpenseMinor, bool isLoadingMemberData, bool isCreatingFamily, String? errorMessage
 });
 
 
@@ -173,7 +175,7 @@ class __$ParentHomeStateCopyWithImpl<$Res>
 
 /// Create a copy of ParentHomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? selectedMemberId = freezed,Object? selectedMemberTransactions = null,Object? selectedMemberExpenseMinor = null,Object? selectedMemberIncomeMinor = null,Object? selectedMemberLimitMinor = null,Object? isLoadingMemberData = null,Object? isCreatingFamily = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? family = freezed,Object? members = null,Object? selectedMemberId = freezed,Object? selectedMemberTransactions = null,Object? selectedMemberExpenseMinor = null,Object? selectedMemberIncomeMinor = null,Object? selectedMemberLimitMinor = null,Object? selectedMemberTodayExpenseMinor = null,Object? isLoadingMemberData = null,Object? isCreatingFamily = null,Object? errorMessage = freezed,}) {
   return _then(_ParentHomeState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as ParentHomeStatus,family: freezed == family ? _self.family : family // ignore: cast_nullable_to_non_nullable
@@ -183,6 +185,7 @@ as String?,selectedMemberTransactions: null == selectedMemberTransactions ? _sel
 as List<TransactionModel>,selectedMemberExpenseMinor: null == selectedMemberExpenseMinor ? _self.selectedMemberExpenseMinor : selectedMemberExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,selectedMemberIncomeMinor: null == selectedMemberIncomeMinor ? _self.selectedMemberIncomeMinor : selectedMemberIncomeMinor // ignore: cast_nullable_to_non_nullable
 as int,selectedMemberLimitMinor: null == selectedMemberLimitMinor ? _self.selectedMemberLimitMinor : selectedMemberLimitMinor // ignore: cast_nullable_to_non_nullable
+as int,selectedMemberTodayExpenseMinor: null == selectedMemberTodayExpenseMinor ? _self.selectedMemberTodayExpenseMinor : selectedMemberTodayExpenseMinor // ignore: cast_nullable_to_non_nullable
 as int,isLoadingMemberData: null == isLoadingMemberData ? _self.isLoadingMemberData : isLoadingMemberData // ignore: cast_nullable_to_non_nullable
 as bool,isCreatingFamily: null == isCreatingFamily ? _self.isCreatingFamily : isCreatingFamily // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable

@@ -328,7 +328,6 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
     batch.set(
       codeRef,
       {
-        'invite_code': code,
         'family_id': familyId,
         'created_at': FieldValue.serverTimestamp(),
         'expired_at': Timestamp.fromDate(
@@ -494,7 +493,6 @@ class LinkFamilyRepositoryImpl implements LinkFamilyRepository {
         tx.set(
           codeRef,
           {
-            'invite_code': newCode,
             'family_id': familyId,
             'created_at': FieldValue.serverTimestamp(),
             'expired_at': Timestamp.fromDate(

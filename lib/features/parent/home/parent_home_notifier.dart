@@ -21,6 +21,10 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
   late final ParentDashboardRepository _dashRepo;
   late final Logger _logger;
 
+  /// Child uid requested by a notification tap before members were loaded.
+  /// Applied once [onInit] finishes loading members.
+  String? _pendingNotifSelectUid;
+
   @override
   ParentHomeState build() {
     _familyRepo = getIt<LinkFamilyRepository>();
@@ -37,6 +41,18 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
   }
 
   String get _currentMonthKey => DateFormat('yyyy-MM').format(DateTime.now());
+
+  /// Selects [uid] from a notification tap. If members are not loaded yet
+  /// (cold start), stores it and applies once [onInit] finishes.
+  Future<void> requestSelectFromNotification(String uid) async {
+    _logger.i('ParentHome.requestSelectFromNotification: uid=$uid '
+        'membersLoaded=${state.members.isNotEmpty}');
+    if (state.members.any((m) => m.uid == uid)) {
+      await selectMember(uid);
+    } else {
+      _pendingNotifSelectUid = uid;
+    }
+  }
 
   Future<void> onInit() async {
     _logger.i('ParentHome.onInit: start.');
@@ -81,7 +97,11 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
 
       final childMembers =
           members.where((m) => m.isChild).toList(growable: false);
-      if (childMembers.isNotEmpty) {
+      final pendingUid = _pendingNotifSelectUid;
+      if (pendingUid != null && childMembers.any((m) => m.uid == pendingUid)) {
+        _pendingNotifSelectUid = null;
+        await selectMember(pendingUid);
+      } else if (childMembers.isNotEmpty) {
         await selectMember(childMembers.first.uid);
       }
       if (members.isNotEmpty) {
@@ -108,6 +128,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         selectedMemberExpenseMinor: 0,
         selectedMemberIncomeMinor: 0,
         selectedMemberLimitMinor: 0,
+        selectedMemberTodayExpenseMinor: 0,
         isLoadingMemberData: false,
       );
       return;
@@ -128,20 +149,31 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
         monthKey: _currentMonthKey,
       );
       final limitFuture = _dashRepo.getChildMonthlyLimit(childUid: uid);
+      final todayFuture = _dashRepo.getChildTodayExpense(childUid: uid);
 
-      final txs = await txsFuture;
-      _logger.i('ParentHome.selectMember: txs loaded count=${txs.length}.');
-      final summary = await summaryFuture;
-      _logger.i('ParentHome.selectMember: summary loaded '
-          'expense=${summary.expenseMinor} income=${summary.incomeMinor}.');
-      final limitMinor = await limitFuture;
-      _logger.i('ParentHome.selectMember: limit loaded limit=$limitMinor.');
+      final results = await Future.wait([
+        txsFuture,
+        summaryFuture,
+        limitFuture,
+        todayFuture,
+      ]);
+
+      final txs = results[0] as List<TransactionModel>;
+      final summary =
+          results[1] as ({int expenseMinor, int incomeMinor});
+      final limitMinor = results[2] as int?;
+      final todayExpense = results[3] as int;
+
+      _logger.i('ParentHome.selectMember: txs=${txs.length} '
+          'expense=${summary.expenseMinor} income=${summary.incomeMinor} '
+          'limit=$limitMinor today=$todayExpense.');
 
       state = state.copyWith(
         selectedMemberTransactions: txs,
         selectedMemberExpenseMinor: summary.expenseMinor,
         selectedMemberIncomeMinor: summary.incomeMinor,
         selectedMemberLimitMinor: limitMinor ?? 0,
+        selectedMemberTodayExpenseMinor: todayExpense,
         isLoadingMemberData: false,
       );
       _logger.i('ParentHome.selectMember: done uid=$uid.');
@@ -230,6 +262,7 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
           selectedMemberExpenseMinor: 0,
           selectedMemberIncomeMinor: 0,
           selectedMemberLimitMinor: 0,
+          selectedMemberTodayExpenseMinor: 0,
         );
         return;
       }
@@ -272,22 +305,40 @@ class ParentHomeNotifier extends _$ParentHomeNotifier {
   Future<void> _syncNotificationData(List<FamilyMemberModel> allMembers) async {
     try {
       final childMembers = allMembers.where((m) => m.userRole == 'child').toList();
-      if (childMembers.isEmpty) return;
+      _logger.i(
+        'ParentHome._syncNotificationData: start. '
+        'totalMembers=${allMembers.length} childMembers=${childMembers.length}',
+      );
+      if (childMembers.isEmpty) {
+        _logger.w('ParentHome._syncNotificationData: no child members, skip.');
+        return;
+      }
 
       final memberUids = childMembers.map((m) => m.uid).toList();
       final limits = await _dashRepo.getChildrenMonthlyLimits(childUids: memberUids);
 
-      final children = <({String name, int expenseMinor, int limitMinor})>[];
+      final children =
+          <({String uid, String name, int expenseMinor, int limitMinor})>[];
       for (final member in childMembers) {
         try {
           final summary = await _dashRepo.getChildMonthlySummary(
             childUid: member.uid,
             monthKey: _currentMonthKey,
           );
+          final limitMinor = limits[member.uid] ?? 0;
+          final pct = limitMinor > 0
+              ? (summary.expenseMinor / limitMinor * 100).toStringAsFixed(1)
+              : 'n/a';
+          _logger.i(
+            'ParentHome._syncNotificationData: child="${member.displayName}" '
+            'uid=${member.uid} expenseMinor=${summary.expenseMinor} '
+            'limitMinor=$limitMinor spent=$pct% monthKey=$_currentMonthKey',
+          );
           children.add((
+            uid: member.uid,
             name: member.displayName,
             expenseMinor: summary.expenseMinor,
-            limitMinor: limits[member.uid] ?? 0,
+            limitMinor: limitMinor,
           ));
         } catch (e, s) {
           _logger.w(

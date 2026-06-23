@@ -16,6 +16,9 @@ class SummaryCard extends StatelessWidget {
   final int? monthlyLimitMinor;
   final double? monthlyTotalExpense;
 
+  /// When false, hides the "Hạn mức còn lại" stat box (light card only).
+  final bool showMonthlyLimit;
+
   const SummaryCard({
     super.key,
     required this.totalIncome,
@@ -24,6 +27,7 @@ class SummaryCard extends StatelessWidget {
     this.displayMonth,
     this.monthlyLimitMinor,
     this.monthlyTotalExpense,
+    this.showMonthlyLimit = true,
   });
 
   @override
@@ -52,6 +56,7 @@ class SummaryCard extends StatelessWidget {
       isDayView: isDayView,
       monthlyLimitMinor: monthlyLimitMinor,
       monthlyTotalExpense: monthlyTotalExpense,
+      showMonthlyLimit: showMonthlyLimit,
     );
   }
 }
@@ -64,6 +69,7 @@ class _LightSummaryCard extends StatelessWidget {
     required this.totalExpense,
     required this.monthLabel,
     required this.isDayView,
+    required this.showMonthlyLimit,
     this.monthlyLimitMinor,
     this.monthlyTotalExpense,
   });
@@ -72,6 +78,7 @@ class _LightSummaryCard extends StatelessWidget {
   final double totalExpense;
   final String monthLabel;
   final bool isDayView;
+  final bool showMonthlyLimit;
   final int? monthlyLimitMinor;
   final double? monthlyTotalExpense;
 
@@ -138,6 +145,7 @@ class _LightSummaryCard extends StatelessWidget {
                     totalExpense: totalExpense,
                     monthlyLimitMinor: monthlyLimitMinor,
                     monthlyTotalExpense: monthlyTotalExpense,
+                    showMonthlyLimit: showMonthlyLimit,
                   ),
                 ],
               ),
@@ -234,39 +242,44 @@ class _SummaryStats extends StatelessWidget {
   const _SummaryStats({
     required this.totalIncome,
     required this.totalExpense,
+    required this.showMonthlyLimit,
     this.monthlyLimitMinor,
     this.monthlyTotalExpense,
   });
 
   final double totalIncome;
   final double totalExpense;
+  final bool showMonthlyLimit;
   final int? monthlyLimitMinor;
   final double? monthlyTotalExpense;
 
   @override
   Widget build(BuildContext context) {
-    final monthlyLimit = monthlyLimitMinor?.toDouble() ?? 0;
-    // Always use full-month expense for remaining limit, regardless of date/category filter.
-    final expenseForLimit = monthlyTotalExpense ?? totalExpense;
-    final remainingLimit = monthlyLimit - expenseForLimit;
-    final isPositive = remainingLimit >= 0;
-    return Row(
-      children: [
-        Expanded(
-          child: _StatBox(
-            label: 'Thu tiền',
-            value: CurrencyFormatter.formatCompact(totalIncome),
-            valueColor: const Color(0xFF23815E),
-          ),
+    final children = <Widget>[
+      Expanded(
+        child: _StatBox(
+          label: 'Thu tiền',
+          value: CurrencyFormatter.formatCompact(totalIncome),
+          valueColor: const Color(0xFF23815E),
         ),
-        SizedBox(width: 10.w),
-        Expanded(
-          child: _StatBox(
-            label: 'Chi tiền',
-            value: CurrencyFormatter.formatCompact(totalExpense),
-            valueColor: AppTheme.redAlert,
-          ),
+      ),
+      SizedBox(width: 10.w),
+      Expanded(
+        child: _StatBox(
+          label: 'Chi tiền',
+          value: CurrencyFormatter.formatCompact(totalExpense),
+          valueColor: AppTheme.redAlert,
         ),
+      ),
+    ];
+
+    if (showMonthlyLimit) {
+      final monthlyLimit = monthlyLimitMinor?.toDouble() ?? 0;
+      // Always use full-month expense for remaining limit, regardless of date/category filter.
+      final expenseForLimit = monthlyTotalExpense ?? totalExpense;
+      final remainingLimit = monthlyLimit - expenseForLimit;
+      final isPositive = remainingLimit >= 0;
+      children.addAll([
         SizedBox(width: 10.w),
         Expanded(
           child: _StatBox(
@@ -275,8 +288,10 @@ class _SummaryStats extends StatelessWidget {
             valueColor: isPositive ? AppTheme.primary : AppTheme.redAlert,
           ),
         ),
-      ],
-    );
+      ]);
+    }
+
+    return Row(children: children);
   }
 }
 

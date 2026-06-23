@@ -139,7 +139,7 @@ class ParentHomeSkeleton extends StatelessWidget {
           SizedBox(height: 12.h),
 
           // ── Transaction rows (data) ──────────────────────
-          ...List.generate(4, (_) => _TxRowBone(isDark: isDark)),
+          ...List.generate(4, (_) => ParentTxRowSkeleton(isDark: isDark)),
           SizedBox(height: 120.h),
         ],
       ),
@@ -148,8 +148,10 @@ class ParentHomeSkeleton extends StatelessWidget {
 }
 
 /// Bone mirror of `TransactionItem`: 44.r icon + 2 text lines + amount.
-class _TxRowBone extends StatelessWidget {
-  const _TxRowBone({required this.isDark});
+/// Public so partial reloads (member switch) can reuse the same row shape.
+/// Wrap in a `Skeletonizer`/`Skeletonizer.zone` to enable the shimmer.
+class ParentTxRowSkeleton extends StatelessWidget {
+  const ParentTxRowSkeleton({required this.isDark, super.key});
 
   final bool isDark;
 

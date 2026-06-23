@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -91,9 +92,36 @@ class HomeSummaryCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
               child: isLoading
-                  ? SizedBox(
-                      height: 80.h,
-                      child: const Center(child: CircularProgressIndicator()),
+                  ? Skeletonizer.zone(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.homeParTotalMonthlySpending,
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w800,
+                              color: mutedColor,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Bone.text(width: 180.w, fontSize: 34.sp),
+                          SizedBox(height: 20.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Bone.text(width: 80.w, fontSize: 13.sp),
+                              Bone.text(width: 110.w, fontSize: 13.sp),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          Bone(
+                            width: double.infinity,
+                            height: 8.h,
+                            borderRadius: BorderRadius.circular(4.r),
+                          ),
+                        ],
+                      ),
                     )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -283,6 +283,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeParSpendingWarningTitle => 'Daily spending over threshold';
+
+  @override
+  String homeParSpendingWarningDesc(
+    String name,
+    String todayAmount,
+    String threshold,
+  ) {
+    return '$name spent $todayAmount today — over the 5% daily threshold ($threshold).';
+  }
+
+  @override
+  String get homeParSpendingSafeTitle => 'Daily spending on track';
+
+  @override
+  String homeParSpendingSafeDesc(String name) {
+    return '$name is within safe spending limits today.';
+  }
+
+  @override
   String get homeParTransactionSuccess => 'Success';
 
   @override

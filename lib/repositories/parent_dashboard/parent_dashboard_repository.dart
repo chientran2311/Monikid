@@ -19,6 +19,8 @@ abstract class ParentDashboardRepository {
     required String monthKey,
   });
 
+  Future<int> getChildTodayExpense({required String childUid});
+
   /// Reads the monthly spending limit (VND) set on the child's user doc.
   /// Returns null when no limit is configured.
   Future<int?> getChildMonthlyLimit({required String childUid});
@@ -97,6 +99,41 @@ class ParentDashboardRepositoryImpl implements ParentDashboardRepository {
     } catch (error, stackTrace) {
       _logger.e(
         'Failed to fetch monthly summary for child $childUid',
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<int> getChildTodayExpense({required String childUid}) async {
+    _logger.d('ParentDashboardRepositoryImpl.getChildTodayExpense: childUid=$childUid.');
+    try {
+      final now = DateTime.now();
+      final todayStart = DateTime(now.year, now.month, now.day);
+      final tomorrowStart = todayStart.add(const Duration(days: 1));
+      final snap = await _firestore
+          .collection('users')
+          .doc(childUid)
+          .collection('transactions')
+          .where('transaction_date',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(todayStart))
+          .where('transaction_date',
+              isLessThan: Timestamp.fromDate(tomorrowStart))
+          .where('type', isEqualTo: 'expense')
+          .get();
+      final total = snap.docs.fold<int>(0, (acc, doc) {
+        final data = doc.data();
+        return acc +
+            ((data['amount'] ?? data['amount_minor'] ?? 0) as num).toInt();
+      });
+      _logger.i(
+          'ParentDashboardRepositoryImpl.getChildTodayExpense: total=$total childUid=$childUid.');
+      return total;
+    } catch (error, stackTrace) {
+      _logger.e(
+        'ParentDashboardRepositoryImpl.getChildTodayExpense failed. childUid=$childUid.',
         error: error,
         stackTrace: stackTrace,
       );

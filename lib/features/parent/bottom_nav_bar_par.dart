@@ -1,23 +1,49 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:monikid/core/service/notification_tap_intent.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
+import 'package:monikid/features/notification_settings/notification_nav_provider.dart';
 import 'package:monikid/features/parent/home/home_tab_par.dart';
+import 'package:monikid/features/parent/home/parent_home_notifier.dart';
 import 'package:monikid/features/parent/setting/setting_tab_par.dart';
 import 'package:monikid/features/parent/statistic/statistic_tab_par.dart';
 
-class ParentBottomNavBar extends HookConsumerWidget {
+class ParentBottomNavBar extends ConsumerStatefulWidget {
   const ParentBottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ParentBottomNavBar> createState() => _ParentBottomNavBarState();
+}
+
+class _ParentBottomNavBarState extends ConsumerState<ParentBottomNavBar> {
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final currentIndex = useState(0);
+
+    // Notification tap → first switch to the Statistic tab, then select the
+    // tapped child so its statistic fetches (skeleton → data). Done in a
+    // post-frame callback so we never modify a provider during build.
+    final navIntent = ref.watch(notificationNavProvider);
+    if (navIntent?.target == NotificationTarget.parentStat) {
+      final childUid = navIntent!.childUid;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        if (_currentIndex != 1) setState(() => _currentIndex = 1);
+        if (childUid != null && childUid.isNotEmpty) {
+          await ref
+              .read(parentHomeNotifierProvider.notifier)
+              .requestSelectFromNotification(childUid);
+        }
+        ref.read(notificationNavProvider.notifier).clear();
+      });
+    }
 
     const tabs = [HomeTabParent(), StatisticTabParent(), SettingTabParent()];
 
@@ -43,7 +69,7 @@ class ParentBottomNavBar extends HookConsumerWidget {
       // Body extends behind floating pill so BackdropFilter has content to blur
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      body: IndexedStack(index: currentIndex.value, children: tabs),
+      body: IndexedStack(index: _currentIndex, children: tabs),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
@@ -61,11 +87,11 @@ class ParentBottomNavBar extends HookConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(navItems.length, (i) {
-                    final isSelected = currentIndex.value == i;
+                    final isSelected = _currentIndex == i;
                     final color =
                         isSelected ? AppTheme.primary : unselectedColor;
                     return GestureDetector(
-                      onTap: () => currentIndex.value = i,
+                      onTap: () => setState(() => _currentIndex = i),
                       behavior: HitTestBehavior.opaque,
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.w),

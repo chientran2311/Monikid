@@ -49,6 +49,13 @@ app.*.map.json
 *.md
 .*
 !/.gitignore
+
+# Shell-redirect junk files (accidental empty files from malformed `>` redirects)
+# Names are code/prose fragments at repo root, e.g. "UChild,", "ref.read(...)", "Đây"
+/*(*
+/*)*
+/*,
+/* *
 !/.git/
 
 fqa_response.dart

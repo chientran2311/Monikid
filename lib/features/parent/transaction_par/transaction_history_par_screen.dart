@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:monikid/core/theme/theme.dart';
+import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_provider.dart';
-import 'package:monikid/features/parent/transaction_par/widgets/transaction_filter_bar.dart';
-import 'package:monikid/features/parent/transaction_par/widgets/transaction_history_par_body.dart';
+import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_filter_bar.dart';
+import 'package:monikid/features/child/transaction/transaction_history/widgets/transaction_history_body.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
-import 'package:monikid/shared/widgets/app_bar_push.dart';
+import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
 class TransactionHistoryParScreen extends HookConsumerWidget {
   const TransactionHistoryParScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1;
 
     final scrollCtrl = useScrollController();
 
@@ -47,16 +50,23 @@ class TransactionHistoryParScreen extends HookConsumerWidget {
     }, [scrollCtrl, isLoadingMore, hasMore]);
 
     return Scaffold(
-      backgroundColor: isDark ? AppTheme.backgroundDark : AppTheme.homeParBg1,
-      appBar: const AppBarPush(title: 'Lịch sử Giao dịch'),
+      backgroundColor: bgColor,
+      appBar: GlassAppBar(title: s.transactionHistoryTitle),
       body: AppBackground(
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TransactionFilterBar(isDark: isDark),
-              TransactionHistoryParBody(
+              // Parent view: read-only categories (no add / no drag-to-delete),
+              // no monthly-limit box — these are child-only business features.
+              TransactionFilterBar(
+                isDark: isDark,
+                allowCategoryManagement: false,
+              ),
+              TransactionHistoryBody(
                 scrollController: scrollCtrl,
                 isDark: isDark,
+                showMonthlyLimit: false,
               ),
             ],
           ),

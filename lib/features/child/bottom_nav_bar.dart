@@ -1,9 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 import 'package:monikid/app/router.dart';
+import 'package:monikid/core/service/notification_tap_intent.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
@@ -12,16 +14,17 @@ import 'package:monikid/features/child/home/home_tab_stu_screen.dart';
 import 'package:monikid/features/child/setting/setting_tab_stu.dart';
 import 'package:monikid/features/child/statistic/statistic_screen.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_screen.dart';
+import 'package:monikid/features/notification_settings/notification_nav_provider.dart';
 
-class StudentBottomNavBar extends StatefulWidget {
+class StudentBottomNavBar extends ConsumerStatefulWidget {
   const StudentBottomNavBar({super.key});
 
   @override
-  State<StudentBottomNavBar> createState() => _StudentBottomNavBarState();
+  ConsumerState<StudentBottomNavBar> createState() => _StudentBottomNavBarState();
 }
 
 // SingleTickerProviderStateMixin needed for pulse glow AnimationController on FAB.
-class _StudentBottomNavBarState extends State<StudentBottomNavBar>
+class _StudentBottomNavBarState extends ConsumerState<StudentBottomNavBar>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   late final AnimationController _pulseCtrl;
@@ -67,6 +70,17 @@ class _StudentBottomNavBarState extends State<StudentBottomNavBar>
   Widget build(BuildContext context) {
     final s = context.l10n;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Notification tap → switch to the Statistic tab (own data, no select).
+    // Done in a post-frame callback so we never modify a provider during build.
+    final navIntent = ref.watch(notificationNavProvider);
+    if (navIntent?.target == NotificationTarget.childStat) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_currentIndex != 2) setState(() => _currentIndex = 2);
+        ref.read(notificationNavProvider.notifier).clear();
+      });
+    }
 
     // HTML: rgba(242,251,242,.88) — light green tint matching the HTML palette.
     final navBgColor = isDark

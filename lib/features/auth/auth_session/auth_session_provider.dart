@@ -6,7 +6,9 @@ import 'package:monikid/core/di/di.dart';
 import 'package:monikid/features/auth/auth_status.dart';
 import 'package:monikid/repositories/auth/auth_repository.dart';
 import 'package:monikid/repositories/auth/pin_code_repository.dart';
+import 'package:monikid/repositories/notification/notification_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'auth_session_state.dart';
 
@@ -72,6 +74,31 @@ class AuthSession extends _$AuthSession {
     );
 
     try {
+      // Notif prefs + scheduled alarms are GLOBAL (not scoped per account).
+      // Reset them on logout so the next account does not inherit the previous
+      // user's enabled flag / scheduled notifications, and is forced to
+      // (re)grant OS permission when they toggle ON.
+      final prefs = await SharedPreferences.getInstance();
+      _logger.i(
+        'AuthSession.signOut: notif prefs BEFORE reset — '
+        'enabled=${prefs.getBool(NotifPrefsKeys.enabled)} '
+        'hour=${prefs.getInt(NotifPrefsKeys.hour)} '
+        'minute=${prefs.getInt(NotifPrefsKeys.minute)}',
+      );
+      try {
+        await getIt<NotificationRepository>().cancelAllAndClearData();
+        await prefs.remove(NotifPrefsKeys.enabled);
+        await prefs.remove(NotifPrefsKeys.hour);
+        await prefs.remove(NotifPrefsKeys.minute);
+        _logger.i('AuthSession.signOut: notif state reset (cancelled + prefs cleared).');
+      } catch (notifError, notifStack) {
+        _logger.w(
+          'AuthSession.signOut: notif reset failed (non-fatal).',
+          error: notifError,
+          stackTrace: notifStack,
+        );
+      }
+
       await _authRepository.signOut();
       await ref.read(pinCodeRepositoryProvider).clearPinCode();
       state = const AuthSessionState(status: AuthStatus.unauthenticated);

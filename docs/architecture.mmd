@@ -1,0 +1,98 @@
+%% MoniKid — Architecture Diagram
+%% Model: Serverless / BaaS (no custom backend). Client-centric + on-device AI.
+%% Zones: USER -> PRODUCT (Flutter app) -> SERVICE (on-device) -> CLOUD (managed BaaS)
+
+flowchart TB
+
+    %% ================= ZONE: USERS =================
+    subgraph ZUSER["👥 USER ZONE"]
+        direction LR
+        UParent["👨‍👩‍👧 Parent<br/>dashboard · limits · alerts"]
+        UChild["🧒 Child<br/>spending · scan receipt"]
+    end
+
+    %% ================= ZONE: PRODUCT (Flutter app) =================
+    subgraph ZAPP["📱 PRODUCT ZONE — Flutter App (on-device)"]
+        direction TB
+
+        subgraph LUI["Presentation"]
+            UI["Screens / Widgets<br/>Consumer · HookConsumer"]
+        end
+
+        subgraph LSTATE["State — Riverpod @riverpod"]
+            ST1["AuthSession (keepAlive)"]
+            ST2["Stream / Notifier providers"]
+        end
+
+        subgraph LREPO["Repository layer (15 repos)"]
+            RAuth["AuthRepository"]
+            RTx["TransactionRepository"]
+            RStat["Statistic · Category · Profile · Family"]
+            RAI["AI Resolver + services"]
+        end
+
+        DI["GetIt DI · lazy singletons"]
+    end
+
+    %% ================= ZONE: ON-DEVICE SERVICES =================
+    subgraph ZSVC["⚙️ SERVICE ZONE — On-device"]
+        direction TB
+        SVGemma["Local Gemma model<br/>flutter_gemma"]
+        SVOCR["ML Kit OCR<br/>receipt text"]
+        SVNoti["Local Notifications<br/>daily reminders"]
+        SVPrefs[("SharedPreferences<br/>onboarding · AI prefs")]
+        SVSec[("Secure Storage<br/>PIN code")]
+        SVFile[("File storage<br/>receipt images")]
+    end
+
+    %% ================= ZONE: CLOUD (managed BaaS) =================
+    subgraph ZCLOUD["☁️ CLOUD ZONE — Managed BaaS (no custom server)"]
+        direction TB
+        CFS[("Cloud Firestore<br/>users · transactions · categories")]
+        CAuth["Firebase Auth<br/>email / password"]
+        CFCM["Firebase Cloud Messaging<br/>push"]
+        CGem["Google Gemini API<br/>cloud AI analysis"]
+    end
+
+    %% ===== USER -> APP =====
+    UParent --> UI
+    UChild --> UI
+
+    %% ===== APP internal path =====
+    UI --> ST1
+    UI --> ST2
+    ST1 --> RAuth
+    ST2 --> RTx
+    ST2 --> RStat
+    ST2 --> RAI
+    DI -. injects .-> LREPO
+
+    %% ===== REPO -> CLOUD =====
+    RAuth --> CAuth
+    RAuth --> CFS
+    RTx --> CFS
+    RStat --> CFS
+    RAI --> CGem
+
+    %% ===== REPO -> ON-DEVICE SERVICE =====
+    RAI --> SVGemma
+    RAI --> SVOCR
+    RTx --> SVFile
+    RAuth -. PIN .-> SVSec
+    RStat -. flags .-> SVPrefs
+
+    %% ===== CLOUD push -> on-device =====
+    CFCM -. push .-> SVNoti
+    SVNoti -. notify .-> UParent
+    SVNoti -. notify .-> UChild
+
+    %% ================= STYLES =================
+    classDef userZone fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
+    classDef appZone fill:#e3f2fd,stroke:#1565c0,color:#0d47a1;
+    classDef svcZone fill:#ede7f6,stroke:#5e35b1,color:#311b92;
+    classDef cloudZone fill:#fff8e1,stroke:#f9a825,color:#e65100;
+
+    class UParent,UChild userZone;
+    class UI,ST1,ST2,RAuth,RTx,RStat,RAI,DI appZone;
+    class SVGemma,SVOCR,SVNoti,SVPrefs,SVSec,SVFile svcZone;
+    class CFS,CAuth,CFCM,CGem cloudZone;

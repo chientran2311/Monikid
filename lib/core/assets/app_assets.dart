@@ -48,58 +48,6 @@ abstract class AppImages {
 }
 
 // =============================================================================
-// ICONS (SVG)
-// =============================================================================
-
-abstract class AppIcons {
-  AppIcons._();
-
-  // Navigation Icons
-  static const String navHome = 'assets/icons/nav/home.svg';
-  static const String navWallet = 'assets/icons/nav/wallet.svg';
-  static const String navChildren = 'assets/icons/nav/children.svg';
-  static const String navChat = 'assets/icons/nav/chat.svg';
-  static const String navSettings = 'assets/icons/nav/settings.svg';
-  static const String navPay = 'assets/icons/nav/pay.svg';
-  static const String navReceipt = 'assets/icons/nav/receipt.svg';
-
-  // Action Icons
-  static const String actionAdd = 'assets/icons/actions/add.svg';
-  static const String actionSend = 'assets/icons/actions/send.svg';
-  static const String actionReceive = 'assets/icons/actions/receive.svg';
-  static const String actionScan = 'assets/icons/actions/scan.svg';
-  static const String actionLock = 'assets/icons/actions/lock.svg';
-  static const String actionUnlock = 'assets/icons/actions/unlock.svg';
-  static const String actionEdit = 'assets/icons/actions/edit.svg';
-  static const String actionDelete = 'assets/icons/actions/delete.svg';
-  static const String actionVerify = 'assets/icons/actions/verify.svg';
-
-  // Status Icons
-  static const String statusSuccess = 'assets/icons/status/success.svg';
-  static const String statusError = 'assets/icons/status/error.svg';
-  static const String statusWarning = 'assets/icons/status/warning.svg';
-  static const String statusPending = 'assets/icons/status/pending.svg';
-  static const String statusApproved = 'assets/icons/status/approved.svg';
-  static const String statusDenied = 'assets/icons/status/denied.svg';
-
-  // Finance Icons
-  static const String financeBank = 'assets/icons/finance/bank.svg';
-  static const String financeCard = 'assets/icons/finance/card.svg';
-  static const String financeMoney = 'assets/icons/finance/money.svg';
-  static const String financeDeposit = 'assets/icons/finance/deposit.svg';
-  static const String financeWithdraw = 'assets/icons/finance/withdraw.svg';
-  static const String financeTransfer = 'assets/icons/finance/transfer.svg';
-  static const String financeQrCode = 'assets/icons/finance/qr_code.svg';
-
-  // Misc Icons
-  static const String miscLocation = 'assets/icons/misc/location.svg';
-  static const String miscCamera = 'assets/icons/misc/camera.svg';
-  static const String miscNotification = 'assets/icons/misc/notification.svg';
-  static const String miscPhone = 'assets/icons/misc/phone.svg';
-  static const String miscFamily = 'assets/icons/misc/family.svg';
-}
-
-// =============================================================================
 // LOTTIE ANIMATIONS
 // =============================================================================
 

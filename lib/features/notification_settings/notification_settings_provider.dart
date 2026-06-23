@@ -33,6 +33,12 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
       final enabled = prefs.getBool(NotifPrefsKeys.enabled) ?? false;
       final hour = prefs.getInt(NotifPrefsKeys.hour) ?? 21;
       final minute = prefs.getInt(NotifPrefsKeys.minute) ?? 0;
+      final role = ref.read(authSessionProvider).userRole;
+      _logger.i(
+        'NotificationSettingsNotifier._loadSettings: loaded from prefs '
+        'enabled=$enabled hour=$hour minute=$minute role=$role '
+        '(prefs are global, NOT scoped per account)',
+      );
       state = state.copyWith(
         status: NotificationSettingsStatus.success,
         enabled: enabled,
@@ -57,10 +63,30 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(NotifPrefsKeys.enabled, value);
+      final readBack = prefs.getBool(NotifPrefsKeys.enabled);
+      final role = ref.read(authSessionProvider).userRole;
+      _logger.i(
+        'NotificationSettingsNotifier.toggleEnabled: wrote enabled=$value '
+        'readBack=$readBack role=$role',
+      );
       state = state.copyWith(enabled: value, errorMessage: null);
 
       if (!value) {
         await _repo.cancelAllAndClearData();
+        return;
+      }
+
+      // Turning ON: must (re)request OS permission. Permission is NOT tied to the
+      // prefs flag and does NOT carry over between accounts, so always ask here.
+      final granted = await _repo.requestPermission();
+      _logger.i('NotificationSettingsNotifier.toggleEnabled: permission granted=$granted');
+      if (!granted) {
+        await prefs.setBool(NotifPrefsKeys.enabled, false);
+        state = state.copyWith(
+          enabled: false,
+          status: NotificationSettingsStatus.error,
+          errorMessage: 'Cần cấp quyền thông báo trong Settings để bật tính năng này.',
+        );
         return;
       }
 
@@ -115,6 +141,10 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final enabled = prefs.getBool(NotifPrefsKeys.enabled) ?? false;
+      final role = ref.read(authSessionProvider).userRole;
+      _logger.i(
+        'NotificationSettingsNotifier.rescheduleIfEnabled: enabled=$enabled role=$role',
+      );
       if (!enabled) {
         _logger.d('NotificationSettingsNotifier.rescheduleIfEnabled: disabled, skip.');
         return;
@@ -205,7 +235,8 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     final memberUids = members.map((m) => m.uid).toList();
     final limits = await dashRepo.getChildrenMonthlyLimits(childUids: memberUids);
 
-    final children = <({String name, int expenseMinor, int limitMinor})>[];
+    final children =
+        <({String uid, String name, int expenseMinor, int limitMinor})>[];
     for (final member in members) {
       try {
         final summary = await dashRepo.getChildMonthlySummary(
@@ -213,6 +244,7 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
           monthKey: monthKey,
         );
         children.add((
+          uid: member.uid,
           name: member.displayName,
           expenseMinor: summary.expenseMinor,
           limitMinor: limits[member.uid] ?? 0,
@@ -231,21 +263,15 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
 
   /// Reads saved prefs data and schedules. Does NOT fetch from Firestore.
   Future<void> _scheduleFromSavedData() async {
-    _logger.d('NotificationSettingsNotifier._scheduleFromSavedData: start.');
     final role = ref.read(authSessionProvider).userRole;
-
-    if (role == 'child') {
-      await _repo.scheduleChildFromSavedData(
-        hour: state.hour,
-        minute: state.minute,
-      );
-    } else if (role == 'parent') {
-      await _repo.scheduleParentFromSavedData(
-        hour: state.hour,
-        minute: state.minute,
-      );
-    } else {
-      _logger.w('NotificationSettingsNotifier._scheduleFromSavedData: unknown role=$role');
-    }
+    _logger.i(
+      'NotificationSettingsNotifier._scheduleFromSavedData: start. '
+      'role=$role hour=${state.hour} minute=${state.minute}',
+    );
+    await _repo.notificationForChildOrParent(
+      role: role ?? '',
+      hour: state.hour,
+      minute: state.minute,
+    );
   }
 }

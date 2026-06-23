@@ -72,6 +72,7 @@ class SettingTabStudent extends ConsumerWidget {
                   width: MediaQuery.of(context).size.width * 0.35,
                   child: PrimaryButton.danger(
                     title: s.settingParLogoutLabel,
+                    icon: const Icon(Icons.logout_rounded),
                     onTap: handleSignOut,
                     borderRadius: 999.r,
                   ),

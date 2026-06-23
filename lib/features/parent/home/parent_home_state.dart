@@ -18,6 +18,7 @@ abstract class ParentHomeState with _$ParentHomeState {
     @Default(0) int selectedMemberExpenseMinor,
     @Default(0) int selectedMemberIncomeMinor,
     @Default(0) int selectedMemberLimitMinor,
+    @Default(0) int selectedMemberTodayExpenseMinor,
     @Default(false) bool isLoadingMemberData,
     @Default(false) bool isCreatingFamily,
     String? errorMessage,

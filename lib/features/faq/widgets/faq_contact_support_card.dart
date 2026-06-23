@@ -46,7 +46,7 @@ class FAQContactSupportCard extends StatelessWidget {
             height: 48,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Handle contact support action
+               
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,

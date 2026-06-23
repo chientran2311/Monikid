@@ -16,6 +16,7 @@ class GlassTabAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.trailing,
     this.titleFontSize = 24,
     this.horizontalPadding = 16,
+    this.height = 60,
   });
 
   /// Title text rendered on the left.
@@ -30,14 +31,17 @@ class GlassTabAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Horizontal padding in logical px; `.w` is applied internally.
   final double horizontalPadding;
 
+  /// Bar height in logical px. Defaults to 60.
+  final double height;
+
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => Size.fromHeight(height);
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
-      height: preferredSize.height,
+      height: height,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding.w),
         child: Row(

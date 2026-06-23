@@ -40,6 +40,7 @@ class CategoryDialog extends HookConsumerWidget {
     this.showAllOption = true,
     this.categoryType,
     this.showAddButton = true,
+    this.allowDeleteCategory = true,
   });
 
   final String? selectedCategory;
@@ -47,6 +48,10 @@ class CategoryDialog extends HookConsumerWidget {
   final bool showAllOption;
   final String? categoryType;
   final bool showAddButton;
+
+  /// When false, custom categories are shown as plain (selectable) tiles
+  /// without drag-to-delete, and the delete drop zone is hidden.
+  final bool allowDeleteCategory;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -208,7 +213,7 @@ class CategoryDialog extends HookConsumerWidget {
                                     localSelectedCategory.value?.id == category.id;
                                 final isCustom =
                                     !category.isDefault && category.id != 'all';
-                                if (isCustom) {
+                                if (isCustom && allowDeleteCategory) {
                                   return DraggableCategoryItem(
                                     category: category,
                                     isSelected: isSelected,
@@ -247,17 +252,18 @@ class CategoryDialog extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: CategoryDeleteDropZone(
-                        visible: isDragging.value,
-                        isDark: isDark,
-                        onCategoryDropped: (category) =>
-                            _confirmDeleteCategory(context, ref, category),
+                    if (allowDeleteCategory)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: CategoryDeleteDropZone(
+                          visible: isDragging.value,
+                          isDark: isDark,
+                          onCategoryDropped: (category) =>
+                              _confirmDeleteCategory(context, ref, category),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),

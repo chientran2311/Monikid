@@ -11,20 +11,6 @@ class AppConfig {
     return url;
   }
 
-  static String get supabaseUrl {
-    final url = dotenv.env['SUPABASE_URL'];
-    if (url == null || url.isEmpty) throw Exception('Missing SUPABASE_URL');
-    return url;
-  }
-
-  static String get supabaseAnonKey {
-    final key = dotenv.env['SUPABASE_ANON_KEY'];
-    if (key == null || key.isEmpty) {
-      throw Exception('Missing SUPABASE_ANON_KEY');
-    }
-    return key;
-  }
-
   static String get cloudinaryCloudName {
     final directCloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'];
     if (directCloudName != null && directCloudName.isNotEmpty) {
@@ -67,6 +53,4 @@ class AppConfig {
     return preset;
   }
 
-  static String get mockBankApiKey =>
-      dotenv.env['MOCK_BANK_API_KEY'] ?? 'monikid-mockbank-secret-2024';
 }

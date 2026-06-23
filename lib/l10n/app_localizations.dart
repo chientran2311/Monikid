@@ -578,6 +578,34 @@ abstract class AppLocalizations {
   /// **'{name}\'s account is below 100,000₫.'**
   String homeParLowBalanceDesc(String name);
 
+  /// No description provided for @homeParSpendingWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily spending over threshold'**
+  String get homeParSpendingWarningTitle;
+
+  /// No description provided for @homeParSpendingWarningDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} spent {todayAmount} today — over the 5% daily threshold ({threshold}).'**
+  String homeParSpendingWarningDesc(
+    String name,
+    String todayAmount,
+    String threshold,
+  );
+
+  /// No description provided for @homeParSpendingSafeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily spending on track'**
+  String get homeParSpendingSafeTitle;
+
+  /// No description provided for @homeParSpendingSafeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is within safe spending limits today.'**
+  String homeParSpendingSafeDesc(String name);
+
   /// No description provided for @homeParTransactionSuccess.
   ///
   /// In en, this message translates to:

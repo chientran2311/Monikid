@@ -21,6 +21,8 @@ class TransactionHistoryBody extends ConsumerWidget {
     required this.scrollController,
     required this.isDark,
     this.showMonthlyLimit = true,
+    this.showBadge = false,
+    this.onTransactionTap,
   });
 
   final ScrollController scrollController;
@@ -29,6 +31,15 @@ class TransactionHistoryBody extends ConsumerWidget {
   /// When false, hides the monthly-limit logic + "Hạn mức còn lại" box
   /// (parent view has no money-limit business logic).
   final bool showMonthlyLimit;
+
+  /// When true, each row shows the amount + NEW/EDITED badge (same as the
+  /// parent home-tab transaction item). Defaults to false (child history).
+  final bool showBadge;
+
+  /// When provided, overrides the default child-detail navigation on row tap.
+  /// Parent screens pass this to route to [ParentTransactionDetailScreen]
+  /// scoped to the child's uid. Null → default child detail behavior.
+  final void Function(TransactionModel tx)? onTransactionTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -94,14 +105,24 @@ class TransactionHistoryBody extends ConsumerWidget {
         : null;
 
     if (isLoading) {
-      return const Expanded(child: TransactionHistorySkeleton());
+      return Expanded(
+        child: TransactionHistorySkeleton(
+          showMonthlyLimit: showMonthlyLimit,
+          showBadge: showBadge,
+        ),
+      );
     }
 
     // Category / date filter change → full-screen skeleton (hides summary card)
     if (isListLoading &&
         listLoadingTrigger != TransactionListLoadingTrigger.none &&
         listLoadingTrigger != TransactionListLoadingTrigger.tabSwitch) {
-      return const Expanded(child: TransactionHistorySkeleton());
+      return Expanded(
+        child: TransactionHistorySkeleton(
+          showMonthlyLimit: showMonthlyLimit,
+          showBadge: showBadge,
+        ),
+      );
     }
 
     if (errorMessage != null) {
@@ -235,11 +256,14 @@ class TransactionHistoryBody extends ConsumerWidget {
               GroupedTransactionList(
                 grouped: sortAndGroup(transactions),
                 isDark: isDark,
-                showBadge: false,
-                onTap: (tx) {
-                  notifier.selectTransaction(tx);
-                  context.push(AppRoutes.detailTransactionPath(tx.transactionId));
-                },
+                showBadge: showBadge,
+                onTap: onTransactionTap ??
+                    (tx) {
+                      notifier.selectTransaction(tx);
+                      context.push(
+                        AppRoutes.detailTransactionPath(tx.transactionId),
+                      );
+                    },
               ),
             SliverToBoxAdapter(
               child: Padding(

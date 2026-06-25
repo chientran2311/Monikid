@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import 'package:monikid/core/font/font.dart';
 import 'package:monikid/core/theme/theme.dart';
 import 'package:monikid/core/utils/build_context_x.dart';
 import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/mock_up_data/transaction_history_mock_data.dart';
 
+/// Full-screen loading placeholder for the transaction history screen.
+///
+/// Mirrors the real UI 1:1 (light glassmorphism [SummaryCard] +
+/// [SwitchTabThreeItem] + grouped [TransactionItem] list) and lets
+/// [Skeletonizer] paint shimmer bones over it, so colors/spacing/shape always
+/// match the loaded screen. Shared by both the child and parent history
+/// screens via `TransactionHistoryBody`.
 class TransactionHistorySkeleton extends StatelessWidget {
-  const TransactionHistorySkeleton({super.key});
+  const TransactionHistorySkeleton({
+    super.key,
+    this.showMonthlyLimit = true,
+    this.showBadge = false,
+  });
+
+  /// Renders the third "Hạn mức còn lại" stat box (child view). Parent passes
+  /// false → 2 stat boxes, matching its real summary card.
+  final bool showMonthlyLimit;
+
+  /// Renders the trailing amount + tag badge on each row (parent view).
+  final bool showBadge;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : AppTheme.textBlack;
-    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
-    final cardColor = isDark ? AppTheme.surfaceDark : Colors.white;
 
     return Skeletonizer(
       enabled: true,
@@ -22,30 +38,41 @@ class TransactionHistorySkeleton extends StatelessWidget {
       child: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(child: SummaryCardSkeleton(isDark: isDark)),
-          SliverToBoxAdapter(child: _MockTabBar(isDark: isDark)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
+              child: _MockSummaryCard(
+                isDark: isDark,
+                showMonthlyLimit: showMonthlyLimit,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
+              child: _MockSwitchTabs(isDark: isDark),
+            ),
+          ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) => _MockDateGroup(
                 group: kMockTxGroups[i],
-                textColor: textColor,
-                mutedColor: mutedColor,
-                cardColor: cardColor,
+                isDark: isDark,
+                showBadge: showBadge,
               ),
               childCount: kMockTxGroups.length,
             ),
           ),
-          SliverToBoxAdapter(child: SizedBox(height: 20.h)),
+          SliverToBoxAdapter(child: SizedBox(height: 100.h)),
         ],
       ),
     );
   }
 }
 
-// =============================================================================
-// TRANSACTION ITEM SKELETON — used for inline "load more" states
-// =============================================================================
-
+/// Single-row placeholder for inline "load more" / list-loading states.
+/// Mirrors one real [TransactionItem] card and self-wraps in [Skeletonizer]
+/// because it is rendered outside the full-screen skeleton.
 class TransactionItemSkeleton extends StatelessWidget {
   const TransactionItemSkeleton({super.key, required this.isDark});
 
@@ -53,256 +80,405 @@ class TransactionItemSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.surfaceVariant : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+    return Skeletonizer(
+      enabled: true,
+      enableSwitchAnimation: true,
+      child: _MockTxRow(
+        item: kMockTxGroups.first.items.first,
+        isDark: isDark,
+        showBadge: true,
       ),
-      child: Row(
+    );
+  }
+}
+
+// =============================================================================
+// SUMMARY CARD — mirrors SummaryCard (_LightSummaryCard / _DarkSummaryCard)
+// =============================================================================
+
+class _MockSummaryCard extends StatelessWidget {
+  const _MockSummaryCard({required this.isDark, required this.showMonthlyLimit});
+
+  final bool isDark;
+  final bool showMonthlyLimit;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isDark) return const _MockDarkSummaryCard();
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.lerp(AppTheme.primary, Colors.white, 0.84)!,
+            Colors.white.withValues(alpha: 0.94),
+          ],
+        ),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.16)),
+        borderRadius: BorderRadius.circular(28.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.10),
+            blurRadius: 60.r,
+            offset: Offset(0, 24.h),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(16.w, 18.h, 16.w, 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Shimmer(
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-                shape: BoxShape.circle,
+          // Header: eyebrow + month label + badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    kMockSummaryEyebrow,
+                    style: AppTextStyleFactory.style(
+                      size: AppFontSizes.captionBig,
+                      weight: FontWeight.w800,
+                      color: AppTheme.textGrey,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+                  Text(
+                    kMockSummaryMonth,
+                    style: AppTextStyleFactory.style(
+                      size: AppFontSizes.titleMedium,
+                      weight: FontWeight.w700,
+                      color: AppTheme.textBlack,
+                    ),
+                  ),
+                ],
               ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999.r),
+                ),
+                child: Text(
+                  kMockSummaryBadge,
+                  style: AppTextStyleFactory.style(
+                    size: AppFontSizes.captionBig,
+                    weight: FontWeight.w800,
+                    color: AppTheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 14.h),
+          // Main amount
+          Text(
+            kMockSummaryMainAmount,
+            style: AppTextStyleFactory.style(
+              size: 34,
+              weight: FontWeight.w900,
+              color: AppTheme.textBlack,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _shimmerBox(isDark: isDark, width: double.infinity),
-                const SizedBox(height: 8),
-                _shimmerBox(isDark: isDark, width: 100, height: 10),
+          SizedBox(height: 14.h),
+          // Stat boxes
+          Row(
+            children: [
+              const Expanded(
+                child: _MockStatBox(
+                  label: kMockStatIncomeLabel,
+                  value: kMockStatIncomeValue,
+                  valueColor: Color(0xFF23815E),
+                ),
+              ),
+              SizedBox(width: 10.w),
+              const Expanded(
+                child: _MockStatBox(
+                  label: kMockStatExpenseLabel,
+                  value: kMockStatExpenseValue,
+                  valueColor: AppTheme.redAlert,
+                ),
+              ),
+              if (showMonthlyLimit) ...[
+                SizedBox(width: 10.w),
+                const Expanded(
+                  child: _MockStatBox(
+                    label: kMockStatLimitLabel,
+                    value: kMockStatLimitValue,
+                    valueColor: AppTheme.primary,
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-          _shimmerBox(isDark: isDark, width: 72, height: 14),
         ],
       ),
     );
   }
 }
 
-class _Shimmer extends StatefulWidget {
-  const _Shimmer({required this.child});
+class _MockStatBox extends StatelessWidget {
+  const _MockStatBox({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
 
-  final Widget child;
-
-  @override
-  State<_Shimmer> createState() => _ShimmerState();
-}
-
-class _ShimmerState extends State<_Shimmer> with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _animation = Tween<double>(
-      begin: 0.3,
-      end: 0.8,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+  final String label;
+  final String value;
+  final Color valueColor;
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(opacity: _animation, child: widget.child);
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.68),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.12)),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyleFactory.style(
+              size: AppFontSizes.captionSmall,
+              weight: FontWeight.w700,
+              color: AppTheme.textGrey,
+            ),
+          ),
+          SizedBox(height: 6.h),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyleFactory.style(
+              size: AppFontSizes.bodyMedium,
+              weight: FontWeight.w900,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
-Widget _shimmerBox({
-  required bool isDark,
-  double? width,
-  double height = 14,
-  double radius = 8,
-}) {
-  return _Shimmer(
-    child: Container(
-      width: width,
-      height: height,
+class _MockDarkSummaryCard extends StatelessWidget {
+  const _MockDarkSummaryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.borderDark : AppTheme.borderLight,
-        borderRadius: BorderRadius.circular(radius),
+        gradient: const LinearGradient(
+          colors: [AppTheme.primary, Color(0xFF1E5222)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.2),
+            blurRadius: 10.r,
+            offset: Offset(0, 4.h),
+          ),
+        ],
       ),
-    ),
-  );
+      padding: EdgeInsets.all(16.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                kMockSummaryMonth.toUpperCase(),
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.8,
+                  color: AppTheme.surfaceLightGreen,
+                ),
+              ),
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                color: Colors.white.withValues(alpha: 0.6),
+                size: 20.r,
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            kMockSummaryMainAmount,
+            style: context.typo.headline.medium.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 14.h),
+          Row(
+            children: [
+              const Expanded(
+                child: _MockDarkBadge(
+                  icon: Icons.arrow_downward,
+                  label: 'Chi: $kMockStatExpenseValue',
+                ),
+              ),
+              SizedBox(width: 16.w),
+              const Expanded(
+                child: _MockDarkBadge(
+                  icon: Icons.arrow_upward,
+                  label: 'Thu: $kMockStatIncomeValue',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MockDarkBadge extends StatelessWidget {
+  const _MockDarkBadge({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14.r, color: Colors.white),
+          SizedBox(width: 4.w),
+          Flexible(
+            child: Text(
+              label,
+              style: context.typo.caption.big.copyWith(color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // =============================================================================
-// MOCK WIDGETS — mirror real screen structure for Skeletonizer
+// SWITCH TABS — mirrors SwitchTabThreeItem (track + first pill active)
 // =============================================================================
 
-class SummaryCardSkeleton extends StatelessWidget {
-  const SummaryCardSkeleton({super.key, required this.isDark});
+class _MockSwitchTabs extends StatelessWidget {
+  const _MockSwitchTabs({required this.isDark});
 
   final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
-      child: Container(
-        height: 120.h,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [AppTheme.greenDarker, AppTheme.greenDark]
-                : [AppTheme.primary, AppTheme.primaryDark],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    kMockTabIncome,
-                    style: context.typo.label.medium.copyWith(color: Colors.white70),
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    kMockSummaryIncome,
-                    style: context.typo.title.small.copyWith(color: Colors.white),
+    final trackColor =
+        isDark ? AppTheme.surfaceVariant : AppTheme.controlTrack;
+    final pillColor = isDark ? AppTheme.surfaceDark : AppTheme.surfaceLight;
+
+    return Container(
+      height: 42.h,
+      padding: EdgeInsets.all(3.r),
+      decoration: BoxDecoration(
+        color: trackColor,
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        children: [
+          // Active pill (first segment)
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: pillColor,
+                borderRadius: BorderRadius.circular(11.r),
+                boxShadow: [
+                  BoxShadow(
+                    offset: Offset(0, 2.h),
+                    blurRadius: 8.r,
+                    color: Colors.black.withValues(alpha: 0.06),
                   ),
                 ],
               ),
-            ),
-            Container(width: 1.w, height: 48.h, color: Colors.white30),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      kMockTabExpense,
-                      style: context.typo.label.medium.copyWith(color: Colors.white70),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      kMockSummaryExpense,
-                      style: context.typo.title.small.copyWith(color: Colors.white),
-                    ),
-                  ],
+              child: Center(
+                child: Text(
+                  kMockTabAll,
+                  style: AppTextStyleFactory.style(
+                    size: AppFontSizes.bodyMedium,
+                    weight: FontWeight.w700,
+                    color: AppTheme.primary,
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          _MockSegmentLabel(label: kMockTabIncome, isDark: isDark),
+          _MockSegmentLabel(label: kMockTabExpense, isDark: isDark),
+        ],
       ),
     );
   }
 }
 
-class _MockTabBar extends StatelessWidget {
-  const _MockTabBar({required this.isDark});
+class _MockSegmentLabel extends StatelessWidget {
+  const _MockSegmentLabel({required this.label, required this.isDark});
 
+  final String label;
   final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? AppTheme.surfaceDark : Colors.white;
-    const activeColor = AppTheme.primary;
-    final inactiveColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      child: Container(
-        height: 40.h,
-        decoration: BoxDecoration(
-          color: isDark
-              ? AppTheme.borderDark.withValues(alpha: 0.3)
-              : AppTheme.borderLight,
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.all(3.r),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(10.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    kMockTabExpense,
-                    style: context.typo.body.small.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: activeColor,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  kMockTabIncome,
-                  style: context.typo.body.small.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: inactiveColor,
-                  ),
-                ),
-              ),
-            ),
-          ],
+    return Expanded(
+      child: Center(
+        child: Text(
+          label,
+          style: AppTextStyleFactory.style(
+            size: AppFontSizes.bodyMedium,
+            weight: FontWeight.w700,
+            color: isDark ? AppTheme.textMuted : AppTheme.textGrey,
+          ),
         ),
       ),
     );
   }
 }
+
+// =============================================================================
+// DATE GROUP + ROW — mirrors GroupedTransactionList + TransactionItem
+// =============================================================================
 
 class _MockDateGroup extends StatelessWidget {
   const _MockDateGroup({
     required this.group,
-    required this.textColor,
-    required this.mutedColor,
-    required this.cardColor,
+    required this.isDark,
+    required this.showBadge,
   });
 
   final MockTxGroup group;
-  final Color textColor;
-  final Color mutedColor;
-  final Color cardColor;
+  final bool isDark;
+  final bool showBadge;
 
   @override
   Widget build(BuildContext context) {
+    final isIncome = group.sum.startsWith('+');
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
+      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -311,29 +487,27 @@ class _MockDateGroup extends StatelessWidget {
             children: [
               Text(
                 group.date,
-                style: context.typo.label.medium.copyWith(
+                style: context.typo.caption.medium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: mutedColor,
+                  color: AppTheme.textMuted,
+                  letterSpacing: 0.5,
                 ),
               ),
               Text(
                 group.sum,
-                style: context.typo.label.medium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: mutedColor,
+                style: context.typo.caption.medium.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: isIncome ? const Color(0xFF2563eb) : AppTheme.redAlert,
                 ),
               ),
             ],
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 8.h),
           ...group.items.map(
             (item) => _MockTxRow(
-              title: item.title,
-              category: item.category,
-              amount: item.amount,
-              textColor: textColor,
-              mutedColor: mutedColor,
-              cardColor: cardColor,
+              item: item,
+              isDark: isDark,
+              showBadge: showBadge,
             ),
           ),
         ],
@@ -344,67 +518,136 @@ class _MockDateGroup extends StatelessWidget {
 
 class _MockTxRow extends StatelessWidget {
   const _MockTxRow({
-    required this.title,
-    required this.category,
-    required this.amount,
-    required this.textColor,
-    required this.mutedColor,
-    required this.cardColor,
+    required this.item,
+    required this.isDark,
+    required this.showBadge,
   });
 
-  final String title;
-  final String category;
-  final String amount;
-  final Color textColor;
-  final Color mutedColor;
-  final Color cardColor;
+  final MockTxItem item;
+  final bool isDark;
+  final bool showBadge;
 
   @override
   Widget build(BuildContext context) {
+    final mutedColor = isDark ? AppTheme.textMuted : AppTheme.textGrey;
     return Container(
-      margin: EdgeInsets.only(bottom: 8.h),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(13.w),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12.r),
+        color: isDark
+            ? AppTheme.surfaceDark.withValues(alpha: 0.88)
+            : Colors.white.withValues(alpha: 0.88),
+        border: Border.all(
+          color: isDark
+              ? AppTheme.borderDark
+              : AppTheme.primary.withValues(alpha: 0.16),
+        ),
+        borderRadius: BorderRadius.circular(22.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.06),
+            blurRadius: 28.r,
+            offset: Offset(0, 12.h),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Category icon
           Container(
             width: 44.r,
             height: 44.r,
-            decoration: const BoxDecoration(
-              color: AppTheme.primaryLight,
-              shape: BoxShape.circle,
+            decoration: BoxDecoration(
+              color: AppTheme.txCategoryOtherBg,
+              border: Border.all(color: AppTheme.txCategoryOtherBorder),
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Center(
+              child: Text(item.emoji, style: TextStyle(fontSize: 18.sp)),
             ),
           ),
           SizedBox(width: 12.w),
+          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: context.typo.body.medium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.2,
+                    color: isDark ? AppTheme.textWhite : AppTheme.textBlack,
                   ),
                 ),
-                SizedBox(height: 2.h),
-                Text(
-                  category,
-                  style: context.typo.label.medium.copyWith(color: mutedColor),
+                SizedBox(height: 4.h),
+                Row(
+                  children: [
+                    Text(
+                      item.meta,
+                      style: context.typo.caption.medium
+                          .copyWith(color: mutedColor),
+                    ),
+                    SizedBox(width: 6.w),
+                    Container(
+                      width: 4.r,
+                      height: 4.r,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: mutedColor.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    Flexible(
+                      child: Text(
+                        item.category,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.typo.caption.medium
+                            .copyWith(color: mutedColor),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Text(
-            amount,
-            style: context.typo.body.medium.copyWith(
-              fontWeight: FontWeight.w600,
-              color: textColor,
+          if (showBadge) ...[
+            SizedBox(width: 8.w),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  item.amount,
+                  style: context.typo.body.medium.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                    color:
+                        item.isExpense ? AppTheme.redAlert : AppTheme.primary,
+                  ),
+                ),
+                SizedBox(height: 5.h),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(999.r),
+                  ),
+                  child: Text(
+                    'Mới',
+                    style: context.typo.caption.small.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
+          ],
         ],
       ),
     );

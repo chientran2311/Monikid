@@ -170,6 +170,7 @@ class HomeTabParent extends HookConsumerWidget {
     Color mutedColor,
   ) {
       final s = context.l10n;
+      final logger = getIt<Logger>();
       final childMembers =
           state.members.where((m) => m.isChild).toList(growable: false);
       final selectedMemberName = state.selectedMember?.displayName;
@@ -225,8 +226,10 @@ class HomeTabParent extends HookConsumerWidget {
                     todayExpenseMinor:
                         state.selectedMemberTodayExpenseMinor,
                     limitMinor: state.selectedMemberLimitMinor,
-                    onTap: () =>
-                        context.push(AppRoutes.parentTransactionHistory),
+                    onTap: () => context.push(
+                      AppRoutes.parentTransactionHistory,
+                      extra: state.selectedMemberId,
+                    ),
                   ),
                 ),
                 0.25,
@@ -242,8 +245,10 @@ class HomeTabParent extends HookConsumerWidget {
                   trailingLabel: s.homeParSeeAll,
                   textColor: textColor,
                   mutedColor: mutedColor,
-                  onTrailingTap: () =>
-                      context.push(AppRoutes.parentTransactionHistory),
+                  onTrailingTap: () => context.push(
+                    AppRoutes.parentTransactionHistory,
+                    extra: state.selectedMemberId,
+                  ),
                 ),
               ),
               0.3,
@@ -272,11 +277,26 @@ class HomeTabParent extends HookConsumerWidget {
               )
             else
               ...state.selectedMemberTransactions.asMap().entries.map((e) {
+                final childUid = state.selectedMemberId;
                 return _fadeSlide(
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: TransactionItem(
                       transaction: e.value,
+                      onTap: (childUid == null || childUid.isEmpty)
+                          ? null
+                          : () {
+                              logger.d(
+                                'HomeTabParent: open detail '
+                                'child=$childUid tx=${e.value.transactionId}.',
+                              );
+                              context.push(
+                                AppRoutes.parentTransactionDetailPath(
+                                  childUid,
+                                  e.value.transactionId,
+                                ),
+                              );
+                            },
                     ),
                   ),
                   (0.35 + e.key * 0.05).clamp(0.0, 0.9),

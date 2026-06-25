@@ -1,13 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
+
+import 'transaction_owner_uid_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'transaction_summary_provider.g.dart';
 
-@riverpod
+@Riverpod(dependencies: [transactionOwnerUid])
 Stream<({double totalIncome, double totalExpense})> streamSummaryCard(
   Ref ref, {
   DateTime? date,
@@ -16,7 +17,7 @@ Stream<({double totalIncome, double totalExpense})> streamSummaryCard(
   String? type,
 }) {
   final log = getIt<Logger>();
-  final uid = ref.watch(authSessionProvider).user?.uid;
+  final uid = ref.watch(transactionOwnerUidProvider);
 
   log.i('Loading transaction summary. uid=$uid date=$date month=$month');
 

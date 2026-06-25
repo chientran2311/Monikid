@@ -263,7 +263,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.parentTransactionHistory,
-        builder: (context, state) => const TransactionHistoryParScreen(),
+        builder: (context, state) {
+          final childUid = state.extra is String ? state.extra! as String : '';
+          return TransactionHistoryParScreen(childUid: childUid);
+        },
       ),
       GoRoute(
         path: AppRoutes.parentTransactionDetail,

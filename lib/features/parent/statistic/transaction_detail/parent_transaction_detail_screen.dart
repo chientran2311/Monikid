@@ -8,6 +8,7 @@ import 'package:monikid/core/utils/screen_utils.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_provider.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/parent_transaction_detail_state.dart';
 import 'package:monikid/features/parent/statistic/transaction_detail/widgets/parent_transaction_detail_card.dart';
+import 'package:monikid/features/parent/statistic/transaction_detail/widgets/parent_transaction_detail_skeleton.dart';
 import 'package:monikid/shared/widgets/app_background.dart';
 import 'package:monikid/shared/widgets/glass_app_bar.dart';
 
@@ -41,7 +42,7 @@ class ParentTransactionDetailScreen extends HookConsumerWidget {
 
     if (state.isLoading ||
         state.status == ParentTransactionDetailStatus.initial) {
-      body = const Center(child: CircularProgressIndicator());
+      body = ParentTransactionDetailSkeleton(isDark: isDark);
     } else if (state.hasError) {
       body = Center(child: Text(context.l10n.transactionLoadError));
     } else {

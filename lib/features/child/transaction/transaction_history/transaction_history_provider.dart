@@ -1,12 +1,12 @@
 import 'package:logger/logger.dart';
 import 'package:monikid/core/di/di.dart';
-import 'package:monikid/features/auth/auth_session/auth_session_provider.dart';
 import 'package:monikid/features/child/transaction/transaction_history/transaction_history_helpers.dart';
 import 'package:monikid/models/entities/transaction_model.dart';
 import 'package:monikid/repositories/transaction/transaction_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'providers/transaction_filter_provider.dart';
+import 'providers/transaction_owner_uid_provider.dart';
 import 'providers/transaction_filter_state.dart';
 import 'providers/transaction_selection_provider.dart';
 import 'providers/transaction_summary_provider.dart';
@@ -16,7 +16,7 @@ part 'transaction_history_provider.g.dart';
 
 const _kPageSize = 8;
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, dependencies: [transactionOwnerUid])
 class TransactionHistory extends _$TransactionHistory {
   late final TransactionRepository _repository;
   late final Logger _logger;
@@ -61,10 +61,7 @@ class TransactionHistory extends _$TransactionHistory {
     return TransactionListLoadingTrigger.dateChange;
   }
 
-  String? get _userId {
-    final auth = ref.read(authSessionProvider);
-    return auth.isAuthenticated ? auth.user?.uid : null;
-  }
+  String? get _userId => ref.read(transactionOwnerUidProvider);
 
   bool get _hasFilter => ref.read(transactionFilterNotifierProvider).hasFilter;
   String? get _activeType => ref.read(transactionFilterNotifierProvider).activeType;

@@ -23,6 +23,13 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+# Generated source files (run `dart run build_runner build` after clone)
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.config.dart
+*.mocks.dart
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -43,6 +50,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Platform folders ignored from version control
+/web/
+/windows/
+/linux/
+/macos/
 
 # User custom ignores
 *.html
@@ -93,3 +106,5 @@ html_to_flutter_converter/utils/__init__.py
 html_to_flutter_converter/utils/helpers.py
 html_to_flutter_converter/validators/__init__.py
 html_to_flutter_converter/validators/flutter_code_validator.py
+android/key.properties
+android/local.properties
